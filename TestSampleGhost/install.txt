@@ -1,0 +1,5 @@
+charset,Shift_JIS
+name,‘t‚Å‚é”ñ“úí‚Ìù—¥
+type,ghost
+directory,kanade_3rd
+refresh,0

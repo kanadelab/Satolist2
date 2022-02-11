@@ -1,0 +1,15 @@
+＊初期化
+＄ユーザ名	ユーザさん
+＄一人称	私
+＄喋り間隔	300秒
+＄なでられ時実行イベント	なでられ時の反応
+＠SAORI
+count,ssu.dll,count
+choice,ssu.dll,choice
+length,ssu.dll,length
+substr,ssu.dll,substr
+replace,ssu.dll,replace
+split,ssu.dll,split
+split,ssu.dll,split
+sprintf,ssu.dll,sprintf
+zen2han,ssu.dll,zen2han

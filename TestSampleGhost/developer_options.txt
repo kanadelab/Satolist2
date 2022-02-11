@@ -1,0 +1,9 @@
+.git/,nonar,noupdate
+ghost/master/development/,nonar,noupdate
+.gitignore,nonar,noupdate
+git_commits.bat,nonar,noupdate
+.vs/,nonar,noupdate
+shell/master/memo/,nonar,noupdate
+shell/master/shell.py,nonar,noupdate
+.vscode/,nonar,noupdate
+ghost/master/dic_ghost.txt,nonar,noupdate

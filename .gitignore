@@ -1,0 +1,9 @@
+/.vs
+/TestSampleGhost/updates2.dau
+/TestSampleGhost/updates.txt
+/TestSampleGhost/ghost/master/updates2.dau
+/TestSampleGhost/ghost/master/updates.txt
+*.user
+obj
+bin
+/packages

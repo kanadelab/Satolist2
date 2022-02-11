@@ -1,0 +1,25 @@
+charset,Shift_JIS
+name,‘t‚Å‚é“úí‚Ìù—¥
+type,ghost
+craftmanw,‚È‚È‚Á‚¿
+craftmanurl,https://nanachi.sakura.ne.jp
+homeurl,http://nanachi.sakura.ne.jp/kanade_3rd/
+readme,readme.txt
+sakura.name,‚©‚È‚Å
+sakura.seriko.defaultsurface,0
+kero.seriko.defaultsurface,10
+balloon.defaultsurface,0
+seriko.alignmenttodesktop,bottom
+sakura.seriko.alignmenttodesktop,bottom
+kero.seriko.alignmenttodesktop,bottom
+sstp.allowunspecifiedsend,1
+sstp.allowcommunicate,1
+sstp.alwaystranslate,0
+name.allowoverrid,1
+shiori.cache,1
+shiori.encoding,0
+don't need onmousemove,0
+don't need bind,0
+don't need seriko talk,0
+balloon.dontmove,False
+shiori,satori.dll
