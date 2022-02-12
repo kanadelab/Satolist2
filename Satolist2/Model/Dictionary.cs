@@ -278,6 +278,7 @@ namespace Satolist2.Model
 			{
 				name = value;
 				NotifyChanged();
+				NotifyChanged(nameof(Identifier));
 			}
 		}
 
@@ -317,6 +318,7 @@ namespace Satolist2.Model
 			{
 				type = value;
 				NotifyChanged();
+				NotifyChanged(nameof(Identifier));
 			}
 		}
 
