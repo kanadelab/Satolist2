@@ -38,9 +38,16 @@
     <Reference Include="AvalonDock, Version=4.60.1.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
       <HintPath>..\packages\Dirkster.AvalonDock.4.60.1\lib\net40\AvalonDock.dll</HintPath>
     </Reference>
+    <Reference Include="ICSharpCode.AvalonEdit, Version=6.1.3.50, Culture=neutral, PublicKeyToken=9cc39be672370310, processorArchitecture=MSIL">
+      <HintPath>..\packages\AvalonEdit.6.1.3.50\lib\net45\ICSharpCode.AvalonEdit.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -71,6 +78,9 @@
     <Compile Include="Control\FileEventTree.xaml.cs">
       <DependentUpon>FileEventTree.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Control\StartMenu.xaml.cs">
+      <DependentUpon>StartMenu.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Control\SurfacePalette.xaml.cs">
       <DependentUpon>SurfacePalette.xaml</DependentUpon>
     </Compile>
@@ -83,6 +93,9 @@
     <Compile Include="Dialog\AddEventDialog.xaml.cs">
       <DependentUpon>AddEventDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dialog\SaveFileListDialog.xaml.cs">
+      <DependentUpon>SaveFileListDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Model\Dictionary.cs" />
     <Compile Include="Utility\Converter.cs" />
     <Compile Include="Utility\DictionaryUtility.cs" />
@@ -92,6 +105,8 @@
     <Compile Include="Utility\SakuraFMOReader.cs" />
     <Compile Include="Utility\Satorite.cs" />
     <Compile Include="Utility\Surfaces.cs" />
+    <Compile Include="Utility\SyntaxHighlight.cs" />
+    <Compile Include="Utility\TemporarySettings.cs" />
     <Page Include="Control\DebugMainMenu.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -108,6 +123,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Control\StartMenu.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Control\SurfacePalette.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -121,6 +140,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Dialog\AddEventDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialog\SaveFileListDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

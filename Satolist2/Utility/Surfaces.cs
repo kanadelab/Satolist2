@@ -28,6 +28,9 @@ namespace Satolist2.Utility
 		private static readonly Regex SatolistSurfaceVisibleRegexPattern = new Regex( "^//satolist.surface.visible,([0-9]+)");
 		private static readonly Regex SatolistSurfaceDefaultRegexPattern = new Regex("^//satolist.surface.default,([0-9]+),([0-9]+)");
 
+		private static readonly Regex BindGroupDefaultRegexPatterh = new Regex("^(sakura|kero)\\.bindgroup([0-9]+)\\.default");
+
+
 		private Dictionary<long, SurfaceRecord> records;
 
 		public string ShellDirectoryPath { get; private set; }
@@ -56,12 +59,6 @@ namespace Satolist2.Utility
 
 		public void Load(string shellDirectory)
 		{
-			/**
-			 * 
-			 * 1.まずシェルフォルダの surfaces0.txt を element扱いで準備する
-			 * 2.そこからsurfaces.txt をロードする
-			 * 
-			 */
 			ShellDirectoryPath = Path.GetFullPath(shellDirectory);
 
 			var files = Directory.GetFiles(shellDirectory, "*.png");
@@ -80,7 +77,10 @@ namespace Satolist2.Utility
 					var surface = new SurfaceRecord();
 					surface.IsImageFileOnly = true;
 					surface.Elements.Add(elementFromFile);
-					records.Add(long.Parse(match.Groups[1].Value), surface);
+					var surfaceId = long.Parse(match.Groups[1].Value);
+
+					if(!records.ContainsKey(surfaceId))
+						records.Add(surfaceId, surface);
 				}
 			}
 
@@ -88,16 +88,54 @@ namespace Satolist2.Utility
 
 			//shell-descriptをロード
 			CsvBuilder descriptReader = new CsvBuilder();
-			descriptReader.Deserialize(shellDirectory + "/descript.txt");
+			descriptReader.DeserializeFromFile(shellDirectory + "/descript.txt");
 
 			//seriko.use_self_alpha
 			var useSelfAlpha = descriptReader.GetValue(DescriptUseSelfAplha);
 			int useSelfAlphaValue;
 			if(int.TryParse(useSelfAlpha, out useSelfAlphaValue))
-				UseSelfAlpha = (useSelfAlphaValue != 0);	
+				UseSelfAlpha = (useSelfAlphaValue != 0);
+
+			//きせかえでデフォルト表示になっているモノは表示するようする
+			foreach (var r in descriptReader.Records)
+			{
+				if (r.Key == null)
+					continue;
+
+				var match = BindGroupDefaultRegexPatterh.Match(r.Key);
+				if (!match.Success)
+					continue;
+
+				int val;
+				long animationId = 0;
+				if (!int.TryParse(r.Value, out val) || !long.TryParse(match.Groups[2].Value, out animationId))
+					val = 0;
+
+				if (val != 0)
+				{
+					foreach (var surface in records)
+					{
+						var anim = surface.Value.Animations.FirstOrDefault(o => o.ID == animationId);
+						if (anim != null && anim.Patterns.Count > 0)
+						{
+							//TODO: 複数intervalを持てるのを忘れていたので、Invalidになっていて解析出来てない場合はrunonceとかがついてると仮定して1パターン目だけ読む
+							if (anim.Internval != AnimationInterval.Bind)
+							{
+								surface.Value.AddSatolistSurfaceDefault(animationId, anim.Patterns.First().ID, false);
+							}
+							else
+							{
+								foreach (var pat in anim.Patterns)
+									surface.Value.AddSatolistSurfaceDefault(animationId, pat.ID, false);
+							}
+						}
+					}
+				}
+			}
+
 
 			//グローバル設定を書き込む
-			foreach(var record in records)
+			foreach (var record in records)
 			{
 				if(!record.Value.UseSatolistPaletteOffset)
 				{
@@ -237,7 +275,7 @@ namespace Satolist2.Utility
 					{
 						int animation = int.Parse(surfaceDefaultMatch.Groups[1].Value);
 						int pattern = int.Parse(surfaceDefaultMatch.Groups[2].Value);
-						currentRecord.AddSatolistSurfaceDefault(animation, pattern);
+						currentRecord.AddSatolistSurfaceDefault(animation, pattern, true);
 						continue;
 					}
 				}
@@ -448,14 +486,19 @@ namespace Satolist2.Utility
 			return newRecord;
 		}
 
-		public void AddSatolistSurfaceDefault(long animationId, long patternId)
+		public void AddSatolistSurfaceDefault(long animationId, long patternId, bool isOverwrite)
 		{
-			SatolistSurfaceDefault.Add(new SurfaceDefaultRecord()
+			var found = SatolistSurfaceDefault.FirstOrDefault(o => o.PatternID == patternId && o.AnimationID == animationId);
+
+			if (found == null || isOverwrite)
+			{
+				SatolistSurfaceDefault.Add(new SurfaceDefaultRecord()
 				{
 					AnimationID = animationId,
 					PatternID = patternId
 				}
-			);
+				);
+			}
 		}
 
 		public bool IsSatolistSurfaceDefault(long animationId, long patternId)
@@ -952,7 +995,7 @@ namespace Satolist2.Utility
 			{
 				foreach(var pattern in animation.Patterns)
 				{
-					if(surface.IsSatolistSurfaceDefault(animation.ID, pattern.ID))
+					if(surface.IsSatolistSurfaceDefault(animation.ID, pattern.ID) && shell.Records.ContainsKey(pattern.SurfaceID))
 					{
 						//サーフェスに所属するelementをビルド
 						//TODO: ここはキャッシュしたい

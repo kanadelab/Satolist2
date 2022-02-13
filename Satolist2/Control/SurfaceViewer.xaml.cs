@@ -33,6 +33,7 @@ namespace Satolist2.Control
 
 	internal class SurfaceViewerViewModel : NotificationObject, IDockingWindowContent
 	{
+		private string shellPath;
 		private ShellAnalyzer shell;
 		private SurfaceRenderer renderer;
 		private ShellImageCache cache;
@@ -43,11 +44,7 @@ namespace Satolist2.Control
 		{
 			if (string.IsNullOrEmpty(shellPath))
 				return;
-
-			shell = new ShellAnalyzer();
-			shell.Load(shellPath);
-			cache = new ShellImageCache(shell.ShellDirectoryPath);
-			renderer = new SurfaceRenderer();
+			ShellPath = shellPath;
 		}
 
 		public ShellAnalyzer Shell
@@ -57,6 +54,24 @@ namespace Satolist2.Control
 			{
 				shell = value;
 				NotifyChanged();
+				NotifyChanged(nameof(SurfaceIDList));
+			}
+		}
+
+		public string ShellPath
+		{
+			get => shellPath;
+			set
+			{
+				shellPath = value;
+				NotifyChanged();
+
+				//リロード
+				shell = new ShellAnalyzer();
+				shell.Load(shellPath);
+				cache = new ShellImageCache(shell.ShellDirectoryPath);
+				renderer = new SurfaceRenderer();
+
 				NotifyChanged(nameof(SurfaceIDList));
 			}
 		}

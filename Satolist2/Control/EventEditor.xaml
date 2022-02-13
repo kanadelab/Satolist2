@@ -4,6 +4,8 @@
 			 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
 			 xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
 			 xmlns:local="clr-namespace:Satolist2.Control"
+			 xmlns:avalonEdit="http://icsharpcode.net/sharpdevelop/avalonedit"
+			 xmlns:util="clr-namespace:Satolist2.Utility"
 			 mc:Ignorable="d" 
 			 d:DesignHeight="450" d:DesignWidth="800">
 	<Grid>
@@ -36,6 +38,20 @@
 			</StackPanel>
 		</Grid>
 
-		<TextBox Grid.Row="1" Margin="3" Text="{Binding Event.Body, UpdateSourceTrigger=PropertyChanged}" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Visible" />
+		<avalonEdit:TextEditor x:Name="MainTextEditor" Grid.Row="1" Margin="3"  Document="{Binding Document}" >
+			<avalonEdit:TextEditor.InputBindings>
+				<KeyBinding Gesture="ALT+Q" Command="{Binding SendToGhostCommand}" />
+			</avalonEdit:TextEditor.InputBindings>
+			<avalonEdit:TextEditor.ContextMenu>
+				<ContextMenu>
+					<MenuItem Header="コピー" Command="ApplicationCommands.Copy" InputGestureText="Ctrl+C" />
+					<MenuItem Header="切り取り" Command="ApplicationCommands.Cut" InputGestureText="Ctrl+X" />
+					<MenuItem Header="貼り付け" Command="ApplicationCommands.Paste" InputGestureText="Ctrl+V" />
+					<Separator />
+					<MenuItem Header="ゴーストに送信" Command="{Binding SendToGhostCommand}" InputGestureText="Alt+Q" />
+				</ContextMenu>
+			</avalonEdit:TextEditor.ContextMenu>
+		</avalonEdit:TextEditor>
+
 	</Grid>
 </UserControl>

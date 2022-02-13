@@ -11,12 +11,25 @@
 		<util:BitmapImageSourceConverter x:Key="BitmapConverter" />
 	</UserControl.Resources>
 	<Grid>
-		<Grid.ColumnDefinitions>
-			<ColumnDefinition Width="auto"/>
-			<ColumnDefinition Width="*" />
-		</Grid.ColumnDefinitions>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="auto" />
+			<RowDefinition Height="*" />
+		</Grid.RowDefinitions>
 
-		<ListView Grid.Column="0" ItemsSource="{Binding SurfaceIDList}" SelectedItem="{Binding SelectedSurfaceID}" />
-		<Image Grid.Column="1" Source="{Binding SelectedSurfaceBitmap, Converter={StaticResource BitmapConverter}}" Width="{Binding SelectedSurfaceBitmap.Width}" />
+		<!--
+		<Menu Grid.Row="0">
+			<MenuItem Header="ファイル" />
+		</Menu>
+		-->
+		<TextBox Text="{Binding ShellPath, Mode=TwoWay}" />
+		<Grid Grid.Row="1">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="auto"/>
+				<ColumnDefinition Width="*" />
+			</Grid.ColumnDefinitions>
+
+			<ListView Grid.Column="0" ItemsSource="{Binding SurfaceIDList}" SelectedItem="{Binding SelectedSurfaceID}" />
+			<Image Grid.Column="1" Source="{Binding SelectedSurfaceBitmap, Converter={StaticResource BitmapConverter}}" Width="{Binding SelectedSurfaceBitmap.Width}" />
+		</Grid>
 	</Grid>
 </UserControl>

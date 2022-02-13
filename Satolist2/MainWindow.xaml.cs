@@ -1,5 +1,6 @@
 ﻿using AvalonDock.Layout;
 using Satolist2.Control;
+using Satolist2.Dialog;
 using Satolist2.Model;
 using Satolist2.Utility;
 using System;
@@ -25,6 +26,8 @@ namespace Satolist2
 	public partial class MainWindow : Window
 	{
 		private List<DockingWindow> EventEditors { get; }
+		private List<DockingWindow> TextEditors { get; }
+		private MainViewModel mainViewModel;
 
 		public LayoutDocumentPane DocumentPane { get; }
 
@@ -32,13 +35,20 @@ namespace Satolist2
 		private DockingWindow EventList { get; set; }
 		private DockingWindow SurfaceViewer { get; set; }
 		private DockingWindow SurfacePalette { get; set; }
+		private DockingWindow StartMenu { get; set; }
 		private DockingWindow DebugMainMenu { get; set; }
 
 		public MainWindow()
 		{
 			InitializeComponent();
 
+			AllowDrop = true;
+			DragEnter += MainWindow_DragEnter;
+			Drop += MainWindow_Drop;
+			
+
 			EventEditors = new List<DockingWindow>();
+			TextEditors = new List<DockingWindow>();
 
 			//DockingWindowの作成
 			FileEventTree = new DockingWindow(new FileEventTree());
@@ -46,11 +56,12 @@ namespace Satolist2
 			SurfaceViewer = new DockingWindow(new SurfaceViewer());
 			SurfacePalette = new DockingWindow(new SurfacePalette());
 			DebugMainMenu = new DockingWindow(new DebugMainMenu());
+			StartMenu = new DockingWindow(new StartMenu());
 
 			//カラのviewModelを設定
-			var mainVM = new MainViewModel(this);
-			DataContext = mainVM;
-			ReflectControlViewModel(mainVM);
+			mainViewModel = new MainViewModel(this);
+			DataContext = mainViewModel;
+			ReflectControlViewModel(mainViewModel);
 
 			//パネルの生成
 			var horizontalPanel = new LayoutPanel() { Orientation = Orientation.Horizontal };
@@ -65,7 +76,8 @@ namespace Satolist2
 			rightPane.Children.Add(SurfaceViewer);
 			rightPane.Children.Add(SurfacePalette);
 			DocumentPane = new LayoutDocumentPane();
-			DocumentPane.Children.Add(DebugMainMenu);
+			//DocumentPane.Children.Add(DebugMainMenu);
+			DocumentPane.Children.Add(StartMenu);
 
 			horizontalPanel.Children.Add(leftPane);
 			horizontalPanel.Children.Add(DocumentPane);
@@ -81,12 +93,34 @@ namespace Satolist2
 			//RightPane.InsertChildAt(0, new DockingWindow(new FileEventTree(), mainVM.FileEventTreeViewModel));
 		}
 
+		private void MainWindow_Drop(object sender, DragEventArgs e)
+		{
+			if(e.Data.GetDataPresent(DataFormats.FileDrop))
+			{
+				var items = (string[])e.Data.GetData(DataFormats.FileDrop);
+				OpenGhost(items.First(), "master");
+			}
+		}
+
+		private void MainWindow_DragEnter(object sender, DragEventArgs e)
+		{
+			if(e.Data.GetDataPresent(DataFormats.FileDrop))
+			{
+				e.Effects = DragDropEffects.Copy;
+			}
+		}
+
 		internal void OpenEventEditor(EventModel ev)
 		{
 			var currentWindow = EventEditors.FirstOrDefault(o => ((EventEditorViewModel)o.ViewModel).Event == ev);
 			if (currentWindow == null)
 			{
-				var newWindow = new DockingWindow(new EventEditor(), new EventEditorViewModel(ev));
+				var newWindow = new DockingWindow(new EventEditor(), new EventEditorViewModel(mainViewModel, ev));
+
+				//閉じたときのイベントを設定
+				newWindow.Closing += EventEditorClosing;
+				ev.OnRemove += OpendEventRemoved;
+
 				EventEditors.Add(newWindow);
 				DocumentPane.Children.Add(newWindow);
 				currentWindow = newWindow;
@@ -96,17 +130,54 @@ namespace Satolist2
 			currentWindow.IsActive = true;
 		}
 
-		internal void OpenTextEditor(TextFileModel text)
+		//イベントが削除されたときイベントエディタを閉じる
+		private void OpendEventRemoved(EventModel obj)
 		{
-
+			var removedEvent = EventEditors.FirstOrDefault(
+				o => ((EventEditorViewModel)o.ViewModel).Event == obj
+				);
+			if (removedEvent != null)
+				removedEvent.Close();
 		}
 
-		internal void OpenGhost(string ghostPath, string shellDirectoryName)
+		//イベントエディタを閉じた
+		private void EventEditorClosing(object sender, System.ComponentModel.CancelEventArgs e)
+		{
+			//登録イベントを解除
+			if(sender is DockingWindow window)
+			{
+				window.Closing -= EventEditorClosing;
+				if (window.ViewModel is EventEditorViewModel viewModel)
+					viewModel.Event.OnRemove -= OpendEventRemoved;
+			}
+		}
+
+		internal void OpenTextEditor(TextFileModel text)
+		{
+			var currentWindow = TextEditors.FirstOrDefault(o => ((TextEditorViewModel)o.ViewModel).TextFile == text);
+			if(currentWindow == null)
+			{
+				var newWindow = new DockingWindow(new TextEditor(), new TextEditorViewModel(text));
+
+				TextEditors.Add(newWindow);
+				DocumentPane.Children.Add(newWindow);
+				currentWindow = newWindow;
+			}
+
+			//アクティベート
+			currentWindow.IsActive = true;
+		}
+
+		internal void OpenGhost(string ghostPath, string shellDirectoryName = "master")
 		{
 			var ghost = new GhostModel(ghostPath);
-			var mainVM = new MainViewModel(this, ghost, shellDirectoryName);
-			DataContext = mainVM;
-			ReflectControlViewModel(mainVM);
+
+			TemporarySettings.Instance.AddHistory(ghost);
+
+			//無事に開けたらヒストリーに足す
+			mainViewModel = new MainViewModel(this, ghost, shellDirectoryName);
+			DataContext = mainViewModel;
+			ReflectControlViewModel(mainViewModel);
 		}
 
 		//各コントロールのViewModelの再バインド
@@ -117,7 +188,18 @@ namespace Satolist2
 			SurfacePalette.ViewModel = mainVm.SurfacePaletteViewModel;
 			SurfaceViewer.ViewModel = mainVm.SurfaceViewerViewModel;
 			DebugMainMenu.ViewModel = mainVm.DebugMainMenuViewModel;
+			StartMenu.ViewModel = mainVm.StartMenuViewModel;
 		}
+
+		/*
+		private void OpenGhost(string path)
+		{
+			//ゴーストルートフォルダを開く。
+			
+			
+
+		}
+		*/
 	}
 
 	//ワークスペースは切り離せるのが望ましそう。Dockのビューモデルとかもくっついてそうだし
@@ -131,8 +213,11 @@ namespace Satolist2
 		public SurfaceViewerViewModel SurfaceViewerViewModel { get; }
 		public SurfacePaletteViewModel SurfacePaletteViewModel { get; }
 		public DebugMainMenuViewModel DebugMainMenuViewModel { get; }
+		public StartMenuViewModel StartMenuViewModel { get; }
 
 		public List<EventEditorViewModel> EventEditors { get; }
+
+		public ActionCommand SaveFileCommand { get; }
 
 		public MainViewModel(MainWindow mainWindow, GhostModel ghost = null, string shellDirectoryName = null)
 		{
@@ -154,11 +239,55 @@ namespace Satolist2
 				System.IO.Path.GetFullPath("../../../TestSampleGhost"),
 				"master"
 				);
+			StartMenuViewModel = new StartMenuViewModel(this);
+
+			SaveFileCommand = new ActionCommand(
+				o =>
+				{
+					var dialog = new SaveFileListDialog();
+					dialog.DataContext = new SaveFileListViewModel(ghost.Dictionaries);
+					if(dialog.ShowDialog() == true)
+					{
+						//TODO: save
+					}
+				});
 		}
 
+		//イベントエディタのオープン
 		public void OpenEventEditor(EventModel ev)
 		{
 			MainWindow.OpenEventEditor(ev);
 		}
+
+		public void OpenEventEditor(InlineEventModel ev)
+		{
+			//TODO: 親のイベントを開くので、カレットの位置をインラインイベントに合わせたい
+			MainWindow.OpenEventEditor(ev.ParentEvent);
+		}
+
+		//イベントの追加
+		public void OpenAddEventDialog(string name = null, string condition = null, EventType type = EventType.Sentence, DictionaryModel addTarget = null)
+		{
+			var dialog = new AddEventDialog(this);
+
+			//カスタムするものがあれば追加設定
+			if (name != null)
+				dialog.DataContext.Name = name;
+			if (condition != null)
+				dialog.DataContext.Condition = condition;
+			dialog.DataContext.Type = type;
+			if (addTarget != null)
+				dialog.DataContext.AddTarget = addTarget;
+
+			//OKされたら追加
+			if (dialog.ShowDialog() == true)
+			{
+				//新規で追加
+				var newEvent = new EventModel(dialog.DataContext.Type, dialog.DataContext.Name, dialog.DataContext.Condition, string.Empty);
+				dialog.DataContext.AddTarget.AddEvent(newEvent);
+				OpenEventEditor(newEvent);
+			}
+		}
+
 	}
 }

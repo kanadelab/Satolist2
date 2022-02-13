@@ -40,6 +40,21 @@ namespace Satolist2.Control
 				{
 					treeViewModel.Main.EventListViewModel.SetItems(eventViewModel.Items, eventViewModel.Label, eventViewModel.Dictionary.Dictionary);
 				}
+				else if(e.NewValue is FileEventTreeItemInlineEventViewModel inlineEventViewModel)
+				{
+					treeViewModel.Main.EventListViewModel.SetItems(inlineEventViewModel.EventList, inlineEventViewModel.Label, inlineEventViewModel.Dictionary);
+				}
+			}
+		}
+
+		private void TreeViewItem_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+		{
+			if(sender is TreeViewItem item)
+			{
+				if(item.DataContext is FileEventTreeItemDictionaryViewModel dic)
+				{
+					e.Handled = dic.Open();
+				}
 			}
 		}
 	}
@@ -86,8 +101,8 @@ namespace Satolist2.Control
 		private ObservableCollection<FileEventTreeItemEventViewModel> items;
 		private Dictionary<string, FileEventTreeItemEventViewModel> itemsDictionary;
 		private Dictionary<EventModel, FileEventTreeItemEventViewModel> reverseDictionary;  //逆引き
-		private ObservableCollection<System.Windows.Controls.Control> contextMenuItems;
 
+		public string NodeType => "Dictionary";
 		public FileEventTreeViewModel FileEventTree { get; }
 		public DictionaryModel Dictionary { get; }
 
@@ -97,43 +112,24 @@ namespace Satolist2.Control
 		}
 
 		//ファイルイベントツリー上で表示する名前
-		public string Label
-		{
-			get => Dictionary.RelativeName;
-		}
+		public string Label => Dictionary.RelativeName;
 
-		public ReadOnlyObservableCollection<System.Windows.Controls.Control> ContextMenuItems
-		{
-			get => new ReadOnlyObservableCollection<System.Windows.Controls.Control>(contextMenuItems);
-		}
+		//アイテムを追加
+		public ActionCommand AddItemCommand { get; }
 
 		public FileEventTreeItemDictionaryViewModel(FileEventTreeViewModel parent, DictionaryModel dictionary)
 		{
 			FileEventTree = parent;
 			Dictionary = dictionary;
-			contextMenuItems = new ObservableCollection<System.Windows.Controls.Control>();
 
 			items = new ObservableCollection<FileEventTreeItemEventViewModel>();
 			itemsDictionary = new Dictionary<string, FileEventTreeItemEventViewModel>();
 			reverseDictionary = new Dictionary<EventModel, FileEventTreeItemEventViewModel>();
 
-			//コンテキストメニュー
-			//TODO: コンテキストメニュー実装
-			{
-				var addItem = new MenuItem();
-				addItem.Header = "項目の追加";
-				addItem.Command = new ActionCommand(o =>
-				{
-					var dialog = new AddEventDialog(parent.Main);
-					if(dialog.ShowDialog()==true)
-					{
-						//新規で追加
-						dialog.DataContext.AddTarget.AddEvent(new EventModel(dialog.DataContext.Type, dialog.DataContext.Name, dialog.DataContext.Condition, string.Empty));
-					}
-				});
-				contextMenuItems.Add(addItem);
-				contextMenuItems.Add(new Separator());
-			}
+			//コマンド
+			AddItemCommand = new ActionCommand(
+				o => FileEventTree.Main.OpenAddEventDialog(addTarget: Dictionary)
+				);
 
 			//イベントハンドラの用意
 			Dictionary.PropertyChanged += OnDictionaryPropertyChanged;
@@ -159,18 +155,16 @@ namespace Satolist2.Control
 		//項目の追加
 		private void AddEvent(EventModel ev)
 		{
-			if (itemsDictionary.ContainsKey(ev.Identifier))
+			FileEventTreeItemEventViewModel item;
+			if(!itemsDictionary.TryGetValue(ev.Identifier, out item))
 			{
-				itemsDictionary[ev.Identifier].AddEvent(ev);
+				item = new FileEventTreeItemEventViewModel(this);
+				itemsDictionary.Add(ev.Identifier, item);
+				items.Add(item);
 			}
-			else
-			{
-				var newItem = new FileEventTreeItemEventViewModel(this);
-				newItem.AddEvent(ev);
-				itemsDictionary.Add(ev.Identifier, newItem);
-				items.Add(newItem);
-				reverseDictionary[ev] = newItem;
-			}
+
+			item.AddEvent(ev);
+			reverseDictionary[ev] = item;
 		}
 
 		//項目の削除
@@ -181,11 +175,17 @@ namespace Satolist2.Control
 			{
 				itemsDictionary.Remove(ev.Identifier);
 				items.Remove(removeTarget);
-				reverseDictionary.Remove(ev);
 			}
-			else
+			removeTarget.RemoveEvent(ev);
+			reverseDictionary.Remove(ev);
+		}
+
+		//全項目の削除
+		private void ClearEvents()
+		{
+			foreach(var ev in reverseDictionary.Keys.ToArray())
 			{
-				removeTarget.RemoveEvent(ev);
+				RemoveEvent(ev);
 			}
 		}
 
@@ -210,12 +210,16 @@ namespace Satolist2.Control
 				{
 					//アイテムが１個しかなく、移動先もない場合はその項目自体をリネームする
 					eventViewModel.UpdateLabel();
+					itemsDictionary.Remove(oldLabel);
+					itemsDictionary.Add(newLabel, eventViewModel);
 				}
 				else
 				{
 					//アイテムが１個しかなく、移動先がある場合は項目を破棄し、既存の項目に合流する
 					itemsDictionary.Remove(oldLabel);
 					items.Remove(eventViewModel);
+					eventViewModel.RemoveEvent(ev);
+					moveTarget.AddEvent(ev);
 					reverseDictionary[ev] = moveTarget;
 				}
 			}
@@ -224,6 +228,8 @@ namespace Satolist2.Control
 				if (moveTarget == null)
 				{
 					//他の項目が存在し、移動先がない場合は項目を新設する
+					eventViewModel.RemoveEvent(ev);
+
 					var newItem = new FileEventTreeItemEventViewModel(this);
 					newItem.AddEvent(ev);
 					itemsDictionary.Add(newLabel, newItem);
@@ -266,24 +272,37 @@ namespace Satolist2.Control
 		//イベントの追加削除
 		private void EventCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
 		{
-			switch (e.Action)
+			if (e.OldItems != null)
 			{
-				case NotifyCollectionChangedAction.Add:
-					foreach (object item in e.NewItems)
-					{
-						if(item is EventModel ev)
-							AddEvent(ev);
-					}
-					break;
-				case NotifyCollectionChangedAction.Remove:
-					foreach(object item in e.OldItems)
-					{
-						if(item is EventModel ev)
-							RemoveEvent(ev);
-					}
-					break;
+				foreach (object item in e.OldItems)
+				{
+					if (item is EventModel ev)
+						RemoveEvent(ev);
+				}
+			}
+
+			if (e.OldItems != null)
+			{
+				foreach (object item in e.NewItems)
+				{
+					if (item is EventModel ev)
+						AddEvent(ev);
+				}
 			}
 		}
+
+		//開く
+		public bool Open()
+		{
+			if (Dictionary.IsSerialized)
+			{
+				//シリアライズされてない版をエディタで開いく
+				FileEventTree.Main.MainWindow.OpenTextEditor(Dictionary);
+				return true;
+			}
+			return false;
+		}
+		
 	}
 
 	//イベントにあたる
@@ -291,9 +310,13 @@ namespace Satolist2.Control
 	{
 		//ノードに所属するイベント
 		private ObservableCollection<EventModel> events;
+		private Dictionary<string, ObservableCollection<InlineEventModel>> inlineEvents;
+		private ObservableCollection<FileEventTreeItemInlineEventViewModel> inlineEventViewModels;
 		private string identifier;
 
+		public string NodeType => "Event";
 		public FileEventTreeItemDictionaryViewModel Dictionary { get; }
+		public ActionCommand AddItemCommand { get; }
 
 		public string Label
 		{
@@ -315,22 +338,33 @@ namespace Satolist2.Control
 			get => new ReadOnlyObservableCollection<EventModel>(events);
 		}
 
-		public IList<FileEventTreeItemEventViewModel> ChildEvent
+		public IList<FileEventTreeItemInlineEventViewModel> ChildItems
 		{
-			get => null;
+			get => new ReadOnlyObservableCollection<FileEventTreeItemInlineEventViewModel>(inlineEventViewModels);
 		}
 
 
 		public FileEventTreeItemEventViewModel(FileEventTreeItemDictionaryViewModel dict)
 		{
 			events = new ObservableCollection<EventModel>();
+			inlineEventViewModels = new ObservableCollection<FileEventTreeItemInlineEventViewModel>();
+			inlineEvents = new Dictionary<string, ObservableCollection<InlineEventModel>>();
 			Dictionary = dict;
+
+			AddItemCommand = new ActionCommand(
+				o => Dictionary.FileEventTree.Main.OpenAddEventDialog(addTarget: Dictionary.Dictionary)
+				);
 		}
 
 		//インスタンス生成中のイベントの追加
 		public void AddEvent(EventModel ev)
 		{
 			events.Add(ev);
+			foreach (var inlineEv in ev.InlineEvents)
+				AddInlineEvent(inlineEv);
+
+			INotifyCollectionChanged inlineEvents = ev.InlineEvents;
+			inlineEvents.CollectionChanged += InlineEvents_CollectionChanged;
 
 			if (identifier == null)
 			{
@@ -341,7 +375,11 @@ namespace Satolist2.Control
 		//イベントを取り除く
 		public void RemoveEvent(EventModel ev)
 		{
-			Debug.Assert(ItemCount > 1);    //最後のアイテムを除去することは考えてない
+			INotifyCollectionChanged inlineEvents = ev.InlineEvents;
+			inlineEvents.CollectionChanged -= InlineEvents_CollectionChanged;
+
+			foreach (var inlineEv in ev.InlineEvents)
+				RemoveInlineEvent(inlineEv);
 			events.Remove(ev);
 		}
 
@@ -351,5 +389,73 @@ namespace Satolist2.Control
 			Label = events.First().Identifier;
 		}
 
+		//インラインイベント処理
+		private void InlineEvents_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+		{
+			if (e.OldItems != null)
+			{
+				foreach (var item in e.OldItems)
+					RemoveInlineEvent((InlineEventModel)item);
+			}
+			if (e.NewItems != null)
+			{
+				foreach (var item in e.NewItems)
+					AddInlineEvent((InlineEventModel)item);
+			}
+		}
+
+		public void AddInlineEvent(InlineEventModel ev)
+		{
+			//追加。必要に応じてviewModelも足す
+			ObservableCollection<InlineEventModel> inlineEventList;
+			if (!inlineEvents.TryGetValue(ev.Identifier, out inlineEventList))
+			{
+				inlineEventList = new ObservableCollection<InlineEventModel>();
+				inlineEvents.Add(ev.Identifier, inlineEventList);
+				inlineEventList.Add(ev);
+				var newViewModel = new FileEventTreeItemInlineEventViewModel(this, inlineEventList);
+				inlineEventViewModels.Add(newViewModel);
+			}
+			else
+			{
+				inlineEventList.Add(ev);
+			}
+		}
+
+		public void RemoveInlineEvent(InlineEventModel ev)
+		{
+			//Viewmodelを削除
+			ObservableCollection<InlineEventModel> inlineEventList = inlineEvents[ev.Identifier];
+			inlineEventList.Remove(ev); ;
+
+			//同名のものがなくなったらViewModelを取り除く
+			if(inlineEventList.Count == 0)
+			{
+				inlineEvents.Remove(ev.Identifier);
+
+				//同じイベントをもつものを取り除く
+				inlineEventViewModels.Remove(inlineEventViewModels.First(o => o.EventList.Count == 0));
+			}
+
+		}
+	}
+
+	//インラインイベントにあたる
+	//末端なので簡易なつくり
+	internal class FileEventTreeItemInlineEventViewModel : NotificationObject
+	{
+		private FileEventTreeItemEventViewModel parentViewModel;
+		public string NodeType => "InlineEvent";
+		public DictionaryModel Dictionary => parentViewModel.Dictionary.Dictionary;
+		public IEnumerable<object> ChildItems => Array.Empty<object>();
+		public ReadOnlyObservableCollection<InlineEventModel> EventList { get; }
+		public string Label { get; }
+
+		public FileEventTreeItemInlineEventViewModel(FileEventTreeItemEventViewModel parent, ObservableCollection<InlineEventModel> events)
+		{
+			parentViewModel = parent;
+			EventList = new ReadOnlyObservableCollection<InlineEventModel>(events);
+			Label = events.First().Identifier;
+		}
 	}
 }

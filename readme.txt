@@ -12,4 +12,10 @@ Satolist2 さとりすとオープンソースプロジェクト
 
 ■使用ライブラリ
 Microsoft Public License (Ms-PL) ライセンスのパッケージを使用しています
+https://opensource.org/licenses/MS-PL
 ・Dirkster.AvalonDock
+
+MITライセンスのパッケージを使用しています
+https://opensource.org/licenses/mit-license.php
+・AvalonEdit
+・Newtonsoft.Json

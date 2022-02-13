@@ -15,12 +15,31 @@
 			</TreeView.ItemTemplate>
 			<TreeView.ItemContainerStyle>
 				<Style TargetType="TreeViewItem">
-					<Setter Property="ContextMenu">
-						<Setter.Value>
-							<ContextMenu ItemsSource="{Binding ContextMenuItems}">
-							</ContextMenu>
-						</Setter.Value>
-					</Setter>
+					<EventSetter Event="MouseDoubleClick" Handler="TreeViewItem_MouseDoubleClick" />
+					<Style.Triggers>
+						<DataTrigger Binding="{Binding NodeType}" Value="Dictionary">
+							<Setter Property="ContextMenu">
+								<Setter.Value>
+									<ContextMenu>
+										<MenuItem Header="項目を追加" Command="{Binding AddItemCommand}" />
+										<MenuItem Header="リスト化を解除" IsCheckable="True" IsChecked="{Binding Dictionary.IsSerialized, Mode=TwoWay}" />
+									</ContextMenu>
+								</Setter.Value>
+							</Setter>
+						</DataTrigger>
+						<DataTrigger Binding="{Binding NodeType}" Value="Event">
+							<Setter Property="ContextMenu">
+								<Setter.Value>
+									<ContextMenu>
+										<MenuItem Header="項目を追加" Command="{Binding AddItemCommand}" />
+									</ContextMenu>
+								</Setter.Value>
+							</Setter>
+						</DataTrigger>
+						<DataTrigger Binding="{Binding NodeType}" Value="InlineEvent">
+							<!--なにもない-->
+						</DataTrigger>
+					</Style.Triggers>
 				</Style>
 			</TreeView.ItemContainerStyle>
 		</TreeView>

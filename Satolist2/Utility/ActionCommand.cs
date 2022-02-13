@@ -13,10 +13,10 @@ namespace Satolist2.Utility
 		private Action<object> executeAction;
 		private Func<object, bool> canExecuteFunc;
 
-		public ActionCommand(Action<object> execute)
+		public ActionCommand(Action<object> execute, bool canExecute = true)
 		{
 			executeAction = execute;
-			canExecuteFunc = null;
+			canExecuteFunc = (o) => canExecute;
 		}
 
 		public ActionCommand(Action<object> execute, Func<object, bool> canExecute)

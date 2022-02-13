@@ -1,0 +1,32 @@
+﻿<Window x:Class="Satolist2.Dialog.SaveFileListDialog"
+		xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+		xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+		xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+		xmlns:local="clr-namespace:Satolist2.Dialog"
+		mc:Ignorable="d"
+		Title="上書き保存" Height="300" Width="400">
+	<Grid>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="auto" />
+			<RowDefinition Height="*" />
+			<RowDefinition Height="auto" />
+		</Grid.RowDefinitions>
+		
+		<TextBlock Grid.Row="0" Text="変更された下記のファイルを上書き保存します。よろしいですか？" Margin="5" />
+		<ListView Grid.Row="1" ItemsSource="{Binding Items}">
+			<ListView.ItemTemplate>
+				<DataTemplate>
+					<TextBlock Text="{Binding SaveFilePath}" />
+				</DataTemplate>
+			</ListView.ItemTemplate>
+		</ListView>
+		<StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
+			<Button Content="保存" Padding="0 5 0 5" Margin="5" Width="100" IsDefault="True" />
+			<Button Content="破棄" Padding="0 5 0 5" Margin="5" Width="100" />
+			<Button Content="キャンセル" Padding="0 5 0 5" Margin="5" Width="100" IsCancel="True" />
+		</StackPanel>
+
+
+	</Grid>
+</Window>

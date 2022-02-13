@@ -100,6 +100,8 @@ namespace Satolist2.Utility
 		public const char WordHead = '＠';
 		//変数
 		public const char VariableHead = '＄';
+		//エスケープ
+		public const char Escape = 'φ';
 		//タブ
 		public const char Tab = '\t';
 		public static readonly char[] TabSeparator = { Tab };
@@ -113,6 +115,9 @@ namespace Satolist2.Utility
 
 		//変数
 		public const string VariableDictionaryDirectory = "辞書フォルダ";
+
+		//インラインイベント
+		public const string InlineEventSeparator = "＃＃＃インラインイベント";
 
 		//EventTypeに対応する文字を取得
 		public static string GetEventHead(EventType type)

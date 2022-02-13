@@ -60,6 +60,17 @@ namespace Satolist2.Utility
 				}
 			}
 		}
+
+		protected override void OnClosing(CancelEventArgs args)
+		{
+			base.OnClosing(args);
+			
+			//ViewModelを破棄
+			if(ViewModel is IDisposable d)
+			{
+				d.Dispose();
+			}
+		}
 	}
 
 	internal interface IDockingWindowContent

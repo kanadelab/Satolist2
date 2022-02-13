@@ -18,37 +18,9 @@ namespace Satolist2.Utility
 		private const string SatoriProxyPath = "data/SatoriProxy.exe";
 		private const string SatoriteEventName = "Satolist2_Satorite_Event";
 
-
-		[DllImport("data/sstp.dll", EntryPoint = "SendSSTP", CallingConvention = CallingConvention.Cdecl)]
-		private extern static void SendSSTP(IntPtr ptr);
-
-		[DllImport("data/sstp.dll", EntryPoint = "NotifySSTP", CallingConvention = CallingConvention.Cdecl)]
-		private extern static void NotifySSTP(IntPtr ptr);
-
-		//SEND SSTPによるスクリプトの送信
-		public static void SendSSTP(string request)
-		{
-			byte[] requestBytes = Constants.EncodingShiftJis.GetBytes(request);
-			IntPtr requestPtr = Marshal.AllocHGlobal(requestBytes.Length);
-			Marshal.Copy(requestBytes, 0, requestPtr, requestBytes.Length);
-			SendSSTP(requestPtr);
-			Marshal.FreeHGlobal(requestPtr);
-		}
-
-		//NOTIFY SSTP によるイベントの起動
-		public static void NotifySSTP(string request)
-		{
-			byte[] requestBytes = Constants.EncodingShiftJis.GetBytes(request);
-			IntPtr requestPtr = Marshal.AllocHGlobal(requestBytes.Length);
-			Marshal.Copy(requestBytes, 0, requestPtr, requestBytes.Length);
-			NotifySSTP(requestPtr);
-			Marshal.FreeHGlobal(requestPtr);
-		}
-
-		//スクリプトを里々にかけて、出力したさくらスクリプトを戻す
+		//里々のスクリプトをゴーストに送信
 		public static void SendSatori(GhostModel ghost, string script, EventType type)
 		{
-			throw new NotImplementedException();
 			var saveData = new SaveDataBuilder(ghost);
 			var dictionaryDirectory = ".";
 
@@ -104,11 +76,12 @@ namespace Satolist2.Utility
 				{
 					sstpBuilder.Parameters["IfGhost"] = ghost.GhostDescriptSakuraName;
 				}
-				
-				if(true)//use Owned SSTP
+
+				var fmoReader = new SakuraFMOReader();
+				fmoReader.Read();
+
+				if (true)//use Owned SSTP
 				{
-					var fmoReader = new SakuraFMOReader();
-					fmoReader.Read();
 					var fmoRecord = fmoReader.Find(ghost);
 
 					if(fmoRecord != null)
@@ -117,7 +90,7 @@ namespace Satolist2.Utility
 					}
 				}
 
-				SendSSTP(sstpBuilder.Serialize());
+				RaiseSSTP(sstpBuilder, fmoReader.Records.First().Value);
 			}
 		}
 

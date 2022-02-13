@@ -1,7 +1,9 @@
-﻿using Satolist2.Model;
+﻿using ICSharpCode.AvalonEdit.Document;
+using Satolist2.Model;
 using Satolist2.Utility;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -25,6 +27,7 @@ namespace Satolist2.Control
 		public EventEditor()
 		{
 			InitializeComponent();
+			MainTextEditor.SyntaxHighlighting = new SatoriSyntaxHilighter();
 		}
 	}
 
@@ -41,8 +44,10 @@ namespace Satolist2.Control
 		}
 	}
 
-	internal class EventEditorViewModel : NotificationObject, IDockingWindowContent
+	internal class EventEditorViewModel : NotificationObject, IDockingWindowContent, IDisposable
 	{
+		private bool disableBodyPropertyChanged;
+
 		public EventModel Event { get; }
 		public string randomizedContentId;
 		public static readonly EventTypeComboBoxItem[] eventTypeList =
@@ -60,17 +65,52 @@ namespace Satolist2.Control
 
 		public string DockingContentId => randomizedContentId;
 
-		public EventEditorViewModel(EventModel ev)
+		public TextDocument Document { get; }
+
+		public ActionCommand SendToGhostCommand {get;}
+
+		public EventEditorViewModel(MainViewModel main, EventModel ev)
 		{
+			//TODO: 閉じるときにイベントを取り除く必要がありそう
 			randomizedContentId = Guid.NewGuid().ToString();	//複数出現するのでユニークなIDを振る
 			Event = ev;
 			Event.PropertyChanged += Event_PropertyChanged;
+
+			Document = new TextDocument(Event.Body);
+			Document.TextChanged += Document_TextChanged;
+
+			//コマンド
+			SendToGhostCommand = new ActionCommand(
+				o =>
+				{
+					Satorite.SendSatori(main.Ghost, Document.Text, Event.Type);
+				}
+				);
+		}
+
+		private void Document_TextChanged(object sender, EventArgs e)
+		{
+			//メインのテキストが変更された場合にModelに伝える
+			//その際PropertyChangedは呼ばないようにしておく
+			disableBodyPropertyChanged = true;
+			Event.Body = Document.Text;
+			disableBodyPropertyChanged = false;
 		}
 
 		private void Event_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
 		{
-			if(e.PropertyName == nameof(EventModel.Name))
+			if (e.PropertyName == nameof(EventModel.Name))
 				NotifyChanged(nameof(DockingTitle));
+			else if (e.PropertyName == nameof(EventModel.Body) && !disableBodyPropertyChanged)
+				Document.Text = Event.Body;
+		}
+
+		public void Dispose()
+		{
+			Event.PropertyChanged -= Event_PropertyChanged;
+			Document.TextChanged -= Document_TextChanged;
 		}
 	}
+
+	
 }
