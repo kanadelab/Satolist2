@@ -101,6 +101,7 @@
     <Compile Include="Utility\DictionaryUtility.cs" />
     <Compile Include="Utility\DockingWindow.cs" />
     <Compile Include="Utility\ActionCommand.cs" />
+    <Compile Include="Utility\NarUtility.cs" />
     <Compile Include="Utility\NotificaionObject.cs" />
     <Compile Include="Utility\SakuraFMOReader.cs" />
     <Compile Include="Utility\Satorite.cs" />
