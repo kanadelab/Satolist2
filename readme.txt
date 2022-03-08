@@ -19,3 +19,8 @@ MITライセンスのパッケージを使用しています
 https://opensource.org/licenses/mit-license.php
 ・AvalonEdit
 ・Newtonsoft.Json
+・FluentFTP
+
+Apache2.0 ライセンスの素材を使用しています。
+https://www.apache.org/licenses/LICENSE-2.0
+・https://materialdesignicons.com/
