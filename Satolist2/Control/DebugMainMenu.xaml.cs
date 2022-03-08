@@ -25,6 +25,7 @@ namespace Satolist2.Control
 		{
 			InitializeComponent();
 		}
+
 	}
 
 	internal class DebugMainMenuViewModel : NotificationObject, IDockingWindowContent
@@ -54,6 +55,8 @@ namespace Satolist2.Control
 		}
 
 		public ActionCommand LoadCommand { get; }
+		public ActionCommand RecvStartCommand { get; }
+		public ActionCommand UITestCommand { get; }
 
 		public DebugMainMenuViewModel(MainViewModel mainViewModel, string loadGhostPath = "", string loadShellDirectoryName = "")
 		{
@@ -63,6 +66,21 @@ namespace Satolist2.Control
 
 			LoadCommand = new ActionCommand(
 				o => mainViewModel.MainWindow.OpenGhost(LoadGhostPath, LoadShellDirectoryName)
+				);
+
+			RecvStartCommand = new ActionCommand(
+				o => Satolist2.Core.SatoriRecvNativeWindow.Create((new System.Windows.Interop.WindowInteropHelper(Main.MainWindow)).Handle)
+				);
+
+			UITestCommand = new ActionCommand(
+				 o =>
+				 {
+					 
+					 var d = new Dialog.UploadSettingDialog();
+					 d.DataContext = new Dialog.UploadSettingDialogViewModel();
+					 d.ShowDialog();
+
+				 }
 				);
 		}
 

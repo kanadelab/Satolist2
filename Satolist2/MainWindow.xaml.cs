@@ -37,6 +37,11 @@ namespace Satolist2
 		private DockingWindow SurfacePalette { get; set; }
 		private DockingWindow StartMenu { get; set; }
 		private DockingWindow DebugMainMenu { get; set; }
+		private DockingWindow GhostDescriptEditor { get; set; }
+		private DockingWindow UpdateIgnoreList { get; set; }
+		private DockingWindow SaoriList { get; set; }
+		private DockingWindow ReplaceList { get; set; }
+		private DockingWindow VariableList { get; set; }
 
 		public MainWindow()
 		{
@@ -57,6 +62,11 @@ namespace Satolist2
 			SurfacePalette = new DockingWindow(new SurfacePalette());
 			DebugMainMenu = new DockingWindow(new DebugMainMenu());
 			StartMenu = new DockingWindow(new StartMenu());
+			GhostDescriptEditor = new DockingWindow(new GhostDescriptEditor());
+			UpdateIgnoreList = new DockingWindow(new UpdateIgnoreList());
+			SaoriList = new DockingWindow(new SaoriList());
+			ReplaceList = new DockingWindow(new ReplaceList());
+			VariableList = new DockingWindow(new VariableList());
 
 			//カラのviewModelを設定
 			mainViewModel = new MainViewModel(this);
@@ -75,8 +85,13 @@ namespace Satolist2
 			leftPane.Children.Add(FileEventTree);
 			rightPane.Children.Add(SurfaceViewer);
 			rightPane.Children.Add(SurfacePalette);
+			rightPane.Children.Add(GhostDescriptEditor);
+			rightPane.Children.Add(UpdateIgnoreList);
+			rightPane.Children.Add(SaoriList);
+			rightPane.Children.Add(ReplaceList);
+			rightPane.Children.Add(VariableList);
 			DocumentPane = new LayoutDocumentPane();
-			//DocumentPane.Children.Add(DebugMainMenu);
+			DocumentPane.Children.Add(DebugMainMenu);
 			DocumentPane.Children.Add(StartMenu);
 
 			horizontalPanel.Children.Add(leftPane);
@@ -189,6 +204,11 @@ namespace Satolist2
 			SurfaceViewer.ViewModel = mainVm.SurfaceViewerViewModel;
 			DebugMainMenu.ViewModel = mainVm.DebugMainMenuViewModel;
 			StartMenu.ViewModel = mainVm.StartMenuViewModel;
+			GhostDescriptEditor.ViewModel = mainVm.GhostDescriptEditorViewModel;
+			UpdateIgnoreList.ViewModel = mainVm.UpdateIgnoreListViewModel;
+			SaoriList.ViewModel = mainVm.SaoriListViewModel;
+			ReplaceList.ViewModel = mainVm.ReplaceListViewModel;
+			VariableList.ViewModel = mainVm.VariableListViewModel;
 		}
 
 		/*
@@ -214,6 +234,11 @@ namespace Satolist2
 		public SurfacePaletteViewModel SurfacePaletteViewModel { get; }
 		public DebugMainMenuViewModel DebugMainMenuViewModel { get; }
 		public StartMenuViewModel StartMenuViewModel { get; }
+		public GhostDescriptEditorViewModel GhostDescriptEditorViewModel { get; }
+		public UpdateIgnoreListViewModel UpdateIgnoreListViewModel { get; }
+		public SaoriListViewModel SaoriListViewModel { get; }
+		public ReplaceListViewModel ReplaceListViewModel { get; }
+		public VariableListViewModel VariableListViewModel { get; }
 
 		public List<EventEditorViewModel> EventEditors { get; }
 
@@ -240,6 +265,11 @@ namespace Satolist2
 				"master"
 				);
 			StartMenuViewModel = new StartMenuViewModel(this);
+			GhostDescriptEditorViewModel = new GhostDescriptEditorViewModel();
+			UpdateIgnoreListViewModel = new UpdateIgnoreListViewModel(this);
+			SaoriListViewModel = new SaoriListViewModel();
+			ReplaceListViewModel = new ReplaceListViewModel(this);
+			VariableListViewModel = new VariableListViewModel(this);
 
 			SaveFileCommand = new ActionCommand(
 				o =>

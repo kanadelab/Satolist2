@@ -1,0 +1,38 @@
+﻿<Window x:Class="Satolist2.Dialog.TextInputDialog"
+		xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+		xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+		xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+		xmlns:local="clr-namespace:Satolist2.Dialog"
+		xmlns:ctl="clr-namespace:Satolist2.Control"
+		mc:Ignorable="d"
+		Title="{Binding Title, FallbackValue=名前の入力}" Height="150" Width="400">
+	<Grid>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="auto" />
+			<RowDefinition Height="auto" />
+			<RowDefinition Height="auto" />
+			<RowDefinition Height="*" />
+			<RowDefinition Height="auto" />
+		</Grid.RowDefinitions>
+		
+		<TextBlock Grid.Row="0" Text="{Binding Description, FallbackValue=名前を入力します。}" Margin="3" />
+		<TextBlock Grid.Row="1" Text="{Binding ErrorMessage}" Foreground="Red" Margin="3">
+			<TextBlock.Style>
+				<Style TargetType="TextBlock">
+					<Style.Triggers>
+						<DataTrigger Binding="{Binding Text, RelativeSource={RelativeSource Self}}" Value="">
+							<Setter Property="Visibility" Value="Collapsed" />
+						</DataTrigger>
+					</Style.Triggers>
+				</Style>
+			</TextBlock.Style>
+		</TextBlock>
+		<ctl:WartermarkedTextBox  Grid.Row="2" Text="{Binding Text, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Wartermark="{Binding Wartermark}" HorizontalAlignment="Stretch" Margin="3"/>
+		<StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right">
+			<Button Content="キャンセル" Margin="3" Width="100" IsCancel="True" Click="CancelButtonClick" />
+			<Button Content="OK" Margin="3" Width="100" IsDefault="True" Command="{Binding OkButtonCommand}" />
+		</StackPanel>
+		
+	</Grid>
+</Window>

@@ -15,6 +15,9 @@
 			<TextBox Text="{Binding LoadShellDirectoryName, Mode=TwoWay}" />
 			<Separator Margin="5" />
 			<Button Content="Load" Command="{Binding LoadCommand}" />
+			<Button Content="Recv Start" Command="{Binding RecvStartCommand}" />
+
+			<Button Content="Test" Command="{Binding UITestCommand}" />
 		</StackPanel>
 	</Grid>
 </UserControl>

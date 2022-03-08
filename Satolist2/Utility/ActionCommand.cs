@@ -7,7 +7,7 @@ using System.Windows.Input;
 
 namespace Satolist2.Utility
 {
-	internal class ActionCommand : ICommand
+	public class ActionCommand : ICommand
 	{
 		public event EventHandler CanExecuteChanged;
 		private Action<object> executeAction;
@@ -38,6 +38,11 @@ namespace Satolist2.Utility
 		public void Execute(object parameter)
 		{
 			executeAction?.Invoke(parameter);
+		}
+
+		public void NotifyCanExecuteChanged()
+		{
+			CanExecuteChanged?.Invoke(this, new EventArgs());
 		}
 	}
 }

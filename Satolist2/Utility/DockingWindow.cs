@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 
 namespace Satolist2.Utility
 {
@@ -15,12 +16,24 @@ namespace Satolist2.Utility
 			get => ((System.Windows.Controls.Control)Content).DataContext;
 			set
 			{
+				//古い方のvmはdisposeする
+				if(((System.Windows.Controls.Control)Content).DataContext is IDisposable d)
+				{
+					d.Dispose();
+				}
+
+				//イベントの変更
 				if(((System.Windows.Controls.Control)Content).DataContext is INotifyPropertyChanged oldVm)
 				{
 					oldVm.PropertyChanged -= ViewModel_PropertyChanged;
 				}
 
 				((System.Windows.Controls.Control)Content).DataContext = value;
+
+				if( value is IControlBindedReceiver recv)
+				{
+					recv.ControlBind((System.Windows.Controls.Control)Content);
+				}
 
 				if (value is INotifyPropertyChanged newVm)
 				{
@@ -77,6 +90,13 @@ namespace Satolist2.Utility
 	{
 		string DockingTitle { get; }
 		string DockingContentId { get; }
+	}
+
+	//ビューモデル側にコントロールを渡す処理
+	//あんまりお行儀よくないかもだけどね
+	internal interface IControlBindedReceiver
+	{
+		void ControlBind(System.Windows.Controls.Control control);
 	}
 
 }

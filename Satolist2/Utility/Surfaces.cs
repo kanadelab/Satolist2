@@ -19,7 +19,7 @@ namespace Satolist2.Utility
 		private const string SurfaceAppendHeader = "surface.append";
 		private static readonly Regex ElementRegexPattern = new Regex("^element([0-9])+");
 		private static readonly Regex AnimationRegexPattern = new Regex("^animation[0-9]+");
-		private static readonly Regex SurfaceRecordRegexPattern = new Regex("^surface(\\.append)?([0-9]+)");
+		private static readonly Regex SurfaceRecordRegexPattern = new Regex("^surface(\\.append)?([0-9,]+)");
 		private const string DescriptUseSelfAplha = "seriko.use_self_alpha";
 
 		private static readonly Regex SatolistPaletteOffsetRegiexPattern = new Regex("^//satolist.palette.offset,([0-9]+),([0-9]+)");
@@ -654,7 +654,6 @@ namespace Satolist2.Utility
 				long.Parse(match.Groups[1].Value),
 				ShellAnalyzer.StringToRenderingMethod(match.Groups[2].Value),
 				long.Parse(match.Groups[3].Value),
-				int.Parse(match.Groups[4].Value),
 				int.Parse(match.Groups[5].Value),
 				int.Parse(match.Groups[6].Value)
 				);
@@ -667,16 +666,15 @@ namespace Satolist2.Utility
 		public long ID { get; set; }
 		public RenderingMethod RenderingMethod { get; set; }
 		public long SurfaceID { get; set; }
-		public int Wait { get; set; }
+		//public int Wait { get; set; }	//ウェイトはランダムがありえる。そもそも本システムでは必要にならないので読み飛ばす
 		public int PositionX { get; set; }
 		public int PositionY { get; set; }
 
-		public AnimationPatternRecord(long id, RenderingMethod renderingMethod, long surfaceId, int wait, int x, int y)
+		public AnimationPatternRecord(long id, RenderingMethod renderingMethod, long surfaceId/*, string wait*/, int x, int y)
 		{
 			ID = id;
 			RenderingMethod = renderingMethod;
 			SurfaceID = surfaceId;
-			Wait = wait;
 			PositionX = x;
 			PositionY = y;
 		}

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -60,12 +61,7 @@ namespace Satolist2.Utility
 				//相対パスを用意
 				var relativePath = rootPathUri.MakeRelativeUri(new Uri(filePath)).ToString();
 
-				//TODO: developer_options.txt を読むこと
-				//除外ファイルをチェック
-				var lowerPath = relativePath.ToLower();
-				if (IgnoreFileNames.Contains(Path.GetFileName(lowerPath)))
-					continue;
-				if (IgnoreDirectoryNames.FirstOrDefault(o => lowerPath.Contains(o + "/")) != null)
+				if (IsIgnoreFile(relativePath, false))
 					continue;
 
 				//ハッシュ計算
@@ -104,6 +100,37 @@ namespace Satolist2.Utility
 			foreach (var item in pathHashSize)
 				builder.AppendLine(string.Concat("file,", item.Item1, (char)1, item.Item2, (char)1, "size=", item.Item3, (char)1));
 			return builder.ToString();
+		}
+
+		public static bool IsIgnoreFile(string relativePath, bool isCreateNar)
+		{
+			//TODO: developer_optionsをチェックすること
+			var lowerPath = relativePath.ToLower();
+			if (IgnoreFileNames.Contains(Path.GetFileName(lowerPath)))
+				return true;
+			if (IgnoreDirectoryNames.FirstOrDefault(o => lowerPath.Contains(o + "/")) != null)
+				return true;
+			return false;
+		}
+
+		public static void CreateNar(string path, string outputPath)
+		{
+			//TODO: テンポラリファイルはまともなかんじにしたい
+			string temporaryDirectory = Path.GetTempPath() + "/satolist/" + Guid.NewGuid().ToString();
+			var rootPathUri = new Uri(path + "/");
+
+			var files = Directory.GetFiles(path, "*", SearchOption.AllDirectories);
+			foreach(var item in files)
+			{
+				var relativePath = rootPathUri.MakeRelativeUri(new Uri(item)).ToString();
+				if (IsIgnoreFile(relativePath, true))
+					continue;
+				Directory.CreateDirectory(Directory.GetParent(temporaryDirectory + "/" + relativePath).FullName);
+				File.Copy(item, temporaryDirectory + "/" + relativePath, true);
+			}
+
+			//zipに固める
+			ZipFile.CreateFromDirectory(temporaryDirectory, outputPath, CompressionLevel.Optimal, false, Constants.EncodingShiftJis);
 		}
 
 	}

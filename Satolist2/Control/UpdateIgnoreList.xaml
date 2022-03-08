@@ -1,0 +1,142 @@
+﻿<UserControl x:Class="Satolist2.Control.UpdateIgnoreList"
+			 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+			 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+			 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+			 xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+			 xmlns:local="clr-namespace:Satolist2.Control"
+			 xmlns:avalonEdit="http://icsharpcode.net/sharpdevelop/avalonedit"
+			 mc:Ignorable="d" 
+			 d:DesignHeight="450" d:DesignWidth="800">
+	<Grid>
+		<TabControl SelectedIndex="{Binding CurrentTabIndex}" >
+			<TabItem Header="プロパティ">
+				<Grid>
+					<Grid.RowDefinitions>
+						<RowDefinition Height="auto" />
+						<RowDefinition Height="*" />
+					</Grid.RowDefinitions>
+
+					<StackPanel Grid.Row="0" Orientation="Horizontal">
+						<Button Margin="3" Command="{Binding AddItemCommand}" Padding="3 0 3 0">
+							<Button.Content>
+								<StackPanel Orientation="Horizontal">
+									<Path Fill="Green" Margin="-3 -3 2 2" Data="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z" />
+									<TextBlock Text="追加" />
+								</StackPanel>
+							</Button.Content>
+						</Button>
+					</StackPanel>
+					
+					<ListView x:Name="MainList" Grid.Row="1" ItemsSource="{Binding Items}">
+						<ListView.InputBindings>
+							<KeyBinding Key="Delete" Command="{Binding RemoveItemCommand}" />
+						</ListView.InputBindings>
+						<ListView.ItemContainerStyle>
+							<Style TargetType="ListViewItem">
+								<Setter Property="HorizontalContentAlignment" Value="Stretch" />
+								<Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
+								<Setter Property="ContextMenu">
+									<Setter.Value>
+										<ContextMenu>
+											<MenuItem Header="削除" InputGestureText="Delete" Command="{Binding RemoveItemCommand}" />
+										</ContextMenu>
+									</Setter.Value>
+								</Setter>
+							</Style>
+						</ListView.ItemContainerStyle>
+						<ListView.View>
+							<GridView>
+								<!--無効警告-->
+								<GridViewColumn>
+									<GridViewColumn.CellTemplate>
+										<DataTemplate>
+											<Path ToolTip="１つも設定が入っていないため、この設定は自動的に消滅します。" Fill="Gray" Data="M13 14H11V9H13M13 18H11V16H13M1 21H23L12 2L1 21Z">
+												<Path.Style>
+													<Style TargetType="Path">
+														<Style.Triggers>
+															<DataTrigger Binding="{Binding IsInvalid}" Value="False">
+																<Setter Property="Visibility" Value="Hidden" />
+															</DataTrigger>
+														</Style.Triggers>
+													</Style>
+												</Path.Style>
+											</Path>
+										</DataTemplate>
+									</GridViewColumn.CellTemplate>
+								</GridViewColumn>
+								
+								<!--パス-->
+								<GridViewColumn Header="パス" Width="300">
+									<GridViewColumn.CellTemplate>
+										<DataTemplate>
+											<Grid>
+												<Grid.ColumnDefinitions>
+													<ColumnDefinition Width="auto" />
+													<ColumnDefinition Width="*" />
+													<ColumnDefinition Width="auto" />
+												</Grid.ColumnDefinitions>
+
+												<TextBox Grid.Column="1" Text="{Binding Path, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" HorizontalAlignment="Stretch" MinWidth="100" />
+												<Button Grid.Column="2" Content="参照" Padding="3 0 3 0" Margin="3 0 3 0" Command="{Binding FileOpenCommand}" />
+											</Grid>
+										</DataTemplate>
+									</GridViewColumn.CellTemplate>
+								</GridViewColumn>
+							
+								<!--nonar-->
+								<GridViewColumn Header="nar除外">
+									<GridViewColumn.CellTemplate>
+										<DataTemplate>
+											<CheckBox IsChecked="{Binding IsNoNar, Mode=TwoWay}" ToolTip="narに含めません。" />
+										</DataTemplate>
+									</GridViewColumn.CellTemplate>
+								</GridViewColumn>
+
+								<!--noupdate-->
+								<GridViewColumn Header="更新除外">
+									<GridViewColumn.CellTemplate>
+										<DataTemplate>
+											<CheckBox IsChecked="{Binding IsNoUpdate, Mode=TwoWay}" ToolTip="更新ファイルに含めません。&#xA;※ななろだのようなnarをアップロードするアップローダの場合は「nar除外」に統一されるので注意してください。" />
+										</DataTemplate>
+									</GridViewColumn.CellTemplate>
+								</GridViewColumn>
+
+								<!--delete-->
+								<GridViewColumn Header="削除">
+									<GridViewColumn.CellTemplate>
+										<DataTemplate>
+											<CheckBox IsChecked="{Binding IsDelete, Mode=TwoWay}" ToolTip="ネットワーク更新時にユーザの環境にこのファイルが有る場合、削除します。" />
+										</DataTemplate>
+									</GridViewColumn.CellTemplate>
+								</GridViewColumn>
+							
+								<!-- 削除ボタン -->
+								<GridViewColumn>
+									<GridViewColumn.CellTemplate>
+										<DataTemplate>
+											<Button Grid.Column="0" Margin="0 0 5 0" Command="{Binding RemoveSingleItemCommand}">
+												<Button.Content>
+													<Path Fill="Red" Margin="-3 -3 2 2" Data="M20 6.91L17.09 4L12 9.09L6.91 4L4 6.91L9.09 12L4 17.09L6.91 20L12 14.91L17.09 20L20 17.09L14.91 12L20 6.91Z" />
+												</Button.Content>
+											</Button>
+										</DataTemplate>
+									</GridViewColumn.CellTemplate>
+								</GridViewColumn>
+
+							</GridView>
+						</ListView.View>
+					</ListView>
+				</Grid>
+			</TabItem>
+
+			<TabItem Header="delete.txt">
+				<avalonEdit:TextEditor Document="{Binding DeleteText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+			</TabItem>
+
+			<TabItem Header="developer__options.txt">
+				<avalonEdit:TextEditor Document="{Binding DeveloperOptionsText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+			</TabItem>
+			
+		</TabControl>
+	</Grid>
+</UserControl>

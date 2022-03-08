@@ -1,0 +1,141 @@
+﻿<Window x:Class="Satolist2.Dialog.RemoteFileSelectDialog"
+		xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+		xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+		xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+		xmlns:local="clr-namespace:Satolist2.Dialog"
+		xmlns:ctl="clr-namespace:Satolist2.Control"
+		mc:Ignorable="d"
+		Title="{Binding Domain}" Height="450" Width="800">
+	<Grid>
+
+		<Grid.RowDefinitions>
+			<RowDefinition Height="auto" />
+			<RowDefinition Height="auto" />
+			<RowDefinition Height="*" />
+			<RowDefinition Height="auto" />
+			<RowDefinition Height="auto" />
+		</Grid.RowDefinitions>
+
+		<Grid Grid.Row="0">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="auto" />
+				<ColumnDefinition Width="auto" />
+				<ColumnDefinition Width="*" />
+			</Grid.ColumnDefinitions>
+			<Button Grid.Column="0" Content="(家)" Width="50" Command="{Binding HomeDirectoryCommand}" Margin="3" />
+			<Button Grid.Column="1" Content="(上)" Width="50" Command="{Binding UpDirectoryCommand}" Margin="3" />
+			<TextBox Grid.Column="2" Text="{Binding CurrentPath, Mode=OneWay}" x:Name="AddressBar" Margin="3" HorizontalAlignment="Stretch" />
+		</Grid>
+
+		<StackPanel Grid.Row="1" Orientation="Horizontal">
+			<Button Content="new folder" Command="{Binding CreateDirectoryCommand}" Margin="3" />
+		</StackPanel>
+
+		<ListView Grid.Row="2" ItemsSource="{Binding Items}" SelectedItem="{Binding SelectedItem, Mode=TwoWay}">
+			<ListView.ItemContainerStyle>
+				<Style TargetType="ListViewItem">
+					<EventSetter Event="MouseDoubleClick" Handler="ListViewItem_MouseDoubleClick" />
+				</Style>
+			</ListView.ItemContainerStyle>
+			<ListView.ItemTemplate>
+				<DataTemplate>
+					<StackPanel Orientation="Horizontal">
+						<Path Fill="LightBlue" VerticalAlignment="Center" Margin="0 -4 0 0">
+							<Path.Style>
+								<Style TargetType="Path">
+									<Style.Triggers>
+										<DataTrigger Binding="{Binding Type}" Value="Directory">
+											<Setter Property="Data" Value="M20,18H4V8H20M20,6H12L10,4H4C2.89,4 2,4.89 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V8C22,6.89 21.1,6 20,6Z" />
+										</DataTrigger>
+										<DataTrigger Binding="{Binding Type}" Value="NewDirectory">
+											<Setter Property="Data" Value="M12 12H14V10H16V12H18V14H16V16H14V14H12V12M22 8V18C22 19.11 21.11 20 20 20H4C2.89 20 2 19.11 2 18V6C2 4.89 2.89 4 4 4H10L12 6H20C21.11 6 22 6.89 22 8M20 8H4V18H20V8Z" />
+										</DataTrigger>
+										<DataTrigger Binding="{Binding Type}" Value="File">
+											<Setter Property="Data" Value="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z" />
+										</DataTrigger>
+										<DataTrigger Binding="{Binding Type}" Value="Ghost">
+											<Setter Property="Data" Value="M2,10.96C1.5,10.68 1.35,10.07 1.63,9.59L3.13,7C3.24,6.8 3.41,6.66 3.6,6.58L11.43,2.18C11.59,2.06 11.79,2 12,2C12.21,2 12.41,2.06 12.57,2.18L20.47,6.62C20.66,6.72 20.82,6.88 20.91,7.08L22.36,9.6C22.64,10.08 22.47,10.69 22,10.96L21,11.54V16.5C21,16.88 20.79,17.21 20.47,17.38L12.57,21.82C12.41,21.94 12.21,22 12,22C11.79,22 11.59,21.94 11.43,21.82L3.53,17.38C3.21,17.21 3,16.88 3,16.5V10.96C2.7,11.13 2.32,11.14 2,10.96M12,4.15V4.15L12,10.85V10.85L17.96,7.5L12,4.15M5,15.91L11,19.29V12.58L5,9.21V15.91M19,15.91V12.69L14,15.59C13.67,15.77 13.3,15.76 13,15.6V19.29L19,15.91M13.85,13.36L20.13,9.73L19.55,8.72L13.27,12.35L13.85,13.36Z" />
+										</DataTrigger>
+									</Style.Triggers>
+								</Style>
+							</Path.Style>
+						</Path>
+						<TextBlock Text="{Binding Name}" Margin="5 1 0 1" />
+					</StackPanel>
+				</DataTemplate>
+			</ListView.ItemTemplate>
+
+			<ListView.Style>
+				<Style TargetType="ListView">
+					<Setter Property="Visibility" Value="Collapsed" />
+					<Style.Triggers>
+						<DataTrigger Binding="{Binding State}" Value="List">
+							<Setter Property="Visibility" Value="Visible" />
+						</DataTrigger>
+					</Style.Triggers>
+				</Style>
+			</ListView.Style>
+		</ListView>
+
+		<!--「接続中」-->
+		<StackPanel Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="Center"  >
+			<TextBlock Text="接続中..." />
+			<ProgressBar IsIndeterminate="True" Height="10" Margin="3" />
+
+			<StackPanel.Style>
+				<Style TargetType="StackPanel">
+					<Setter Property="Visibility" Value="Collapsed" />
+					<Style.Triggers>
+						<DataTrigger Binding="{Binding State}" Value="Connecting">
+							<Setter Property="Visibility" Value="Visible" />
+						</DataTrigger>
+					</Style.Triggers>
+				</Style>
+			</StackPanel.Style>
+		</StackPanel>
+		
+		<!-- 「フォルダはからっぽです」 -->
+		<TextBlock Grid.Row="2" Text="フォルダはからっぽです" HorizontalAlignment="Center" VerticalAlignment="Center">
+			<TextBlock.Style>
+				<Style TargetType="TextBlock">
+					<Setter Property="Visibility" Value="Collapsed" />
+					<Style.Triggers>
+						<DataTrigger Binding="{Binding State}" Value="Empty">
+							<Setter Property="Visibility" Value="Visible" />
+						</DataTrigger>
+					</Style.Triggers>
+				</Style>
+			</TextBlock.Style>
+		</TextBlock>
+
+		<!-- 「エラー」 -->
+		<TextBlock Grid.Row="2" Text="接続エラーが発生しました" HorizontalAlignment="Center" VerticalAlignment="Center">
+			<TextBlock.Style>
+				<Style TargetType="TextBlock">
+					<Setter Property="Visibility" Value="Collapsed" />
+					<Style.Triggers>
+						<DataTrigger Binding="{Binding State}" Value="Error">
+							<Setter Property="Visibility" Value="Visible" />
+						</DataTrigger>
+					</Style.Triggers>
+				</Style>
+			</TextBlock.Style>
+		</TextBlock>
+
+		<Grid x:Name="FileNameTextBox" Grid.Row="3">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="auto" />
+				<ColumnDefinition Width="*" />
+			</Grid.ColumnDefinitions>
+			<TextBlock Grid.Column="0" Text="ファイル名" Margin="3" />
+			<ctl:WartermarkedTextBox Grid.Column="1" Text="{Binding FileName}" Wartermark="ファイル名" HorizontalAlignment="Stretch" Margin="3" />
+		</Grid>
+
+		<StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right">
+			<Button Content="キャンセル" Width="100" Margin="3" Command="{Binding CancelCommand}" IsCancel="True"/>
+			<Button Content="OK" Width="100" Margin="3" Command="{Binding OkCommand}" IsDefault="True" />
+		</StackPanel>
+
+	</Grid>
+</Window>

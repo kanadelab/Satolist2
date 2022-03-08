@@ -90,6 +90,44 @@ namespace Satolist2.Utility
 		{
 			return Path.GetFullPath(path).Replace('\\', '/');
 		}
+
+		//パス区切りを統一
+		public static string NormalizePath(string path)
+		{
+			return path.Replace('\\', '/');
+		}
+
+		//パス区切り文字を delete.exe 準拠の \ に統一
+		public static string NormalizeDeletePath(string path)
+		{
+			return path.Replace('/', '\\');
+		}
+
+		//フルパス同士から相対パスの作成
+		public static string MakeRelativePath(string baseFullPath, string targetFullPath)
+		{
+			var baseUri = new Uri(baseFullPath + "/");
+			var targetUri = new Uri(targetFullPath);
+			return baseUri.MakeRelativeUri(targetUri).ToString();
+		}
+
+		//baseFullpathの配下にあるかどうかチェックする
+		public static bool IsChildPath(string baseFullPath, string targetFullPath)
+		{
+			//もう少しちゃんとした検出方法があるかも？
+			//ドライブレターが異なる場合は間違ってる
+			if (baseFullPath[0] != targetFullPath[0])
+				return false;
+
+			var relativePath = MakeRelativePath(baseFullPath, targetFullPath);
+
+			//遡ろうとしてたら違う
+			if(relativePath.IndexOf("..") == 0)
+			{
+				return false;
+			}
+			return true;
+		}
 	}
 
 	internal static class Constants
@@ -115,6 +153,9 @@ namespace Satolist2.Utility
 
 		//変数
 		public const string VariableDictionaryDirectory = "辞書フォルダ";
+
+		//変数初期化
+		public const string VariableInitializeEvent = "＊初期化";
 
 		//インラインイベント
 		public const string InlineEventSeparator = "＃＃＃インラインイベント";

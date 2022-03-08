@@ -38,6 +38,9 @@
     <Reference Include="AvalonDock, Version=4.60.1.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
       <HintPath>..\packages\Dirkster.AvalonDock.4.60.1\lib\net40\AvalonDock.dll</HintPath>
     </Reference>
+    <Reference Include="FluentFTP, Version=37.0.1.0, Culture=neutral, PublicKeyToken=f4af092b1d8df44f, processorArchitecture=MSIL">
+      <HintPath>..\packages\FluentFTP.37.0.1\lib\net45\FluentFTP.dll</HintPath>
+    </Reference>
     <Reference Include="ICSharpCode.AvalonEdit, Version=6.1.3.50, Culture=neutral, PublicKeyToken=9cc39be672370310, processorArchitecture=MSIL">
       <HintPath>..\packages\AvalonEdit.6.1.3.50\lib\net45\ICSharpCode.AvalonEdit.dll</HintPath>
     </Reference>
@@ -47,6 +50,8 @@
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.IO.Compression.FileSystem" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
@@ -66,6 +71,19 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Control\ReplaceList.xaml.cs">
+      <DependentUpon>ReplaceList.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Control\SaoriList.xaml.cs">
+      <DependentUpon>SaoriList.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Control\UpdateIgnoreList.xaml.cs">
+      <DependentUpon>UpdateIgnoreList.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Control\VariableList.xaml.cs">
+      <DependentUpon>VariableList.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Control\WartermarkedTextBox.cs" />
     <Compile Include="Control\DebugMainMenu.xaml.cs">
       <DependentUpon>DebugMainMenu.xaml</DependentUpon>
     </Compile>
@@ -77,6 +95,9 @@
     </Compile>
     <Compile Include="Control\FileEventTree.xaml.cs">
       <DependentUpon>FileEventTree.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Control\GhostDescriptEditor.xaml.cs">
+      <DependentUpon>GhostDescriptEditor.xaml</DependentUpon>
     </Compile>
     <Compile Include="Control\StartMenu.xaml.cs">
       <DependentUpon>StartMenu.xaml</DependentUpon>
@@ -90,11 +111,26 @@
     <Compile Include="Control\TextEditor.xaml.cs">
       <DependentUpon>TextEditor.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Core\FtpClient.cs" />
+    <Compile Include="Core\NarNaLoaderClient.cs" />
+    <Compile Include="Core\SatoriRecv.cs" />
     <Compile Include="Dialog\AddEventDialog.xaml.cs">
       <DependentUpon>AddEventDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dialog\RemoteFileSelectDialog.xaml.cs">
+      <DependentUpon>RemoteFileSelectDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dialog\SaveFileListDialog.xaml.cs">
       <DependentUpon>SaveFileListDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialog\TextEditorInsertPaletteSettingsDialog.xaml.cs">
+      <DependentUpon>TextEditorInsertPaletteSettingsDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialog\TextInputDialog.xaml.cs">
+      <DependentUpon>TextInputDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialog\UploadSettingDialog.xaml.cs">
+      <DependentUpon>UploadSettingDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Model\Dictionary.cs" />
     <Compile Include="Utility\Converter.cs" />
@@ -124,7 +160,23 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Control\GhostDescriptEditor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Control\ReplaceList.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Control\SaoriList.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Control\StartMenu.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Control\StrechedListViewItemStyle.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -140,11 +192,35 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Control\UpdateIgnoreList.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Control\VariableList.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Dialog\AddEventDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Dialog\RemoteFileSelectDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Dialog\SaveFileListDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialog\TextEditorInsertPaletteSettingsDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialog\TextInputDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialog\UploadSettingDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

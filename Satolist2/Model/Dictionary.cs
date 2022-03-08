@@ -102,12 +102,7 @@ namespace Satolist2.Model
 		//辞書の相対パス
 		public string RelativeName
 		{
-			get
-			{
-				var dictRootUri = new Uri(Ghost.FullDictionaryPath + "/") ;
-				var dictUri = new Uri(FullPath);
-				return dictRootUri.MakeRelativeUri(dictUri).ToString();
-			}
+			get => DictionaryUtility.MakeRelativePath(Ghost.FullDictionaryPath, FullPath);
 		}
 
 		public string Body
