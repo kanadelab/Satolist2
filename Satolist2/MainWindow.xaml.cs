@@ -394,8 +394,8 @@ namespace Satolist2
 		{
 			List<ISaveFileObject> objects = new List<ISaveFileObject>();
 			objects.AddRange(SaveLoadPanes);
-			objects.AddRange(Ghost.Dictionaries);
-			
+			if(Ghost != null)
+				objects.AddRange(Ghost.Dictionaries);
 
 			var dialog = new SaveFileListDialog();
 			dialog.DataContext = new SaveFileListViewModel(objects);

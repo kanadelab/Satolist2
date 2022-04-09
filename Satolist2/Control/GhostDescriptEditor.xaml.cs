@@ -82,7 +82,7 @@ namespace Satolist2.Control
 		}
 	}
 
-	internal class GhostDescriptEditorViewModel : NotificationObject, ISaveFileObject, IDockingWindowContent
+	internal class GhostDescriptEditorViewModel : NotificationObject, ISaveFileObject, IDockingWindowContent, IDisposable
 	{
 		public virtual string SaveFilePath => "/ghost/master/descript.txt";
 		public virtual string DockingTitle => "ゴーストプロパティ";
@@ -187,6 +187,7 @@ namespace Satolist2.Control
 
 			if (main.Ghost != null)
 				Load();
+			isChanged = false;
 		}
 
 		//ファイルからの読み込み
@@ -208,10 +209,6 @@ namespace Satolist2.Control
 			{
 				loadState = EditorLoadState.LoadFailed;
 				return false;
-			}
-			finally
-			{
-				isChanged = false;
 			}
 		}
 
@@ -289,12 +286,27 @@ namespace Satolist2.Control
 
 		private void ListToText()
 		{
+			if (Document != null)
+				Document.TextChanged -= Document_TextChanged;
+
 			Document = new TextDocument(Serialize());
+			Document.TextChanged += Document_TextChanged;
+		}
+
+		private void Document_TextChanged(object sender, EventArgs e)
+		{
+			Changed();
 		}
 
 		public void Changed()
 		{
 			isChanged = true;
+		}
+
+		public void Dispose()
+		{
+			if (Document != null)
+				Document.TextChanged -= Document_TextChanged;
 		}
 	}
 
