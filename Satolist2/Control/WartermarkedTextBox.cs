@@ -76,7 +76,8 @@ namespace Satolist2.Control
 			var layer = AdornerLayer.GetAdornerLayer(this);
 			wartermarkedAdorner = new WartermarkedAdorner(this);
 			wartermarkedAdorner.SetWartermark(Wartermark);
-			layer.Add(wartermarkedAdorner);
+			layer?.Add(wartermarkedAdorner);
+			OnTextChanged(null);	//初期状態
 		}
 
 		protected override void OnTextChanged(TextChangedEventArgs e)

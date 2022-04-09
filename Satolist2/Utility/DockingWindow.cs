@@ -99,4 +99,21 @@ namespace Satolist2.Utility
 		void ControlBind(System.Windows.Controls.Control control);
 	}
 
+	//変更検出と保存実行
+	internal interface ISaveFileObject
+	{
+		bool IsChanged { get; }
+		string SaveFilePath { get; }
+		bool Save();
+		void Changed();
+		EditorLoadState LoadState { get; }
+	}
+
+	public enum EditorLoadState
+	{
+		Initialized,    //まだロードしてない
+		Loaded,         //ロード完了(ファイルが存在しないので新規になっていることを含む)
+		LoadFailed      //ロード失敗
+	}
+
 }

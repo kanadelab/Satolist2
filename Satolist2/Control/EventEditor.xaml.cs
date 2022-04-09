@@ -3,6 +3,7 @@ using Satolist2.Model;
 using Satolist2.Utility;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -16,6 +17,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Satolist2.Dialog;
 
 namespace Satolist2.Control
 {
@@ -28,6 +30,44 @@ namespace Satolist2.Control
 		{
 			InitializeComponent();
 			MainTextEditor.SyntaxHighlighting = new SatoriSyntaxHilighter();
+		}
+
+		internal void UpdateInsertPaletteKeyBindings(InsertItemPaletteModel palette, ICommand command)
+		{
+			//古いバインディング削除
+			List<InputBinding> removes = new List<InputBinding>();
+			foreach(var item in MainTextEditor.InputBindings)
+			{
+				if (item is InsertPaletteKeyBinding b)
+					removes.Add(b);
+			}
+
+			foreach(var item in removes)
+			{
+				MainTextEditor.InputBindings.Remove(item);
+			}
+
+			//バインディングの作成
+			var items = palette?.AllItems() ?? Array.Empty<InsertItemPaletteModel>();
+			foreach(var item in items)
+			{
+				var gesture = InsertItemPaletteShortCutGestureConverter.ConvertToGesture(item);
+				if (gesture != null)
+				{
+					MainTextEditor.InputBindings.Add(new InsertPaletteKeyBinding(command, gesture, item));
+				}
+			}
+		}
+
+	}
+
+	//クラス識別用
+	internal class InsertPaletteKeyBinding : KeyBinding
+	{
+		public InsertPaletteKeyBinding(ICommand command, KeyGesture gesture, object commandParam):
+			base(command,gesture)
+		{
+			base.CommandParameter = commandParam;
 		}
 	}
 
@@ -44,9 +84,10 @@ namespace Satolist2.Control
 		}
 	}
 
-	internal class EventEditorViewModel : NotificationObject, IDockingWindowContent, IDisposable
+	internal class EventEditorViewModel : NotificationObject, IDockingWindowContent, IDisposable, IControlBindedReceiver
 	{
 		private bool disableBodyPropertyChanged;
+		private EventEditor control;
 
 		public EventModel Event { get; }
 		public string randomizedContentId;
@@ -68,10 +109,15 @@ namespace Satolist2.Control
 		public TextDocument Document { get; }
 
 		public ActionCommand SendToGhostCommand {get;}
+		public ActionCommand InsertCommand { get; }
+		public MainViewModel Main { get; }
+
 
 		public EventEditorViewModel(MainViewModel main, EventModel ev)
 		{
-			//TODO: 閉じるときにイベントを取り除く必要がありそう
+			Main = main;
+			Main.PropertyChanged += Main_PropertyChanged;
+
 			randomizedContentId = Guid.NewGuid().ToString();	//複数出現するのでユニークなIDを振る
 			Event = ev;
 			Event.PropertyChanged += Event_PropertyChanged;
@@ -86,6 +132,24 @@ namespace Satolist2.Control
 					Satorite.SendSatori(main.Ghost, Document.Text, Event.Type);
 				}
 				);
+
+			InsertCommand = new ActionCommand(
+				//o => System.Console.WriteLine(((InsertItemPaletteModel)o).Label)
+				o =>
+				{
+					//TODO: control側のメソッドに
+					control.MainTextEditor.Document.Insert(control.MainTextEditor.CaretOffset, ((InsertItemPaletteModel)o).Body);
+				}
+				);
+		}
+
+		private void Main_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+		{
+			if(e.PropertyName == nameof(MainViewModel.InsertPalette))
+			{
+				//insertPalette更新
+				control.UpdateInsertPaletteKeyBindings(Main.InsertPalette, InsertCommand);
+			}
 		}
 
 		private void Document_TextChanged(object sender, EventArgs e)
@@ -109,8 +173,20 @@ namespace Satolist2.Control
 		{
 			Event.PropertyChanged -= Event_PropertyChanged;
 			Document.TextChanged -= Document_TextChanged;
+			Main.PropertyChanged -= Main_PropertyChanged;
+		}
+
+		public void ControlBind(System.Windows.Controls.Control ctrl)
+		{
+			if(ctrl is EventEditor eventEditor)
+			{
+				control = eventEditor;
+				control.UpdateInsertPaletteKeyBindings(Main.InsertPalette, InsertCommand);
+			}
 		}
 	}
+
+	
 
 	
 }

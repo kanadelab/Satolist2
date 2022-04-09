@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Satolist2.Utility;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -19,7 +20,7 @@ namespace Satolist2.Dialog
 	/// </summary>
 	public partial class SaveFileListDialog : Window
 	{
-		public new SaveFileListViewModel DataContext
+		internal new SaveFileListViewModel DataContext
 		{
 			get => (SaveFileListViewModel)base.DataContext;
 			set => base.DataContext = value;
@@ -31,22 +32,55 @@ namespace Satolist2.Dialog
 		}
 	}
 
-	public class SaveFileListViewModel
+	internal class SaveFileListViewModel
 	{
-		public ISaveFileObject[] Items { get; }
+		public SaveFileListItemViewModel[] Items { get; }
 
 		public SaveFileListViewModel(IEnumerable<ISaveFileObject> saveFiles)
 		{
 			//変更があったものだけフィルタしてリストアップ
-			Items = saveFiles.Where( o=> o.IsChanged).ToArray();
+			Items = saveFiles.Where( o=> o.IsChanged).Select( o => new SaveFileListItemViewModel(o)).ToArray();
 		}
 	}
 
-	//変更検出と保存実行
-	public interface ISaveFileObject
+	internal class SaveFileListItemViewModel : NotificationObject
 	{
-		bool IsChanged { get; }
-		string SaveFilePath { get; }
-		void Save();
+		public bool isSave;
+
+		public ISaveFileObject SaveItem { get; }
+		public string SaveFilePath
+		{
+			get
+			{
+				//見栄え的に最初のスラッシュは消しておく
+				//スラッシュ付けない仕様に固定するのでもいいかも
+				if(SaveItem.SaveFilePath.IndexOf('/') == 0)
+				{
+					return SaveItem.SaveFilePath.Substring(1);
+				}
+				else
+				{
+					return SaveItem.SaveFilePath;
+				}
+			}
+		}
+
+		public bool IsSave
+		{
+			get => isSave;
+			set
+			{
+				isSave = value;
+				NotifyChanged();
+			}
+		}
+
+		public SaveFileListItemViewModel(ISaveFileObject obj)
+		{
+			isSave = true;
+			SaveItem = obj;
+		}
 	}
+
+	
 }

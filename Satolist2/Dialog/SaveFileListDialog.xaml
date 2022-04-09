@@ -17,7 +17,10 @@
 		<ListView Grid.Row="1" ItemsSource="{Binding Items}">
 			<ListView.ItemTemplate>
 				<DataTemplate>
-					<TextBlock Text="{Binding SaveFilePath}" />
+					<StackPanel Orientation="Horizontal">
+						<CheckBox IsChecked="{Binding IsSave, Mode=TwoWay}" />
+						<TextBlock Text="{Binding SaveFilePath}"/>
+					</StackPanel>
 				</DataTemplate>
 			</ListView.ItemTemplate>
 		</ListView>

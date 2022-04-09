@@ -1,0 +1,335 @@
+[
+	{
+		"Property": "name",
+		"Description": "(必須)ゴースト名",
+		"Help": "例：奏でる日常の旋律",
+		"Type": "String",
+		"Required": true
+	},
+	{
+		"Property": "craftman",
+		"Description": "作者名の半角英数表記",
+		"Help": "例:yunosora",
+		"Type": "String"
+	},
+	{
+		"Property": "craftmaiw",
+		"Description": "作者名",
+		"Help": "例:湯空さとり",
+		"Type": "String"
+	},
+	{
+		"Property": "id",
+		"Description": "ログID名",
+		"Help": [
+			"そのゴーストのID名。半角英数のみ。",
+			"SSPでは起動ログ表示モードでのみ有効。"
+		],
+		"Type": "String"
+	},
+	{
+		"Property": "title",
+		"Description": "ログ表示名",
+		"Help": [
+			"そのゴーストの起動ログでIDの代わりに表示される名前。半角英数のみ。",
+			"SSPでは起動ログ表示モードでのみ有効"
+		],
+		"Type": "String"
+	},
+	{
+		"Property": "craftmanurl",
+		"Description": "作者サイトのURL",
+		"Help": "例:https://nanachi.sakura.ne.jp",
+		"Type": "String"
+	},
+	{
+		"Property": "homeurl",
+		"Description": "ネットワーク更新URL",
+		"Help": [
+			"ネットワーク更新用のURL。末尾に / を忘れないように注意"
+		],
+		"Type": "String"
+	},
+	{
+		"Property": "sakura.name",
+		"Description": "(必須)メインキャラの名前",
+		"Help": "例:かなで",
+		"Type": "String",
+		"Required": true
+	},
+	{
+		"Property": "sakura.name2",
+		"Description": "本体側の名前",
+		"Help": "本体側ゴーストの名前。愛称など。",
+		"Type": "String"
+	},
+	{
+		"Property": "kero.name",
+		"Description": "相方側の名前",
+		"Help": "例：うにゅう",
+		"Type": "String"
+	},
+	{
+		"Property": "sakura.seriko.defaultsurface",
+		"Description": "本体側のデフォルトサーフェス番号",
+		"Type": "String",
+		"Default": "0"
+	},
+	{
+		"Property": "kero.seriko.defaultsurface",
+		"Description": "相方側のデフォルトサーフェス番号",
+		"Type": "String",
+		"Default": "10"
+	},
+	{
+		"Property": "balloon.defaultsurface",
+		"Description": "バルーンのデフォルトサーフェス番号",
+		"Type": "String",
+		"Default": "0"
+	},
+	{
+		"Property": "sakura.balloon.defaultsurface",
+		"Description": "本体側バルーンのデフォルトサーフェス番号",
+		"Type": "String",
+		"Default": "0"
+	},
+	{
+		"Property": "kero.balloon.defaultsurface",
+		"Description": "相方側バルーンのデフォルトサーフェス番号",
+		"Type": "String",
+		"Defailt": "0"
+	},
+	{
+		"Property": "sakura.alignmenttodesktop",
+		"Description": "デフォルト表示位置",
+		"Help": "sakura,keroで個別に設定してある場合は設定値が優先",
+		"Type": "Select",
+		"Items": [
+			{
+				"Value": "top"
+			},
+			{
+				"Value": "bottom"
+			},
+			{
+				"Value": "free"
+			}
+		]
+	},
+	{
+		"Property": "sakura.seriko.alignmenttodesktop",
+		"Description": "本体側のデフォルト表示位置",
+		"Type": "Select",
+		"Items": [
+			{
+				"Value": "top"
+			},
+			{
+				"Value": "bottom"
+			},
+			{
+				"Value": "free"
+			}
+		]
+	},
+	{
+		"Property": "kero.seriko.alignmenttodesktop",
+		"Description": "相方側のデフォルト表示位置",
+		"Type": "Select",
+		"Items": [
+			{
+				"Value": "top"
+			},
+			{
+				"Value": "bottom"
+			},
+			{
+				"Value": "free"
+			}
+		]
+	},
+	{
+		"Property": "sakura.defaultx",
+		"Description": "本体側の画像ベースX座標",
+		"Type": "String"
+	},
+	{
+		"Property": "kero.defaultx",
+		"Description": "相方側の画像ベースX座標",
+		"Type": "String"
+	},
+	{
+		"Property": "sakura.defaulty",
+		"Description": "本体側の画像ベースY座標",
+		"Type": "String"
+	},
+	{
+		"Property": "kero.defaulty",
+		"Description": "相方側の画像ベースY座標",
+		"Type": "String"
+	},
+	{
+		"Property": "sakura.defaultleft",
+		"Description": "本体側のディスプレイ上でのデフォルトX座標",
+		"Type": "String"
+	},
+	{
+		"Property": "kero.defaultleft",
+		"Description": "相方側のディスプレイ上でのデフォルトX座標",
+		"Type": "String"
+	},
+	{
+		"Property": "sakura.defaulttop",
+		"Description": "本体側のディスプレイ上でのデフォルトY座標",
+		"Help": "seriko.alignmenttodesktop が free の場合にのみ有効",
+		"Type": "String"
+	},
+	{
+		"Property": "kero.defaulttop",
+		"Description": "相方側のディスプレイ上でのデフォルトY座標",
+		"Help": "seriko.alignmenttodesktop が free の場合にのみ有効",
+		"Type": "String"
+	},
+	{
+		"Property": "seriko.defaultsurfacedirectoryname",
+		"Description": "デフォルトシェル",
+		"Help": "初回起動時や一度もシェルを切り替えたことのない時に、標準で読み込まれるシェルのディレクトリ名を指定",
+		"Type": "String",
+		"Default": "master"
+	},
+	{
+		"Property": "sstp.allowunspecifiedsend",
+		"Description": "ゴースト指定のないSSTPの許容",
+		"Default": "1",
+		"Type": "Select",
+		"Items": [
+			{
+				"Label": "ON",
+				"Value": "1"
+			},
+			{
+				"Label": "OFF",
+				"Value": "0"
+			}
+		]
+	},
+	{
+		"Property": "sstp.allowcommunicate",
+		"Description": "COMMUNICATEの許容",
+		"Default": "1",
+		"Type": "Select",
+		"Items": [
+			{
+				"Label": "ON",
+				"Value": "1"
+			},
+			{
+				"Label": "OFF",
+				"Value": "0"
+			}
+		]
+	},
+	{
+		"Property": "sstp.alwaystranslate",
+		"Description": "常にSSTPをトランスレートする",
+		"Default": "0",
+		"Type": "Select",
+		"Items": [
+			{
+				"Label": "ON",
+				"Value": "1"
+			},
+			{
+				"Label": "OFF",
+				"Value": "0"
+			}
+		]
+	},
+	{
+		"Property": "name.allowoverride",
+		"Description": "シェル側によるnameの書き換えを許容",
+		"Default": "1",
+		"Type": "Select",
+		"Items": [
+			{
+				"Label": "ON",
+				"Value": "1"
+			},
+			{
+				"Label": "OFF",
+				"Value": "0"
+			}
+		]
+	},
+	{
+		"Property": "icon",
+		"Description": "タスクトレイアイコン",
+		"Type": "String"
+	},
+	{
+		"Property": "icon.minimize",
+		"Description": "最小化時のタスクトレイアイコン",
+		"Type": "String"
+	},
+	{
+		"Property": "makoto",
+		"Description": "MAKOTOファイル",
+		"Type": "String",
+		"Default": "makoto.dll"
+	},
+	{
+		"Property": "menu.font.name",
+		"Description": "右クリックメニューのフォント",
+		"Type": "String"
+	},
+	{
+		"Property": "menu.font.height",
+		"Description": "右クリックメニューのフォントサイズ",
+		"Type": "String"
+	},
+	{
+		"Property": "shiori.logo.file",
+		"Description": "AIグラフ背景画像",
+		"Type": "String",
+		"Default": "ai.png",
+		"Help": [
+			"画像サイズは288x288pxでグラフ描画面一杯になる"
+		]
+	},
+	{
+		"Property": "shiori.logo.x",
+		"Description": "AIグラフ背景画像のX位置",
+		"Type": "String",
+		"Defailt": "0"
+	},
+	{
+		"Property": "shiori.logo.y",
+		"Description": "AIグラフ背景画像のY位置",
+		"Type": "String",
+		"Default": "0"
+	},
+	{
+		"Property": "shiori.logo.align",
+		"Description": "AIグラフ背景画像の基準",
+		"Type": "Select",
+		"Default": "lefttop",
+		"Items": [
+			{
+				"Label": "左上",
+				"Value": "lefttop"
+			},
+			{
+				"Label": "左下",
+				"Value": "leftbottom"
+			},
+			{
+				"Label": "右上",
+				"Value": "righttop"
+			},
+			{
+				"Label": "右下",
+				"Value": "rightbottom"
+			}
+		]
+	}
+]

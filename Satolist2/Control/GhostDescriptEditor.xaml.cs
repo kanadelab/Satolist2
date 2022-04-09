@@ -1,6 +1,8 @@
-﻿using Satolist2.Utility;
+﻿using ICSharpCode.AvalonEdit.Document;
+using Satolist2.Utility;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -80,11 +82,31 @@ namespace Satolist2.Control
 		}
 	}
 
-	internal class GhostDescriptEditorViewModel : NotificationObject
-	{ 
-		private int selectedIndex;
+	internal class GhostDescriptEditorViewModel : NotificationObject, ISaveFileObject, IDockingWindowContent
+	{
+		public string SaveFilePath => "/ghost/master/descript.txt";
+		private const int TabIndexList = 0;
 
-		public IEnumerable<DescriptItemViewModel> Items { get; }
+		private MainViewModel main;
+		private int currentTabIndex;
+		private int selectedIndex;
+		private EditorLoadState loadState;
+		private List<string> commonLine;
+		private TextDocument document;
+		private bool isChanged;
+		private IEnumerable<DescriptItemViewModel> items;
+		private string searchString;
+
+		public ICollectionView Items { get; }
+		public TextDocument Document
+		{
+			get => document;
+			set
+			{
+				document = value;
+				NotifyChanged();
+			}
+		}
 
 		public int SelectedIndex
 		{
@@ -96,89 +118,183 @@ namespace Satolist2.Control
 			}
 		}
 
-		public GhostDescriptEditorViewModel()
+		public int CurrentTabIndex
 		{
-			Items = new DescriptItemViewModel[]
+			get => currentTabIndex;
+			set
 			{
-				new DescriptItemViewModel()
+				if (currentTabIndex != value)
 				{
-					Label = "name",
-					Description = "(必須)ゴースト名",
-					Help = "例：奏でる日常の旋律",
-					Type = DescriptType.String,
-					Required = true
-				},
+					if (value == TabIndexList)
+						TextToList();
+					else
+						ListToText();
 
-				new DescriptItemViewModel()
-				{
-					Label = "sakura.name",
-					Description = "(必須)メインキャラの名前",
-					Help = "例: かなで",
-					Type = DescriptType.String,
-					Required = true
-				},
-
-				new DescriptItemViewModel()
-				{
-					Label = "craftman",
-					Description = "(必須)半角英数の作者名",
-					Help = "例：yunosora",
-					Type = DescriptType.String,
-					Required = true
-				},
-
-				new DescriptItemViewModel()
-				{
-					Label = "craftmanw",
-					Description = "(必須)作者名",
-					Help = "例: 湯空さとり",
-					Type = DescriptType.String,
-					Required = true
-				},
-
-				new DescriptItemViewModel()
-				{
-					Label = "craftmanurl",
-					Description = "作者サイトのURL",
-					Help = "例: https://nanachi.sakura.ne.jp",
-					Type = DescriptType.String
-				},
-
-				new DescriptItemViewModel()
-				{
-					Label = "sakura.seriko.defaultsurface",
-					Description = "本体側のゴーストのデフォルトサーフェス番号",
-					Help = "既定値: 0"
-				},
-
-				new DescriptItemViewModel()
-				{
-					Label = "kero.seriko.defaultsurface",
-					Description = "相方側のゴーストのデフォルトサーフェス番号",
-					Help = "既定値: 0"
+					currentTabIndex = value;
+					NotifyChanged();
 				}
-
-
-
-
-				/*
-				new DescriptItemViewModel()
-				{
-					Label = "name",
-					Description = "そのゴーストの名前",
-					Type = DescriptType.Bool
-				}
-				*/
-			};
+			}
 		}
-	
+
+		public EditorLoadState LoadState
+		{
+			get => loadState;
+			set
+			{
+				loadState = value;
+				NotifyChanged();
+			}
+		}
+
+		public string SearchString
+		{
+			get => searchString;
+			set
+			{
+				searchString = value;
+				Items.Refresh();
+			}
+		}
+
+		//変更されたか
+		public bool IsChanged
+		{
+			get => isChanged;
+		}
+
+		public string DockingTitle => "ゴーストプロパティ";
+
+		public string DockingContentId => "GhostProperty";
+
+		public GhostDescriptEditorViewModel(MainViewModel main)
+		{
+			this.main = main;
+			loadState = EditorLoadState.Initialized;
+			items = DataModelManager.DescriptItems.Select(o => new DescriptItemViewModel(o, this)).ToArray();
+			Items = CollectionViewSource.GetDefaultView(items);
+			Items.Filter = new Predicate<object>(
+				o =>
+				{
+					return ((DescriptItemViewModel)o).Label.Contains(searchString ?? string.Empty);
+				}
+				);
+
+			commonLine = new List<string>();
+
+			if (main.Ghost != null)
+				Load();
+		}
+
+		//ファイルからの読み込み
+		private bool Load()
+		{
+			loadState = EditorLoadState.Initialized;
+			try
+			{
+				var fullPath = main.Ghost.FullPath + SaveFilePath;
+				if (System.IO.File.Exists(fullPath))
+				{
+					var fileBody = System.IO.File.ReadAllText(fullPath, Constants.EncodingShiftJis);
+					Deserialize(fileBody);
+				}
+				loadState = EditorLoadState.Loaded;
+				return true;
+			}
+			catch
+			{
+				loadState = EditorLoadState.LoadFailed;
+				return false;
+			}
+			finally
+			{
+				isChanged = false;
+			}
+		}
+
+		//ファイルへの書き込み
+		public bool Save()
+		{
+			if (loadState != EditorLoadState.Loaded)
+				return false;
+
+			string saveText;
+			if(CurrentTabIndex == TabIndexList)
+			{
+				//リスト化されてるのでシリアライズして保存
+				saveText = Serialize();
+			}
+			else
+			{
+				//テキスト編集モードなのでDocumentを保存
+				saveText = document.Text;
+			}
+
+			try
+			{
+				var fullPath = main.Ghost.FullPath + SaveFilePath;
+				System.IO.File.WriteAllText(fullPath, saveText, Constants.EncodingShiftJis);
+				return true;
+			}
+			catch
+			{
+				return false;
+			}
+		}
+
+		//テキストのデシリアライズ
+		private void Deserialize(string body)
+		{
+			commonLine.Clear();
+			var lines = DictionaryUtility.SplitLines(body);
+
+			foreach(var line in lines)
+			{
+				var sp = DictionaryUtility.SplitCSVLine(line);
+				if(sp.Length == 2)
+				{
+					//Modelに一致するものを探す
+					var item = items.FirstOrDefault(o => o.Label == sp[0]);
+					if(item != null)
+					{
+						item.Value = sp[1]; //TODO: bool変換?
+						continue;
+					}
+				}
+
+				commonLine.Add(line);
+			}
+		}
+
+		//テキストへのシリアライズ
+		private string Serialize()
+		{
+			var lines = new List<string>();
+			foreach(var item in items)
+			{
+				if(!string.IsNullOrEmpty(item.Value))
+					lines.Add(string.Concat(item.Label, ',', item.Value));
+			}
+			lines.AddRange(commonLine);
+			return DictionaryUtility.JoinLines(lines);
+		}
+
+		private void TextToList()
+		{
+			Deserialize(Document.Text);
+		}
+
+		private void ListToText()
+		{
+			Document = new TextDocument(Serialize());
+		}
+
+		public void Changed()
+		{
+			isChanged = true;
+		}
 	}
 
-	internal enum DescriptType
-	{
-		String,
-		Bool
-	}
+	
 
 	internal enum DescriptBool
 	{
@@ -189,23 +305,77 @@ namespace Satolist2.Control
 
 	internal class DescriptItemViewModel :NotificationObject
 	{
-		private object val;
+		private string val;
 		private bool isSelected;
+		private DescriptItemModel model;
+		private DescriptSelectItem selectedItem;
+		private ISaveFileObject parent;
 
-		public string Label { get; set; }
-		public string Description { get; set; }
-		public string Help { get; set; }
-		public DescriptType Type { get; set; }
-		public bool Required { get; set; }
+		public string Label => model.Property;
+		public string Description => model.Description;
+		public string Default => model.Default;
+		public string Help
+		{
+			get
+			{
+				if (string.IsNullOrEmpty(model.Help))
+					return model.Description;
+				else
+					return string.Concat(model.Description, Constants.NewLine, model.Help);
+			}
+		}
+		public DescriptItemModel.DescriptType Type => model.Type;
+		public bool Required => model.Required;
+		public IEnumerable<DescriptSelectItem> Items
+		{
+			get
+			{
+				//リストにないものが選択されている場合はアイテムの１つとして列挙する形で許容する
+				foreach (var item in model.Items)
+					yield return item;
 
-		public object Value
+				if(!model.Items.Any(o => o == selectedItem))
+					yield return selectedItem;
+			}
+		}
+
+		public string Value
 		{
 			get => val;
 			set
 			{
-				val = value;
-				NotifyChanged();
-				NotifyChanged(nameof(IsDefault));
+				if (val != value)
+				{
+					val = value;
+
+					var item = model.Items.FirstOrDefault(o => o.Value == val);
+					if (item != null)
+						selectedItem = item;
+					else
+						selectedItem = new DescriptSelectItem() { Label = val, Value = val };
+
+					NotifyChanged();
+					NotifyChanged(nameof(IsDefault));
+					NotifyChanged(nameof(SelectedItem));
+					parent.Changed();
+				}
+			}
+		}
+
+		public DescriptSelectItem SelectedItem
+		{
+			get => selectedItem;
+			set
+			{
+				if (selectedItem != value)
+				{
+					selectedItem = value;
+					val = selectedItem.Value;
+					NotifyChanged(nameof(IsDefault));
+					NotifyChanged(nameof(Value));
+					NotifyChanged();
+					parent.Changed();
+				}
 			}
 		}
 
@@ -215,10 +385,10 @@ namespace Satolist2.Control
 			{
 				switch(Type)
 				{
-					case DescriptType.String:
-						return string.IsNullOrEmpty(val as string);
-					case DescriptType.Bool:
-						return val as DescriptBool? == DescriptBool.Default;
+					case DescriptItemModel.DescriptType.String:
+						return string.IsNullOrEmpty(val);
+					case DescriptItemModel.DescriptType.Select:
+						return string.IsNullOrEmpty(selectedItem.Value);
 						
 				}
 				return false;
@@ -233,6 +403,13 @@ namespace Satolist2.Control
 				isSelected = value;
 				NotifyChanged();
 			}
+		}
+
+		public DescriptItemViewModel(DescriptItemModel model, ISaveFileObject document)
+		{
+			this.parent = document;
+			this.model = model;
+			SelectedItem = model.Items[0];
 		}
 	}
 }

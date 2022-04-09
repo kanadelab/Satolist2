@@ -140,8 +140,11 @@ namespace Satolist2.Model
 
 		public string SaveFilePath => RelativeName;
 
+		public EditorLoadState LoadState { get; set; }
+
 		public TextFileModel(GhostModel ghost, string fullPath)
 		{
+			LoadState = EditorLoadState.Initialized;
 			Ghost = ghost;
 			FullPath = fullPath;
 			bodyAvailable = true;
@@ -152,13 +155,26 @@ namespace Satolist2.Model
 
 		protected virtual void LoadFile()
 		{
-			body = File.ReadAllText(FullPath, Constants.EncodingShiftJis);
-			bodyAvailable = true;
+			try
+			{
+				body = File.ReadAllText(FullPath, Constants.EncodingShiftJis);
+				bodyAvailable = true;
+				LoadState = EditorLoadState.Loaded;
+			}
+			catch
+			{
+				LoadState = EditorLoadState.LoadFailed;
+			}
 		}
 
-		public void Save()
+		public bool Save()
 		{
 			throw new NotImplementedException();
+		}
+
+		public void Changed()
+		{
+			IsChanged = true;
 		}
 	}
 

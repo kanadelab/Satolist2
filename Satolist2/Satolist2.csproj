@@ -133,10 +133,14 @@
       <DependentUpon>UploadSettingDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Model\Dictionary.cs" />
+    <Compile Include="Model\EditorSettings.cs" />
+    <Compile Include="Model\TextEditor.cs" />
     <Compile Include="Utility\Converter.cs" />
+    <Compile Include="Utility\DataModelManager.cs" />
     <Compile Include="Utility\DictionaryUtility.cs" />
     <Compile Include="Utility\DockingWindow.cs" />
     <Compile Include="Utility\ActionCommand.cs" />
+    <Compile Include="Utility\JsonUtility.cs" />
     <Compile Include="Utility\NarUtility.cs" />
     <Compile Include="Utility\NotificaionObject.cs" />
     <Compile Include="Utility\SakuraFMOReader.cs" />
@@ -255,6 +259,9 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="data\descript.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

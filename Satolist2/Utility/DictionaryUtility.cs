@@ -85,6 +85,16 @@ namespace Satolist2.Utility
 			return text.Split(Constants.NewLineSeparator, StringSplitOptions.None);
 		}
 
+		public static string[] SplitCSVLine(string line)
+		{
+			return line.Split(new char[] { ',' }, 2, StringSplitOptions.None);
+		}
+
+		public static string JoinLines(IEnumerable<string> lines)
+		{
+			return string.Join(Constants.NewLine, lines);
+		}
+
 		//絶対パスに整形し、区切り文字を '/' に統一する
 		public static string NormalizeFullPath(string path)
 		{

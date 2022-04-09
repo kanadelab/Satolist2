@@ -4,105 +4,129 @@
 			 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
 			 xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
 			 xmlns:local="clr-namespace:Satolist2.Control"
+			 xmlns:util="clr-namespace:Satolist2.Utility"
+			 xmlns:avalonEdit="http://icsharpcode.net/sharpdevelop/avalonedit"
 			 mc:Ignorable="d" 
 			 d:DesignHeight="450" d:DesignWidth="800">
 	<UserControl.Resources>
 		<BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+		<util:EditorLoadStateToVisibilityConverter State="Initialized" x:Key="InitializedVisibility"  />
+		<util:EditorLoadStateToVisibilityConverter State="Loaded" x:Key="LoadedVisibility" />
+		<util:EditorLoadStateToVisibilityConverter State="LoadFailed" x:Key="LoadFailedVisibility" />
 	</UserControl.Resources>
 	<Grid>
-		<ListView x:Name="SettingsList" ItemsSource="{Binding Items}" SelectedIndex="{Binding SelectedIndex, Mode=TwoWay}" HorizontalContentAlignment="Stretch" SelectionMode="Single">
-			<ListView.InputBindings>
-				<KeyBinding Key="Down" Command="{Binding MoveDownCommand}" />
-				<KeyBinding Key="Up" Command="{Binding MoveUpCommand}" />
-			</ListView.InputBindings>
-			<ListView.ItemTemplate>
-				<DataTemplate>
-					<StackPanel>
-						<Grid>
-							<Grid.ColumnDefinitions>
-								<ColumnDefinition Width="*" />
-								<ColumnDefinition Width="*" />
-							</Grid.ColumnDefinitions>
+		<TextBlock Text="descript.txt がまだロードされていません。" Visibility="{Binding LoadState, Converter={StaticResource InitializedVisibility}}" />
+		<TextBlock Text="descript.txt のロードに失敗しているため編集は無効です。" Visibility="{Binding LoadState, Converter={StaticResource LoadFailedVisibility}}" />
 
-							<TextBlock Grid.Column="0" Text="{Binding Label}">
-								<TextBlock.Style>
-									<Style TargetType="TextBlock">
-										<Style.Triggers>
-											<DataTrigger Binding="{Binding IsDefault}" Value="True">
-												<Setter Property="Foreground" Value="DarkGray" />
-											</DataTrigger>
-										</Style.Triggers>
-									</Style>
-								</TextBlock.Style>
-							</TextBlock>
-							<ContentControl Grid.Column="1">
-								<ContentControl.Style>
-									<Style TargetType="Control">
-										<EventSetter Event="GotFocus" Handler="StringInput_GotFocus" />
-										<EventSetter Event="PreviewKeyDown" Handler="StringInput_PreviewKeyDown"/>
-										<Style.Triggers>
-											<DataTrigger Binding="{Binding Type}" Value="String">
-												<Setter Property="Template">
-													<Setter.Value>
-														<ControlTemplate>
-															<Grid>
-																<TextBox x:Name="StringInput" Text="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
-																</TextBox>
-															</Grid>
-														</ControlTemplate>
-													</Setter.Value>
-												</Setter>
-											</DataTrigger>
-											<DataTrigger Binding="{Binding Type}" Value="Bool">
-												<Setter Property="Template">
-													<Setter.Value>
-														<ControlTemplate>
-															<ComboBox SelectedItem="{Binding Value}">
+		<TabControl SelectedIndex="{Binding CurrentTabIndex, Mode=TwoWay}" Visibility="{Binding LoadState, Converter={StaticResource LoadedVisibility}}">
+			<TabItem Header="ゴースト プロパティ">
+				<Grid>
+					<Grid.RowDefinitions>
+						<RowDefinition Height="auto" />
+						<RowDefinition Height="*" />
+					</Grid.RowDefinitions>
 
-															</ComboBox>
-														</ControlTemplate>
-													</Setter.Value>
-												</Setter>
-											</DataTrigger>
-										</Style.Triggers>
-									</Style>
-								</ContentControl.Style>
-							</ContentControl>
-						</Grid>
-						<TextBlock Text="{Binding Description}">
-							<TextBlock.Style>
-								<Style TargetType="TextBlock">
-									<Style.Triggers>
-										<DataTrigger Binding="{Binding IsDefault}" Value="True">
-											<Setter Property="Foreground" Value="DarkGray" />
-										</DataTrigger>
-										<MultiDataTrigger>
-											<MultiDataTrigger.Conditions>
-												<Condition Binding="{Binding IsDefault}" Value="True" />
-												<Condition Binding="{Binding Required}" Value="True" />
-											</MultiDataTrigger.Conditions>
-											<Setter Property="Foreground" Value="DarkRed" />
-										</MultiDataTrigger>
-									</Style.Triggers>
-								</Style>
-							</TextBlock.Style>
-						</TextBlock>
+					<!--検索ボックス-->
+					<local:WartermarkedTextBox Grid.Row="0" Margin="3" Wartermark="検索" Text="{Binding SearchString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+
+					<ListView x:Name="SettingsList" Grid.Row="1" ItemsSource="{Binding Items}" SelectedIndex="{Binding SelectedIndex, Mode=TwoWay}" HorizontalContentAlignment="Stretch" SelectionMode="Single">
+						<ListView.InputBindings>
+							<KeyBinding Key="Down" Command="{Binding MoveDownCommand}" />
+							<KeyBinding Key="Up" Command="{Binding MoveUpCommand}" />
+						</ListView.InputBindings>
+						<ListView.ItemTemplate>
+							<DataTemplate>
+								<StackPanel>
+									<UniformGrid Columns="2" Rows="1">
+
+						
+										<TextBlock Grid.Column="0" Grid.Row="0" Text="{Binding Label}" Height="20" >
+											<TextBlock.Style>
+												<Style TargetType="TextBlock">
+													<Style.Triggers>
+														<DataTrigger Binding="{Binding IsDefault}" Value="True">
+															<Setter Property="Foreground" Value="DarkGray" />
+														</DataTrigger>
+													</Style.Triggers>
+												</Style>
+											</TextBlock.Style>
+										</TextBlock>
+										<ContentControl Grid.Column="1" Grid.Row="0" HorizontalAlignment="Stretch" Height="20">
+											<ContentControl.Style>
+												<Style TargetType="Control">
+													<EventSetter Event="GotFocus" Handler="StringInput_GotFocus" />
+													<EventSetter Event="PreviewKeyDown" Handler="StringInput_PreviewKeyDown"/>
+													<Style.Triggers>
+														<DataTrigger Binding="{Binding Type}" Value="String">
+															<Setter Property="Template">
+																<Setter.Value>
+																	<ControlTemplate>
+																		<Grid>
+																			<local:WartermarkedTextBox x:Name="StringInput" Text="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Wartermark="{Binding Default}">
+																			</local:WartermarkedTextBox>
+																		</Grid>
+																	</ControlTemplate>
+																</Setter.Value>
+															</Setter>
+														</DataTrigger>
+														<DataTrigger Binding="{Binding Type}" Value="Select">
+															<Setter Property="Template">
+																<Setter.Value>
+																	<ControlTemplate>
+																		<ComboBox SelectedItem="{Binding SelectedItem, Mode=TwoWay}" DisplayMemberPath="Label" ItemsSource="{Binding Items}">
+																		</ComboBox>
+																	</ControlTemplate>
+																</Setter.Value>
+															</Setter>
+														</DataTrigger>
+													</Style.Triggers>
+												</Style>
+											</ContentControl.Style>
+										</ContentControl>
+									</UniformGrid>
+									<TextBlock Text="{Binding Description}">
+										<TextBlock.Style>
+											<Style TargetType="TextBlock">
+												<Style.Triggers>
+													<DataTrigger Binding="{Binding IsDefault}" Value="True">
+														<Setter Property="Foreground" Value="DarkGray" />
+													</DataTrigger>
+													<MultiDataTrigger>
+														<MultiDataTrigger.Conditions>
+															<Condition Binding="{Binding IsDefault}" Value="True" />
+															<Condition Binding="{Binding Required}" Value="True" />
+														</MultiDataTrigger.Conditions>
+														<Setter Property="Foreground" Value="DarkRed" />
+													</MultiDataTrigger>
+												</Style.Triggers>
+											</Style>
+										</TextBlock.Style>
+									</TextBlock>
+									<!--
 						<StackPanel Visibility="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=ListViewItem}, Converter={StaticResource BoolToVisibilityConverter}}">
 							<Separator />
 							<TextBlock Text="{Binding Help}" Foreground="Blue" />
 						</StackPanel>
-					</StackPanel>
-				</DataTemplate>
-			</ListView.ItemTemplate>
-			<ListView.ItemContainerStyle>
-				<Style TargetType="ListViewItem">
-					<Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
-					<EventSetter Event="GotFocus" Handler="ListViewItem_GotFocus" />
-					<EventSetter Event="Selected" Handler="ListViewItem_GotFocus" />
-				</Style>
-			</ListView.ItemContainerStyle>
-			
-			
-		</ListView>
+						-->
+								</StackPanel>
+							</DataTemplate>
+						</ListView.ItemTemplate>
+						<ListView.ItemContainerStyle>
+							<Style TargetType="ListViewItem">
+								<Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
+								<EventSetter Event="GotFocus" Handler="ListViewItem_GotFocus" />
+								<EventSetter Event="Selected" Handler="ListViewItem_GotFocus" />
+								<Setter Property="ToolTip" Value="{Binding Help}" />
+							</Style>
+						</ListView.ItemContainerStyle>
+
+
+					</ListView>
+				</Grid>
+			</TabItem>
+			<TabItem Header="descript.txt">
+				<avalonEdit:TextEditor Document="{Binding Document, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+			</TabItem>
+		</TabControl>
 	</Grid>
 </UserControl>

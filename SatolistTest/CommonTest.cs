@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Satolist2.Core;
 using Satolist2.Model;
 using Satolist2.Utility;
 using System;
@@ -108,5 +109,36 @@ namespace SatolistTest
 			SurfaceRangeCollection range = SurfaceRangeCollection.MakeRange(input);
 			Console.WriteLine( string.Format("\"{0}\" -> \"{1}\"", input, range));
 		}
+
+		[TestMethod]
+		public void GenerateUpdateFileTest()
+		{
+			NarUtility.CreateUpdateFile(GetTestSampleGhostDirectory());
+		}
+
+		[TestMethod]
+		public void GenerateUpdateNarTest()
+		{
+			NarUtility.CreateNar(GetTestSampleGhostDirectory(), Path.GetTempPath() + "/test.nar");
+		}
+
+		[TestMethod]
+		public void FtpTest()
+		{
+			//パスワードいれたままあげないこと
+			var account = new FtpAccount()
+			{
+			};
+
+			var client = new FtpClient(account);
+			var request = new FtpFileListRequest()
+			{
+				RemotePath = "www"
+			};
+
+			client.ExecuteCommand(request);
+			Console.WriteLine("a");
+		}
+
 	}
 }

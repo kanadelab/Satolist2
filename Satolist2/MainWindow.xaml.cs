@@ -5,6 +5,7 @@ using Satolist2.Model;
 using Satolist2.Utility;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -225,9 +226,12 @@ namespace Satolist2
 	//ワークスペースは切り離せるのが望ましそう。Dockのビューモデルとかもくっついてそうだし
 	internal class MainViewModel : NotificationObject
 	{
+		public static EditorSettings EditorSettings { get; private set; }
+
 		public MainWindow MainWindow { get; }
 		public GhostModel Ghost { get; private set; }
 
+		//それぞれのドッキングウィンドウ
 		public FileEventTreeViewModel FileEventTreeViewModel { get; }
 		public EventListViewModel EventListViewModel { get; }
 		public SurfaceViewerViewModel SurfaceViewerViewModel { get; }
@@ -242,13 +246,43 @@ namespace Satolist2
 
 		public List<EventEditorViewModel> EventEditors { get; }
 
+		//汎用コマンド
 		public ActionCommand SaveFileCommand { get; }
+		public ActionCommand OpenGhostDirectoryCommand { get; }
+		public ActionCommand EditInsertPaletteCommand { get; }
+
+		//設定情報
+		public InsertItemPaletteModel InsertPalette
+		{
+			get => EditorSettings.InsertPalette;
+			private set
+			{
+				EditorSettings.InsertPalette = value;
+				NotifyChanged();
+			}
+		}
+
+		public IEnumerable<ISaveFileObject> SaveLoadPanes
+		{
+			get
+			{
+				yield return GhostDescriptEditorViewModel;
+			}
+		}
 
 		public MainViewModel(MainWindow mainWindow, GhostModel ghost = null, string shellDirectoryName = null)
 		{
 			MainWindow = mainWindow;
 			Ghost = ghost;
 			string shellPath = null;
+
+			//エディタ設定のロード
+			if(EditorSettings == null)
+			{
+				EditorSettings = new EditorSettings();
+				//同じタイミングでリストデータ周辺をロード
+				DataModelManager.Load();
+			}
 
 			if(ghost != null && !string.IsNullOrEmpty(shellDirectoryName))
 			{
@@ -265,7 +299,7 @@ namespace Satolist2
 				"master"
 				);
 			StartMenuViewModel = new StartMenuViewModel(this);
-			GhostDescriptEditorViewModel = new GhostDescriptEditorViewModel();
+			GhostDescriptEditorViewModel = new GhostDescriptEditorViewModel(this);
 			UpdateIgnoreListViewModel = new UpdateIgnoreListViewModel(this);
 			SaoriListViewModel = new SaoriListViewModel();
 			ReplaceListViewModel = new ReplaceListViewModel(this);
@@ -274,13 +308,42 @@ namespace Satolist2
 			SaveFileCommand = new ActionCommand(
 				o =>
 				{
-					var dialog = new SaveFileListDialog();
-					dialog.DataContext = new SaveFileListViewModel(ghost.Dictionaries);
-					if(dialog.ShowDialog() == true)
-					{
-						//TODO: save
-					}
+					AskSave();
 				});
+
+			OpenGhostDirectoryCommand = new ActionCommand(
+				o =>
+				{
+					try
+					{
+						Process.Start(ghost.FullDictionaryPath);
+					}
+					catch { }
+				},
+				o => ghost != null
+
+				);
+
+			EditInsertPaletteCommand = new ActionCommand(
+				o =>
+				{
+					var dialog = new TextEditorInsertPaletteSettingsDialog();
+					using (var vm = new TextEditorInsertPaletteSettingsDialogViewModel(dialog, InsertPalette))
+					{
+						dialog.DataContext = vm;
+						if(dialog.ShowDialog() == true)
+						{
+							InsertPalette = vm.Items.First().ToModel();
+						}
+					}
+				}
+				);
+
+			//読込エラーが発生している場合に通知
+			foreach(var err in SaveLoadPanes.Where(o => o.LoadState == EditorLoadState.LoadFailed))
+			{
+				//TODO: ロードエラー通知
+			}
 		}
 
 		//イベントエディタのオープン
@@ -316,6 +379,22 @@ namespace Satolist2
 				var newEvent = new EventModel(dialog.DataContext.Type, dialog.DataContext.Name, dialog.DataContext.Condition, string.Empty);
 				dialog.DataContext.AddTarget.AddEvent(newEvent);
 				OpenEventEditor(newEvent);
+			}
+		}
+
+		//保存ダイアログを呼ぶ処理
+		public void AskSave()
+		{
+			List<ISaveFileObject> objects = new List<ISaveFileObject>();
+			objects.AddRange(SaveLoadPanes);
+			objects.AddRange(Ghost.Dictionaries);
+			
+
+			var dialog = new SaveFileListDialog();
+			dialog.DataContext = new SaveFileListViewModel(objects);
+			if (dialog.ShowDialog() == true)
+			{
+				//TODO: save
 			}
 		}
 

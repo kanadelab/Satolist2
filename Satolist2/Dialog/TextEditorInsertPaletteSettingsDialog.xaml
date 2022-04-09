@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="Satolist2.Dialog.TextEditorInsertPaletteSettingsDialog"
+﻿<Window x:Class="Satolist2.Dialog.TextEditorInsertPaletteSettingsDialog"
 			 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 			 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 			 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -6,49 +6,107 @@
 			 xmlns:local="clr-namespace:Satolist2.Dialog"
 			 mc:Ignorable="d" 
 			 d:DesignHeight="450" d:DesignWidth="800">
-	<Grid>
+	<Window.Resources>
+		<ResourceDictionary>
+			<ResourceDictionary.MergedDictionaries>
+				<ResourceDictionary Source="/Control/StrechedListViewItemStyle.xaml" />
+			</ResourceDictionary.MergedDictionaries>
+			<Geometry x:Key="GroupIcon">M20,18H4V8H20M20,6H12L10,4H4C2.89,4 2,4.89 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V8C22,6.89 21.1,6 20,6Z</Geometry>
+			<Geometry x:Key="ItemIcon">M4,2H20A2,2 0 0,1 22,4V16A2,2 0 0,1 20,18H16L12,22L8,18H4A2,2 0 0,1 2,16V4A2,2 0 0,1 4,2M4,4V16H8.83L12,19.17L15.17,16H20V4H4M6,7H18V9H6V7M6,11H16V13H6V11Z</Geometry>
+		</ResourceDictionary>
+	</Window.Resources>
+	<Grid x:Name="RootGrid">
 		<Grid.ColumnDefinitions>
 			<ColumnDefinition Width="*" />
 			<ColumnDefinition Width="*" />
 		</Grid.ColumnDefinitions>
 
-		<TreeView x:Name="MainList" ItemsSource="{Binding Items}" Grid.Column="0">
-			<TreeView.ItemContainerStyle>
-				<Style TargetType="TreeViewItem">
-					
-				</Style>
-			</TreeView.ItemContainerStyle>
-			<TreeView.ItemTemplate>
-				<HierarchicalDataTemplate ItemsSource="{Binding Items}">
-					<StackPanel Orientation="Horizontal">
-						<Path>
-							
-						</Path>
-						<TextBlock Text="{Binding Label}" />
-					</StackPanel>
-				</HierarchicalDataTemplate>
-			</TreeView.ItemTemplate>
-		</TreeView>
+		<Grid Grid.Column="0">
+			<Grid.RowDefinitions>
+				<RowDefinition Height="auto" />
+				<RowDefinition Height="*" />
+			</Grid.RowDefinitions>
 
-		<StackPanel Grid.Column="1" DataContext="{Binding SelectedItem, ElementName=MainList}">
-			<TextBlock Text="表示名" />
-			<TextBox />
-			<TextBlock Text="挿入する内容" />
-			<TextBox />
-			<TextBlock Text="ショートカットキー(CtrlかAltにチェックが必要)" />
-			<StackPanel Orientation="Horizontal">
-				<ComboBox>
-					<ComboBoxItem>1</ComboBoxItem>
-					<ComboBoxItem>2</ComboBoxItem>
-				</ComboBox>
-				<CheckBox Content="Ctrl" />
-				<CheckBox Content="Alt" />
-				<CheckBox Content="Shift" />
+			<StackPanel Grid.Row="0" Orientation="Horizontal">
+				<Button Content="アイテム追加" Margin="3" Command="{Binding AddItemCommand}" />
+				<Button Content="グループ追加" Margin="3" Command="{Binding AddGroupCommand}" />
 			</StackPanel>
-			<StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-				<Button Content="OK" />
-				<Button Content="キャンセル" />
+			
+			<TreeView Grid.Row="1" x:Name="MainList" ItemsSource="{Binding Items}" >
+				<TreeView.ItemContainerStyle>
+					<Style TargetType="TreeViewItem" BasedOn="{StaticResource StrechedListViewItemStyle}">
+						<Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
+						<Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
+						<Setter Property="AllowDrop" Value="True" />
+						<EventSetter Event="DragOver" Handler="TreeViewItem_DragOver" />
+						<EventSetter Event="Drop" Handler="TreeViewItem_Drop" />
+						<EventSetter Event="PreviewMouseLeftButtonDown" Handler="TreeViewItem_MouseLeftButtonDown" />
+					</Style>
+				</TreeView.ItemContainerStyle>
+				<TreeView.ItemTemplate>
+					<HierarchicalDataTemplate ItemsSource="{Binding Items}">
+						<StackPanel Orientation="Horizontal">
+							<Path x:Name="ListPath" Fill="Green">
+								<Path.Style>
+									<Style TargetType="Path">
+										<Style.Triggers>
+											<DataTrigger Binding="{Binding Type}" Value="Group">
+												<Setter Property="Data" Value="M6.1,10L4,18V8H21A2,2 0 0,0 19,6H12L10,4H4A2,2 0 0,0 2,6V18A2,2 0 0,0 4,20H19C19.9,20 20.7,19.4 20.9,18.5L23.2,10H6.1M19,18H6L7.6,12H20.6L19,18Z" />
+											</DataTrigger>
+											<DataTrigger Binding="{Binding Type}" Value="Item">
+												<Setter Property="Data" Value="M9,22A1,1 0 0,1 8,21V18H4A2,2 0 0,1 2,16V4C2,2.89 2.9,2 4,2H20A2,2 0 0,1 22,4V16A2,2 0 0,1 20,18H13.9L10.2,21.71C10,21.9 9.75,22 9.5,22V22H9M10,16V19.08L13.08,16H20V4H4V16H10M6,7H18V9H6V7M6,11H15V13H6V11Z" />
+											</DataTrigger>
+											<!--
+											<DataTrigger Binding="{Binding Type}" Value="Root">
+												<Setter Property="Data" Value="" />
+											</DataTrigger>
+											-->
+										</Style.Triggers>
+									</Style>
+								</Path.Style>
+							</Path>
+							<TextBlock Text="{Binding ListLabel}" />
+
+							<Button Content="↑" />
+							<Button Content="↓" />
+						</StackPanel>
+					</HierarchicalDataTemplate>
+				</TreeView.ItemTemplate>
+			</TreeView>
+		</Grid>
+
+		<StackPanel x:Name="RightPane" Grid.Column="1">
+			<StackPanel DataContext="{Binding SelectedItem}">
+				<TextBlock Text="表示名" />
+				<TextBox Text="{Binding Label, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+				<TextBlock Text="挿入する内容" />
+				<TextBox Text="{Binding Body, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+				<TextBlock Text="ショートカットキー(CtrlかAltにチェックが必要)" />
+				<StackPanel Orientation="Horizontal">
+					<ComboBox>
+						<ComboBoxItem>0</ComboBoxItem>
+						<ComboBoxItem>1</ComboBoxItem>
+						<ComboBoxItem>2</ComboBoxItem>
+					</ComboBox>
+					<CheckBox Content="Ctrl" IsChecked="{Binding ShortcutKeyCtrl}" />
+					<CheckBox Content="Alt" IsChecked="{Binding ShortcutKeyAlt}" />
+					<CheckBox Content="Shift" IsChecked="{Binding ShortcutKeyShift}" />
+				</StackPanel>
+
+				<StackPanel.Style>
+					<Style TargetType="StackPanel">
+						<Style.Triggers>
+							<DataTrigger Binding="{Binding .}" Value="Null">
+								<Setter Property="IsEnabled" Value="False" />
+							</DataTrigger>
+						</Style.Triggers>
+					</Style>
+				</StackPanel.Style>
+			</StackPanel>
+			<StackPanel Orientation="Horizontal" HorizontalAlignment="Right" DataContext="{Binding DataContext, ElementName=RootGrid}">
+				<Button Content="OK" Command="{Binding OkCommand}" />
+				<Button Content="キャンセル" Command="{Binding CancelCommand}" />
 			</StackPanel>
 		</StackPanel>
 	</Grid>
-</UserControl>
+</Window>
