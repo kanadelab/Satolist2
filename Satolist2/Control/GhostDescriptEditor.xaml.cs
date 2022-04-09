@@ -84,7 +84,13 @@ namespace Satolist2.Control
 
 	internal class GhostDescriptEditorViewModel : NotificationObject, ISaveFileObject, IDockingWindowContent
 	{
-		public string SaveFilePath => "/ghost/master/descript.txt";
+		public virtual string SaveFilePath => "/ghost/master/descript.txt";
+		public virtual string DockingTitle => "ゴーストプロパティ";
+		public virtual string DockingContentId => "GhostProperty";
+		public virtual DescriptItemModel[] ItemModel => DataModelManager.DescriptItems;
+		public string FileName => System.IO.Path.GetFileName(SaveFilePath);
+
+
 		private const int TabIndexList = 0;
 
 		private MainViewModel main;
@@ -162,15 +168,13 @@ namespace Satolist2.Control
 			get => isChanged;
 		}
 
-		public string DockingTitle => "ゴーストプロパティ";
-
-		public string DockingContentId => "GhostProperty";
+		
 
 		public GhostDescriptEditorViewModel(MainViewModel main)
 		{
 			this.main = main;
 			loadState = EditorLoadState.Initialized;
-			items = DataModelManager.DescriptItems.Select(o => new DescriptItemViewModel(o, this)).ToArray();
+			items = ItemModel.Select(o => new DescriptItemViewModel(o, this)).ToArray();
 			Items = CollectionViewSource.GetDefaultView(items);
 			Items.Filter = new Predicate<object>(
 				o =>
@@ -294,7 +298,18 @@ namespace Satolist2.Control
 		}
 	}
 
-	
+	internal class GhostInstallEditorViewModel : GhostDescriptEditorViewModel
+	{
+		public override string DockingContentId => "Install";
+		public override string DockingTitle => "インストール設定";
+		public override string SaveFilePath => "/install.txt";
+		public override DescriptItemModel[] ItemModel => DataModelManager.InstallItems;
+
+		public GhostInstallEditorViewModel(MainViewModel main):base(main)
+		{
+
+		}
+	}
 
 	internal enum DescriptBool
 	{

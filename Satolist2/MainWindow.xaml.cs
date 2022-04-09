@@ -39,6 +39,7 @@ namespace Satolist2
 		private DockingWindow StartMenu { get; set; }
 		private DockingWindow DebugMainMenu { get; set; }
 		private DockingWindow GhostDescriptEditor { get; set; }
+		private	DockingWindow GhostInstallEditor { get; set; }
 		private DockingWindow UpdateIgnoreList { get; set; }
 		private DockingWindow SaoriList { get; set; }
 		private DockingWindow ReplaceList { get; set; }
@@ -64,6 +65,7 @@ namespace Satolist2
 			DebugMainMenu = new DockingWindow(new DebugMainMenu());
 			StartMenu = new DockingWindow(new StartMenu());
 			GhostDescriptEditor = new DockingWindow(new GhostDescriptEditor());
+			GhostInstallEditor = new DockingWindow(new GhostDescriptEditor());
 			UpdateIgnoreList = new DockingWindow(new UpdateIgnoreList());
 			SaoriList = new DockingWindow(new SaoriList());
 			ReplaceList = new DockingWindow(new ReplaceList());
@@ -87,6 +89,7 @@ namespace Satolist2
 			rightPane.Children.Add(SurfaceViewer);
 			rightPane.Children.Add(SurfacePalette);
 			rightPane.Children.Add(GhostDescriptEditor);
+			rightPane.Children.Add(GhostInstallEditor);
 			rightPane.Children.Add(UpdateIgnoreList);
 			rightPane.Children.Add(SaoriList);
 			rightPane.Children.Add(ReplaceList);
@@ -206,6 +209,7 @@ namespace Satolist2
 			DebugMainMenu.ViewModel = mainVm.DebugMainMenuViewModel;
 			StartMenu.ViewModel = mainVm.StartMenuViewModel;
 			GhostDescriptEditor.ViewModel = mainVm.GhostDescriptEditorViewModel;
+			GhostInstallEditor.ViewModel = mainVm.GhostInstallEditorViewModel;
 			UpdateIgnoreList.ViewModel = mainVm.UpdateIgnoreListViewModel;
 			SaoriList.ViewModel = mainVm.SaoriListViewModel;
 			ReplaceList.ViewModel = mainVm.ReplaceListViewModel;
@@ -239,6 +243,7 @@ namespace Satolist2
 		public DebugMainMenuViewModel DebugMainMenuViewModel { get; }
 		public StartMenuViewModel StartMenuViewModel { get; }
 		public GhostDescriptEditorViewModel GhostDescriptEditorViewModel { get; }
+		public GhostInstallEditorViewModel GhostInstallEditorViewModel { get; }
 		public UpdateIgnoreListViewModel UpdateIgnoreListViewModel { get; }
 		public SaoriListViewModel SaoriListViewModel { get; }
 		public ReplaceListViewModel ReplaceListViewModel { get; }
@@ -267,6 +272,7 @@ namespace Satolist2
 			get
 			{
 				yield return GhostDescriptEditorViewModel;
+				yield return GhostInstallEditorViewModel;
 			}
 		}
 
@@ -300,6 +306,7 @@ namespace Satolist2
 				);
 			StartMenuViewModel = new StartMenuViewModel(this);
 			GhostDescriptEditorViewModel = new GhostDescriptEditorViewModel(this);
+			GhostInstallEditorViewModel = new GhostInstallEditorViewModel(this);
 			UpdateIgnoreListViewModel = new UpdateIgnoreListViewModel(this);
 			SaoriListViewModel = new SaoriListViewModel();
 			ReplaceListViewModel = new ReplaceListViewModel(this);
