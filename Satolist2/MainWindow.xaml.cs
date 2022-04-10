@@ -267,6 +267,8 @@ namespace Satolist2
 			get
 			{
 				yield return GhostDescriptEditorViewModel;
+				yield return ReplaceListViewModel.ReplaceSaveObject;
+				yield return ReplaceListViewModel.ReplaceAfterSaveObject;
 			}
 		}
 
