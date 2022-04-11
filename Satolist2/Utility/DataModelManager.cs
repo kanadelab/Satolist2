@@ -48,17 +48,20 @@ namespace Satolist2.Utility
 	internal class DataModelManager
 	{
 		public const string DescriptPath = "data/descript.json";
+		public const string InstallPath = "data/install.json";
 
 		public static DescriptItemModel[] DescriptItems { get; private set; }
+		public static DescriptItemModel[] InstallItems { get; private set; }
 
 		public static void Load()
 		{
-			LoadDescript();
+			DescriptItems = LoadDescript(DescriptPath);
+			InstallItems = LoadDescript(InstallPath);
 		}
 
-		private static void LoadDescript()
+		private static DescriptItemModel[] LoadDescript(string path)
 		{
-			var descriptItems = (JArray)JsonUtility.DeserializeFromFile(DescriptPath);
+			var descriptItems = (JArray)JsonUtility.DeserializeFromFile(path);
 			var descriptData = new List<DescriptItemModel>();
 			foreach(JObject item in descriptItems)
 			{
@@ -96,7 +99,7 @@ namespace Satolist2.Utility
 
 				descriptData.Add(d);
 			}
-			DescriptItems = descriptData.ToArray();
+			return descriptData.ToArray();
 		}
 	
 

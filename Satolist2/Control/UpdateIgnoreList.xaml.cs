@@ -68,9 +68,12 @@ namespace Satolist2.Control
 
 	internal class UpdateIgnoreListViewModel : NotificationObject, IDockingWindowContent, IDisposable, IControlBindedReceiver
 	{
+		public const string DeleteFilePath = "/delete.txt";
+		public const string DeveloperOptionsFilePath = "/developer_options.txt";
+
 		//有効レコードかどうかを判定するためのもの
 		private static readonly Regex NoNarNoUpdateRegex = new Regex("(nonar|noupdate)(,nonar|,noupdate)?");
-		private const int TAB_INDEX_LIST = 0;
+		private const int TabIndexList = 0;
 
 		private ObservableCollection<UpdateIgnoreListItemViewModel> items;
 
@@ -113,12 +116,12 @@ namespace Satolist2.Control
 			{
 				if(currentTabIndex != value)
 				{
-					if(currentTabIndex == TAB_INDEX_LIST)
+					if(currentTabIndex == TabIndexList)
 					{
 						//リストから別の場所へ
 						ListToText();
 					}
-					else if(value == TAB_INDEX_LIST)
+					else if(value == TabIndexList)
 					{
 						//別の場所からリストへ
 						TextToList();
@@ -132,6 +135,8 @@ namespace Satolist2.Control
 
 		public ActionCommand RemoveItemCommand { get; }
 		public ActionCommand AddItemCommand { get; }
+		public SaveFileObjectWrapper DeveloperOptionsSaveObject { get; }
+		public SaveFileObjectWrapper DeleteSaveObject { get; }
 
 		public string DockingTitle => "更新除外設定";
 
@@ -153,7 +158,7 @@ namespace Satolist2.Control
 						//選択中のアイテムを削除
 						var removes = items.Where(i => i.IsSelected).ToArray();
 						foreach (var item in removes)
-							items.Remove(item);
+							RemoveItem(item);
 					}
 				},
 				(o) =>
@@ -175,6 +180,9 @@ namespace Satolist2.Control
 					control.RequestScroll(items.Last());
 				}
 				);
+
+			DeleteSaveObject = new SaveFileObjectWrapper(DeleteFilePath, SaveDelete);
+			DeveloperOptionsSaveObject = new SaveFileObjectWrapper(DeveloperOptionsFilePath, SaveDeveloperOptions);
 
 			//読み込み処理
 			if(main.Ghost != null)
@@ -218,6 +226,7 @@ namespace Satolist2.Control
 
 		public void RemoveItem(UpdateIgnoreListItemViewModel item)
 		{
+			item.ChangedCurrentFile();
 			items.Remove(item);
 		}
 
@@ -230,21 +239,99 @@ namespace Satolist2.Control
 		//読み書き系
 		public void Load()
 		{
-			var deletePath = main.Ghost.FullPath + "/delete.txt";
-			var deveoperOptionsPath = main.Ghost.FullPath + "/developer_options.txt";
+			var deletePath = main.Ghost.FullPath + DeleteFilePath;
+			var deveoperOptionsPath = main.Ghost.FullPath + DeveloperOptionsFilePath;
 
-			if(System.IO.File.Exists(deveoperOptionsPath))
+			//セットで考える
+			DeleteSaveObject.LoadState = EditorLoadState.Initialized;
+			DeveloperOptionsSaveObject.LoadState = EditorLoadState.Initialized;
+
+			try
 			{
-				var fileBody = System.IO.File.ReadAllText(deveoperOptionsPath, Constants.EncodingShiftJis);
-				DeserializeDeveloperOptions(fileBody);
+				if (System.IO.File.Exists(deveoperOptionsPath))
+				{
+					var fileBody = System.IO.File.ReadAllText(deveoperOptionsPath, Constants.EncodingShiftJis);
+					DeserializeDeveloperOptions(fileBody);
+				}
+
+				if (System.IO.File.Exists(deletePath))
+				{
+					var fileBody = System.IO.File.ReadAllText(deletePath, Constants.EncodingShiftJis);
+					DeserializeDelete(fileBody);
+				}
+				DeleteSaveObject.LoadState = EditorLoadState.Loaded;
+				DeveloperOptionsSaveObject.LoadState = EditorLoadState.Loaded;
+			}
+			catch
+			{
+				DeleteSaveObject.LoadState = EditorLoadState.LoadFailed;
+				DeveloperOptionsSaveObject.LoadState = EditorLoadState.LoadFailed;
+			}
+			finally
+			{
+				DeleteSaveObject.IsChanged = false;
+				DeveloperOptionsSaveObject.IsChanged = false;
+			}
+		}
+
+		public bool SaveDeveloperOptions()
+		{
+			if (DeveloperOptionsSaveObject.LoadState != EditorLoadState.Loaded)
+				return false;
+
+			string saveText;
+			if(CurrentTabIndex == TabIndexList)
+			{
+				//リスト化されているのでシリアライズして保存
+				saveText = SerializeDeveloperOptions();
+			}
+			else
+			{
+				//テキスト編集モードなのでDocumentを保存
+				saveText = DeveloperOptionsText.Text;
 			}
 
-			if (System.IO.File.Exists(deletePath))
+			try
 			{
-				var fileBody = System.IO.File.ReadAllText(deletePath, Constants.EncodingShiftJis);
-				DeserializeDelete(fileBody);
+				var fullPath = main.Ghost.FullPath + DeveloperOptionsFilePath;
+				System.IO.File.WriteAllText(fullPath, saveText, Constants.EncodingShiftJis);
+				DeveloperOptionsSaveObject.IsChanged = false;
+				return true;
+			}
+			catch
+			{
+				return false;
+			}
+		}
+
+		public bool SaveDelete()
+		{
+			if (DeleteSaveObject.LoadState != EditorLoadState.Loaded)
+				return false;
+
+			string saveText;
+			if(CurrentTabIndex == TabIndexList)
+			{
+				//リスト化されているのでシリアライズして保存
+				saveText = SerializeDelete();
+			}
+			else
+			{
+				//テキスト編集モードなのでDocumentを保存
+				saveText = DeleteText.Text;
 			}
 
+			try
+			{
+				var fullPath = main.Ghost.FullPath + DeleteFilePath;
+				System.IO.File.WriteAllText(fullPath, saveText, Constants.EncodingShiftJis);
+				DeleteSaveObject.IsChanged = false;
+				return true;
+			}
+			catch
+			{
+				return false;
+			}
 		}
 
 		public void AddDeveloperOptionsRecord(string path, bool nonar, bool noupdate)
@@ -402,9 +489,26 @@ namespace Satolist2.Control
 
 		public void ListToText()
 		{
+			if (DeveloperOptionsText != null)
+				DeveloperOptionsText.TextChanged -= DeveloperOptionsText_TextChanged;
+			if (DeleteText != null)
+				DeleteText.TextChanged -= DeleteText_TextChanged;
+
 			//シリアライズ操作
 			DeveloperOptionsText = new TextDocument(SerializeDeveloperOptions());
 			DeleteText = new TextDocument(SerializeDelete());
+			DeveloperOptionsText.TextChanged += DeveloperOptionsText_TextChanged;
+			deleteText.TextChanged += DeleteText_TextChanged;
+		}
+
+		private void DeleteText_TextChanged(object sender, EventArgs e)
+		{
+			DeleteSaveObject.Changed();
+		}
+
+		private void DeveloperOptionsText_TextChanged(object sender, EventArgs e)
+		{
+			DeveloperOptionsSaveObject.Changed();
 		}
 
 		public void TextToList()
@@ -419,6 +523,10 @@ namespace Satolist2.Control
 		public void Dispose()
 		{
 			control.OnFileDrop -= Control_OnFileDrop;
+			if (DeveloperOptionsText != null)
+				DeveloperOptionsText.TextChanged -= DeveloperOptionsText_TextChanged;
+			if (DeleteText != null)
+				DeleteText.TextChanged -= DeleteText_TextChanged;
 		}
 
 		public void ControlBind(System.Windows.Controls.Control control)
@@ -447,10 +555,17 @@ namespace Satolist2.Control
 			set
 			{
 				if (value.IndexOfAny(System.IO.Path.GetInvalidPathChars()) >= 0)
+				{
+					NotifyChanged();
 					return;
+				}
 
-				path = value;
-				NotifyChanged();
+				if (path != value)
+				{
+					path = value;
+					NotifyChanged();
+					ChangedCurrentFile();
+				}
 			}
 		}
 
@@ -460,9 +575,13 @@ namespace Satolist2.Control
 			get => isNoNar;
 			set
 			{
-				isNoNar = value;
-				NotifyChanged();
-				NotifyChanged(nameof(IsInvalid));
+				if (isNoNar != value)
+				{
+					isNoNar = value;
+					NotifyChanged();
+					NotifyChanged(nameof(IsInvalid));
+					parent.DeveloperOptionsSaveObject.Changed();
+				}
 			}
 		}
 
@@ -472,9 +591,13 @@ namespace Satolist2.Control
 			get => isNoUpdate;
 			set
 			{
-				isNoUpdate = value;
-				NotifyChanged();
-				NotifyChanged(nameof(IsInvalid));
+				if (isNoUpdate != value)
+				{
+					isNoUpdate = value;
+					NotifyChanged();
+					NotifyChanged(nameof(IsInvalid));
+					parent.DeveloperOptionsSaveObject.Changed();
+				}
 			}
 		}
 
@@ -484,9 +607,13 @@ namespace Satolist2.Control
 			get => isDelete;
 			set
 			{
-				isDelete = value;
-				NotifyChanged();
-				NotifyChanged(nameof(IsInvalid));
+				if (isDelete != value)
+				{
+					isDelete = value;
+					NotifyChanged();
+					NotifyChanged(nameof(IsInvalid));
+					parent.DeleteSaveObject.Changed();
+				}
 			}
 		}
 
@@ -550,6 +677,22 @@ namespace Satolist2.Control
 				}
 				);
 		}
+
+		//チェックが入っている種別のファイルについて変更扱いにする
+		public void ChangedCurrentFile()
+		{
+			if(isDelete)
+			{
+				parent.DeleteSaveObject.Changed();
+			}
+
+			if(isNoNar || isNoUpdate)
+			{
+				parent.DeveloperOptionsSaveObject.Changed();
+			}
+		}
+
+		
 	}
 
 }

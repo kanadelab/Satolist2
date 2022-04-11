@@ -29,9 +29,11 @@ namespace Satolist2.Control
 		}
 	}
 
-	internal class ReplaceListViewModel : NotificationObject, IDockingWindowContent, IControlBindedReceiver
+	internal class ReplaceListViewModel : NotificationObject, IDockingWindowContent, IControlBindedReceiver, IDisposable
 	{
-		private const int TAB_INDEX_LIST = 0;
+		public const string ReplaceFilePath = "/ghost/master/replace.txt";
+		public const string ReplaceAfterFilePath = "/ghost/master/replace_after.txt";
+		private const int TabIndexList = 0;
 
 		private MainViewModel main;
 		private ReplaceList control;
@@ -41,6 +43,7 @@ namespace Satolist2.Control
 		private TextDocument replaceDocument;
 		private TextDocument replaceAfterDocument;
 		private int currentTabIndex;
+		
 
 		public ReadOnlyObservableCollection<ReplaceListItemViewModel> Items => new ReadOnlyObservableCollection<ReplaceListItemViewModel>(items);
 		public TextDocument ReplaceDocument
@@ -70,7 +73,7 @@ namespace Satolist2.Control
 			{
 				if (currentTabIndex != value)
 				{
-					if (value == TAB_INDEX_LIST)
+					if (value == TabIndexList)
 						TextToList();
 					else
 						ListToText();
@@ -83,6 +86,8 @@ namespace Satolist2.Control
 
 		public ActionCommand AddItemCommand { get; }
 		public ActionCommand RemoveItemCommand { get; }
+		public SaveFileObjectWrapper ReplaceSaveObject { get; }
+		public SaveFileObjectWrapper ReplaceAfterSaveObject { get; }
 
 		public string DockingTitle => "文字置換リスト";
 
@@ -105,7 +110,7 @@ namespace Satolist2.Control
 						//選択中のアイテムを削除
 						var removes = items.Where(i => i.IsSelected).ToArray();
 						foreach (var item in removes)
-							items.Remove(item);
+							RemoveItem(item);
 					}
 				},
 				o =>
@@ -126,12 +131,16 @@ namespace Satolist2.Control
 				}
 				);
 
+			ReplaceSaveObject = new SaveFileObjectWrapper(ReplaceFilePath, SaveReplace);
+			ReplaceAfterSaveObject = new SaveFileObjectWrapper(ReplaceAfterFilePath, SaveReplaceAfter);
+
 			if (main.Ghost != null)
 				Load();
 		}
 
 		public void RemoveItem(ReplaceListItemViewModel item)
 		{
+			item.ChangedCurrentFile();
 			items.Remove(item);
 		}
 
@@ -149,19 +158,101 @@ namespace Satolist2.Control
 		//ロード周り
 		public void Load()
 		{
-			var replacePath = main.Ghost.FullPath + "/ghost/master/replace.txt";
-			var replaceAfterPath = main.Ghost.FullPath + "/ghost/master/replace_after.txt";
+			var replacePath = main.Ghost.FullPath + ReplaceFilePath;
+			var replaceAfterPath = main.Ghost.FullPath + ReplaceAfterFilePath;
 
-			if(System.IO.File.Exists(replacePath))
+			//セットで考える必要がある、片方が失敗したら両方NG扱いにする
+			ReplaceAfterSaveObject.LoadState = EditorLoadState.Initialized;
+			ReplaceSaveObject.LoadState = EditorLoadState.Initialized;
+
+			try
 			{
-				var fileBody = System.IO.File.ReadAllText(replacePath, Constants.EncodingShiftJis);
-				DeserializeReplace(fileBody);
+
+				if (System.IO.File.Exists(replacePath))
+				{
+					var fileBody = System.IO.File.ReadAllText(replacePath, Constants.EncodingShiftJis);
+					DeserializeReplace(fileBody);
+				}
+
+				if (System.IO.File.Exists(replaceAfterPath))
+				{
+					var fileBody = System.IO.File.ReadAllText(replaceAfterPath, Constants.EncodingShiftJis);
+					DeserializeReplaceAfter(fileBody);
+				}
+
+				ReplaceSaveObject.LoadState = EditorLoadState.Loaded;
+				ReplaceAfterSaveObject.LoadState = EditorLoadState.Loaded;
+			}
+			catch
+			{
+				ReplaceAfterSaveObject.LoadState = EditorLoadState.LoadFailed;
+				ReplaceSaveObject.LoadState = EditorLoadState.LoadFailed;
+			}
+			finally
+			{
+				ReplaceAfterSaveObject.IsChanged = false;
+				ReplaceSaveObject.IsChanged = false;
+			}
+		}
+
+		//保存
+		public bool SaveReplace()
+		{
+			if (ReplaceSaveObject.LoadState != EditorLoadState.Loaded)
+				return false;
+
+			string saveText;
+			if(CurrentTabIndex == TabIndexList)
+			{
+				//リスト化されているのでシリアライズして保存
+				saveText = SerializeReplace();
+			}
+			else
+			{
+				//テキスト編集モードなのでDocumentを保存
+				saveText = ReplaceDocument.Text;
 			}
 
-			if(System.IO.File.Exists(replaceAfterPath))
+			try
 			{
-				var fileBody = System.IO.File.ReadAllText(replaceAfterPath, Constants.EncodingShiftJis);
-				DeserializeReplaceAfter(fileBody);
+				var fullPath = main.Ghost.FullPath + ReplaceFilePath;
+				System.IO.File.WriteAllText(fullPath, saveText, Constants.EncodingShiftJis);
+				ReplaceSaveObject.IsChanged = false;
+				return true;
+			}
+			catch
+			{
+				return false;
+			}
+		}
+
+		public bool SaveReplaceAfter()
+		{
+			if (ReplaceAfterSaveObject.LoadState != EditorLoadState.Loaded)
+				return false;
+
+			string saveText;
+			if(CurrentTabIndex == TabIndexList)
+			{
+				//リスト化されているのでシリアライズして保存
+				saveText = SerializeReplaceAfter();
+			}
+			else
+			{
+				//テキスト編集モードなのでDocument保存
+				saveText = ReplaceAfterDocument.Text;
+			}
+
+			try
+			{
+				var fullPath = main.Ghost.FullPath + ReplaceAfterFilePath;
+				System.IO.File.WriteAllText(fullPath, saveText, Constants.EncodingShiftJis);
+				ReplaceSaveObject.IsChanged = false;
+				return true;
+			}
+			catch
+			{
+				return false;
 			}
 		}
 
@@ -241,8 +332,25 @@ namespace Satolist2.Control
 
 		private void TextToList()
 		{
+			if (ReplaceDocument != null)
+				ReplaceDocument.TextChanged -= ReplaceDocument_TextChanged;
+			if (ReplaceAfterDocument != null)
+				ReplaceAfterDocument.TextChanged -= ReplaceAfterDocument_TextChanged;
+
 			ReplaceDocument = new TextDocument(SerializeReplace());
 			ReplaceAfterDocument = new TextDocument(SerializeReplaceAfter());
+			ReplaceDocument.TextChanged += ReplaceDocument_TextChanged;
+			ReplaceAfterDocument.TextChanged += ReplaceAfterDocument_TextChanged;
+		}
+
+		private void ReplaceAfterDocument_TextChanged(object sender, EventArgs e)
+		{
+			ReplaceAfterSaveObject.Changed();
+		}
+
+		private void ReplaceDocument_TextChanged(object sender, EventArgs e)
+		{
+			ReplaceSaveObject.Changed();
 		}
 
 		private void ListToText()
@@ -255,6 +363,74 @@ namespace Satolist2.Control
 		public void ControlBind(System.Windows.Controls.Control control)
 		{
 			this.control = (ReplaceList)control;
+		}
+
+		public void Dispose()
+		{
+			if (ReplaceDocument != null)
+				ReplaceDocument.TextChanged -= ReplaceDocument_TextChanged;
+			if (ReplaceAfterDocument != null)
+				ReplaceAfterDocument.TextChanged -= ReplaceAfterDocument_TextChanged;
+		}
+	}
+
+	//replace.txt, replace_after.txt の２ファイルがこのエディタにあるので、それぞれの変更を示すインターフェースを用意するためのオブジェクト
+	//単純な形の変更管理
+	internal class SaveFileObjectWrapper : NotificationObject, ISaveFileObject
+	{
+		private bool isChanged;
+		private EditorLoadState loadState;
+		private Func<bool> saveFunc;
+
+		public bool IsChanged 
+		{
+			get => isChanged;
+			set
+			{
+				isChanged = value;
+				NotifyChanged();
+			}
+		}
+
+		public string SaveFilePath { get; }
+
+		public EditorLoadState LoadState
+		{
+			get => loadState;
+			set
+			{
+				loadState = value;
+				NotifyChanged();
+			}
+		}
+
+		public bool Save()
+		{
+			if( saveFunc())
+			{
+				IsChanged = false;
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+
+		public void Changed()
+		{
+			IsChanged = true;
+		}
+
+		public SaveFileObjectWrapper(string saveFilePath, Func<bool> saveFunc)
+		{
+			this.saveFunc = saveFunc;
+			this.SaveFilePath = saveFilePath;
+		}
+
+		public void SetSaveFunc(Func<bool> saveFunc)
+		{
+			this.saveFunc = saveFunc;
 		}
 	}
 
@@ -274,8 +450,12 @@ namespace Satolist2.Control
 			get => before;
 			set
 			{
-				before = value;
-				NotifyChanged();
+				if (before != value)
+				{
+					before = value;
+					NotifyChanged();
+					ChangedCurrentFile();
+				}
 			}
 		}
 
@@ -284,8 +464,12 @@ namespace Satolist2.Control
 			get => after;
 			set
 			{
-				after = value;
-				NotifyChanged();
+				if (after != value)
+				{
+					after = value;
+					NotifyChanged();
+					ChangedCurrentFile();
+				}
 			}
 		}
 
@@ -294,9 +478,13 @@ namespace Satolist2.Control
 			get => isReplaceAfter;
 			set
 			{
-				isReplaceAfter = value;
-				NotifyChanged();
-				NotifyChanged(nameof(IsReplace));
+				if (isReplaceAfter != value)
+				{
+					isReplaceAfter = value;
+					NotifyChanged();
+					NotifyChanged(nameof(IsReplace));
+					ChangedBothFile();
+				}
 			}
 		}
 
@@ -305,9 +493,13 @@ namespace Satolist2.Control
 			get => !isReplaceAfter;
 			set
 			{
-				isReplaceAfter = !value;
-				NotifyChanged();
-				NotifyChanged(nameof(IsReplaceAfter));
+				if (isReplaceAfter != !value)
+				{
+					isReplaceAfter = !value;
+					NotifyChanged();
+					NotifyChanged(nameof(IsReplaceAfter));
+					ChangedBothFile();
+				}
 			}
 		}
 
@@ -338,6 +530,24 @@ namespace Satolist2.Control
 					}
 				}
 				);
+		}
+
+		public void ChangedCurrentFile()
+		{
+			if(isReplaceAfter)
+			{
+				parent.ReplaceAfterSaveObject.Changed();
+			}
+			else
+			{
+				parent.ReplaceSaveObject.Changed();
+			}
+		}
+
+		public void ChangedBothFile()
+		{
+			parent.ReplaceAfterSaveObject.Changed();
+			parent.ReplaceSaveObject.Changed();
 		}
 	}
 }

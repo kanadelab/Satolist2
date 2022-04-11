@@ -107,6 +107,12 @@ namespace Satolist2.Utility
 			return path.Replace('\\', '/');
 		}
 
+		//パス栗切りを\\に変更
+		public static string NormalizeWindowsPath(string path)
+		{
+			return path.Replace('/', '\\');
+		}
+
 		//パス区切り文字を delete.exe 準拠の \ に統一
 		public static string NormalizeDeletePath(string path)
 		{
@@ -156,6 +162,10 @@ namespace Satolist2.Utility
 		//改行
 		public const string NewLine = "\r\n";
 		public static readonly string[] NewLineSeparator = { NewLine };
+
+		//カンマ
+		public static readonly string[] CommaSeparator = { "," };
+
 		public static readonly Encoding EncodingShiftJis = Encoding.GetEncoding("Shift_JIS");
 
 		public const string SaveDataFileName = "satori_savedata.txt";
@@ -166,6 +176,7 @@ namespace Satolist2.Utility
 
 		//変数初期化
 		public const string VariableInitializeEvent = "＊初期化";
+		public const string SaoriListEvent = "＠SAORI";
 
 		//インラインイベント
 		public const string InlineEventSeparator = "＃＃＃インラインイベント";

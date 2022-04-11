@@ -81,6 +81,8 @@ namespace Satolist2.Utility
 		public string Name { get; set; }
 		[JsonProperty]
 		public string Path { get; set; }
+		[JsonProperty]
+		public string IsFavorite { get; set; }
 
 		public OpenGhostHistory(string name, string path)
 		{

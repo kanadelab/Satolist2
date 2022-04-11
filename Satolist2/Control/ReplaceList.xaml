@@ -4,11 +4,24 @@
 			 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
 			 xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
 			 xmlns:local="clr-namespace:Satolist2.Control"
+			 xmlns:util="clr-namespace:Satolist2.Utility"
 			 xmlns:avalonEdit="http://icsharpcode.net/sharpdevelop/avalonedit"
 			 mc:Ignorable="d" 
 			 d:DesignHeight="450" d:DesignWidth="800">
+	<UserControl.Resources>
+		<util:EditorLoadStateToVisibilityConverter State="Initialized" x:Key="InitializedVisibility"  />
+		<util:EditorLoadStateToVisibilityConverter State="Loaded" x:Key="LoadedVisibility" />
+		<util:EditorLoadStateToVisibilityConverter State="LoadFailed" x:Key="LoadFailedVisibility" />
+	</UserControl.Resources>
 	<Grid>
-		<TabControl SelectedIndex="{Binding CurrentTabIndex, Mode=TwoWay}">
+
+		<TextBlock Text="replace.txt, replace_after.txt のロードに失敗しているため、編集は無効です。"
+				   Visibility="{Binding ReplaceSaveObject.LoadState, Converter={StaticResource InitializedVisibility}}" />
+		<TextBlock Text="replace.txt, replace_after.txt がまだロードされていません。"
+				   Visibility="{Binding ReplaceSaveObject.LoadState, Converter={StaticResource LoadFailedVisibility}}" />
+
+		<TabControl SelectedIndex="{Binding CurrentTabIndex, Mode=TwoWay}"
+					Visibility="{Binding ReplaceSaveObject.LoadState, Converter={StaticResource LoadedVisibility}}">
 			<TabItem Header="文字置換リスト">
 				<Grid>
 					<Grid.RowDefinitions>

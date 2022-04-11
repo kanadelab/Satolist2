@@ -29,9 +29,9 @@ namespace Satolist2.Control
 		}
 	}
 
-	internal class VariableListViewModel : NotificationObject, IDockingWindowContent, IControlBindedReceiver
+	internal class VariableListViewModel : NotificationObject, IDockingWindowContent, IControlBindedReceiver, IDisposable
 	{
-		private const int TAB_INDEX_LIST = 0;
+		private const int TabIndexList = 0;
 
 		private MainViewModel main;
 		private VariableList control;
@@ -62,7 +62,7 @@ namespace Satolist2.Control
 			{
 				if (currentTabIndex != value)
 				{
-					if (value == TAB_INDEX_LIST)
+					if (value == TabIndexList)
 						TextToList();
 					else
 						ListToText();
@@ -139,60 +139,51 @@ namespace Satolist2.Control
 		}
 
 		//読み込み周辺
-		//TODO: SAORIリストと共有できる必要がある
-
 		public void Load()
 		{
-			var satoriConfPath = main.Ghost.FullPath + "/ghost/master/satori_conf.txt";
-
-			if(System.IO.File.Exists(satoriConfPath))
+			if(main.SatoriConfViewModel.LoadState == EditorLoadState.Loaded)
 			{
-				var fileBody = System.IO.File.ReadAllText(satoriConfPath, Constants.EncodingShiftJis);
-				Deserialize(fileBody);
+				main.SatoriConfViewModel.VariableInitializeListFileSaveBody = GetSaveBody;
+				Deserialize(main.SatoriConfViewModel.VariableInitializeListBody);
 			}
 		}
 
 		public void Deserialize(string body)
 		{
 			items.Clear();
+			commonLines.Clear();
 
 			var lines = DictionaryUtility.SplitLines(body);
-			bool begin = false;
 			foreach(var item in lines)
 			{
-				if(item == Constants.VariableInitializeEvent)
-				{
-					begin = true;
-					continue;
-				}
-
 				//変数じゃない
 				if (item.IndexOf(Constants.VariableHead) != 0)
-					continue;
-
-				if(begin)
 				{
-					var sp = item.Split(Constants.TabSeparator, 2, StringSplitOptions.None);
-					items.Add(new VariableListItemViewModel(this)
-					{
-						Name = sp[0].Substring(1),
-						Data = sp.Length > 1 ? sp[1] : string.Empty
-					});
-				}
+					commonLines.Add(item);
+					continue;
+				}	
+
+				var sp = item.Split(Constants.TabSeparator, 2, StringSplitOptions.None);
+				items.Add(new VariableListItemViewModel(this)
+				{
+					Name = sp[0].Substring(1),
+					Data = sp.Length > 1 ? sp[1] : string.Empty
+				});
 			}
 		}
 
 		public string Serialize()
 		{
 			var lines = new List<string>();
-			lines.Add(Constants.VariableInitializeEvent);
+			//lines.Add(Constants.VariableInitializeEvent);
 
 			foreach(var item in items)
 			{
 				lines.Add(string.Format("{0}{1}\t{2}", Constants.VariableHead, item.Name, item.Data));
 			}
+			lines.AddRange(commonLines);
 
-			return string.Join(Constants.NewLine, lines);
+			return DictionaryUtility.JoinLines(lines);
 		}
 
 		public void TextToList()
@@ -201,7 +192,39 @@ namespace Satolist2.Control
 		}
 		public void ListToText()
 		{
+			if (Document != null)
+				Document.TextChanged -= Document_TextChanged;
+
 			Document = new TextDocument(Serialize());
+			Document.TextChanged += Document_TextChanged;
+		}
+
+		private void Document_TextChanged(object sender, EventArgs e)
+		{
+			main.SatoriConfViewModel.Changed();
+		}
+
+		//保存内容を出力
+		private string GetSaveBody()
+		{
+			string saveText;
+			if(currentTabIndex == TabIndexList)
+			{
+				//リストモードなのでシリアライズ
+				saveText = Serialize();
+			}
+			else
+			{
+				//テキストなのでdocumetを保存
+				saveText = document.Text;
+			}
+			return saveText;
+		}
+
+		public void Dispose()
+		{
+			if (Document != null)
+				Document.TextChanged -= Document_TextChanged;
 		}
 	}
 
@@ -260,5 +283,136 @@ namespace Satolist2.Control
 
 		}
 	
+	}
+
+	//satori_conf.txt のデータ
+	//変数リストとSAORIリストと共有するオブジェクト
+	internal class SatoriConfWrapper : SaveFileObjectWrapper
+	{
+		private MainViewModel main;
+		public const string SatoriConfFilePath = "/ghost/master/satori_conf.txt";
+
+		//変数リストの保存内容を取得する
+		public Func<string> VariableInitializeListFileSaveBody { get; set; }
+
+		//SAORIリストの保存内容を取得する
+		public Func<string> SaoriListFileSaveBody { get; set; }
+
+		//読み込んだ情報の取得
+		public string CommonFileBody { get; private set; }
+		public string SaoriListBody { get; private set; }
+		public string VariableInitializeListBody { get; private set; }
+
+		public SatoriConfWrapper(MainViewModel main) : base(SatoriConfFilePath, null)
+		{
+			this.main = main;
+			base.SetSaveFunc(SaveSatoriConf);
+			this.CommonFileBody = string.Empty;
+			this.SaoriListBody = string.Empty;
+			this.VariableInitializeListBody = string.Empty;
+
+			if (main.Ghost != null)
+				Load();
+		}
+
+		private void Load()
+		{
+			var fullPath = main.Ghost.FullPath + SatoriConfFilePath;
+			LoadState = EditorLoadState.Initialized;
+
+			try
+			{
+				if(System.IO.File.Exists(fullPath))
+				{
+					var fileBody = System.IO.File.ReadAllText(fullPath, Constants.EncodingShiftJis);
+
+					//ここで初期化とSAORIのリストを切り出す
+					var lines = DictionaryUtility.SplitLines(fileBody);
+					bool isVariableList = false;
+					bool isSaoriList = false;
+					var saoriListLines = new List<string>();
+					var variableInitializeListLines = new List<string>();
+					var commonLines = new List<string>();
+					
+					foreach(var line in lines)
+					{
+						if(line == Constants.VariableInitializeEvent)
+						{
+							isVariableList = true;
+							isSaoriList = false;
+							continue;	//ヘッダは含めない
+						}
+						else if(line == Constants.SaoriListEvent)
+						{
+							isVariableList = false;
+							isSaoriList = true;
+							continue;	//ヘッダは含めない
+						}
+						else if(line.IndexOf(Constants.SentenceHead) == 0 || line.IndexOf(Constants.WordHead) == 0)
+						{
+							isVariableList = false;
+							isSaoriList = false;
+							commonLines.Add(line);
+							continue;
+						}
+
+						if(isVariableList)
+						{
+							variableInitializeListLines.Add(line);
+						}
+						else if(isSaoriList)
+						{
+							saoriListLines.Add(line);
+						}
+						else
+						{
+							commonLines.Add(line);
+						}
+					}
+
+					//処理終了後、まとめる
+					CommonFileBody = DictionaryUtility.JoinLines(commonLines);
+					SaoriListBody = DictionaryUtility.JoinLines(saoriListLines);
+					VariableInitializeListBody = DictionaryUtility.JoinLines(variableInitializeListLines);
+				}
+				LoadState = EditorLoadState.Loaded;
+			}
+			catch
+			{
+				LoadState = EditorLoadState.LoadFailed;
+			}
+		}
+
+		private bool SaveSatoriConf()
+		{
+			if (LoadState != EditorLoadState.Loaded)
+				return false;
+
+			var saveText = CommonFileBody;
+			var variableInitializeListBody = VariableInitializeListFileSaveBody();
+			var saoriListBody = SaoriListFileSaveBody();
+
+			if(!string.IsNullOrEmpty(variableInitializeListBody))
+			{
+				saveText = string.Concat(saveText, Constants.NewLine, Constants.VariableInitializeEvent, Constants.NewLine, variableInitializeListBody);
+			}
+
+			if(!string.IsNullOrEmpty(saoriListBody))
+			{
+				saveText = string.Concat(saveText, Constants.NewLine, Constants.SaoriListEvent, Constants.NewLine, saoriListBody);
+			}
+
+			try
+			{
+				var fullPath = main.Ghost.FullPath + SatoriConfFilePath;
+				System.IO.File.WriteAllText(fullPath, saveText, Constants.EncodingShiftJis);
+				IsChanged = false;
+				return true;
+			}
+			catch
+			{
+				return false;
+			}
+		}
 	}
 }

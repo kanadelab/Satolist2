@@ -7,6 +7,9 @@
 		xmlns:avalonDock="https://github.com/Dirkster99/AvalonDock"
 		mc:Ignorable="d"
 		Title="MainWindow" Height="800" Width="1200">
+	<Window.InputBindings>
+		<KeyBinding Gesture="CTRL+S" Command="{Binding SaveFileCommand}" />
+	</Window.InputBindings>
 	<Grid>
 		<Grid.RowDefinitions>
 			<RowDefinition Height="auto" />
@@ -15,7 +18,7 @@
 
 		<Menu Grid.Row="0">
 			<MenuItem Header="ファイル">
-				<MenuItem Header="上書き保存" Command="{Binding SaveFileCommand}" />
+				<MenuItem Header="上書き保存" Command="{Binding SaveFileCommand}" InputGestureText="Crrl+S"/>
 				<Separator />
 				<MenuItem Header="編集中のゴーストをエクスプローラで開く" Command="{Binding OpenGhostDirectoryCommand}" />
 			</MenuItem>

@@ -1,0 +1,48 @@
+[
+	{
+		"Property": "name",
+		"Description": "(必須)ゴースト名",
+		"Help": "例:奏でる日常の旋律",
+		"Type": "String",
+		"Required": true
+	},
+	{
+		"Property": "directory",
+		"Description": "(必須)インストール先フォルダ名",
+		"Help": "例:kanade",
+		"Type": "String",
+		"Required": true
+	},
+	{
+		"Property": "refresh",
+		"Description": "上書きインストール前に全削除",
+		"Help": "ONにすると同じフォルダのファイルを全て消去してからインストールする",
+		"Type": "Select",
+		"Default": "0",
+		"Items": [
+			{
+				"Label": "ON",
+				"Value": "1"
+			},
+			{
+				"Label": "OFF",
+				"Value": "0"
+			}
+		]
+	},
+	{
+		"Property": "refreshundeletemask",
+		"Description": "refreshで削除しないファイル",
+		"Help": [
+			"複数ある場合はコロン「:」で区切る。",
+			"パス指定不可。全てのディレクトリの指定したファイル名のファイルが除外される。"
+		],
+		"Type": "String"
+	},
+	{
+		"Property": "balloon.directory",
+		"Description": "同梱バルーンのインストール先フォルダ",
+		"Help": "半角英数推奨",
+		"Type": "String"
+	}
+]

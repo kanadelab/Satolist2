@@ -79,7 +79,7 @@
 				</Grid>
 			</TabItem>
 
-			<TabItem Header="satori__conf.txt">
+			<TabItem Header="＊初期化">
 				<avalonEdit:TextEditor Document="{Binding Document, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 			</TabItem>
 		</TabControl>

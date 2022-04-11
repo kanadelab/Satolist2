@@ -54,7 +54,7 @@ namespace Satolist2.Model
 
 		public GhostModel(string path)
 		{
-			fullPath = Path.GetFullPath(path);
+			fullPath = DictionaryUtility.NormalizeFullPath(Path.GetFullPath(path));
 			dictionaries = new ObservableCollection<DictionaryModel>();
 
 			//ファイル巡回
@@ -90,7 +90,7 @@ namespace Satolist2.Model
 		//フルパス
 		public string FullPath
 		{
-			get;
+			get; set;
 		}
 
 		//純粋なファイル名

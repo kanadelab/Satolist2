@@ -76,23 +76,29 @@ namespace Satolist2.Control
 				{
 					Name = item.Value.GhostName,
 					Path = item.Value.GhostPath,
-					Type = GhostItemViewModel.ItemType.Running
+					IsRunning = true
 				});
 			}
 
 			//ヒストリーから表示
 			foreach(var item in TemporarySettings.Instance.GhostHistory)
 			{
-				var addItem = new GhostItemViewModel()
-				{
-					Name = item.Name,
-					Path = item.Path,
-					Type = GhostItemViewModel.ItemType.History
-				};
-
 				//既に起動中ならスキップ
-				if (items.FirstOrDefault(o => o.Path == addItem.Path) == null)
+				var foundItem = items.FirstOrDefault(o => o.Path == item.Path);
+				if (foundItem == null)
+				{
+					var addItem = new GhostItemViewModel()
+					{
+						Name = item.Name,
+						Path = item.Path,
+						IsHistory = true
+					};
 					items.Add(addItem);
+				}
+				else
+				{
+					foundItem.IsHistory = true;
+				}
 			}
 		}
 
@@ -105,9 +111,11 @@ namespace Satolist2.Control
 		}
 	}
 
-	internal class GhostItemViewModel
+	internal class GhostItemViewModel : NotificationObject
 	{
 		private string path;
+		private bool isFavorite;
+
 
 		public string Name { get; set; }
 		public string Path
@@ -115,13 +123,33 @@ namespace Satolist2.Control
 			get => path;
 			set => path = DictionaryUtility.NormalizeFullPath(value);
 		}
-		public ItemType Type { get; set; }
 
-		public enum ItemType
+		//ヒストリーに存在するレコード
+		public bool IsHistory { get; set; }
+		//起動中のゴースト
+		public bool IsRunning { get; set; }
+
+		public ActionCommand ToggleFavoriteCommand { get;}
+
+		public bool IsFavorite
 		{
-			History,
-			Favorite,
-			Running
+			get => isFavorite;
+			set
+			{
+				isFavorite = value;
+				NotifyChanged();
+			}
+		}
+
+		public GhostItemViewModel()
+		{
+			//お気に入り設定をトグル
+			ToggleFavoriteCommand = new ActionCommand(
+				o =>
+				{
+					IsFavorite = !IsFavorite;
+				}
+				);
 		}
 	}
 }

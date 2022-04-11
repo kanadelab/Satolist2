@@ -82,9 +82,15 @@ namespace Satolist2.Control
 		}
 	}
 
-	internal class GhostDescriptEditorViewModel : NotificationObject, ISaveFileObject, IDockingWindowContent
+	internal class GhostDescriptEditorViewModel : NotificationObject, ISaveFileObject, IDockingWindowContent, IDisposable
 	{
-		public string SaveFilePath => "/ghost/master/descript.txt";
+		public virtual string SaveFilePath => "/ghost/master/descript.txt";
+		public virtual string DockingTitle => "ゴーストプロパティ";
+		public virtual string DockingContentId => "GhostProperty";
+		public virtual DescriptItemModel[] ItemModel => DataModelManager.DescriptItems;
+		public string FileName => System.IO.Path.GetFileName(SaveFilePath);
+
+
 		private const int TabIndexList = 0;
 
 		private MainViewModel main;
@@ -162,15 +168,13 @@ namespace Satolist2.Control
 			get => isChanged;
 		}
 
-		public string DockingTitle => "ゴーストプロパティ";
-
-		public string DockingContentId => "GhostProperty";
+		
 
 		public GhostDescriptEditorViewModel(MainViewModel main)
 		{
 			this.main = main;
 			loadState = EditorLoadState.Initialized;
-			items = DataModelManager.DescriptItems.Select(o => new DescriptItemViewModel(o, this)).ToArray();
+			items = ItemModel.Select(o => new DescriptItemViewModel(o, this)).ToArray();
 			Items = CollectionViewSource.GetDefaultView(items);
 			Items.Filter = new Predicate<object>(
 				o =>
@@ -183,6 +187,7 @@ namespace Satolist2.Control
 
 			if (main.Ghost != null)
 				Load();
+			isChanged = false;
 		}
 
 		//ファイルからの読み込み
@@ -204,10 +209,6 @@ namespace Satolist2.Control
 			{
 				loadState = EditorLoadState.LoadFailed;
 				return false;
-			}
-			finally
-			{
-				isChanged = false;
 			}
 		}
 
@@ -233,6 +234,7 @@ namespace Satolist2.Control
 			{
 				var fullPath = main.Ghost.FullPath + SaveFilePath;
 				System.IO.File.WriteAllText(fullPath, saveText, Constants.EncodingShiftJis);
+				isChanged = false;
 				return true;
 			}
 			catch
@@ -285,16 +287,42 @@ namespace Satolist2.Control
 
 		private void ListToText()
 		{
+			if (Document != null)
+				Document.TextChanged -= Document_TextChanged;
+
 			Document = new TextDocument(Serialize());
+			Document.TextChanged += Document_TextChanged;
+		}
+
+		private void Document_TextChanged(object sender, EventArgs e)
+		{
+			Changed();
 		}
 
 		public void Changed()
 		{
 			isChanged = true;
 		}
+
+		public void Dispose()
+		{
+			if (Document != null)
+				Document.TextChanged -= Document_TextChanged;
+		}
 	}
 
-	
+	internal class GhostInstallEditorViewModel : GhostDescriptEditorViewModel
+	{
+		public override string DockingContentId => "Install";
+		public override string DockingTitle => "インストール設定";
+		public override string SaveFilePath => "/install.txt";
+		public override DescriptItemModel[] ItemModel => DataModelManager.InstallItems;
+
+		public GhostInstallEditorViewModel(MainViewModel main):base(main)
+		{
+
+		}
+	}
 
 	internal enum DescriptBool
 	{

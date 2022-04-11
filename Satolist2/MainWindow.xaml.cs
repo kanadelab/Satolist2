@@ -248,8 +248,10 @@ namespace Satolist2
 		public SaoriListViewModel SaoriListViewModel { get; }
 		public ReplaceListViewModel ReplaceListViewModel { get; }
 		public VariableListViewModel VariableListViewModel { get; }
+		
 
 		public List<EventEditorViewModel> EventEditors { get; }
+		public SatoriConfWrapper SatoriConfViewModel { get; }
 
 		//汎用コマンド
 		public ActionCommand SaveFileCommand { get; }
@@ -275,6 +277,9 @@ namespace Satolist2
 				yield return GhostInstallEditorViewModel;
 				yield return ReplaceListViewModel.ReplaceSaveObject;
 				yield return ReplaceListViewModel.ReplaceAfterSaveObject;
+				yield return UpdateIgnoreListViewModel.DeleteSaveObject;
+				yield return UpdateIgnoreListViewModel.DeveloperOptionsSaveObject;
+				yield return SatoriConfViewModel;
 			}
 		}
 
@@ -310,7 +315,8 @@ namespace Satolist2
 			GhostDescriptEditorViewModel = new GhostDescriptEditorViewModel(this);
 			GhostInstallEditorViewModel = new GhostInstallEditorViewModel(this);
 			UpdateIgnoreListViewModel = new UpdateIgnoreListViewModel(this);
-			SaoriListViewModel = new SaoriListViewModel();
+			SatoriConfViewModel = new SatoriConfWrapper(this);
+			SaoriListViewModel = new SaoriListViewModel(this);
 			ReplaceListViewModel = new ReplaceListViewModel(this);
 			VariableListViewModel = new VariableListViewModel(this);
 

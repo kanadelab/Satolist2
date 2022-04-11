@@ -15,11 +15,18 @@
 		<util:EditorLoadStateToVisibilityConverter State="LoadFailed" x:Key="LoadFailedVisibility" />
 	</UserControl.Resources>
 	<Grid>
-		<TextBlock Text="descript.txt がまだロードされていません。" Visibility="{Binding LoadState, Converter={StaticResource InitializedVisibility}}" />
-		<TextBlock Text="descript.txt のロードに失敗しているため編集は無効です。" Visibility="{Binding LoadState, Converter={StaticResource LoadFailedVisibility}}" />
+		<StackPanel Orientation="Horizontal" Visibility="{Binding LoadState, Converter={StaticResource InitializedVisibility}}">
+			<TextBlock Text="{Binding FileName}" />
+			<TextBlock Text=" がまだロードされていません。" />	
+		</StackPanel>
+
+		<StackPanel Visibility="{Binding LoadState, Converter={StaticResource LoadFailedVisibility}}">
+			<TextBlock Text="{Binding FileName}" />
+			<TextBlock Text=" のロードに失敗しているため編集は無効です。" />
+		</StackPanel>
 
 		<TabControl SelectedIndex="{Binding CurrentTabIndex, Mode=TwoWay}" Visibility="{Binding LoadState, Converter={StaticResource LoadedVisibility}}">
-			<TabItem Header="ゴースト プロパティ">
+			<TabItem Header="{Binding DockingTitle}">
 				<Grid>
 					<Grid.RowDefinitions>
 						<RowDefinition Height="auto" />
@@ -30,10 +37,6 @@
 					<local:WartermarkedTextBox Grid.Row="0" Margin="3" Wartermark="検索" Text="{Binding SearchString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
 					<ListView x:Name="SettingsList" Grid.Row="1" ItemsSource="{Binding Items}" SelectedIndex="{Binding SelectedIndex, Mode=TwoWay}" HorizontalContentAlignment="Stretch" SelectionMode="Single">
-						<ListView.InputBindings>
-							<KeyBinding Key="Down" Command="{Binding MoveDownCommand}" />
-							<KeyBinding Key="Up" Command="{Binding MoveUpCommand}" />
-						</ListView.InputBindings>
 						<ListView.ItemTemplate>
 							<DataTemplate>
 								<StackPanel>
@@ -124,7 +127,7 @@
 					</ListView>
 				</Grid>
 			</TabItem>
-			<TabItem Header="descript.txt">
+			<TabItem Header="{Binding FileName}">
 				<avalonEdit:TextEditor Document="{Binding Document, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 			</TabItem>
 		</TabControl>
