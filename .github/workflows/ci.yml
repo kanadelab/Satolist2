@@ -1,18 +1,21 @@
 name: test-build
 on: [push]
 jobs:
-  - name: checkout
-    uses: actions/chechout@v2
+  build:
+  runs-on: windows-2019
+  steps:
+    - name: checkout
+      uses: actions/chechout@v2
 
-  - name: msbuild setup
-    uses: microsoft/setup-msbuild@v1.0.2
+    - name: msbuild setup
+      uses: microsoft/setup-msbuild@v1.0.2
 
-  - name: run msbuild
-    run: |
-      MSBuild.exe Satolist2/Satolist2.csproj -property:Configuration=Release;Platform=AnyCPU
+    - name: run msbuild
+      run: |
+        MSBuild.exe Satolist2/Satolist2.csproj -property:Configuration=Release;Platform=AnyCPU
 
-  - name: upload artifacts
-    uses: actions/upload-artifact@v3
-    with:
-      name: build-output
-      path: Satolist2/bin/Release
+    - name: upload artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: build-output
+        path: Satolist2/bin/Release
