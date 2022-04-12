@@ -5,29 +5,43 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
 
 namespace Satolist2.Utility
 {
-	internal class DockingWindow : LayoutAnchorable
+	public class DockingWindow : LayoutAnchorable
 	{
+		//public static readonly DependencyProperty ContentProperty = DependencyProperty.Register(nameof(Content), typeof(System.Windows.Controls.Control), typeof(DockingWindow));
+		/*
+		public static readonly DependencyProperty ViewModelProperty = DependencyProperty.Register("ViewModel", typeof(object), typeof(DockingWindow),
+			new PropertyMetadata(null, (d,e) =>
+			{
+				((System.Windows.Controls.Control)((DockingWindow)d).Content).DataContext = e.NewValue;
+			}
+			));
+		*/
+
 		public object ViewModel
 		{
+			//get => GetValue(ViewModelProperty);
 			get => ((System.Windows.Controls.Control)Content).DataContext;
 			set
 			{
 				//古い方のvmはdisposeする
-				if(((System.Windows.Controls.Control)Content).DataContext is IDisposable d)
+				if(ViewModel is IDisposable d)
 				{
 					d.Dispose();
 				}
 
 				//イベントの変更
-				if(((System.Windows.Controls.Control)Content).DataContext is INotifyPropertyChanged oldVm)
+				if(ViewModel is INotifyPropertyChanged oldVm)
 				{
 					oldVm.PropertyChanged -= ViewModel_PropertyChanged;
 				}
 
+				//TODO: set
+				//SetValue(ViewModelProperty, value);
 				((System.Windows.Controls.Control)Content).DataContext = value;
 
 				if( value is IControlBindedReceiver recv)
@@ -58,6 +72,10 @@ namespace Satolist2.Utility
 			Content = control;
 			ViewModel = viewModel;
 		}
+
+		//??
+		public DockingWindow()
+		{ }
 
 		private void ViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
 		{

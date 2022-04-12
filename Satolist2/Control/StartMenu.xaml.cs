@@ -38,6 +38,7 @@ namespace Satolist2.Control
 
 	internal class StartMenuViewModel : NotificationObject, IDockingWindowContent
 	{
+		public const string ContentId = "StartMenu";
 		private GhostItemViewModel selectedItem;
 		private MainViewModel mainVm;
 		private ObservableCollection<GhostItemViewModel> items;
@@ -59,7 +60,7 @@ namespace Satolist2.Control
 
 		public string DockingTitle => "スタートメニュー";
 
-		public string DockingContentId => null;
+		public string DockingContentId => ContentId;
 
 		public StartMenuViewModel(MainViewModel main)
 		{

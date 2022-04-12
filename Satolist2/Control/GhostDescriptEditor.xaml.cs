@@ -84,9 +84,10 @@ namespace Satolist2.Control
 
 	internal class GhostDescriptEditorViewModel : NotificationObject, ISaveFileObject, IDockingWindowContent, IDisposable
 	{
+		public const string ContentId = "GhostProperty";
 		public virtual string SaveFilePath => "/ghost/master/descript.txt";
 		public virtual string DockingTitle => "ゴーストプロパティ";
-		public virtual string DockingContentId => "GhostProperty";
+		public virtual string DockingContentId => ContentId;
 		public virtual DescriptItemModel[] ItemModel => DataModelManager.DescriptItems;
 		public string FileName => System.IO.Path.GetFileName(SaveFilePath);
 
@@ -313,7 +314,8 @@ namespace Satolist2.Control
 
 	internal class GhostInstallEditorViewModel : GhostDescriptEditorViewModel
 	{
-		public override string DockingContentId => "Install";
+		public new const string ContentId = "Install";
+		public override string DockingContentId => ContentId;
 		public override string DockingTitle => "インストール設定";
 		public override string SaveFilePath => "/install.txt";
 		public override DescriptItemModel[] ItemModel => DataModelManager.InstallItems;

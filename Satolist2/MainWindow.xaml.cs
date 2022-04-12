@@ -1,4 +1,6 @@
-﻿using AvalonDock.Layout;
+﻿using AvalonDock.Controls;
+using AvalonDock.Layout;
+using AvalonDock.Layout.Serialization;
 using Satolist2.Control;
 using Satolist2.Dialog;
 using Satolist2.Model;
@@ -30,33 +32,42 @@ namespace Satolist2
 		private List<DockingWindow> TextEditors { get; }
 		private MainViewModel mainViewModel;
 
-		public LayoutDocumentPane DocumentPane { get; }
+		//public LayoutDocumentPane DocumentPane { get; }
 
-		private DockingWindow FileEventTree { get; set; }
-		private DockingWindow EventList { get; set; }
-		private DockingWindow SurfaceViewer { get; set; }
-		private DockingWindow SurfacePalette { get; set; }
-		private DockingWindow StartMenu { get; set; }
-		private DockingWindow DebugMainMenu { get; set; }
-		private DockingWindow GhostDescriptEditor { get; set; }
-		private	DockingWindow GhostInstallEditor { get; set; }
-		private DockingWindow UpdateIgnoreList { get; set; }
-		private DockingWindow SaoriList { get; set; }
-		private DockingWindow ReplaceList { get; set; }
-		private DockingWindow VariableList { get; set; }
+		//private DockingWindow FileEventTree { get; set; }
+		//private DockingWindow EventList { get; set; }
+		//private DockingWindow SurfaceViewer { get; set; }
+		//private DockingWindow SurfacePalette { get; set; }
+		//private DockingWindow StartMenu { get; set; }
+		//private DockingWindow DebugMainMenu { get; set; }
+		//private DockingWindow GhostDescriptEditor { get; set; }
+		//private	DockingWindow GhostInstallEditor { get; set; }
+		//private DockingWindow UpdateIgnoreList { get; set; }
+		//private DockingWindow SaoriList { get; set; }
+		//private DockingWindow ReplaceList { get; set; }
+		//private DockingWindow VariableList { get; set; }
+		private LayoutDocumentPane DocumentPane { get; set; }
+
+	
+
 
 		public MainWindow()
 		{
 			InitializeComponent();
 
-			AllowDrop = true;
-			DragEnter += MainWindow_DragEnter;
-			Drop += MainWindow_Drop;
-			
+			//デフォルト状態で閉じておくもの
+			GhostDescriptEditor.IsVisible = false;
+			GhostInstallEditor.IsVisible = false;
+			UpdateIgnoreList.IsVisible = false;
+			SaoriList.IsVisible = false;
+			ReplaceList.IsVisible = false;
+			VariableList.IsVisible = false;
 
+			AllowDrop = true;
 			EventEditors = new List<DockingWindow>();
 			TextEditors = new List<DockingWindow>();
 
+#if false
 			//DockingWindowの作成
 			FileEventTree = new DockingWindow(new FileEventTree());
 			EventList = new DockingWindow(new EventList());
@@ -85,6 +96,11 @@ namespace Satolist2
 
 			var leftPane = new LayoutAnchorablePane() { DockWidth = new GridLength(200.0) };
 			var rightPane = new LayoutAnchorablePane() { DockWidth = new GridLength(300.0) };
+			FileEventTree.CanHide = true;
+			FileEventTree.CanShowOnHover = true;
+			FileEventTree.CanMove = true;
+			FileEventTree.CanFloat = true;
+			FileEventTree.CanDockAsTabbedDocument = true;
 			leftPane.Children.Add(FileEventTree);
 			rightPane.Children.Add(SurfaceViewer);
 			rightPane.Children.Add(SurfacePalette);
@@ -103,13 +119,49 @@ namespace Satolist2
 			horizontalPanel.Children.Add(rightPane);
 
 			//VerticalPanel.Children.Add(topPane);
-			VerticalPanel.Children.Add(horizontalPanel);
-			VerticalPanel.Children.Add(bottomPane);
+			//VerticalPanel.Children.Add(horizontalPanel);
+			//VerticalPanel.Children.Add(bottomPane);
 
 
 			//PaneB.Children.Add( new DockingWindow(new FileEventTree(), mainVM.FileEventTreeViewModel));
 			//LeftPane.InsertChildAt(0, new DockingWindow(new EventList(), mainVM.EventListViewModel));
 			//RightPane.InsertChildAt(0, new DockingWindow(new FileEventTree(), mainVM.FileEventTreeViewModel));
+#else
+			ReflectVisibleMenuDataContext();
+
+			//カラのVM生成
+			mainViewModel = new MainViewModel(this);
+			DataContext = mainViewModel;
+			ReflectControlViewModel(mainViewModel);
+
+			//レイアウトの復元
+			DeserializeLayout(TemporarySettings.Instance.SerializedDockingLayout);
+
+			//DocumentPane探す
+			//DockingManager.LayoutRootPanel.Children
+			DocumentPane = FindDocumentPane(DockingManager.Layout);
+#endif
+		}
+
+		private LayoutDocumentPane FindDocumentPane(ILayoutContainer panel)
+		{
+			if (panel.Children != null)
+			{
+				foreach (var c in panel.Children)
+				{
+					if (c is LayoutDocumentPane documentPane)
+					{
+						return documentPane;
+					}
+					else if (c is ILayoutContainer childPanel)
+					{
+						var found = FindDocumentPane(childPanel);
+						if (found != null)
+							return found;
+					}
+				}
+			}
+			return null;
 		}
 
 		private void MainWindow_Drop(object sender, DragEventArgs e)
@@ -135,12 +187,15 @@ namespace Satolist2
 			if (currentWindow == null)
 			{
 				var newWindow = new DockingWindow(new EventEditor(), new EventEditorViewModel(mainViewModel, ev));
+				newWindow.CanClose = true;
+				newWindow.CanHide = false;
 
 				//閉じたときのイベントを設定
 				newWindow.Closing += EventEditorClosing;
 				ev.OnRemove += OpendEventRemoved;
 
 				EventEditors.Add(newWindow);
+				//DockingManager.
 				DocumentPane.Children.Add(newWindow);
 				currentWindow = newWindow;
 			}
@@ -165,6 +220,7 @@ namespace Satolist2
 			//登録イベントを解除
 			if(sender is DockingWindow window)
 			{
+				EventEditors.Remove(window);
 				window.Closing -= EventEditorClosing;
 				if (window.ViewModel is EventEditorViewModel viewModel)
 					viewModel.Event.OnRemove -= OpendEventRemoved;
@@ -177,6 +233,8 @@ namespace Satolist2
 			if(currentWindow == null)
 			{
 				var newWindow = new DockingWindow(new TextEditor(), new TextEditorViewModel(text));
+				newWindow.CanClose = true;
+				newWindow.CanHide = false;
 
 				TextEditors.Add(newWindow);
 				DocumentPane.Children.Add(newWindow);
@@ -202,6 +260,7 @@ namespace Satolist2
 		//各コントロールのViewModelの再バインド
 		private void ReflectControlViewModel(MainViewModel mainVm)
 		{
+#if false
 			FileEventTree.ViewModel = mainVm.FileEventTreeViewModel;
 			EventList.ViewModel = mainVm.EventListViewModel;
 			SurfacePalette.ViewModel = mainVm.SurfacePaletteViewModel;
@@ -214,6 +273,42 @@ namespace Satolist2
 			SaoriList.ViewModel = mainVm.SaoriListViewModel;
 			ReplaceList.ViewModel = mainVm.ReplaceListViewModel;
 			VariableList.ViewModel = mainVm.VariableListViewModel;
+#else
+			FileEventTree.ViewModel = mainVm.FileEventTreeViewModel;
+			EventList.ViewModel = mainVm.EventListViewModel;
+			SurfacePalette.ViewModel = mainVm.SurfacePaletteViewModel;
+			SurfaceViewer.ViewModel = mainVm.SurfaceViewerViewModel;
+			DebugMainMenu.ViewModel = mainVm.DebugMainMenuViewModel;
+			StartMenu.ViewModel = mainVm.StartMenuViewModel;
+			GhostDescriptEditor.ViewModel = mainVm.GhostDescriptEditorViewModel;
+			GhostInstallEditor.ViewModel = mainVm.GhostInstallEditorViewModel;
+			UpdateIgnoreList.ViewModel = mainVm.UpdateIgnoreListViewModel;
+			SaoriList.ViewModel = mainVm.SaoriListViewModel;
+			ReplaceList.ViewModel = mainVm.ReplaceListViewModel;
+			VariableList.ViewModel = mainVm.VariableListViewModel;
+
+#endif
+		}
+
+		private void ReflectVisibleMenuDataContext()
+		{
+			//デシリアライズ時、DockingWindowも作り直し食らうので
+			//ちょっと微妙だけど、バインディングの繋ぎ変えを一括で行う
+			FileEventTreeVisibleMenu.DataContext = FileEventTree;
+			EventListVisibleMenu.DataContext = EventList;
+			SurfaceViewerVisibleMenu.DataContext = SurfaceViewer;
+			SurfacePaletteVisibleMenu.DataContext = SurfacePalette;
+			DebugMainMenuVisibleMenu.DataContext = DebugMainMenu;
+			StartMenuVisibleMenu.DataContext = StartMenu;
+			GhostDescriptEditorVisibleMenu.DataContext = GhostDescriptEditor;
+			GhostInstallEditorVisibleMenu.DataContext = GhostInstallEditor;
+			UpdateIgnoreListVisibleMenu.DataContext = UpdateIgnoreList;
+			SaoriListVisibleMenu.DataContext = SaoriList;
+			ReplaceListVisibleMenu.DataContext = ReplaceList;
+			VariableListVisibleMenu.DataContext = VariableList;
+			
+			//
+			
 		}
 
 		/*
@@ -225,6 +320,94 @@ namespace Satolist2
 
 		}
 		*/
+
+		//レイアウトの保存と読込
+		private string SerializeDockingLayout()
+		{
+			XmlLayoutSerializer serializer = new XmlLayoutSerializer(DockingManager);
+			using(var writer = new System.IO.StringWriter())
+			{
+				serializer.Serialize(writer);
+				return writer.ToString();
+			}
+		}
+
+		private void DeserializeLayout(string serializedLayout)
+		{
+			//無効な設定
+			if (string.IsNullOrEmpty(serializedLayout))
+				return;
+			//return;	
+			//読込
+			try
+			{
+				XmlLayoutSerializer serializer = new XmlLayoutSerializer(DockingManager);
+				using (var reader = new System.IO.StringReader(serializedLayout))
+				{
+					serializer.LayoutSerializationCallback += Serializer_LayoutSerializationCallback;
+					serializer.Deserialize(reader);
+					ReflectVisibleMenuDataContext();
+				}
+			}
+			catch
+			{
+				//だめそうだったらパス
+			}
+		}
+
+		private void Serializer_LayoutSerializationCallback(object sender, LayoutSerializationCallbackEventArgs e)
+		{
+		//	throw new NotImplementedException();
+			switch(e.Model.ContentId)
+			{
+				case FileEventTreeViewModel.ContentId:
+					FileEventTree = (DockingWindow)e.Model;
+					break;
+				case EventListViewModel.ContentId:
+					EventList = (DockingWindow)e.Model;
+					break;
+				case SurfacePaletteViewModel.ContentId:
+					SurfacePalette = (DockingWindow)e.Model;
+					break;
+				case SurfaceViewerViewModel.ContentId:
+					SurfaceViewer = (DockingWindow)e.Model;
+					break;
+				case StartMenuViewModel.ContentId:
+					StartMenu = (DockingWindow)e.Model;
+					break;
+				case DebugMainMenuViewModel.ContentId:
+					DebugMainMenu = (DockingWindow)e.Model;
+					break;
+				case GhostDescriptEditorViewModel.ContentId:
+					GhostDescriptEditor = (DockingWindow)e.Model;
+					break;
+				case GhostInstallEditorViewModel.ContentId:
+					GhostInstallEditor = (DockingWindow)e.Model;
+					break;
+				case UpdateIgnoreListViewModel.ContentId:
+					UpdateIgnoreList = (DockingWindow)e.Model;
+					break;
+				case SaoriListViewModel.ContentId:
+					SaoriList = (DockingWindow)e.Model;
+					break;
+				case ReplaceListViewModel.ContentId:
+					ReplaceList = (DockingWindow)e.Model;
+					break;
+				case VariableListViewModel.ContentId:
+					VariableList = (DockingWindow)e.Model;
+					break;
+				default:
+					//イベントエディタ等一時的なモノはデシリアライズする必要はない
+					e.Cancel = true;
+					break;
+			}
+		}
+
+		private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+		{
+			//ウインドウを閉じるときに、複製する
+			TemporarySettings.Instance.SerializedDockingLayout = SerializeDockingLayout();
+		}
 	}
 
 	//ワークスペースは切り離せるのが望ましそう。Dockのビューモデルとかもくっついてそうだし

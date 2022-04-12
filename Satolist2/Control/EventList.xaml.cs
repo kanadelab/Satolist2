@@ -39,10 +39,19 @@ namespace Satolist2.Control
 				}
 			}
 		}
+
+		private void UserControl_SizeChanged(object sender, SizeChangedEventArgs e)
+		{
+			//サイズ更新
+			//いい感じのサイズ感にしておく
+			EventBodyColumn.Width = MainListView.ActualWidth * 0.7;
+			EventConditionColumn.Width = MainListView.ActualWidth * 0.3;
+		}
 	}
 
 	internal class EventListViewModel : NotificationObject, IDockingWindowContent
 	{
+		public const string ContentId = "EventList";
 		private ObservableCollection<EventListItemViewModel> items;
 		private INotifyCollectionChanged itemsSource;
 		private string dockingTitle;
@@ -64,7 +73,7 @@ namespace Satolist2.Control
 			}
 		}
 
-		public string DockingContentId => "EventList";
+		public string DockingContentId => ContentId;
 
 		public EventListViewModel(MainViewModel main)
 		{

@@ -31,6 +31,7 @@ namespace Satolist2.Control
 
 	internal class SurfacePaletteViewModel : NotificationObject, IDockingWindowContent
 	{
+		public const string ContentId = "SurfacePalette";
 		//TODO: SurfaceViewerと独立して持ってしまっているので一緒にしたい
 		private ShellAnalyzer shell;
 		private SurfaceRenderer renderer;
@@ -73,7 +74,7 @@ namespace Satolist2.Control
 
 		public string DockingTitle => "サーフェス パレット";
 
-		public string DockingContentId => "SurfacePalette";
+		public string DockingContentId => ContentId;
 	}
 
 	internal class SurfacePaletteItemViewModel

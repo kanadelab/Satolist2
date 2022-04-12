@@ -33,6 +33,7 @@ namespace Satolist2.Control
 
 	internal class SurfaceViewerViewModel : NotificationObject, IDockingWindowContent
 	{
+		public const string ContentId = "SurfaceViewer";
 		private string shellPath;
 		private ShellAnalyzer shell;
 		private SurfaceRenderer renderer;
@@ -128,7 +129,7 @@ namespace Satolist2.Control
 
 		public string DockingTitle => "サーフェスビューワ";
 
-		public string DockingContentId => "SurfaceViewer";
+		public string DockingContentId => ContentId;
 
 	}
 

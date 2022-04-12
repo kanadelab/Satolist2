@@ -4,9 +4,10 @@
 		xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 		xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 		xmlns:ctl="clr-namespace:Satolist2.Control"
+		xmlns:util="clr-namespace:Satolist2.Utility"
 		xmlns:avalonDock="https://github.com/Dirkster99/AvalonDock"
 		mc:Ignorable="d"
-		Title="MainWindow" Height="800" Width="1200">
+		Title="MainWindow" Height="800" Width="1200" DragEnter="MainWindow_DragEnter" Drop="MainWindow_Drop" Closing="Window_Closing">
 	<Window.InputBindings>
 		<KeyBinding Gesture="CTRL+S" Command="{Binding SaveFileCommand}" />
 	</Window.InputBindings>
@@ -22,11 +23,26 @@
 				<Separator />
 				<MenuItem Header="編集中のゴーストをエクスプローラで開く" Command="{Binding OpenGhostDirectoryCommand}" />
 			</MenuItem>
+			<MenuItem Header="表示">
+				<MenuItem Header="ファイルイベントツリー" x:Name="FileEventTreeVisibleMenu" IsCheckable="True" IsChecked="{Binding IsVisible, Mode=TwoWay}" />
+				<MenuItem Header="単語群・文リスト" x:Name="EventListVisibleMenu" IsCheckable="True" IsChecked="{Binding IsVisible, Mode=TwoWay}" />
+				<MenuItem Header="サーフェスビューワ" x:Name="SurfaceViewerVisibleMenu" IsCheckable="True" IsChecked="{Binding IsVisible, Mode=TwoWay}" />
+				<MenuItem Header="サーフェスパレット" x:Name="SurfacePaletteVisibleMenu" IsCheckable="True" IsChecked="{Binding IsVisible, Mode=TwoWay}" />
+				<MenuItem Header="デバッグメニュー" x:Name="DebugMainMenuVisibleMenu" IsCheckable="True" IsChecked="{Binding IsVisible, Mode=TwoWay}" />
+				<MenuItem Header="スタートメニュー" x:Name="StartMenuVisibleMenu" IsCheckable="True" IsChecked="{Binding IsVisible, Mode=TwoWay}" />
+				<MenuItem Header="ゴーストプロパティ" x:Name="GhostDescriptEditorVisibleMenu" IsCheckable="True" IsChecked="{Binding IsVisible, Mode=TwoWay}"/>
+				<MenuItem Header="インストール設定" x:Name="GhostInstallEditorVisibleMenu" IsCheckable="True" IsChecked="{Binding IsVisible, Mode=TwoWay}" />
+				<MenuItem Header="更新除外設定" x:Name="UpdateIgnoreListVisibleMenu" IsCheckable="True" IsChecked="{Binding IsVisible, Mode=TwoWay}" />
+				<MenuItem Header="SAORIリスト" x:Name="SaoriListVisibleMenu" IsCheckable="True" IsChecked="{Binding IsVisible, Mode=TwoWay}" />
+				<MenuItem Header="文字置換リスト" x:Name="ReplaceListVisibleMenu" IsCheckable="True" IsChecked="{Binding IsVisible, Mode=TwoWay}" />
+				<MenuItem Header="変数リスト" x:Name="VariableListVisibleMenu" IsCheckable="True" IsChecked="{Binding IsVisible, Mode=TwoWay}" />
+			</MenuItem>
 			<MenuItem Header="オプション">
 				<MenuItem Header="挿入メニューのカスタマイズ" Command="{Binding EditInsertPaletteCommand}" />
 			</MenuItem>
 		</Menu>
 		
+		<!--
 		<avalonDock:DockingManager Grid.Row="1">
 			<avalonDock:LayoutRoot x:Name="LayoutRoot">
 				<avalonDock:LayoutPanel x:Name="VerticalPanel" Orientation="Vertical">
@@ -34,5 +50,97 @@
 				</avalonDock:LayoutPanel>
 			</avalonDock:LayoutRoot>
 		</avalonDock:DockingManager>
+		-->
+
+		<avalonDock:DockingManager Grid.Row="1" AllowMixedOrientation="True" x:Name="DockingManager">
+			<avalonDock:DockingManager.Theme>
+				<avalonDock:Vs2013LightTheme/>
+			</avalonDock:DockingManager.Theme>
+			<avalonDock:LayoutRoot>
+				<avalonDock:LayoutPanel Orientation="Vertical">
+					<avalonDock:LayoutPanel Orientation="Horizontal">
+
+						<!--左ペイン-->
+						<avalonDock:LayoutAnchorablePane DockWidth="200" >
+							
+							<!--ファイルイベントツリー-->
+							<util:DockingWindow x:Name="FileEventTree">
+								<ctl:FileEventTree />
+							</util:DockingWindow>
+						
+						</avalonDock:LayoutAnchorablePane>
+						
+						<!--ドキュメントペイン-->
+						<avalonDock:LayoutDocumentPane>
+							
+							<!--スタートメニュー-->
+							<util:DockingWindow x:Name="StartMenu">
+								<ctl:StartMenu />
+							</util:DockingWindow>
+							
+							<!--デバッグメニュー-->
+							<util:DockingWindow x:Name="DebugMainMenu">
+								<ctl:DebugMainMenu />
+							</util:DockingWindow>
+							
+							<!--ゴーストプロパティ-->
+							<util:DockingWindow x:Name="GhostDescriptEditor">
+								<ctl:GhostDescriptEditor />
+							</util:DockingWindow>
+							
+							<!--インストール設定-->
+							<util:DockingWindow x:Name="GhostInstallEditor">
+								<ctl:GhostDescriptEditor />
+							</util:DockingWindow>
+							
+							<!--更新除外設定-->
+							<util:DockingWindow x:Name="UpdateIgnoreList">
+								<ctl:UpdateIgnoreList />
+							</util:DockingWindow>
+							
+							<!--SAORIリスト-->
+							<util:DockingWindow x:Name="SaoriList">
+								<ctl:SaoriList />
+							</util:DockingWindow>
+							
+							<!--文字置換リスト-->
+							<util:DockingWindow x:Name="ReplaceList">
+								<ctl:ReplaceList />
+							</util:DockingWindow>
+							
+							<!--変数リスト-->
+							<util:DockingWindow x:Name="VariableList">
+								<ctl:VariableList />
+							</util:DockingWindow>
+							
+						</avalonDock:LayoutDocumentPane>
+						
+						<!--右ペイン-->
+						<avalonDock:LayoutAnchorablePane DockWidth="300">
+							<!--サーフェスビューワ-->
+							<util:DockingWindow x:Name="SurfaceViewer">
+								<ctl:SurfaceViewer />
+							</util:DockingWindow>
+							
+							<!--サーフェスパレット-->
+							<util:DockingWindow x:Name="SurfacePalette">
+								<ctl:SurfacePalette />
+							</util:DockingWindow>
+						</avalonDock:LayoutAnchorablePane>
+
+					</avalonDock:LayoutPanel>
+
+					<!--下ペイン-->
+					<avalonDock:LayoutAnchorablePane DockHeight="250">
+						<util:DockingWindow x:Name="EventList">
+							<ctl:EventList />
+						</util:DockingWindow>
+					</avalonDock:LayoutAnchorablePane>
+					
+
+				</avalonDock:LayoutPanel>
+			</avalonDock:LayoutRoot>
+		</avalonDock:DockingManager>
+
 	</Grid>
 </Window>

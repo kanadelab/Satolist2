@@ -20,6 +20,8 @@ namespace Satolist2.Utility
 
 		[JsonProperty]
 		public ObservableCollection<OpenGhostHistory> GhostHistory { get; set; }
+		[JsonProperty]
+		public string SerializedDockingLayout { get; set; }
 
 		public TemporarySettings()
 		{
@@ -92,7 +94,7 @@ namespace Satolist2.Utility
 
 		public bool IsEquals(OpenGhostHistory item)
 		{
-			return Path == item.Path;
+			return DictionaryUtility.NormalizePath(Path) == DictionaryUtility.NormalizePath(item.Path);
 		}
 	}
 }

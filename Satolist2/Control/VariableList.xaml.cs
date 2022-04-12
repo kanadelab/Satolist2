@@ -31,6 +31,7 @@ namespace Satolist2.Control
 
 	internal class VariableListViewModel : NotificationObject, IDockingWindowContent, IControlBindedReceiver, IDisposable
 	{
+		public const string ContentId = "VariableList";
 		private const int TabIndexList = 0;
 
 		private MainViewModel main;
@@ -75,7 +76,7 @@ namespace Satolist2.Control
 
 		public string DockingTitle => "変数設定";
 
-		public string DockingContentId => "VariableList";
+		public string DockingContentId => ContentId;
 
 		public VariableListViewModel(MainViewModel main)
 		{

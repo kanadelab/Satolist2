@@ -68,6 +68,7 @@ namespace Satolist2.Control
 
 	internal class UpdateIgnoreListViewModel : NotificationObject, IDockingWindowContent, IDisposable, IControlBindedReceiver
 	{
+		public const string ContentId = "UpdateIgnoreList";
 		public const string DeleteFilePath = "/delete.txt";
 		public const string DeveloperOptionsFilePath = "/developer_options.txt";
 
@@ -140,7 +141,7 @@ namespace Satolist2.Control
 
 		public string DockingTitle => "更新除外設定";
 
-		public string DockingContentId => "UpdateIgnoreList";
+		public string DockingContentId => ContentId;
 
 		public UpdateIgnoreListViewModel(MainViewModel main)
 		{

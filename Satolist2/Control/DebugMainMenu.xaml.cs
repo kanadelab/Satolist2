@@ -30,6 +30,7 @@ namespace Satolist2.Control
 
 	internal class DebugMainMenuViewModel : NotificationObject, IDockingWindowContent
 	{
+		public const string ContentId = "DebugMainMenu";
 		private string loadGhostPath;
 		private string loadShellDirectoryName;
 		private MainViewModel Main { get; set; }
@@ -86,6 +87,6 @@ namespace Satolist2.Control
 
 		public string DockingTitle => "DebugMainMenu";
 
-		public string DockingContentId => "DebugMainMenu";
+		public string DockingContentId => ContentId;
 	}
 }

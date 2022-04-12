@@ -31,6 +31,7 @@ namespace Satolist2.Control
 
 	internal class ReplaceListViewModel : NotificationObject, IDockingWindowContent, IControlBindedReceiver, IDisposable
 	{
+		public const string ContentId = "ReplaceList";
 		public const string ReplaceFilePath = "/ghost/master/replace.txt";
 		public const string ReplaceAfterFilePath = "/ghost/master/replace_after.txt";
 		private const int TabIndexList = 0;
@@ -91,7 +92,7 @@ namespace Satolist2.Control
 
 		public string DockingTitle => "文字置換リスト";
 
-		public string DockingContentId => "ReplaceList";
+		public string DockingContentId => ContentId;
 
 		public ReplaceListViewModel(MainViewModel main)
 		{

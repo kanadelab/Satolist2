@@ -51,9 +51,16 @@ namespace Satolist2.Control
 		{
 			if(sender is TreeViewItem item)
 			{
-				if(item.DataContext is FileEventTreeItemDictionaryViewModel dic)
+				if (item.DataContext is FileEventTreeItemDictionaryViewModel dic)
 				{
 					e.Handled = dic.Open();
+				}
+				else if(item.DataContext is FileEventTreeItemEventViewModel ev)
+				{
+					if(ev.Items.Count==1)
+					{
+						ev.OpenFirstEventEditor();
+					}
 				}
 			}
 		}
@@ -61,6 +68,7 @@ namespace Satolist2.Control
 
 	internal class FileEventTreeViewModel : NotificationObject, IDockingWindowContent
 	{
+		public const string ContentId = "FileEventTree";
 		private ObservableCollection<FileEventTreeItemDictionaryViewModel> dictionaries;
 
 		public MainViewModel Main { get; }
@@ -76,7 +84,7 @@ namespace Satolist2.Control
 
 		public string DockingTitle => "ファイルイベントツリー";
 
-		public string DockingContentId => "FileEventTree";
+		public string DockingContentId => ContentId;
 
 		public FileEventTreeViewModel(MainViewModel main)
 		{
@@ -436,7 +444,13 @@ namespace Satolist2.Control
 				//同じイベントをもつものを取り除く
 				inlineEventViewModels.Remove(inlineEventViewModels.First(o => o.EventList.Count == 0));
 			}
+		}
 
+		//最初の１つをイベントエディタで開く。１つしかアイテムがない場合にダブルクリック時エディタを開くためのもの
+		public void OpenFirstEventEditor()
+		{
+			if(Items.Count > 0)
+				Dictionary.FileEventTree.Main.OpenEventEditor(Items.First());
 		}
 	}
 

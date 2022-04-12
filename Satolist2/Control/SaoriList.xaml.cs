@@ -32,6 +32,7 @@ namespace Satolist2.Control
 
 	internal class SaoriListViewModel : NotificationObject, IDockingWindowContent, IDisposable
 	{
+		public const string ContentId = "SaoriList";
 		private const int TabIndexList = 0;
 		private TextDocument document;
 		private int currentTabIndex;
@@ -44,7 +45,7 @@ namespace Satolist2.Control
 		public MainViewModel Main { get; }
 		public string DockingTitle => "SAORIリスト";
 
-		public string DockingContentId => "SaoriList";
+		public string DockingContentId => ContentId;
 
 		public TextDocument Document
 		{
