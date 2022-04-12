@@ -13,7 +13,7 @@ jobs:
       - name: restore nuget
         shell: cmd
         run: |
-          MSBuild.exe Satolist2/Satolist2.csproj -t:restore
+          MSBuild.exe -t:restore
       
       - name: run msbuild
         shell: cmd
