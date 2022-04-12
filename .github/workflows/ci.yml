@@ -9,6 +9,8 @@ jobs:
 
       - name: msbuild setup
         uses: microsoft/setup-msbuild@v1.1
+        with:
+          vs-version: '[16.11]'
 
       - name: run msbuild
         shell: cmd
