@@ -120,9 +120,6 @@
     <Compile Include="Dialog\AddEventDialog.xaml.cs">
       <DependentUpon>AddEventDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Dialog\DockingWorkspace.xaml.cs">
-      <DependentUpon>DockingWorkspace.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Dialog\RemoteFileSelectDialog.xaml.cs">
       <DependentUpon>RemoteFileSelectDialog.xaml</DependentUpon>
     </Compile>
@@ -211,10 +208,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Dialog\AddEventDialog.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Dialog\DockingWorkspace.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
