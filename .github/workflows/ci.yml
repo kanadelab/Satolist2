@@ -11,6 +11,7 @@ jobs:
         uses: microsoft/setup-msbuild@v1.0.2
 
       - name: run msbuild
+        shell: cmd
         run: |
           MSBuild.exe Satolist2/Satolist2.csproj -property:Configuration=Release;Platform=AnyCPU
 
