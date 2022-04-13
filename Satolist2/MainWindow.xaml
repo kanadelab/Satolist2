@@ -10,6 +10,7 @@
 		Title="MainWindow" Height="800" Width="1200" DragEnter="MainWindow_DragEnter" Drop="MainWindow_Drop" Closing="Window_Closing">
 	<Window.InputBindings>
 		<KeyBinding Gesture="CTRL+S" Command="{Binding SaveFileCommand}" />
+		<KeyBinding Gesture="CTRL+ALT+R" Command="{Binding ReloadShioriCommand}" />
 	</Window.InputBindings>
 	<Grid>
 		<Grid.RowDefinitions>
@@ -19,7 +20,7 @@
 
 		<Menu Grid.Row="0">
 			<MenuItem Header="ファイル">
-				<MenuItem Header="上書き保存" Command="{Binding SaveFileCommand}" InputGestureText="Crrl+S"/>
+				<MenuItem Header="上書き保存" Command="{Binding SaveFileCommand}" InputGestureText="Ctrl+S"/>
 				<Separator />
 				<MenuItem Header="編集中のゴーストをエクスプローラで開く" Command="{Binding OpenGhostDirectoryCommand}" />
 			</MenuItem>
@@ -36,6 +37,9 @@
 				<MenuItem Header="SAORIリスト" x:Name="SaoriListVisibleMenu" IsCheckable="True" IsChecked="{Binding IsVisible, Mode=TwoWay}" />
 				<MenuItem Header="文字置換リスト" x:Name="ReplaceListVisibleMenu" IsCheckable="True" IsChecked="{Binding IsVisible, Mode=TwoWay}" />
 				<MenuItem Header="変数リスト" x:Name="VariableListVisibleMenu" IsCheckable="True" IsChecked="{Binding IsVisible, Mode=TwoWay}" />
+			</MenuItem>
+			<MenuItem Header="デバッグ">
+				<MenuItem Header="SHIORI Reload" Command="{Binding ReloadShioriCommand}" InputGestureText="Ctrl+Alt+R" />
 			</MenuItem>
 			<MenuItem Header="オプション">
 				<MenuItem Header="挿入メニューのカスタマイズ" Command="{Binding EditInsertPaletteCommand}" />

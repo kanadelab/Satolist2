@@ -189,6 +189,11 @@ namespace Satolist2.Control
 				}
 			}
 
+			if(e.Action == NotifyCollectionChangedAction.Reset)
+			{
+				items.Clear();
+			}
+
 		}
 
 	}

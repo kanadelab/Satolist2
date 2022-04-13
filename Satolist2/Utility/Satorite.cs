@@ -65,33 +65,38 @@ namespace Satolist2.Utility
 			if(parsedResult.Parameters.ContainsKey("Value"))
 			{
 				string resultScript = parsedResult.Parameters["Value"];
-
-				var sstpBuilder = new ProtocolBuilder();
-				sstpBuilder.Command = "SEND SSTP/1.0";
-				sstpBuilder.Parameters["Script"] = resultScript;
-				sstpBuilder.Parameters["Sender"] = "さとりすと";
-				
-				//ifghostを設定
-				if(!string.IsNullOrEmpty(ghost.GhostDescriptSakuraName))
-				{
-					sstpBuilder.Parameters["IfGhost"] = ghost.GhostDescriptSakuraName;
-				}
-
-				var fmoReader = new SakuraFMOReader();
-				fmoReader.Read();
-
-				if (true)//use Owned SSTP
-				{
-					var fmoRecord = fmoReader.Find(ghost);
-
-					if(fmoRecord != null)
-					{
-						sstpBuilder.Parameters["ID"] = fmoRecord.ID;
-					}
-				}
-
-				RaiseSSTP(sstpBuilder, fmoReader.Records.First().Value);
+				SendSakuraScript(ghost, resultScript, true);
 			}
+		}
+
+		//さくらスクリプトをゴーストに送信
+		public static void SendSakuraScript(GhostModel ghost, string script, bool useOwnedSSTP)
+		{
+			var sstpBuilder = new ProtocolBuilder();
+			sstpBuilder.Command = "SEND SSTP/1.0";
+			sstpBuilder.Parameters["Script"] = script;
+			sstpBuilder.Parameters["Sender"] = "さとりすと";
+
+			//ifghostを設定
+			if (!string.IsNullOrEmpty(ghost.GhostDescriptSakuraName))
+			{
+				sstpBuilder.Parameters["IfGhost"] = ghost.GhostDescriptSakuraName;
+			}
+
+			var fmoReader = new SakuraFMOReader();
+			fmoReader.Read();
+
+			if (useOwnedSSTP)
+			{
+				var fmoRecord = fmoReader.Find(ghost);
+
+				if (fmoRecord != null)
+				{
+					sstpBuilder.Parameters["ID"] = fmoRecord.ID;
+				}
+			}
+
+			RaiseSSTP(sstpBuilder, fmoReader.Records.First().Value);
 		}
 
 		//里々を起動
@@ -123,13 +128,6 @@ namespace Satolist2.Utility
 				return string.Empty;
 			}
 		}
-
-		//FMOからOwned SSTP用のIDを取得する
-		private static string GetOwnedSSTPId(GhostModel ghost)
-		{
-			throw new NotImplementedException();
-		}
-
 
 		//SSPへの単純データ送信
 		public static void RaiseSSTP(ProtocolBuilder data, SakuraFMORecord target)

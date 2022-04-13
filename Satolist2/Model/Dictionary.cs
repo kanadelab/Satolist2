@@ -28,12 +28,12 @@ namespace Satolist2.Model
 
 		public string FullDictionaryPath
 		{
-			get => FullPath + "/ghost/master";
+			get => Path.Combine(FullPath, "ghost/master");
 		}
 
 		public string FullGhostDescriptPath
 		{
-			get => FullDictionaryPath + "/descript.txt";
+			get => Path.Combine(FullDictionaryPath, "descript.txt");
 		}
 
 		public string GhostDescriptSakuraName
@@ -112,6 +112,7 @@ namespace Satolist2.Model
 			{
 				bodyAvailable = true;
 				body = value;
+				Changed();
 				NotifyChanged();
 				NotifyChanged(nameof(BodyAvailable));
 			}
@@ -167,7 +168,7 @@ namespace Satolist2.Model
 			}
 		}
 
-		public bool Save()
+		public virtual bool Save()
 		{
 			throw new NotImplementedException();
 		}
@@ -198,6 +199,7 @@ namespace Satolist2.Model
 			{
 				if(isSerialized != value)
 				{
+					bool changed = IsChanged;
 					isSerialized = value;
 					if(value)
 					{
@@ -212,6 +214,7 @@ namespace Satolist2.Model
 						Deserialize(Body);
 						BodyAvailable = false;
 					}
+					IsChanged = changed;    //この操作だけでは編集ステータスは変わらない
 				}
 				NotifyChanged();
 			}
@@ -283,10 +286,14 @@ namespace Satolist2.Model
 			
 			foreach(var ev in events)
 			{
+				//辞書ヘッダがカラの場合は無視
+				if (ev.Type == EventType.Header && string.IsNullOrEmpty(ev.Body))
+					continue;
+
 				serializedEvents.Add(ev.Serialize());
 			}
 
-			//1行あける
+			//TODO: 1行あけたい（古いさとりすとのほうはデフォルト０で指定可能だった）
 			return string.Join(Constants.NewLine, serializedEvents);
 		}
 
@@ -336,6 +343,31 @@ namespace Satolist2.Model
 		public void MarkChanged()
 		{
 			IsChanged = true;
+		}
+
+		public override bool Save()
+		{
+			try
+			{
+				string saveText;
+				if (IsSerialized)
+				{
+					//保存
+					saveText = Body;
+				}
+				else
+				{
+					//シリアライズして保存
+					saveText = Serialize();
+				}
+				File.WriteAllText(FullPath, saveText, Constants.EncodingShiftJis);
+				IsChanged = false;
+				return true;
+			}
+			catch
+			{
+				return false;
+			}
 		}
 
 	}
@@ -523,10 +555,23 @@ namespace Satolist2.Model
 		public string Serialize()
 		{
 			var header = DictionaryUtility.SerializeEventHeader(type, name, condition);
+
+			//インラインイベントを検出する
+			var lines = DictionaryUtility.SplitLines(body);
+			var serializeLines = new List<string>();
+
+			foreach(var line in lines)
+			{
+				if (line.IndexOf(Constants.SentenceHead) == 0 || line.IndexOf(Constants.WordHead) == 0)
+					serializeLines.Add(Constants.InlineEventSeparator);
+				serializeLines.Add(line);
+			}
+
+			var serializedBody = DictionaryUtility.JoinLines(serializeLines);
 			if (header == null)
-				return body;
+				return serializedBody;
 			else
-				return header + Constants.NewLine + body;
+				return header + Constants.NewLine + serializedBody;
 
 		}
 

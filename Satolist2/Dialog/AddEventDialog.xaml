@@ -5,23 +5,23 @@
 		xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 		xmlns:local="clr-namespace:Satolist2.Dialog"
 		mc:Ignorable="d"
-		Title="新しい項目を追加する" Height="450" Width="800">
+		Title="新しい項目を追加する" Height="200" Width="500" FocusManager.FocusedElement="{Binding ElementName=NameInputBox}">
 	<Grid>
-		<StackPanel>
+		<StackPanel Margin="5">
 			
-			<TextBlock Text="項目の名前" />
-			<TextBox Text="{Binding Name}" />
+			<TextBlock Text="項目の名前" Margin="3" />
+			<TextBox Text="{Binding Name}" x:Name="NameInputBox" Margin="3"/>
 			
 			<TextBlock Text="追加先"/>
 			<ComboBox SelectedItem="{Binding AddTarget}" ItemsSource="{Binding Main.Ghost.Dictionaries}" DisplayMemberPath="RelativeName" />
 			<StackPanel Orientation="Horizontal">
-				<RadioButton Content="文" IsChecked="{Binding IsSentenceSelected}" />
-				<RadioButton Content="単語群" IsChecked="{Binding IsWordSelected}" />
+				<RadioButton Content="文" IsChecked="{Binding IsSentenceSelected}" Margin="5"/>
+				<RadioButton Content="単語群" IsChecked="{Binding IsWordSelected}" Margin="5"/>
 			</StackPanel>
 			
-			<StackPanel Orientation="Horizontal">
-				<Button Content="追加" IsDefault="True" Click="OkButtonClick" />
-				<Button Content="キャンセル" IsCancel="True" Click="CancelButtonClick" />
+			<StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+				<Button Content="追加" IsDefault="True" Click="OkButtonClick" Height="30" Width="100" Margin="5" />
+				<Button Content="キャンセル" IsCancel="True" Click="CancelButtonClick" Width="100" Margin="5"/>
 			</StackPanel>
 		</StackPanel>
 	</Grid>

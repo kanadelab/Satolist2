@@ -20,15 +20,29 @@ namespace Satolist2.Dialog
 	/// </summary>
 	public partial class SaveFileListDialog : Window
 	{
-		internal new SaveFileListViewModel DataContext
-		{
-			get => (SaveFileListViewModel)base.DataContext;
-			set => base.DataContext = value;
-		}
+		public MessageBoxResult Result { get; private set; }
 
 		public SaveFileListDialog()
 		{
 			InitializeComponent();
+		}
+
+		private void SaveButton_Click(object sender, RoutedEventArgs e)
+		{
+			Result = MessageBoxResult.Yes;
+			Close();
+		}
+
+		private void DisposeButton_Click(object sender, RoutedEventArgs e)
+		{
+			Result = MessageBoxResult.No;
+			Close();
+		}
+
+		private void CancelButton_Click(object sender, RoutedEventArgs e)
+		{
+			Result = MessageBoxResult.Cancel;
+			Close();
 		}
 	}
 
@@ -45,7 +59,7 @@ namespace Satolist2.Dialog
 
 	internal class SaveFileListItemViewModel : NotificationObject
 	{
-		public bool isSave;
+		private bool isSave;
 
 		public ISaveFileObject SaveItem { get; }
 		public string SaveFilePath

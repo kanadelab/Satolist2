@@ -42,7 +42,7 @@ namespace Satolist2.Utility
 
 		public IEnumerable<long> SurfaceIDList
 		{
-			get => records.Keys;
+			get => records.Keys.OrderBy(o=>o);
 		}
 
 		public ReadOnlyDictionary<long, SurfaceRecord> Records

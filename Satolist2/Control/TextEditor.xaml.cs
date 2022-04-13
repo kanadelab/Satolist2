@@ -44,7 +44,7 @@ namespace Satolist2.Control
 		{
 			randomizedContetnId = Guid.NewGuid().ToString();    //複数出現するのでユニークなIDを振る
 			TextFile = textFile;
-			TextFile.PropertyChanged += TextFile_PropertyChanged;
+			//TextFile.PropertyChanged += TextFile_PropertyChanged;
 
 			Document = new TextDocument(TextFile.Body);
 			Document.TextChanged += Document_TextChanged;
@@ -57,15 +57,17 @@ namespace Satolist2.Control
 			disableBodyPropertyChanged = false;
 		}
 
+		/*
 		private void TextFile_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
 		{
 			if (e.PropertyName == nameof(TextFileModel.Body) && !disableBodyPropertyChanged)
 				Document.Text = TextFile.Body;
 		}
+		*/
 
 		public void Dispose()
 		{
-			TextFile.PropertyChanged -= TextFile_PropertyChanged;
+			//TextFile.PropertyChanged -= TextFile_PropertyChanged;
 			Document.TextChanged -= Document_TextChanged;
 		}
 	}

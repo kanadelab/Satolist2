@@ -124,6 +124,7 @@ namespace Satolist2.Control
 
 		//アイテムを追加
 		public ActionCommand AddItemCommand { get; }
+		public ActionCommand ChangeSerializeStatusCommand { get; }
 
 		public FileEventTreeItemDictionaryViewModel(FileEventTreeViewModel parent, DictionaryModel dictionary)
 		{
@@ -139,6 +140,14 @@ namespace Satolist2.Control
 				o => FileEventTree.Main.OpenAddEventDialog(addTarget: Dictionary)
 				);
 
+			ChangeSerializeStatusCommand = new ActionCommand(
+				o =>
+				{
+					FileEventTree.Main.MainWindow.CloseDictionaryEditors(Dictionary);
+					Dictionary.IsSerialized = !Dictionary.IsSerialized;
+				}
+				);
+
 			//イベントハンドラの用意
 			Dictionary.PropertyChanged += OnDictionaryPropertyChanged;
 			INotifyCollectionChanged collectionChanged = Dictionary.Events;
@@ -147,8 +156,6 @@ namespace Satolist2.Control
 			//dictionaryから同名のeventsを引っ張ってくる
 			foreach (var ev in Dictionary.Events)
 			{
-				ev.PropertyChanged += OnEventPropertyChanged;
-
 				if (!itemsDictionary.ContainsKey(ev.Identifier))
 				{
 					var newItem = new FileEventTreeItemEventViewModel(this);
@@ -254,7 +261,7 @@ namespace Satolist2.Control
 			}
 		}
 
-		private void OnEventPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+		internal void OnEventPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
 		{
 			if (sender is EventModel ev)
 			{
@@ -289,13 +296,18 @@ namespace Satolist2.Control
 				}
 			}
 
-			if (e.OldItems != null)
+			if (e.NewItems != null)
 			{
 				foreach (object item in e.NewItems)
 				{
 					if (item is EventModel ev)
 						AddEvent(ev);
 				}
+			}
+
+			if(e.Action == NotifyCollectionChangedAction.Reset)
+			{
+				ClearEvents();
 			}
 		}
 
@@ -362,11 +374,13 @@ namespace Satolist2.Control
 			AddItemCommand = new ActionCommand(
 				o => Dictionary.FileEventTree.Main.OpenAddEventDialog(addTarget: Dictionary.Dictionary)
 				);
+
 		}
 
 		//インスタンス生成中のイベントの追加
 		public void AddEvent(EventModel ev)
 		{
+			ev.PropertyChanged += Dictionary.OnEventPropertyChanged;
 			events.Add(ev);
 			foreach (var inlineEv in ev.InlineEvents)
 				AddInlineEvent(inlineEv);
@@ -383,6 +397,7 @@ namespace Satolist2.Control
 		//イベントを取り除く
 		public void RemoveEvent(EventModel ev)
 		{
+			ev.PropertyChanged -= Dictionary.OnEventPropertyChanged;
 			INotifyCollectionChanged inlineEvents = ev.InlineEvents;
 			inlineEvents.CollectionChanged -= InlineEvents_CollectionChanged;
 
@@ -409,6 +424,11 @@ namespace Satolist2.Control
 			{
 				foreach (var item in e.NewItems)
 					AddInlineEvent((InlineEventModel)item);
+			}
+
+			if(e.Action == NotifyCollectionChangedAction.Reset)
+			{
+				ClearInlineEvent();
 			}
 		}
 
@@ -443,6 +463,17 @@ namespace Satolist2.Control
 
 				//同じイベントをもつものを取り除く
 				inlineEventViewModels.Remove(inlineEventViewModels.First(o => o.EventList.Count == 0));
+			}
+		}
+
+		public void ClearInlineEvent()
+		{
+			foreach(var evList in inlineEvents.ToArray())
+			{
+				foreach(var ev in evList.Value.ToArray())
+				{
+					RemoveInlineEvent(ev);
+				}
 			}
 		}
 

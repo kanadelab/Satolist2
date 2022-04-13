@@ -32,23 +32,7 @@ namespace Satolist2
 		private List<DockingWindow> TextEditors { get; }
 		private MainViewModel mainViewModel;
 
-		//public LayoutDocumentPane DocumentPane { get; }
-
-		//private DockingWindow FileEventTree { get; set; }
-		//private DockingWindow EventList { get; set; }
-		//private DockingWindow SurfaceViewer { get; set; }
-		//private DockingWindow SurfacePalette { get; set; }
-		//private DockingWindow StartMenu { get; set; }
-		//private DockingWindow DebugMainMenu { get; set; }
-		//private DockingWindow GhostDescriptEditor { get; set; }
-		//private	DockingWindow GhostInstallEditor { get; set; }
-		//private DockingWindow UpdateIgnoreList { get; set; }
-		//private DockingWindow SaoriList { get; set; }
-		//private DockingWindow ReplaceList { get; set; }
-		//private DockingWindow VariableList { get; set; }
 		private LayoutDocumentPane DocumentPane { get; set; }
-
-	
 
 
 		public MainWindow()
@@ -67,66 +51,6 @@ namespace Satolist2
 			EventEditors = new List<DockingWindow>();
 			TextEditors = new List<DockingWindow>();
 
-#if false
-			//DockingWindowの作成
-			FileEventTree = new DockingWindow(new FileEventTree());
-			EventList = new DockingWindow(new EventList());
-			SurfaceViewer = new DockingWindow(new SurfaceViewer());
-			SurfacePalette = new DockingWindow(new SurfacePalette());
-			DebugMainMenu = new DockingWindow(new DebugMainMenu());
-			StartMenu = new DockingWindow(new StartMenu());
-			GhostDescriptEditor = new DockingWindow(new GhostDescriptEditor());
-			GhostInstallEditor = new DockingWindow(new GhostDescriptEditor());
-			UpdateIgnoreList = new DockingWindow(new UpdateIgnoreList());
-			SaoriList = new DockingWindow(new SaoriList());
-			ReplaceList = new DockingWindow(new ReplaceList());
-			VariableList = new DockingWindow(new VariableList());
-
-			//カラのviewModelを設定
-			mainViewModel = new MainViewModel(this);
-			DataContext = mainViewModel;
-			ReflectControlViewModel(mainViewModel);
-
-			//パネルの生成
-			var horizontalPanel = new LayoutPanel() { Orientation = Orientation.Horizontal };
-			var topPane = new LayoutAnchorablePane();
-			var bottomPane = new LayoutAnchorablePane() { DockHeight = new GridLength(250.0) };
-
-			bottomPane.Children.Add(EventList);
-
-			var leftPane = new LayoutAnchorablePane() { DockWidth = new GridLength(200.0) };
-			var rightPane = new LayoutAnchorablePane() { DockWidth = new GridLength(300.0) };
-			FileEventTree.CanHide = true;
-			FileEventTree.CanShowOnHover = true;
-			FileEventTree.CanMove = true;
-			FileEventTree.CanFloat = true;
-			FileEventTree.CanDockAsTabbedDocument = true;
-			leftPane.Children.Add(FileEventTree);
-			rightPane.Children.Add(SurfaceViewer);
-			rightPane.Children.Add(SurfacePalette);
-			rightPane.Children.Add(GhostDescriptEditor);
-			rightPane.Children.Add(GhostInstallEditor);
-			rightPane.Children.Add(UpdateIgnoreList);
-			rightPane.Children.Add(SaoriList);
-			rightPane.Children.Add(ReplaceList);
-			rightPane.Children.Add(VariableList);
-			DocumentPane = new LayoutDocumentPane();
-			DocumentPane.Children.Add(DebugMainMenu);
-			DocumentPane.Children.Add(StartMenu);
-
-			horizontalPanel.Children.Add(leftPane);
-			horizontalPanel.Children.Add(DocumentPane);
-			horizontalPanel.Children.Add(rightPane);
-
-			//VerticalPanel.Children.Add(topPane);
-			//VerticalPanel.Children.Add(horizontalPanel);
-			//VerticalPanel.Children.Add(bottomPane);
-
-
-			//PaneB.Children.Add( new DockingWindow(new FileEventTree(), mainVM.FileEventTreeViewModel));
-			//LeftPane.InsertChildAt(0, new DockingWindow(new EventList(), mainVM.EventListViewModel));
-			//RightPane.InsertChildAt(0, new DockingWindow(new FileEventTree(), mainVM.FileEventTreeViewModel));
-#else
 			ReflectVisibleMenuDataContext();
 
 			//カラのVM生成
@@ -138,8 +62,16 @@ namespace Satolist2
 			DeserializeLayout(TemporarySettings.Instance.SerializedDockingLayout);
 
 			//DocumentPane探す
-			//DockingManager.LayoutRootPanel.Children
 			DocumentPane = FindDocumentPane(DockingManager.Layout);
+
+			//スタートメニューは自動で閉じるので復活する
+			StartMenu.Show();
+
+#if DEPLOY
+			//公開時はデバッグメニューを封じておく。今のところ根本に消すわけではないけど
+			DebugMainMenuVisibleMenu.Visibility = Visibility.Collapsed;
+			DebugMainMenuVisibleMenu.IsEnabled = false;
+			DebugMainMenu.Hide();
 #endif
 		}
 
@@ -204,6 +136,31 @@ namespace Satolist2
 			currentWindow.IsActive = true;
 		}
 
+		//一致するテキストファイルの編集画面を閉じる
+		//辞書のシリアライズステータスの切り替え
+		public void CloseDictionaryEditors(DictionaryModel dict)
+		{
+			{
+				var editors = EventEditors.Where(
+					o => ReferenceEquals(((EventEditorViewModel)o.ViewModel).Event.Dictionary, dict)
+					);
+				foreach (var e in editors.ToArray())
+				{
+					e.Close();
+				}
+			}
+
+			{
+				var editors = TextEditors.Where(
+					o => ReferenceEquals(((TextEditorViewModel)o.ViewModel).TextFile, dict)
+					);
+				foreach(var e in editors.ToArray())
+				{
+					e.Close();
+				}
+			}
+		}
+
 		//イベントが削除されたときイベントエディタを閉じる
 		private void OpendEventRemoved(EventModel obj)
 		{
@@ -255,12 +212,14 @@ namespace Satolist2
 			mainViewModel = new MainViewModel(this, ghost, shellDirectoryName);
 			DataContext = mainViewModel;
 			ReflectControlViewModel(mainViewModel);
+
+			//開けたらスタートメニューを閉じる
+			StartMenu.Hide();
 		}
 
 		//各コントロールのViewModelの再バインド
 		private void ReflectControlViewModel(MainViewModel mainVm)
 		{
-#if false
 			FileEventTree.ViewModel = mainVm.FileEventTreeViewModel;
 			EventList.ViewModel = mainVm.EventListViewModel;
 			SurfacePalette.ViewModel = mainVm.SurfacePaletteViewModel;
@@ -273,21 +232,6 @@ namespace Satolist2
 			SaoriList.ViewModel = mainVm.SaoriListViewModel;
 			ReplaceList.ViewModel = mainVm.ReplaceListViewModel;
 			VariableList.ViewModel = mainVm.VariableListViewModel;
-#else
-			FileEventTree.ViewModel = mainVm.FileEventTreeViewModel;
-			EventList.ViewModel = mainVm.EventListViewModel;
-			SurfacePalette.ViewModel = mainVm.SurfacePaletteViewModel;
-			SurfaceViewer.ViewModel = mainVm.SurfaceViewerViewModel;
-			DebugMainMenu.ViewModel = mainVm.DebugMainMenuViewModel;
-			StartMenu.ViewModel = mainVm.StartMenuViewModel;
-			GhostDescriptEditor.ViewModel = mainVm.GhostDescriptEditorViewModel;
-			GhostInstallEditor.ViewModel = mainVm.GhostInstallEditorViewModel;
-			UpdateIgnoreList.ViewModel = mainVm.UpdateIgnoreListViewModel;
-			SaoriList.ViewModel = mainVm.SaoriListViewModel;
-			ReplaceList.ViewModel = mainVm.ReplaceListViewModel;
-			VariableList.ViewModel = mainVm.VariableListViewModel;
-
-#endif
 		}
 
 		private void ReflectVisibleMenuDataContext()
@@ -405,6 +349,19 @@ namespace Satolist2
 
 		private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
 		{
+			//保存するかを尋ねる
+			if(DataContext is MainViewModel vm)
+			{
+				if(vm.IsChanged)
+				{
+					if(!vm.AskSave())
+					{
+						e.Cancel = true;
+						return;
+					}
+				}
+			}
+
 			//ウインドウを閉じるときに、複製する
 			TemporarySettings.Instance.SerializedDockingLayout = SerializeDockingLayout();
 		}
@@ -440,6 +397,7 @@ namespace Satolist2
 		public ActionCommand SaveFileCommand { get; }
 		public ActionCommand OpenGhostDirectoryCommand { get; }
 		public ActionCommand EditInsertPaletteCommand { get; }
+		public ActionCommand ReloadShioriCommand { get; }
 
 		//設定情報
 		public InsertItemPaletteModel InsertPalette
@@ -463,6 +421,24 @@ namespace Satolist2
 				yield return UpdateIgnoreListViewModel.DeleteSaveObject;
 				yield return UpdateIgnoreListViewModel.DeveloperOptionsSaveObject;
 				yield return SatoriConfViewModel;
+			}
+		}
+
+		public bool IsChanged
+		{
+			get
+			{
+				foreach (var item in SaveLoadPanes)
+					if (item.IsChanged)
+						return true;
+
+				if(Ghost != null)
+				{
+					foreach (var item in Ghost.Dictionaries)
+						if (item.IsChanged)
+							return true;
+				}
+				return false;
 			}
 		}
 
@@ -537,6 +513,12 @@ namespace Satolist2
 				}
 				);
 
+			ReloadShioriCommand = new ActionCommand(
+				o => GhostRuntimeRequest.ReloadShiori(ghost),
+				o => ghost != null
+				);
+			
+
 			//読込エラーが発生している場合に通知
 			foreach(var err in SaveLoadPanes.Where(o => o.LoadState == EditorLoadState.LoadFailed))
 			{
@@ -581,7 +563,8 @@ namespace Satolist2
 		}
 
 		//保存ダイアログを呼ぶ処理
-		public void AskSave()
+		//falseが帰ったら終了をキャンセル
+		public bool AskSave()
 		{
 			List<ISaveFileObject> objects = new List<ISaveFileObject>();
 			objects.AddRange(SaveLoadPanes);
@@ -589,12 +572,42 @@ namespace Satolist2
 				objects.AddRange(Ghost.Dictionaries);
 
 			var dialog = new SaveFileListDialog();
-			dialog.DataContext = new SaveFileListViewModel(objects);
-			if (dialog.ShowDialog() == true)
+			var dialogViewModel = new SaveFileListViewModel(objects);
+			dialog.DataContext = dialogViewModel;
+			dialog.ShowDialog();
+
+			if(dialog.Result == MessageBoxResult.Yes)
 			{
-				//TODO: save
+				//現時点ではエラーはダイアログに表示するだけにしておく
+				var errorList = new List<string>();
+
+				//保存
+				foreach( var saveItem in dialogViewModel.Items.Where(o => o.IsSave))
+				{
+					bool success = saveItem.SaveItem.Save();
+					if (!success)
+						errorList.Add(saveItem.SaveFilePath);
+				}
+
+				if(errorList.Count > 0)
+				{
+					var message = string.Format("保存に失敗しました。\r\n\r\n{0}", DictionaryUtility.JoinLines(errorList));
+					MessageBox.Show(message, "さとりすと", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+					return false;
+				}
+				return true;
+				
+			}
+			else if(dialog.Result == MessageBoxResult.No)
+			{
+				return true;
+			}
+			else
+			{
+				return false;
 			}
 		}
+
 
 	}
 }

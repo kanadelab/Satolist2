@@ -22,7 +22,7 @@
 								<Setter.Value>
 									<ContextMenu>
 										<MenuItem Header="項目を追加" Command="{Binding AddItemCommand}" />
-										<MenuItem Header="リスト化を解除" IsCheckable="True" IsChecked="{Binding Dictionary.IsSerialized, Mode=TwoWay}" />
+										<MenuItem Header="リスト化を解除" IsCheckable="False" IsChecked="{Binding Dictionary.IsSerialized, Mode=OneWay}" Command="{Binding ChangeSerializeStatusCommand}" />
 									</ContextMenu>
 								</Setter.Value>
 							</Setter>

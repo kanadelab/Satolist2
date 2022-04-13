@@ -21,10 +21,10 @@ jobs:
       - name: run msbuild
         shell: cmd
         run: |
-          MSBuild.exe Satolist2/Satolist2.csproj -property:Configuration=Release;Platform=AnyCPU
+          MSBuild.exe Satolist2/Satolist2.csproj -property:Configuration=Deploy;Platform=AnyCPU
 
       - name: upload artifacts
         uses: actions/upload-artifact@v3
         with:
           name: build-output
-          path: Satolist2/bin/Release
+          path: Satolist2/bin/Deploy
