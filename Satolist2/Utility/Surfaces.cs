@@ -551,7 +551,7 @@ namespace Satolist2.Utility
 			}
 
 			if (!record.IsImageFileOnly)
-				record.IsImageFileOnly = false;
+				IsImageFileOnly = false;
 		}
 	}
 
