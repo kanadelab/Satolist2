@@ -9,11 +9,14 @@
 試して頂くのは歓迎ですが、実際のゴースト開発をするにはまだまだ機能がたりなさそうです。  
 ゴーストのデータを壊したりするかもしれないので必ずバックアップを取ってから試して下さい。
 
+* お試しはこちらから
+  * リストの一番上を開いてから、下部のArtifactsのところをクリックするとダウンロードできます。
+  * ！不安定なので消えても大丈夫なデータでためすこと！
+[![test-build](https://github.com/kanadelab/Satolist2/actions/workflows/ci.yml/badge.svg)](https://github.com/kanadelab/Satolist2/actions/workflows/ci.yml)
+
 ## 現在の状況  
 編集機能とサーフェス周りの基礎をざーっくりと作ってみた状況。  
 細かい機能にはあんまり対応してないです。  
-[![test-build](https://github.com/kanadelab/Satolist2/actions/workflows/ci.yml/badge.svg)](https://github.com/kanadelab/Satolist2/actions/workflows/ci.yml)
-
 
 ## 使用ライブラリ  
 * Microsoft Public License (Ms-PL) ライセンスのパッケージを使用しています  
@@ -26,6 +29,6 @@ https://opensource.org/licenses/mit-license.php
   * Newtonsoft.Json
   * FluentFTP
 
-* Apache2.0 ライセンスの素材を使用しています。
+* Apache2.0 ライセンスの素材を使用しています。  
   https://www.apache.org/licenses/LICENSE-2.0
   * https://materialdesignicons.com/
