@@ -11,8 +11,8 @@
 
 * お試しはこちらから
   * リストの一番上を開いてから、下部のArtifactsのところをクリックするとダウンロードできます。
-  * ！不安定なので消えても大丈夫なデータでためすこと！
-[![test-build](https://github.com/kanadelab/Satolist2/actions/workflows/ci.yml/badge.svg)](https://github.com/kanadelab/Satolist2/actions/workflows/ci.yml)
+  * ！不安定なので消えても大丈夫なデータでためすこと！  
+[![おためしばん](https://github.com/kanadelab/Satolist2/actions/workflows/ci.yml/badge.svg?branch=master&event=push)](https://github.com/kanadelab/Satolist2/actions/workflows/ci.yml)
 
 ## 現在の状況  
 編集機能とサーフェス周りの基礎をざーっくりと作ってみた状況。  
