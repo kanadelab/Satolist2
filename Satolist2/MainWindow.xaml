@@ -46,16 +46,6 @@
 			</MenuItem>
 		</Menu>
 		
-		<!--
-		<avalonDock:DockingManager Grid.Row="1">
-			<avalonDock:LayoutRoot x:Name="LayoutRoot">
-				<avalonDock:LayoutPanel x:Name="VerticalPanel" Orientation="Vertical">
-					
-				</avalonDock:LayoutPanel>
-			</avalonDock:LayoutRoot>
-		</avalonDock:DockingManager>
-		-->
-
 		<avalonDock:DockingManager Grid.Row="1" AllowMixedOrientation="True" x:Name="DockingManager">
 			<avalonDock:DockingManager.Theme>
 				<avalonDock:Vs2013LightTheme/>

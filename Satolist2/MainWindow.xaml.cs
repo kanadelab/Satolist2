@@ -480,10 +480,9 @@ namespace Satolist2
 			VariableListViewModel = new VariableListViewModel(this);
 
 			SaveFileCommand = new ActionCommand(
-				o =>
-				{
-					AskSave();
-				});
+				o => AskSave(),
+				o => ghost != null
+				);
 
 			OpenGhostDirectoryCommand = new ActionCommand(
 				o =>
