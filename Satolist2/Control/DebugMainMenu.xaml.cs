@@ -77,9 +77,11 @@ namespace Satolist2.Control
 				 o =>
 				 {
 					 
+					 /*
 					 var d = new Dialog.UploadSettingDialog();
 					 d.DataContext = new Dialog.UploadSettingDialogViewModel();
 					 d.ShowDialog();
+					 */
 
 				 }
 				);

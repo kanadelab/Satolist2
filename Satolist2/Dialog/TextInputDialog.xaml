@@ -6,7 +6,9 @@
 		xmlns:local="clr-namespace:Satolist2.Dialog"
 		xmlns:ctl="clr-namespace:Satolist2.Control"
 		mc:Ignorable="d"
-		Title="{Binding Title, FallbackValue=名前の入力}" Height="150" Width="400">
+		Title="{Binding Title, FallbackValue=名前の入力}" Height="150" Width="400"
+		FocusManager.FocusedElement="{Binding ElementName=MainInputBox}"
+		>
 	<Grid>
 		<Grid.RowDefinitions>
 			<RowDefinition Height="auto" />
@@ -28,7 +30,7 @@
 				</Style>
 			</TextBlock.Style>
 		</TextBlock>
-		<ctl:WartermarkedTextBox  Grid.Row="2" Text="{Binding Text, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Wartermark="{Binding Wartermark}" HorizontalAlignment="Stretch" Margin="3"/>
+		<ctl:WartermarkedTextBox x:Name="MainInputBox"  Grid.Row="2" Text="{Binding Text, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Wartermark="{Binding Wartermark}" HorizontalAlignment="Stretch" Margin="3"/>
 		<StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right">
 			<Button Content="キャンセル" Margin="3" Width="100" IsCancel="True" Click="CancelButtonClick" />
 			<Button Content="OK" Margin="3" Width="100" IsDefault="True" Command="{Binding OkButtonCommand}" />

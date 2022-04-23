@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Satolist2.Utility;
 
 namespace Satolist2.Model
@@ -16,23 +17,58 @@ namespace Satolist2.Model
 	internal class EditorSettings
 	{
 		private const string InsertPaettePath = "settings/insertpalette.json";
+		private const string UploadSettingPath = "settings/accounts.json";
+		private const string TemporarySettingsPath = "settings/temporary.json";
 
-		[JsonProperty]
 		public InsertItemPaletteModel InsertPalette { get; set; }
+		public UploadServerSettingModelBase[] UploadSettings { get; set; }
+		public TemporarySettings TemporarySettings { get; set; }
+		public GhostTemporarySettings GhostTemporarySettings { get; set; }
 
 		[JsonIgnore]
 		public bool IsLoadFailed { get; set; }
 
 		public EditorSettings()
 		{
+			LoadTemporarySettings();
+
+			//TODO: 起動失敗処理？
 			try
 			{
 				LoadInsertPalette();
+				LoadUploadSettings();
 			}
 			catch
 			{
 				IsLoadFailed = true;
 			}
+		}
+
+		//ゴースト依存の情報をロード
+		//基本的にはロードできてなくても初期状態にしてたいして差し支えない情報群
+		public void LoadGhostTemporarySettings(GhostModel ghost)
+		{
+			var path = Utility.DictionaryUtility.ConbinePath(ghost.FullDictionaryPath, "profile/satolist.json");
+			try
+			{
+				if (System.IO.File.Exists(path))
+				{
+					GhostTemporarySettings = JsonUtility.DeserializeFromFile<GhostTemporarySettings>(path);
+				}
+				if (GhostTemporarySettings == null)
+					throw new Exception();
+			}
+			catch
+			{
+				GhostTemporarySettings = new GhostTemporarySettings();
+			}
+		}
+
+		public void SaveGhostTemporarySettings(GhostModel ghost)
+		{
+			var path = Utility.DictionaryUtility.ConbinePath(ghost.FullDictionaryPath, "profile/satolist.json");
+			System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(path));
+			JsonUtility.SerializeToFile(path, GhostTemporarySettings);
 		}
 
 		private void LoadInsertPalette()
@@ -47,7 +83,75 @@ namespace Satolist2.Model
 
 		void SaveInsertPalette()
 		{
-			JsonUtility.SerializeToFile(InsertPalette, InsertPaettePath);
+			System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(InsertPaettePath));
+			JsonUtility.SerializeToFile(InsertPaettePath, InsertPalette);
+		}
+
+		public void LoadUploadSettings()
+		{
+			if (System.IO.File.Exists(UploadSettingPath))
+			{
+				var itemArray = JsonUtility.DeserializeFromFile(UploadSettingPath) as JArray;
+				var uploadSettings = new List<UploadServerSettingModelBase>();
+				foreach (JObject item in itemArray)
+				{
+					var itemType = item["ItemType"].ToString();
+					switch (itemType)
+					{
+						case FtpServerSettingModel.Type:
+							uploadSettings.Add(item.ToObject<FtpServerSettingModel>());
+							break;
+						case NarnaloaderV2ServerSettingModel.Type:
+							uploadSettings.Add(item.ToObject<NarnaloaderV2ServerSettingModel>());
+							break;
+						default:
+							throw new Exception("アップロード設定に不明なエントリがあります");
+					}
+				}
+				UploadSettings = uploadSettings.ToArray();
+			}
+		}
+
+		public void SaveUploadSettings()
+		{
+			System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(UploadSettingPath));
+			JsonUtility.SerializeToFile(UploadSettingPath, UploadSettings);
+		}
+
+		private void LoadTemporarySettings()
+		{
+			//ここは消えても対して気にしない方向
+			try
+			{
+				var jsonSerializer = new JsonSerializer();
+				TemporarySettings = jsonSerializer.Deserialize<TemporarySettings>(new JsonTextReader(new System.IO.StreamReader(TemporarySettingsPath)));
+
+				if (TemporarySettings == null)
+					throw new Exception();
+			}
+			catch
+			{
+				TemporarySettings = new TemporarySettings();
+			}
+		}
+
+		public void SaveTemporarySettings()
+		{
+			try
+			{
+				System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(TemporarySettingsPath));
+				var jsonSerializer = new JsonSerializer();
+				using (var writer = new System.IO.StreamWriter(TemporarySettingsPath))
+				{
+					JsonTextWriter w = new JsonTextWriter(writer);
+					w.IndentChar = '\t';
+					w.Indentation = 1;
+					jsonSerializer.Serialize(w, TemporarySettingsPath);
+				}
+			}
+			catch
+			{
+			}
 		}
 
 	}

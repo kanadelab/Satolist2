@@ -41,8 +41,15 @@
 			<MenuItem Header="デバッグ">
 				<MenuItem Header="SHIORI Reload" Command="{Binding ReloadShioriCommand}" InputGestureText="Ctrl+Alt+R" />
 			</MenuItem>
+			<MenuItem Header="更新">
+				<MenuItem Header="narファイル作成" Command="{Binding ExportNarCommand}" />
+				<MenuItem Header="更新ファイル作成" Command="{Binding MakeUpdateFileCommand}" />
+				<Separator />
+				<MenuItem Header="サーバにファイルをアップロード" Command="{Binding UploadGhostCommand}" />
+			</MenuItem>
 			<MenuItem Header="オプション">
 				<MenuItem Header="挿入メニューのカスタマイズ" Command="{Binding EditInsertPaletteCommand}" />
+				<MenuItem Header="アップロード設定" Command="{Binding EditUploadSettingCommand}" />
 			</MenuItem>
 		</Menu>
 		

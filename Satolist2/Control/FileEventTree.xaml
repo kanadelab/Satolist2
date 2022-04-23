@@ -31,6 +31,7 @@
 							<Setter Property="ContextMenu">
 								<Setter.Value>
 									<ContextMenu>
+										<MenuItem Header="項目を別のファイルに一括移動" Command="{Binding MoveItemCommand}" />
 										<MenuItem Header="項目を追加" Command="{Binding AddItemCommand}" />
 									</ContextMenu>
 								</Setter.Value>

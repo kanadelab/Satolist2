@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Satolist2.Model;
+using Satolist2.Utility;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -7,17 +8,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Satolist2.Utility
+namespace Satolist2.Model
 {
 	//自動保存される系のデータ
 	[JsonObject]
 	public class TemporarySettings
 	{
-		private const string FilePath = "settings/temporary.json";
-
-		[JsonIgnore]
-		public static TemporarySettings Instance {get; private set;}
-
 		[JsonProperty]
 		public ObservableCollection<OpenGhostHistory> GhostHistory { get; set; }
 		[JsonProperty]
@@ -37,42 +33,6 @@ namespace Satolist2.Utility
 			GhostHistory.Insert(0, history);
 
 			//TODO: 多くなりすぎたら捨てる
-		}
-
-		//読み込み
-		public static void Load()
-		{
-			try
-			{
-				var jsonSerializer = new JsonSerializer();
-				Instance = jsonSerializer.Deserialize<TemporarySettings>(new JsonTextReader(new System.IO.StreamReader(FilePath)));
-
-				if (Instance == null)
-					throw new Exception();
-			}
-			catch
-			{
-				Instance = new TemporarySettings();
-			}
-		}
-
-		public static void Save()
-		{
-			try
-			{
-				System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(FilePath));
-				var jsonSerializer = new JsonSerializer();
-				using (var writer = new System.IO.StreamWriter(FilePath))
-				{
-					JsonTextWriter w = new JsonTextWriter(writer);
-					w.IndentChar = '\t';
-					w.Indentation = 1;
-					jsonSerializer.Serialize(w, Instance);
-				}
-			}
-			catch
-			{
-			}
 		}
 	}
 
@@ -96,5 +56,23 @@ namespace Satolist2.Utility
 		{
 			return DictionaryUtility.NormalizePath(Path) == DictionaryUtility.NormalizePath(item.Path);
 		}
+	}
+
+	//ゴースト単位で保存される一時的データ
+	//sspに便乗してghost/master/profileにいれちゃう
+	public class GhostTemporarySettings
+	{
+		//前回アップロードに使用した設定
+		[JsonProperty]
+		public string LastUploadSettingId { get; set; }
+		//前回アップロードで差分更新を使用した(ftp)
+		[JsonProperty]
+		public bool LastUploadUseDiff { get; set; }
+		//前回アップロードでnar更新を使用した
+		[JsonProperty]
+		public bool LastUploadUseNar { get; set; }
+		//前回アップロードで更新ファイルアップロードを使用した
+		[JsonProperty]
+		public bool LastUploadUseFiles { get; set; }
 	}
 }

@@ -72,8 +72,6 @@ namespace Satolist2.Control
 		public const string DeleteFilePath = "/delete.txt";
 		public const string DeveloperOptionsFilePath = "/developer_options.txt";
 
-		//有効レコードかどうかを判定するためのもの
-		private static readonly Regex NoNarNoUpdateRegex = new Regex("(nonar|noupdate)(,nonar|,noupdate)?");
 		private const int TabIndexList = 0;
 
 		private ObservableCollection<UpdateIgnoreListItemViewModel> items;
@@ -377,6 +375,15 @@ namespace Satolist2.Control
 			//リセット
 			developerOptionsCommonLine.Clear();
 
+			var parser = new DeveloperOptionsParser(body);
+			developerOptionsCommonLine.AddRange(parser.CommonLines);
+
+			foreach(var item in parser.Records)
+			{
+				AddDeveloperOptionsRecord(item.Path, item.IsNonar, item.IsNoUpdate);
+			}
+
+#if false
 			//csvをロード
 			var csvBuilder = new CsvBuilder();
 			csvBuilder.Deserialize(body);
@@ -413,6 +420,7 @@ namespace Satolist2.Control
 					developerOptionsCommonLine.Add(item.Value);
 				}
 			}
+#endif
 		}
 
 		public void DeserializeDelete(string body)

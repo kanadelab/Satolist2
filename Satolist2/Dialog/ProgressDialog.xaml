@@ -1,0 +1,24 @@
+﻿<Window x:Class="Satolist2.Dialog.ProgressDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Satolist2.Dialog"
+        mc:Ignorable="d"
+        Title="{Binding Title}" Height="200" Width="400">
+    <Grid>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="auto" />
+			<RowDefinition Height="auto" />
+			<RowDefinition Height="*" />
+			<RowDefinition Height="auto" />
+		</Grid.RowDefinitions>
+		
+		<TextBlock Grid.Row="0" Text="{Binding Message}" />
+		<ProgressBar Grid.Row="1" Height="20" Margin="3" IsIndeterminate="{Binding IsIndeterminate}" Value="{Binding Progress}"/>
+		<TextBox Grid.Row="2" AcceptsReturn="True" Text="{Binding Logs}" />
+		<StackPanel Grid.Row="3">
+			<Button Content="OK" x:Name="CloseButton" IsEnabled="False" Click="Button_Click" HorizontalAlignment="Center" Width="100" Height="25" Margin="5"/>
+		</StackPanel>
+	</Grid>
+</Window>

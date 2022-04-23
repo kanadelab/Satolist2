@@ -20,18 +20,43 @@ namespace Satolist2.Core
 		{
 			requestQueue = new List<FtpRequestBase>();
 			Implement = new FluentFTP.FtpClient(account.url);
-			Implement.Credentials = new System.Net.NetworkCredential(account.username, account.password);
+			Implement.Credentials = new System.Net.NetworkCredential(account.username, Utility.EncryptString.Decrypt(account.password));
 			Implement.EncryptionMode = FtpEncryptionMode.Auto;
 		}
 
 		//同期実行
-		//キューにコマンドが残ってたらまずいかも
+		//キューにコマンドが残ってたらまずいかも？
 		public void ExecuteCommand(FtpRequestBase request)
 		{
 			request.Execute(this);
 		}
 
+		public void Connect()
+		{
+			Implement.Connect();
+		}
+
+		public void UploadFile(string localPath, string remotePath)
+		{
+			//上書き、フォルダ自動生成
+			var bytes = System.IO.File.ReadAllBytes(localPath);
+			var status = Implement.Upload(bytes, remotePath, FtpRemoteExists.Overwrite, true);
+			if (status != FtpStatus.Success)
+				throw new Exception("アップロードに失敗しました。");
+		}
+
+		public byte[] DownloadFile(string remotePath)
+		{
+			byte[] resultBytes;
+			bool result = Implement.Download(out resultBytes, remotePath);
+			if (!result)
+				throw new Exception("ダウンロードに失敗しました。");
+
+			return resultBytes;
+		}
+
 		//非同期実行
+		//こちらで非同期するべきではないかも…
 		public Task ExecuteCommandAsync(FtpRequestBase request)
 		{
 			lock(this)

@@ -17,12 +17,11 @@ namespace Satolist2
 		protected override void OnStartup(StartupEventArgs e)
 		{
 			base.OnStartup(e);
-			TemporarySettings.Load();
 		}
 
 		protected override void OnExit(ExitEventArgs e)
 		{
-			TemporarySettings.Save();
+			MainViewModel.EditorSettings?.SaveTemporarySettings();
 			base.OnExit(e);
 		}
 	}

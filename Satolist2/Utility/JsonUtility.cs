@@ -29,16 +29,18 @@ namespace Satolist2.Utility
 				using(var textReader = new JsonTextReader(stream))
 				{
 					var jsonSerializer = new JsonSerializer();
+					jsonSerializer.Formatting = Formatting.Indented;
 					return jsonSerializer.Deserialize<T>(textReader);
 				}
 			}
 		}
 
-		public static void SerializeToFile(object obj, string path)
+		public static void SerializeToFile(string path, object obj)
 		{
 			using (var writer = new System.IO.StreamWriter(path))
 			{
 				var jsonSerializer = new JsonSerializer();
+				jsonSerializer.Formatting = Formatting.Indented;
 				jsonSerializer.Serialize(writer, obj);
 			}
 		}

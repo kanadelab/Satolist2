@@ -95,6 +95,12 @@ namespace Satolist2.Utility
 			return string.Join(Constants.NewLine, lines);
 		}
 
+		//スラッシュ区切りのconbine
+		public static string ConbinePath(params string[] path)
+		{
+			return Path.Combine(path).Replace("\\", "/");
+		}
+
 		//絶対パスに整形し、区切り文字を '/' に統一する
 		public static string NormalizeFullPath(string path)
 		{

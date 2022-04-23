@@ -47,11 +47,13 @@ namespace Satolist2.Dialog
 	public class RemoteFileSelectDialogViewModel : NotificationObject
 	{
 		private bool activated;
+		private bool showFileNameInput;
 		private RemoteFileSelectDialog dialog;
 		private ObservableCollection<FileListItem> items;
 		private FileListItem selectedItem;
 		private FtpClient ftpClient;
 		private string currentPath;
+		private string fileName;
 		private RemoteFileSelectDialog.DialogState state;
 		private List<CreateDirectoryRecord> createDirectory;
 
@@ -92,6 +94,26 @@ namespace Satolist2.Dialog
 					req.OnFinished += Req_OnFinished;
 					ftpClient.ExecuteCommandAsync(req);
 				}
+				NotifyChanged();
+			}
+		}
+
+		public bool ShowFileNameInput
+		{
+			get => showFileNameInput;
+			set
+			{
+				showFileNameInput = value;
+				NotifyChanged();
+			}
+		}
+
+		public string FileName
+		{
+			get => fileName;
+			set
+			{
+				fileName = value;
 				NotifyChanged();
 			}
 		}
@@ -143,7 +165,8 @@ namespace Satolist2.Dialog
 						{
 							FullName = string.Concat(currentPath, "/", vm.Text),
 							Name = vm.Text,
-							Type = FileListItemType.NewDirectory
+							Type = FileListItemType.NewDirectory,
+							IsSelected = true
 						});
 					}
 				}
@@ -156,10 +179,10 @@ namespace Satolist2.Dialog
 			UpDirectoryCommand = new ActionCommand(
 				o =>
 				{
-					var index = currentPath.LastIndexOf(@"\");
+					var index = currentPath.LastIndexOf(@"/");
 					if (index >= 0)
 					{
-						CurrentPath = currentPath.Substring(0, currentPath.LastIndexOf(@"\") + 1);
+						CurrentPath = currentPath.Substring(0, currentPath.LastIndexOf(@"/") + 1);
 					}
 				}
 				);
@@ -177,10 +200,21 @@ namespace Satolist2.Dialog
 			OkCommand = new ActionCommand(
 				o =>
 				{
-					//選択されているものがあればそれ優先
-					ResultPath = currentPath;
-					if(selectedItem != null)
-						ResultPath = selectedItem.FullName;
+					if (string.IsNullOrEmpty(FileName))
+					{
+						//選択されているものがあればそれ優先
+						if (selectedItem != null)
+							ResultPath = selectedItem.FullName;
+						else
+							ResultPath = currentPath;
+					}
+					else
+					{
+						if (selectedItem != null)
+							ResultPath = DictionaryUtility.ConbinePath(selectedItem.FullName, fileName);
+						else
+							ResultPath = DictionaryUtility.ConbinePath(currentPath, fileName);
+					}
 
 					dialog.DialogResult = true;
 					dialog.Close();
@@ -321,11 +355,21 @@ namespace Satolist2.Dialog
 		NewDirectory	//仮の新規作成ディレクトリ
 	}
 
-	public class FileListItem
+	public class FileListItem : NotificationObject
 	{
+		bool isSelected;
 		public FileListItemType Type { get; set; }
 		public string FullName { get; set; }
 		public string Name { get; set; }
+		public bool IsSelected
+		{
+			get => isSelected;
+			set
+			{
+				isSelected = value;
+				NotifyChanged();
+			}
+		}
 	}
 
 	public class CreateDirectoryDialogViewModel : NotificationObject

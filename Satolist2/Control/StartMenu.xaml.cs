@@ -82,7 +82,7 @@ namespace Satolist2.Control
 			}
 
 			//ヒストリーから表示
-			foreach(var item in TemporarySettings.Instance.GhostHistory)
+			foreach(var item in MainViewModel.EditorSettings.TemporarySettings.GhostHistory)
 			{
 				//既に起動中ならスキップ
 				var foundItem = items.FirstOrDefault(o => o.Path == item.Path);

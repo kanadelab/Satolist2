@@ -86,6 +86,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Control\BindablePasswordBox.xaml.cs">
+      <DependentUpon>BindablePasswordBox.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Control\ReplaceList.xaml.cs">
       <DependentUpon>ReplaceList.xaml</DependentUpon>
     </Compile>
@@ -132,6 +135,12 @@
     <Compile Include="Dialog\AddEventDialog.xaml.cs">
       <DependentUpon>AddEventDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dialog\DictionarySelectDialog.xaml.cs">
+      <DependentUpon>DictionarySelectDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialog\ProgressDialog.xaml.cs">
+      <DependentUpon>ProgressDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dialog\RemoteFileSelectDialog.xaml.cs">
       <DependentUpon>RemoteFileSelectDialog.xaml</DependentUpon>
     </Compile>
@@ -144,26 +153,37 @@
     <Compile Include="Dialog\TextInputDialog.xaml.cs">
       <DependentUpon>TextInputDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dialog\UploadDialog.xaml.cs">
+      <DependentUpon>UploadDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dialog\UploadSettingDialog.xaml.cs">
       <DependentUpon>UploadSettingDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Model\Dictionary.cs" />
     <Compile Include="Model\EditorSettings.cs" />
     <Compile Include="Model\TextEditor.cs" />
+    <Compile Include="Model\UploadSettings.cs" />
     <Compile Include="Utility\Converter.cs" />
     <Compile Include="Utility\DataModelManager.cs" />
     <Compile Include="Utility\DictionaryUtility.cs" />
     <Compile Include="Utility\DockingWindow.cs" />
     <Compile Include="Utility\ActionCommand.cs" />
+    <Compile Include="Utility\EncryptString.cs" />
     <Compile Include="Utility\GhostRuntimeRequest.cs" />
     <Compile Include="Utility\JsonUtility.cs" />
     <Compile Include="Utility\NarUtility.cs" />
     <Compile Include="Utility\NotificaionObject.cs" />
+    <Compile Include="Utility\Progress.cs" />
     <Compile Include="Utility\SakuraFMOReader.cs" />
     <Compile Include="Utility\Satorite.cs" />
     <Compile Include="Utility\Surfaces.cs" />
     <Compile Include="Utility\SyntaxHighlight.cs" />
-    <Compile Include="Utility\TemporarySettings.cs" />
+    <Compile Include="Utility\TemporaryDirectory.cs" />
+    <Compile Include="Model\TemporarySettings.cs" />
+    <Page Include="Control\BindablePasswordBox.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Control\DebugMainMenu.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -224,6 +244,14 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Dialog\DictionarySelectDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialog\ProgressDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Dialog\RemoteFileSelectDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -237,6 +265,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Dialog\TextInputDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialog\UploadDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

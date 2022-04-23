@@ -7,6 +7,9 @@
 		xmlns:ctl="clr-namespace:Satolist2.Control"
 		mc:Ignorable="d"
 		Title="{Binding Domain}" Height="450" Width="800">
+	<Window.Resources>
+		<BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+	</Window.Resources>
 	<Grid>
 
 		<Grid.RowDefinitions>
@@ -23,19 +26,35 @@
 				<ColumnDefinition Width="auto" />
 				<ColumnDefinition Width="*" />
 			</Grid.ColumnDefinitions>
-			<Button Grid.Column="0" Content="(家)" Width="50" Command="{Binding HomeDirectoryCommand}" Margin="3" />
-			<Button Grid.Column="1" Content="(上)" Width="50" Command="{Binding UpDirectoryCommand}" Margin="3" />
-			<TextBox Grid.Column="2" Text="{Binding CurrentPath, Mode=OneWay}" x:Name="AddressBar" Margin="3" HorizontalAlignment="Stretch" />
+			<Button Grid.Column="0" Width="50" Command="{Binding HomeDirectoryCommand}" Margin="3">
+				<Button.Content>
+					<Path Fill="Green" Margin="0 -2 2 2" Data="M10,20V14H14V20H19V12H22L12,3L2,12H5V20H10Z" />
+				</Button.Content>
+			</Button>
+			<Button Grid.Column="1" Width="50" Command="{Binding UpDirectoryCommand}" Margin="3">
+				<Button.Content>
+					<Path Fill="Blue" Margin="0 -2 2 2" Data="M14,20H10V11L6.5,14.5L4.08,12.08L12,4.16L19.92,12.08L17.5,14.5L14,11V20Z" />
+				</Button.Content>
+			</Button>
+			<TextBox Grid.Column="2" Text="{Binding CurrentPath, Mode=OneWay}" x:Name="AddressBar" Margin="3" HorizontalAlignment="Stretch" VerticalAlignment="Center" />
 		</Grid>
 
 		<StackPanel Grid.Row="1" Orientation="Horizontal">
-			<Button Content="new folder" Command="{Binding CreateDirectoryCommand}" Margin="3" />
+			<Button Command="{Binding CreateDirectoryCommand}" Margin="3" Padding="3 1 3 1">
+				<Button.Content>
+					<StackPanel Orientation="Horizontal">
+						<Path Fill="Blue" Margin="-3 -3 2 2" Data="M12 12H14V10H16V12H18V14H16V16H14V14H12V12M22 8V18C22 19.11 21.11 20 20 20H4C2.89 20 2 19.11 2 18V6C2 4.89 2.89 4 4 4H10L12 6H20C21.11 6 22 6.89 22 8M20 8H4V18H20V8Z" />
+						<TextBlock Text="新規フォルダ" />
+					</StackPanel>
+				</Button.Content>
+			</Button>
 		</StackPanel>
 
 		<ListView Grid.Row="2" ItemsSource="{Binding Items}" SelectedItem="{Binding SelectedItem, Mode=TwoWay}">
 			<ListView.ItemContainerStyle>
 				<Style TargetType="ListViewItem">
 					<EventSetter Event="MouseDoubleClick" Handler="ListViewItem_MouseDoubleClick" />
+					<Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
 				</Style>
 			</ListView.ItemContainerStyle>
 			<ListView.ItemTemplate>
@@ -123,13 +142,13 @@
 			</TextBlock.Style>
 		</TextBlock>
 
-		<Grid x:Name="FileNameTextBox" Grid.Row="3">
+		<Grid x:Name="FileNameTextBox" Grid.Row="3" Visibility="{Binding ShowFileNameInput, Converter={StaticResource BoolToVisibilityConverter}}">
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition Width="auto" />
 				<ColumnDefinition Width="*" />
 			</Grid.ColumnDefinitions>
 			<TextBlock Grid.Column="0" Text="ファイル名" Margin="3" />
-			<ctl:WartermarkedTextBox Grid.Column="1" Text="{Binding FileName}" Wartermark="ファイル名" HorizontalAlignment="Stretch" Margin="3" />
+			<ctl:WartermarkedTextBox Grid.Column="1" Text="{Binding FileName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Wartermark="ファイル名" HorizontalAlignment="Stretch" Margin="3" />
 		</Grid>
 
 		<StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right">

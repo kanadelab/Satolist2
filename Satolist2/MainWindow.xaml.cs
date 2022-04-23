@@ -1,6 +1,7 @@
 ﻿using AvalonDock.Controls;
 using AvalonDock.Layout;
 using AvalonDock.Layout.Serialization;
+using Microsoft.Win32;
 using Satolist2.Control;
 using Satolist2.Dialog;
 using Satolist2.Model;
@@ -59,7 +60,7 @@ namespace Satolist2
 			ReflectControlViewModel(mainViewModel);
 
 			//レイアウトの復元
-			DeserializeLayout(TemporarySettings.Instance.SerializedDockingLayout);
+			DeserializeLayout(MainViewModel.EditorSettings.TemporarySettings.SerializedDockingLayout);
 
 			//DocumentPane探す
 			DocumentPane = FindDocumentPane(DockingManager.Layout);
@@ -206,7 +207,7 @@ namespace Satolist2
 		{
 			var ghost = new GhostModel(ghostPath);
 
-			TemporarySettings.Instance.AddHistory(ghost);
+			MainViewModel.EditorSettings.TemporarySettings.AddHistory(ghost);
 
 			//無事に開けたらヒストリーに足す
 			mainViewModel = new MainViewModel(this, ghost, shellDirectoryName);
@@ -352,18 +353,15 @@ namespace Satolist2
 			//保存するかを尋ねる
 			if(DataContext is MainViewModel vm)
 			{
-				if(vm.IsChanged)
+				if(!vm.AskSave())
 				{
-					if(!vm.AskSave())
-					{
-						e.Cancel = true;
-						return;
-					}
+					e.Cancel = true;
+					return;
 				}
 			}
 
 			//ウインドウを閉じるときに、複製する
-			TemporarySettings.Instance.SerializedDockingLayout = SerializeDockingLayout();
+			MainViewModel.EditorSettings.TemporarySettings.SerializedDockingLayout = SerializeDockingLayout();
 		}
 	}
 
@@ -397,7 +395,11 @@ namespace Satolist2
 		public ActionCommand SaveFileCommand { get; }
 		public ActionCommand OpenGhostDirectoryCommand { get; }
 		public ActionCommand EditInsertPaletteCommand { get; }
+		public ActionCommand EditUploadSettingCommand { get; }
 		public ActionCommand ReloadShioriCommand { get; }
+		public ActionCommand ExportNarCommand { get; }
+		public ActionCommand MakeUpdateFileCommand { get; }
+		public ActionCommand UploadGhostCommand { get; }
 
 		//設定情報
 		public InsertItemPaletteModel InsertPalette
@@ -428,16 +430,17 @@ namespace Satolist2
 		{
 			get
 			{
+				if (Ghost == null)
+					return false;
+
 				foreach (var item in SaveLoadPanes)
 					if (item.IsChanged)
 						return true;
 
-				if(Ghost != null)
-				{
-					foreach (var item in Ghost.Dictionaries)
-						if (item.IsChanged)
-							return true;
-				}
+				foreach (var item in Ghost.Dictionaries)
+					if (item.IsChanged)
+						return true;
+
 				return false;
 			}
 		}
@@ -455,6 +458,10 @@ namespace Satolist2
 				//同じタイミングでリストデータ周辺をロード
 				DataModelManager.Load();
 			}
+
+			//ゴーストのローカル情報のロード
+			if(ghost != null)
+				EditorSettings.LoadGhostTemporarySettings(ghost);
 
 			if(ghost != null && !string.IsNullOrEmpty(shellDirectoryName))
 			{
@@ -512,10 +519,109 @@ namespace Satolist2
 				}
 				);
 
+			EditUploadSettingCommand = new ActionCommand(
+				o =>
+				{
+					var d = new Dialog.UploadSettingDialog(EditorSettings.UploadSettings);
+					if( d.ShowDialog() == true)
+					{
+						EditorSettings.UploadSettings = d.DataContext.GetItems();
+						EditorSettings.SaveUploadSettings();
+					}
+				}
+				);
+
 			ReloadShioriCommand = new ActionCommand(
 				o => GhostRuntimeRequest.ReloadShiori(ghost),
 				o => ghost != null
 				);
+
+			ExportNarCommand = new ActionCommand(
+				o =>
+				{
+					//保存ダイアログを出す
+					if(AskSave())
+					{
+						//ファイル保存先の選択
+						//TODO: developer_options.txt を実装してのテストはできてないので要確認
+						var saveDialog = new SaveFileDialog();
+						saveDialog.Filter = "narゴーストアーカイブ(*.nar)|*.nar|zip圧縮ファイル(*.zip)|*.zip|すべてのファイル|*.*";
+						saveDialog.InitialDirectory = DictionaryUtility.NormalizeWindowsPath(ghost.FullPath);
+						saveDialog.AddExtension = true;
+						saveDialog.OverwritePrompt = true;
+						saveDialog.FileName = "ghost.nar";
+
+						if(saveDialog.ShowDialog() == true)
+						{
+							var progressDialog = new ProgressDialog();
+							progressDialog.DataContext.Title = "narファイルの作成";
+							progressDialog.DataContext.SetMessage("narファイルを作成します。");
+
+							var task = Task.Run(() =>
+							{
+								try
+								{
+									NarUtility.CreateNar(Ghost.FullPath, saveDialog.FileName);
+									MainWindow.Dispatcher.Invoke(() =>
+									{
+										progressDialog.DataContext.SetMessage("作成完了しました。");
+									});
+								}
+								catch
+								{
+									//TODO: エラー内容表示？ 折角ログ領域ある
+									MainWindow.Dispatcher.Invoke(() =>
+									{
+										progressDialog.DataContext.SetMessage("失敗しました。");
+									});
+								}
+							});
+							progressDialog.SetTask(task);
+							progressDialog.ShowDialog();
+							
+						}
+					}
+				},
+				o => ghost != null
+				);
+
+			MakeUpdateFileCommand = new ActionCommand(
+				o =>
+				{
+					if(AskSave())
+					{
+						//TODO: progressDialog出して実行
+						var progressDialog = new ProgressDialog();
+					}
+				},
+				o => ghost != null
+				);
+
+			UploadGhostCommand = new ActionCommand(
+				o =>
+				{
+					if (AskSave())
+					{
+						//ゴーストアップロード
+						var dialog = new UploadDialog(EditorSettings.UploadSettings, ghost, EditorSettings.GhostTemporarySettings);
+						dialog.ShowDialog();
+						if(dialog.IsUploadStarted)
+						{
+							//アップロードを開始した場合は、設定を更新する
+							EditorSettings.GhostTemporarySettings.LastUploadSettingId = dialog.DataContext.SelectedSettingId;
+							EditorSettings.GhostTemporarySettings.LastUploadUseDiff = dialog.DataContext.IsDiffUpload;
+							EditorSettings.GhostTemporarySettings.LastUploadUseFiles = dialog.DataContext.IsUploadFiles;
+							EditorSettings.GhostTemporarySettings.LastUploadUseNar = dialog.DataContext.IsUploadNar;
+
+							//保存。どこかでまとめてやる？
+							EditorSettings.SaveGhostTemporarySettings(ghost);
+						}
+
+					}
+				},
+				o => ghost != null
+				);
+
 			
 
 			//読込エラーが発生している場合に通知
@@ -561,10 +667,17 @@ namespace Satolist2
 			}
 		}
 
-		//保存ダイアログを呼ぶ処理
-		//falseが帰ったら終了をキャンセル
+		//保存ダイアログを呼ぶ
 		public bool AskSave()
 		{
+			//ゴーストを開いてない
+			if (Ghost == null)
+				return true;
+
+			//保存が不要
+			if (!IsChanged)
+				return true;
+
 			List<ISaveFileObject> objects = new List<ISaveFileObject>();
 			objects.AddRange(SaveLoadPanes);
 			if(Ghost != null)

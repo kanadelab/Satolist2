@@ -337,6 +337,7 @@ namespace Satolist2.Control
 		public string NodeType => "Event";
 		public FileEventTreeItemDictionaryViewModel Dictionary { get; }
 		public ActionCommand AddItemCommand { get; }
+		public ActionCommand MoveItemCommand { get; }
 
 		public string Label
 		{
@@ -373,6 +374,14 @@ namespace Satolist2.Control
 
 			AddItemCommand = new ActionCommand(
 				o => Dictionary.FileEventTree.Main.OpenAddEventDialog(addTarget: Dictionary.Dictionary)
+				);
+
+			MoveItemCommand = new ActionCommand(
+				o =>
+				{
+					var dialog = new DictionarySelectDialog(Dictionary.FileEventTree.Main);
+					dialog.ShowDialog();
+				}
 				);
 
 		}
