@@ -49,7 +49,6 @@ namespace Satolist2.Utility
 		public static void CreateUpdateFile(string path)
 		{
 			var pathHashSize = new List<Tuple<string, string, int>>();
-			var rootPathUri = new Uri(path + "/");
 			var developerOptions = new DeveloperOptionsParser();
 
 			var pathUpdates2Dau = path + "/updates2.dau";
@@ -71,7 +70,7 @@ namespace Satolist2.Utility
 			foreach (var filePath in files)
 			{
 				//相対パスを用意
-				var relativePath = rootPathUri.MakeRelativeUri(new Uri(filePath)).ToString();
+				var relativePath = DictionaryUtility.MakeRelativePath(path, filePath);
 
 				if (IsIgnoreFile(relativePath, false))
 					continue;
@@ -111,6 +110,7 @@ namespace Satolist2.Utility
 		private static string BuildUpdatesTxt(IEnumerable<Tuple<string,string,int>> pathHashSize)
 		{
 			var builder = new StringBuilder();
+			builder.AppendLine("charset,Shift_JIS");
 			foreach (var item in pathHashSize)
 				builder.AppendLine(string.Concat("file,", item.Item1, (char)1, item.Item2, (char)1, "size=", item.Item3, (char)1));
 			return builder.ToString();
@@ -125,6 +125,9 @@ namespace Satolist2.Utility
 				if (string.IsNullOrEmpty(line))
 					continue;
 				var items = line.Split((char)1);
+				if (items.Length < 3)
+					continue;
+
 				var size = int.Parse(items[2].Substring("size=".Length));
 				yield return new Tuple<string, string, int>(items[0], items[1], size);
 			}
@@ -139,6 +142,9 @@ namespace Satolist2.Utility
 				if (string.IsNullOrEmpty(line))
 					continue;
 				var items = line.Substring("file,".Length).Split((char)1);
+				if (items.Length < 3)
+					continue;
+
 				var size = int.Parse(items[2].Substring("size=".Length));
 				yield return new Tuple<string, string, int>(items[0], items[1], size);
 			}

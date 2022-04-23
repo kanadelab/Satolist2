@@ -562,9 +562,10 @@ namespace Satolist2
 								try
 								{
 									NarUtility.CreateNar(Ghost.FullPath, saveDialog.FileName);
+
 									MainWindow.Dispatcher.Invoke(() =>
 									{
-										progressDialog.DataContext.SetMessage("作成完了しました。");
+										progressDialog.DataContext.SetMessage("作成完了しました。", 100.0);
 									});
 								}
 								catch
@@ -590,8 +591,29 @@ namespace Satolist2
 				{
 					if(AskSave())
 					{
-						//TODO: progressDialog出して実行
 						var progressDialog = new ProgressDialog();
+						progressDialog.DataContext.Title = "更新ファイルの作成";
+						progressDialog.DataContext.SetMessage("更新ファイルを作成します。");
+						var task = Task.Run(() =>
+					   {
+						   try
+						   {
+							   NarUtility.CreateUpdateFile(Ghost.FullPath);
+							   MainWindow.Dispatcher.Invoke(() =>
+							   {
+								   progressDialog.DataContext.SetMessage("作成完了しました。", 100.0);
+							   });
+						   }
+						   catch
+						   {
+							   MainWindow.Dispatcher.Invoke(() =>
+							   {
+								   progressDialog.DataContext.SetMessage("失敗しました。");
+							   });
+						   }
+					   });
+						progressDialog.SetTask(task);
+						progressDialog.ShowDialog();
 					}
 				},
 				o => ghost != null

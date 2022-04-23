@@ -128,7 +128,10 @@ namespace Satolist2.Utility
 		//フルパス同士から相対パスの作成
 		public static string MakeRelativePath(string baseFullPath, string targetFullPath)
 		{
-			var baseUri = new Uri(baseFullPath + "/");
+			if (baseFullPath.Last() != '/')
+				baseFullPath = baseFullPath + "/";
+
+			var baseUri = new Uri(baseFullPath);
 			var targetUri = new Uri(targetFullPath);
 			return baseUri.MakeRelativeUri(targetUri).ToString();
 		}

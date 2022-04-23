@@ -33,7 +33,7 @@ namespace Satolist2.Dialog
 		public ProgressDialog()
 		{
 			InitializeComponent();
-			DataContext = new ProgressDialogViewModel();
+			DataContext = new ProgressDialogViewModel(this);
 			
 		}
 
@@ -62,6 +62,7 @@ namespace Satolist2.Dialog
 		private string title;
 		private string message;
 		private string logs;
+		private ProgressDialog dialog;
 
 		public bool IsIndeterminate
 		{
@@ -75,10 +76,10 @@ namespace Satolist2.Dialog
 
 		public double Progress
 		{
-			get => progress * 0.01;
+			get => progress;
 			set
 			{
-				progress = value * 100.0;
+				progress = value;
 				NotifyChanged();
 			}
 		}
@@ -113,11 +114,22 @@ namespace Satolist2.Dialog
 			}
 		}
 
+		public ProgressDialogViewModel(ProgressDialog dialog)
+		{
+			this.dialog = dialog;
+		}
+
 		//ログに流しつつメッセージ表示
 		public void SetMessage(string message)
 		{
 			Message = message;
 			Logs = Logs + message + Constants.NewLine;
+		}
+
+		public void SetMessage(string message, double progress)
+		{
+			SetMessage(message);
+			Progress = progress;
 		}
 	}
 }
