@@ -138,6 +138,9 @@
     <Compile Include="Dialog\DictionarySelectDialog.xaml.cs">
       <DependentUpon>DictionarySelectDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dialog\GeneralSettingsDialog.xaml.cs">
+      <DependentUpon>GeneralSettingsDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dialog\ProgressDialog.xaml.cs">
       <DependentUpon>ProgressDialog.xaml</DependentUpon>
     </Compile>
@@ -176,6 +179,7 @@
     <Compile Include="Utility\Progress.cs" />
     <Compile Include="Utility\SakuraFMOReader.cs" />
     <Compile Include="Utility\Satorite.cs" />
+    <Compile Include="Utility\SSPBootUtility.cs" />
     <Compile Include="Utility\Surfaces.cs" />
     <Compile Include="Utility\SyntaxHighlight.cs" />
     <Compile Include="Utility\TemporaryDirectory.cs" />
@@ -245,6 +249,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Dialog\DictionarySelectDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialog\GeneralSettingsDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

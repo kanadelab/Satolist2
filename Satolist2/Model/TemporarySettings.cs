@@ -74,5 +74,8 @@ namespace Satolist2.Model
 		//前回アップロードで更新ファイルアップロードを使用した
 		[JsonProperty]
 		public bool LastUploadUseFiles { get; set; }
+		//最後に起動を確認した実行ファイル
+		[JsonProperty]
+		public string LastBootExecutePath { get; set; }
 	}
 }

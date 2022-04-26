@@ -23,6 +23,7 @@
 				<MenuItem Header="上書き保存" Command="{Binding SaveFileCommand}" InputGestureText="Ctrl+S"/>
 				<Separator />
 				<MenuItem Header="編集中のゴーストをエクスプローラで開く" Command="{Binding OpenGhostDirectoryCommand}" />
+				<MenuItem Header="編集中のゴーストをSSPで起動" Command="{Binding BootSSPCommand}" />
 			</MenuItem>
 			<MenuItem Header="表示">
 				<MenuItem Header="ファイルイベントツリー" x:Name="FileEventTreeVisibleMenu" IsCheckable="True" IsChecked="{Binding IsVisible, Mode=TwoWay}" />

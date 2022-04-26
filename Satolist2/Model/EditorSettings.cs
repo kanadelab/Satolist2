@@ -19,11 +19,13 @@ namespace Satolist2.Model
 		private const string InsertPaettePath = "settings/insertpalette.json";
 		private const string UploadSettingPath = "settings/accounts.json";
 		private const string TemporarySettingsPath = "settings/temporary.json";
+		private const string GeneralSettingPath = "settings/general.json";
 
 		public InsertItemPaletteModel InsertPalette { get; set; }
 		public UploadServerSettingModelBase[] UploadSettings { get; set; }
 		public TemporarySettings TemporarySettings { get; set; }
 		public GhostTemporarySettings GhostTemporarySettings { get; set; }
+		public GeneralSettings GeneralSettings { get; set; }
 
 		[JsonIgnore]
 		public bool IsLoadFailed { get; set; }
@@ -146,7 +148,8 @@ namespace Satolist2.Model
 					JsonTextWriter w = new JsonTextWriter(writer);
 					w.IndentChar = '\t';
 					w.Indentation = 1;
-					jsonSerializer.Serialize(w, TemporarySettingsPath);
+					w.Formatting = Formatting.Indented;
+					jsonSerializer.Serialize(w, TemporarySettings);
 				}
 			}
 			catch
@@ -154,5 +157,48 @@ namespace Satolist2.Model
 			}
 		}
 
+		public void LoadGeneralSettings()
+		{
+			if(System.IO.File.Exists(GeneralSettingPath))
+			{
+
+			}
+		}
+
+		public void SaveGeneralSettings()
+		{
+			System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(TemporarySettingsPath));
+
+		}
+
+	}
+
+	//基本設定情報
+	public class GeneralSettings
+	{
+		[JsonProperty]
+		public bool UseOwnedSSTP { get; set; }
+		[JsonProperty]
+		public int ListedDictionaryInsertEmptyLines { get; set; }
+
+
+		public GeneralSettings Clone()
+		{
+			return new GeneralSettings()
+			{
+				UseOwnedSSTP = UseOwnedSSTP,
+				ListedDictionaryInsertEmptyLines = ListedDictionaryInsertEmptyLines
+			};
+		}
+
+		public bool IsEqlals(GeneralSettings obj)
+		{
+			if (UseOwnedSSTP != obj.UseOwnedSSTP)
+				return false;
+			if (ListedDictionaryInsertEmptyLines != obj.ListedDictionaryInsertEmptyLines)
+				return false;
+			return true;
+
+		}
 	}
 }

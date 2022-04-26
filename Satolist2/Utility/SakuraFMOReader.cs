@@ -112,6 +112,7 @@ namespace Satolist2.Utility
 		public string KeroName { get; private set; }
 		public string GhostName { get; private set; }
 		public string GhostPath { get; private set; }
+		public string ExecutablePath { get; private set; }
 		public IntPtr HWnd { get; private set; }
 		
 
@@ -138,6 +139,9 @@ namespace Satolist2.Utility
 					break;
 				case "fullname":
 					GhostName = value;
+					break;
+				case "path":
+					ExecutablePath = DictionaryUtility.ConbinePath(value, "ssp.exe");
 					break;
 			}
 		}

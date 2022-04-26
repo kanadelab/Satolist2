@@ -77,7 +77,8 @@ namespace Satolist2.Control
 				{
 					Name = item.Value.GhostName,
 					Path = item.Value.GhostPath,
-					IsRunning = true
+					IsRunning = true,
+					RunningExecutablePath = item.Value.ExecutablePath
 				});
 			}
 
@@ -107,7 +108,7 @@ namespace Satolist2.Control
 		{
 			if(selectedItem != null)
 			{
-				mainVm.MainWindow.OpenGhost(selectedItem.Path);
+				mainVm.MainWindow.OpenGhost(selectedItem.Path, executablePath: selectedItem.RunningExecutablePath);
 			}
 		}
 	}
@@ -129,6 +130,8 @@ namespace Satolist2.Control
 		public bool IsHistory { get; set; }
 		//起動中のゴースト
 		public bool IsRunning { get; set; }
+		//起動中のゴーストを実行しているsspのパス
+		public string RunningExecutablePath { get; set; }
 
 		public ActionCommand ToggleFavoriteCommand { get;}
 

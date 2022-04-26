@@ -203,16 +203,23 @@ namespace Satolist2
 			currentWindow.IsActive = true;
 		}
 
-		internal void OpenGhost(string ghostPath, string shellDirectoryName = "master")
+		internal void OpenGhost(string ghostPath, string shellDirectoryName = "master", string executablePath = null)
 		{
+			//ゴーストのロード
 			var ghost = new GhostModel(ghostPath);
 
-			MainViewModel.EditorSettings.TemporarySettings.AddHistory(ghost);
-
-			//無事に開けたらヒストリーに足す
-			mainViewModel = new MainViewModel(this, ghost, shellDirectoryName);
+			//メインの起動
+			var init = new MainViewModelInitializeData();
+			init.Ghost = ghost;
+			init.ShellDirectoryName = shellDirectoryName;
+			init.RunningExecutablePath = executablePath;
+			
+			mainViewModel = new MainViewModel(this, init);
 			DataContext = mainViewModel;
 			ReflectControlViewModel(mainViewModel);
+
+			//無事に開けたらヒストリーに足す
+			MainViewModel.EditorSettings.TemporarySettings.AddHistory(ghost);
 
 			//開けたらスタートメニューを閉じる
 			StartMenu.Hide();
@@ -365,6 +372,14 @@ namespace Satolist2
 		}
 	}
 
+	//MainViewModel起動オプション
+	internal class MainViewModelInitializeData
+	{
+		public GhostModel Ghost { get; set; }
+		public string ShellDirectoryName { get; set; }
+		public string RunningExecutablePath { get; set; }
+	}
+
 	//ワークスペースは切り離せるのが望ましそう。Dockのビューモデルとかもくっついてそうだし
 	internal class MainViewModel : NotificationObject
 	{
@@ -394,6 +409,7 @@ namespace Satolist2
 		//汎用コマンド
 		public ActionCommand SaveFileCommand { get; }
 		public ActionCommand OpenGhostDirectoryCommand { get; }
+		public ActionCommand BootSSPCommand { get; }
 		public ActionCommand EditInsertPaletteCommand { get; }
 		public ActionCommand EditUploadSettingCommand { get; }
 		public ActionCommand ReloadShioriCommand { get; }
@@ -445,10 +461,11 @@ namespace Satolist2
 			}
 		}
 
-		public MainViewModel(MainWindow mainWindow, GhostModel ghost = null, string shellDirectoryName = null)
+		public MainViewModel(MainWindow mainWindow, MainViewModelInitializeData initializeData = null)
 		{
+			initializeData = initializeData ?? new MainViewModelInitializeData();
 			MainWindow = mainWindow;
-			Ghost = ghost;
+			Ghost = initializeData.Ghost;
 			string shellPath = null;
 
 			//エディタ設定のロード
@@ -460,12 +477,21 @@ namespace Satolist2
 			}
 
 			//ゴーストのローカル情報のロード
-			if(ghost != null)
-				EditorSettings.LoadGhostTemporarySettings(ghost);
-
-			if(ghost != null && !string.IsNullOrEmpty(shellDirectoryName))
+			if (Ghost != null)
 			{
-				shellPath = ghost.FullPath + "/shell/" + shellDirectoryName;
+				EditorSettings.LoadGhostTemporarySettings(Ghost);
+
+				//起動ベースウェアの位置を特定できたら保存しておく
+				if (!string.IsNullOrEmpty(initializeData.RunningExecutablePath))
+				{
+					EditorSettings.GhostTemporarySettings.LastBootExecutePath = initializeData.RunningExecutablePath;
+					EditorSettings.SaveGhostTemporarySettings(Ghost);
+				}
+
+				if (!string.IsNullOrEmpty(initializeData.ShellDirectoryName))
+				{
+					shellPath = Ghost.FullPath + "/shell/" + initializeData.ShellDirectoryName;
+				}
 			}
 
 			EventEditors = new List<EventEditorViewModel>();
@@ -488,7 +514,7 @@ namespace Satolist2
 
 			SaveFileCommand = new ActionCommand(
 				o => AskSave(),
-				o => ghost != null
+				o => Ghost != null
 				);
 
 			OpenGhostDirectoryCommand = new ActionCommand(
@@ -496,12 +522,49 @@ namespace Satolist2
 				{
 					try
 					{
-						Process.Start(ghost.FullDictionaryPath);
+						Process.Start(Ghost.FullDictionaryPath);
 					}
 					catch { }
 				},
-				o => ghost != null
+				o => Ghost != null
 
+				);
+
+			BootSSPCommand = new ActionCommand(
+				o =>
+				{
+					try
+					{
+						try
+						{ 
+							if (!string.IsNullOrEmpty(EditorSettings.GhostTemporarySettings.LastBootExecutePath))
+							{
+								SSPBootUtility.Boot(Ghost.FullPath, EditorSettings.GhostTemporarySettings.LastBootExecutePath);
+								return;
+							}
+						}
+						catch(System.IO.FileNotFoundException)
+						{
+							//起動に使用するSSPが見つからない場合、推測モードにフォールバック
+						}
+
+						//最後に起動したSSPで起動できなかった場合、フォルダを上へ遡る形でSSPの場所を推測して起動する
+						var executablePath = SSPBootUtility.Boot(Ghost.FullPath);
+
+						//起動に成功したらパスを格納して次回以降の起動に使用する
+						EditorSettings.GhostTemporarySettings.LastBootExecutePath = executablePath;
+						EditorSettings.SaveGhostTemporarySettings(Ghost);
+					}
+					catch(System.IO.FileNotFoundException)
+					{
+						MessageBox.Show("起動に使用するSSPが見つかりませんでした。\r\nいちど、先にSSPを起動した状態でさとりすとを開き、スタートメニューから起動中のゴーストを開くことで起動中のSSPを認識するようになります。");
+					}
+					catch
+					{
+						MessageBox.Show("起動に失敗しました。");
+					}
+				},
+				o => Ghost != null
 				);
 
 			EditInsertPaletteCommand = new ActionCommand(
@@ -532,8 +595,8 @@ namespace Satolist2
 				);
 
 			ReloadShioriCommand = new ActionCommand(
-				o => GhostRuntimeRequest.ReloadShiori(ghost),
-				o => ghost != null
+				o => GhostRuntimeRequest.ReloadShiori(Ghost),
+				o => Ghost != null
 				);
 
 			ExportNarCommand = new ActionCommand(
@@ -546,7 +609,7 @@ namespace Satolist2
 						//TODO: developer_options.txt を実装してのテストはできてないので要確認
 						var saveDialog = new SaveFileDialog();
 						saveDialog.Filter = "narゴーストアーカイブ(*.nar)|*.nar|zip圧縮ファイル(*.zip)|*.zip|すべてのファイル|*.*";
-						saveDialog.InitialDirectory = DictionaryUtility.NormalizeWindowsPath(ghost.FullPath);
+						saveDialog.InitialDirectory = DictionaryUtility.NormalizeWindowsPath(Ghost.FullPath);
 						saveDialog.AddExtension = true;
 						saveDialog.OverwritePrompt = true;
 						saveDialog.FileName = "ghost.nar";
@@ -583,7 +646,7 @@ namespace Satolist2
 						}
 					}
 				},
-				o => ghost != null
+				o => Ghost != null
 				);
 
 			MakeUpdateFileCommand = new ActionCommand(
@@ -616,7 +679,7 @@ namespace Satolist2
 						progressDialog.ShowDialog();
 					}
 				},
-				o => ghost != null
+				o => Ghost != null
 				);
 
 			UploadGhostCommand = new ActionCommand(
@@ -625,7 +688,7 @@ namespace Satolist2
 					if (AskSave())
 					{
 						//ゴーストアップロード
-						var dialog = new UploadDialog(EditorSettings.UploadSettings, ghost, EditorSettings.GhostTemporarySettings);
+						var dialog = new UploadDialog(EditorSettings.UploadSettings, Ghost, EditorSettings.GhostTemporarySettings);
 						dialog.ShowDialog();
 						if(dialog.IsUploadStarted)
 						{
@@ -636,12 +699,12 @@ namespace Satolist2
 							EditorSettings.GhostTemporarySettings.LastUploadUseNar = dialog.DataContext.IsUploadNar;
 
 							//保存。どこかでまとめてやる？
-							EditorSettings.SaveGhostTemporarySettings(ghost);
+							EditorSettings.SaveGhostTemporarySettings(Ghost);
 						}
 
 					}
 				},
-				o => ghost != null
+				o => Ghost != null
 				);
 
 			
