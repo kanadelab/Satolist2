@@ -685,6 +685,12 @@ namespace Satolist2
 			UploadGhostCommand = new ActionCommand(
 				o =>
 				{
+					if(!(EditorSettings.UploadSettings?.Any() ?? false))
+					{
+						MessageBox.Show("アップロード設定がありません。\r\n「設定」→「アップロード設定」でアップロード設定を構成してください。", "さとりすと");
+						return;
+					}
+
 					if (AskSave())
 					{
 						//ゴーストアップロード
