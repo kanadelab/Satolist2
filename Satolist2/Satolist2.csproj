@@ -89,6 +89,9 @@
     <Compile Include="Control\BindablePasswordBox.xaml.cs">
       <DependentUpon>BindablePasswordBox.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Control\RecvEventLog.xaml.cs">
+      <DependentUpon>RecvEventLog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Control\ReplaceList.xaml.cs">
       <DependentUpon>ReplaceList.xaml</DependentUpon>
     </Compile>
@@ -100,6 +103,9 @@
     </Compile>
     <Compile Include="Control\SearchResult.xaml.cs">
       <DependentUpon>SearchResult.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Control\TemporaryTextEditor.xaml.cs">
+      <DependentUpon>TemporaryTextEditor.xaml</DependentUpon>
     </Compile>
     <Compile Include="Control\UpdateIgnoreList.xaml.cs">
       <DependentUpon>UpdateIgnoreList.xaml</DependentUpon>
@@ -214,6 +220,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Control\RecvEventLog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Control\ReplaceList.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -243,6 +253,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Control\SurfaceViewer.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Control\TemporaryTextEditor.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

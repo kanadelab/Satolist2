@@ -40,6 +40,7 @@
 				<MenuItem Header="SAORIリスト" x:Name="SaoriListVisibleMenu" IsCheckable="True" IsChecked="{Binding IsVisible, Mode=TwoWay}" />
 				<MenuItem Header="文字置換リスト" x:Name="ReplaceListVisibleMenu" IsCheckable="True" IsChecked="{Binding IsVisible, Mode=TwoWay}" />
 				<MenuItem Header="変数リスト" x:Name="VariableListVisibleMenu" IsCheckable="True" IsChecked="{Binding IsVisible, Mode=TwoWay}" />
+				<MenuItem Header="れしばイベントログ" x:Name="RecvEventLogVisibleMenu" IsCheckable="True" IsChecked="{Binding IsVisible, Mode=TwoWay}" />
 			</MenuItem>
 			<MenuItem Header="デバッグ">
 				<MenuItem Header="SHIORI Reload" Command="{Binding ReloadShioriCommand}" InputGestureText="Ctrl+Alt+R" />
@@ -120,6 +121,11 @@
 							<!--検索-->
 							<util:DockingWindow x:Name="SearchMenu">
 								<ctl:SearchMenu />
+							</util:DockingWindow>
+							
+							<!--れしばイベントログ-->
+							<util:DockingWindow x:Name="RecvEventLog">
+								<ctl:RecvEventLog />
 							</util:DockingWindow>
 							
 						</avalonDock:LayoutDocumentPane>

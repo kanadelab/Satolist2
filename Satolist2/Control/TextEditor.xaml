@@ -14,11 +14,7 @@
 		<util:ReferenceToBoolConverter x:Key="ReferenceToBoolConverter" />
 	</UserControl.Resources>
 	<Grid>
-		<!--
-		<TextBox TextWrapping="Wrap" AcceptsReturn="True" HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Visible"
-				 Text="{Binding TextFile.Body, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="3" />
-		-->
-		<avalonEdit:TextEditor x:Name="MainTextEditor" Grid.Row="1" Margin="3" Document="{Binding Document, Mode=OneWay}">
+		<avalonEdit:TextEditor x:Name="MainTextEditor" Margin="3" Document="{Binding Document, Mode=OneWay}">
 			<avalonEdit:TextEditor.InputBindings>
 				<KeyBinding Gesture="ALT+Q" Command="{Binding SendToGhostCommand}" />
 			</avalonEdit:TextEditor.InputBindings>

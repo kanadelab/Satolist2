@@ -69,10 +69,11 @@ namespace Satolist2.Control
 				o => mainViewModel.MainWindow.OpenGhost(LoadGhostPath, LoadShellDirectoryName)
 				);
 
+			/*
 			RecvStartCommand = new ActionCommand(
 				o => Satolist2.Core.SatoriRecvNativeWindow.Create((new System.Windows.Interop.WindowInteropHelper(Main.MainWindow)).Handle)
 				);
-
+			*/
 			UITestCommand = new ActionCommand(
 				 o =>
 				 {

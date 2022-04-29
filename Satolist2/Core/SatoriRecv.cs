@@ -10,10 +10,6 @@ using System.Windows.Forms;
 
 namespace Satolist2.Core
 {
-	class SatoriRecv
-	{
-	}
-
 	//れしばのウインドウメッセージを受け取るウインドウ
 	//ネイティブwin32APIを使ってウインドウを生成する
 	public class SatoriRecvNativeWindow
@@ -23,6 +19,8 @@ namespace Satolist2.Core
 
 		//ウインドウハンドル
 		private IntPtr hWnd;
+		//受信コールバック
+		private Action<string> onReceiveCallback;
 
 		//ウインドウプロシージャがGCに回収されないように参照しておく
 		private WndProcDelegate wndProc;
@@ -30,19 +28,25 @@ namespace Satolist2.Core
 		public static SatoriRecvNativeWindow Instance { get; private set; }
 
 		//シングルトン開放生成
-		public static void Create(IntPtr parent)
+		public static void Create(IntPtr parent, Action<string> onReceive)
 		{
 			if (Instance != null)
 				throw new InvalidOperationException();
 			Instance = new SatoriRecvNativeWindow(parent);
+			Instance.onReceiveCallback = onReceive;
 		}
 
-		private static void Destroy()
+		public static void Destroy()
 		{
 			if (Instance == null)
 				throw new InvalidOperationException();
 			Instance.Dispose();
 			Instance = null;
+		}
+
+		public static bool IsCreated
+		{
+			get => Instance != null;
 		}
 
 		private SatoriRecvNativeWindow(IntPtr parent)
@@ -71,7 +75,6 @@ namespace Satolist2.Core
 				throw new Win32Exception(Marshal.GetLastWin32Error());
 
 			//ウインドウの生成
-			//TODO: parentっているんだっけ…
 			hWnd = CreateWindow(0, WindowClassName, WindowName, 0, 0, 0, 100, 100, parent, IntPtr.Zero, GetModuleHandle(IntPtr.Zero), IntPtr.Zero);
 			if (Marshal.GetLastWin32Error() != 0)
 				throw new Win32Exception(Marshal.GetLastWin32Error());
@@ -100,7 +103,7 @@ namespace Satolist2.Core
 
 		private static void Data(string data)
 		{
-			Console.WriteLine(data);
+			Instance.onReceiveCallback?.Invoke(data);
 		}
 
 		private delegate IntPtr WndProcDelegate(IntPtr hwnd, int msg, UIntPtr wParam, IntPtr lParam);

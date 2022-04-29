@@ -205,8 +205,27 @@ namespace Satolist2
 			//アクティベート
 			currentWindow.IsActive = true;
 			
+			//TODO: このあたりテキストエディタ本体をアクティブにする方法がいまいちわからない・・・
 			var editor = (TextEditor)currentWindow.Content;
 			editor.MainTextEditor.Focus();
+			return editor;
+		}
+
+		internal TemporaryTextEditor OpenTemporaryTextEditor(string body, string title)
+		{
+			var editor = new TemporaryTextEditor();
+			var newWindow = new DockingWindow(editor, new TemporaryTextEditorViewModel()
+			{
+				Title = title,
+				Text = body
+			});
+			newWindow.CanClose = true;
+			newWindow.CanHide = false;
+
+			DocumentPane.Children.Add(newWindow);
+
+			//アクティベート
+			newWindow.IsActive = true;
 			return editor;
 		}
 
@@ -249,6 +268,7 @@ namespace Satolist2
 			SaoriList.ViewModel = mainVm.SaoriListViewModel;
 			ReplaceList.ViewModel = mainVm.ReplaceListViewModel;
 			VariableList.ViewModel = mainVm.VariableListViewModel;
+			RecvEventLog.ViewModel = mainVm.RecvEventLogViewModel;
 		}
 
 		private void ReflectVisibleMenuDataContext()
@@ -269,20 +289,11 @@ namespace Satolist2
 			SaoriListVisibleMenu.DataContext = SaoriList;
 			ReplaceListVisibleMenu.DataContext = ReplaceList;
 			VariableListVisibleMenu.DataContext = VariableList;
+			RecvEventLogVisibleMenu.DataContext = RecvEventLog;
 			
 			//
 			
 		}
-
-		/*
-		private void OpenGhost(string path)
-		{
-			//ゴーストルートフォルダを開く。
-			
-			
-
-		}
-		*/
 
 		//レイアウトの保存と読込
 		private string SerializeDockingLayout()
@@ -365,6 +376,9 @@ namespace Satolist2
 				case SearchResultViewModel.ContentId:
 					SearchResult = (DockingWindow)e.Model;
 					break;
+				case RecvEventLogViewModel.ContentId:
+					RecvEventLog = (DockingWindow)e.Model;
+					break;
 				default:
 					//イベントエディタ等一時的なモノはデシリアライズする必要はない
 					e.Cancel = true;
@@ -420,6 +434,7 @@ namespace Satolist2
 		public SaoriListViewModel SaoriListViewModel { get; }
 		public ReplaceListViewModel ReplaceListViewModel { get; }
 		public VariableListViewModel VariableListViewModel { get; }
+		public RecvEventLogViewModel RecvEventLogViewModel { get; }
 		
 
 		public List<EventEditorViewModel> EventEditors { get; }
@@ -532,6 +547,7 @@ namespace Satolist2
 			SaoriListViewModel = new SaoriListViewModel(this);
 			ReplaceListViewModel = new ReplaceListViewModel(this);
 			VariableListViewModel = new VariableListViewModel(this);
+			RecvEventLogViewModel = new RecvEventLogViewModel(this);
 
 			SaveFileCommand = new ActionCommand(
 				o => AskSave(),
@@ -769,6 +785,12 @@ namespace Satolist2
 			{
 				vm.MoveCaretToLine(moveCaretLine);
 			}
+		}
+
+		//テンポラリ用途のテキストエディタのオープン
+		public void OpenTemporaryTextEditor(string body, string title)
+		{
+			MainWindow.OpenTemporaryTextEditor(body, title);
 		}
 
 		//イベントの追加

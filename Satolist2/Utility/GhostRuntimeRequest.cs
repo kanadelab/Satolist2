@@ -10,9 +10,9 @@ namespace Satolist2.Utility
 	public static class GhostRuntimeRequest
 	{
 		//SHIORIリロードスクリプトでリロードを行う
-		public static void ReloadShiori(GhostModel ghost)
+		public static void ReloadShiori(GhostModel ghost, string message = "SHIORIリロード。")
 		{
-			string script = @"\0\![reload,shiori]\![quicksession,true]SHIORIリロード。";
+			string script = @"\0\![reload,shiori]\![quicksession,true]" + message;
 			Satorite.SendSakuraScript(ghost, script, true);
 		}
 
