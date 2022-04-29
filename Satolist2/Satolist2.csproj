@@ -95,6 +95,12 @@
     <Compile Include="Control\SaoriList.xaml.cs">
       <DependentUpon>SaoriList.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Control\SearchMenu.xaml.cs">
+      <DependentUpon>SearchMenu.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Control\SearchResult.xaml.cs">
+      <DependentUpon>SearchResult.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Control\UpdateIgnoreList.xaml.cs">
       <DependentUpon>UpdateIgnoreList.xaml</DependentUpon>
     </Compile>
@@ -213,6 +219,14 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Control\SaoriList.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Control\SearchMenu.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Control\SearchResult.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

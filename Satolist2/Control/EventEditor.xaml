@@ -44,9 +44,8 @@
 		</Grid>
 
 		<avalonEdit:TextEditor x:Name="MainTextEditor" Grid.Row="1" Margin="3"  Document="{Binding Document}" >
-			
+
 			<avalonEdit:TextEditor.InputBindings>
-				<!--TODO: 挿入パレットの内容も追加してやる必要がある。そのためInsertPaletteの変更監視とプログラムからのショートカットキーの追加が必要 -->
 				<KeyBinding Gesture="ALT+Q" Command="{Binding SendToGhostCommand}" />
 			</avalonEdit:TextEditor.InputBindings>
 			
@@ -64,7 +63,6 @@
 								<Setter Property="Header" Value="{Binding Label}"/>
 								<Setter Property="ItemsSource" Value="{Binding Items}" />
 								<Setter Property="InputGestureText" Value="{Binding .,Converter={StaticResource ShortCutGestureConverter}}" />
-								<Setter Property="Command" Value="{Binding DataContext.InsertCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
 								<Setter Property="Command" Value="{Binding DataContext.InsertCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
 								<Setter Property="CommandParameter" Value="{Binding .}" />
 							</Style>

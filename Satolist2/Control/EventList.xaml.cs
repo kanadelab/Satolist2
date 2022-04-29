@@ -58,6 +58,8 @@ namespace Satolist2.Control
 
 		public MainViewModel Main { get; }
 
+		//NOTE: ファイルイベントツリーのViewModelから直接受け取っているので、自動で削除が反映される
+		//分離したほうがいいのかもしれないけど・・・
 		public ReadOnlyObservableCollection<EventListItemViewModel> Items
 		{
 			get => new ReadOnlyObservableCollection<EventListItemViewModel>(items);

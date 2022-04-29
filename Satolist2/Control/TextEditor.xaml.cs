@@ -27,27 +27,87 @@ namespace Satolist2.Control
 		{
 			InitializeComponent();
 		}
+
+		internal void UpdateInsertPaletteKeyBindings(InsertItemPaletteModel palette, ICommand command)
+		{
+			//古いバインディング削除
+			List<InputBinding> removes = new List<InputBinding>();
+			foreach (var item in MainTextEditor.InputBindings)
+			{
+				if (item is InsertPaletteKeyBinding b)
+					removes.Add(b);
+			}
+
+			foreach (var item in removes)
+			{
+				MainTextEditor.InputBindings.Remove(item);
+			}
+
+			//バインディングの作成
+			var items = palette?.AllItems() ?? Array.Empty<InsertItemPaletteModel>();
+			foreach (var item in items)
+			{
+				var gesture = InsertItemPaletteShortCutGestureConverter.ConvertToGesture(item);
+				if (gesture != null)
+				{
+					MainTextEditor.InputBindings.Add(new InsertPaletteKeyBinding(command, gesture, item));
+				}
+			}
+		}
 	}
 
-	internal class TextEditorViewModel : NotificationObject, IDockingWindowContent, IDisposable
+	internal class TextEditorViewModel : NotificationObject, IDockingWindowContent, IDisposable, IControlBindedReceiver
 	{
+		private TextEditor control;
 		private bool disableBodyPropertyChanged;
 		private string randomizedContetnId;
-		public TextFileModel TextFile { get; }
-		public TextDocument Document { get; }
-
+		
 		public string DockingTitle => TextFile.RelativeName;
 
 		public string DockingContentId => randomizedContetnId;
 
-		public TextEditorViewModel(TextFileModel textFile)
+		
+		public TextFileModel TextFile { get; }
+		public TextDocument Document { get; }
+		public MainViewModel Main { get; }
+		public ActionCommand SendToGhostCommand { get; }
+		public ActionCommand InsertCommand { get; }
+
+
+		public TextEditorViewModel(MainViewModel main, TextFileModel textFile)
 		{
 			randomizedContetnId = Guid.NewGuid().ToString();    //複数出現するのでユニークなIDを振る
 			TextFile = textFile;
-			//TextFile.PropertyChanged += TextFile_PropertyChanged;
+
+			Main = main;
+			Main.PropertyChanged += Main_PropertyChanged;
 
 			Document = new TextDocument(TextFile.Body);
 			Document.TextChanged += Document_TextChanged;
+
+			//コマンド
+			SendToGhostCommand = new ActionCommand(
+				o =>
+				{
+					//イベントのスコープを検出して送信する必要がある
+					throw new NotImplementedException();
+				}
+				);
+
+			InsertCommand = new ActionCommand(
+				o =>
+				{
+					control.MainTextEditor.Document.Insert(control.MainTextEditor.CaretOffset, ((InsertItemPaletteModel)o).Body);
+				}
+				);
+		}
+
+		private void Main_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+		{
+			if(e.PropertyName == nameof(MainViewModel.InsertPalette))
+			{
+				control.UpdateInsertPaletteKeyBindings(Main.InsertPalette, InsertCommand);
+			}
 		}
 
 		private void Document_TextChanged(object sender, EventArgs e)
@@ -57,18 +117,28 @@ namespace Satolist2.Control
 			disableBodyPropertyChanged = false;
 		}
 
-		/*
-		private void TextFile_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+		public void MoveCaretToLine(int lineIndex)
 		{
-			if (e.PropertyName == nameof(TextFileModel.Body) && !disableBodyPropertyChanged)
-				Document.Text = TextFile.Body;
+			if (lineIndex < control.MainTextEditor.LineCount)
+			{
+				control.MainTextEditor.ScrollToLine(lineIndex);
+				control.MainTextEditor.CaretOffset = Document.Lines[lineIndex].Offset;
+			}
 		}
-		*/
 
 		public void Dispose()
 		{
 			//TextFile.PropertyChanged -= TextFile_PropertyChanged;
 			Document.TextChanged -= Document_TextChanged;
+		}
+
+		public void ControlBind(System.Windows.Controls.Control ctrl)
+		{
+			if (ctrl is TextEditor textEditor)
+			{
+				control = textEditor;
+				control.UpdateInsertPaletteKeyBindings(Main.InsertPalette, InsertCommand);
+			}
 		}
 	}
 }

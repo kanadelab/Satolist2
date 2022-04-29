@@ -185,12 +185,15 @@ namespace Satolist2
 			}
 		}
 
-		internal void OpenTextEditor(TextFileModel text)
+		internal TextEditor OpenTextEditor(TextFileModel text)
 		{
+			if (!text.BodyAvailable)
+				throw new Exception();  //多分リストモードのファイルを開こうとしてる
+
 			var currentWindow = TextEditors.FirstOrDefault(o => ((TextEditorViewModel)o.ViewModel).TextFile == text);
 			if(currentWindow == null)
 			{
-				var newWindow = new DockingWindow(new TextEditor(), new TextEditorViewModel(text));
+				var newWindow = new DockingWindow(new TextEditor(), new TextEditorViewModel(mainViewModel, text));
 				newWindow.CanClose = true;
 				newWindow.CanHide = false;
 
@@ -201,6 +204,10 @@ namespace Satolist2
 
 			//アクティベート
 			currentWindow.IsActive = true;
+			
+			var editor = (TextEditor)currentWindow.Content;
+			editor.MainTextEditor.Focus();
+			return editor;
 		}
 
 		internal void OpenGhost(string ghostPath, string shellDirectoryName = "master", string executablePath = null)
@@ -230,6 +237,8 @@ namespace Satolist2
 		{
 			FileEventTree.ViewModel = mainVm.FileEventTreeViewModel;
 			EventList.ViewModel = mainVm.EventListViewModel;
+			SearchMenu.ViewModel = mainViewModel.SearchMenuViewModel;
+			SearchResult.ViewModel = mainVm.SearchResultViewModel;
 			SurfacePalette.ViewModel = mainVm.SurfacePaletteViewModel;
 			SurfaceViewer.ViewModel = mainVm.SurfaceViewerViewModel;
 			DebugMainMenu.ViewModel = mainVm.DebugMainMenuViewModel;
@@ -248,6 +257,8 @@ namespace Satolist2
 			//ちょっと微妙だけど、バインディングの繋ぎ変えを一括で行う
 			FileEventTreeVisibleMenu.DataContext = FileEventTree;
 			EventListVisibleMenu.DataContext = EventList;
+			SearchMenuVisibleMenu.DataContext = SearchMenu;
+			SearchResultVisibleMenu.DataContext = SearchResult;
 			SurfaceViewerVisibleMenu.DataContext = SurfaceViewer;
 			SurfacePaletteVisibleMenu.DataContext = SurfacePalette;
 			DebugMainMenuVisibleMenu.DataContext = DebugMainMenu;
@@ -348,6 +359,12 @@ namespace Satolist2
 				case VariableListViewModel.ContentId:
 					VariableList = (DockingWindow)e.Model;
 					break;
+				case SearchMenuViewModel.ContentId:
+					SearchMenu = (DockingWindow)e.Model;
+					break;
+				case SearchResultViewModel.ContentId:
+					SearchResult = (DockingWindow)e.Model;
+					break;
 				default:
 					//イベントエディタ等一時的なモノはデシリアライズする必要はない
 					e.Cancel = true;
@@ -391,6 +408,8 @@ namespace Satolist2
 		//それぞれのドッキングウィンドウ
 		public FileEventTreeViewModel FileEventTreeViewModel { get; }
 		public EventListViewModel EventListViewModel { get; }
+		public SearchMenuViewModel SearchMenuViewModel { get; }
+		public SearchResultViewModel SearchResultViewModel { get; }
 		public SurfaceViewerViewModel SurfaceViewerViewModel { get; }
 		public SurfacePaletteViewModel SurfacePaletteViewModel { get; }
 		public DebugMainMenuViewModel DebugMainMenuViewModel { get; }
@@ -497,6 +516,8 @@ namespace Satolist2
 			EventEditors = new List<EventEditorViewModel>();
 			FileEventTreeViewModel = new FileEventTreeViewModel(this);
 			EventListViewModel = new EventListViewModel(this);
+			SearchMenuViewModel = new SearchMenuViewModel(this);
+			SearchResultViewModel = new SearchResultViewModel(this);
 			SurfaceViewerViewModel = new SurfaceViewerViewModel(shellPath);
 			SurfacePaletteViewModel = new SurfacePaletteViewModel(shellPath);
 			DebugMainMenuViewModel = new DebugMainMenuViewModel(this,
@@ -732,6 +753,22 @@ namespace Satolist2
 		{
 			//TODO: 親のイベントを開くので、カレットの位置をインラインイベントに合わせたい
 			MainWindow.OpenEventEditor(ev.ParentEvent);
+		}
+
+		//テキストエディタのオープン
+		public void OpenTextEditor(TextFileModel textFile)
+		{
+			MainWindow.OpenTextEditor(textFile);
+		}
+
+		//テキストエディタのオープン、必要な位置へカレットを移動
+		public void OpenTextEditor(TextFileModel textFile, int moveCaretLine)
+		{
+			var textEditor = MainWindow.OpenTextEditor(textFile);
+			if(textEditor.DataContext is TextEditorViewModel vm)
+			{
+				vm.MoveCaretToLine(moveCaretLine);
+			}
 		}
 
 		//イベントの追加

@@ -28,6 +28,8 @@
 			<MenuItem Header="表示">
 				<MenuItem Header="ファイルイベントツリー" x:Name="FileEventTreeVisibleMenu" IsCheckable="True" IsChecked="{Binding IsVisible, Mode=TwoWay}" />
 				<MenuItem Header="単語群・文リスト" x:Name="EventListVisibleMenu" IsCheckable="True" IsChecked="{Binding IsVisible, Mode=TwoWay}" />
+				<MenuItem Header="検索" x:Name="SearchMenuVisibleMenu" IsCheckable="True" IsChecked="{Binding IsVisible, Mode=TwoWay}" />
+				<MenuItem Header="検索結果" x:Name="SearchResultVisibleMenu" IsCheckable="True" IsChecked="{Binding IsVisible, Mode=TwoWay}" />
 				<MenuItem Header="サーフェスビューワ" x:Name="SurfaceViewerVisibleMenu" IsCheckable="True" IsChecked="{Binding IsVisible, Mode=TwoWay}" />
 				<MenuItem Header="サーフェスパレット" x:Name="SurfacePaletteVisibleMenu" IsCheckable="True" IsChecked="{Binding IsVisible, Mode=TwoWay}" />
 				<MenuItem Header="デバッグメニュー" x:Name="DebugMainMenuVisibleMenu" IsCheckable="True" IsChecked="{Binding IsVisible, Mode=TwoWay}" />
@@ -115,6 +117,11 @@
 								<ctl:VariableList />
 							</util:DockingWindow>
 							
+							<!--検索-->
+							<util:DockingWindow x:Name="SearchMenu">
+								<ctl:SearchMenu />
+							</util:DockingWindow>
+							
 						</avalonDock:LayoutDocumentPane>
 						
 						<!--右ペイン-->
@@ -134,11 +141,18 @@
 
 					<!--下ペイン-->
 					<avalonDock:LayoutAnchorablePane DockHeight="250">
+
+						<!-- 単語群・文リスト-->
 						<util:DockingWindow x:Name="EventList">
 							<ctl:EventList />
 						</util:DockingWindow>
+
+						<!--検索結果-->
+						<util:DockingWindow x:Name="SearchResult">
+							<ctl:SearchResult />
+						</util:DockingWindow>
+
 					</avalonDock:LayoutAnchorablePane>
-					
 
 				</avalonDock:LayoutPanel>
 			</avalonDock:LayoutRoot>

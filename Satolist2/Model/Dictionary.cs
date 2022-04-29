@@ -105,6 +105,7 @@ namespace Satolist2.Model
 			get => DictionaryUtility.MakeRelativePath(Ghost.FullDictionaryPath, FullPath);
 		}
 
+		//ファイルの中身
 		public string Body
 		{
 			get => bodyAvailable ? body : null;
@@ -118,6 +119,7 @@ namespace Satolist2.Model
 			}
 		}
 
+		//ファイルの中身が有効か
 		public bool BodyAvailable
 		{
 			get => bodyAvailable;
@@ -192,6 +194,7 @@ namespace Satolist2.Model
 			get => new ReadOnlyObservableCollection<EventModel>(events);
 		}
 
+		//リスト化解除されているか
 		public bool IsSerialized
 		{
 			get => isSerialized;
@@ -207,7 +210,7 @@ namespace Satolist2.Model
 						BodyAvailable = true;
 
 						//イベントを消す
-						events.Clear();
+						ClearEvent();
 					}
 					else
 					{
@@ -270,6 +273,17 @@ namespace Satolist2.Model
 				ev.Dictionary = null;
 				RemoveEventInternal(ev);
 			}
+		}
+
+		//イベントの全削除。削除イベントを使うのでevent.Clear直接触らない
+		public void ClearEvent()
+		{
+			foreach(var ev in events)
+			{
+				ev.RaiseRemoveEvent();
+				ev.Dictionary = null;
+			}
+			events.Clear();
 		}
 
 		//内部的なイベントの削除
@@ -389,7 +403,7 @@ namespace Satolist2.Model
 		//項目名
 		public string Name
 		{
-			get => name;
+			get => name ?? string.Empty;
 			set
 			{
 				if (name != value)
@@ -403,7 +417,7 @@ namespace Satolist2.Model
 		//実行条件
 		public string Condition
 		{
-			get => condition;
+			get => condition ?? string.Empty;
 			set
 			{
 				if (condition != value)
@@ -416,7 +430,7 @@ namespace Satolist2.Model
 		//本文
 		public string Body
 		{
-			get => body;
+			get => body ?? string.Empty;
 			set
 			{
 				if (body != value)

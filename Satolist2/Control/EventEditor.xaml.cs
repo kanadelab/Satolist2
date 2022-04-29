@@ -134,10 +134,8 @@ namespace Satolist2.Control
 				);
 
 			InsertCommand = new ActionCommand(
-				//o => System.Console.WriteLine(((InsertItemPaletteModel)o).Label)
 				o =>
 				{
-					//TODO: control側のメソッドに
 					control.MainTextEditor.Document.Insert(control.MainTextEditor.CaretOffset, ((InsertItemPaletteModel)o).Body);
 				}
 				);
