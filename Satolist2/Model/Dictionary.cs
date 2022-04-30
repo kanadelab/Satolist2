@@ -64,6 +64,7 @@ namespace Satolist2.Model
 				if(Regex.IsMatch(Path.GetFileName(f), "^dic.*\\.txt$"))
 				{
 					var dict = new DictionaryModel(this, Path.GetFullPath(f));
+					dict.LoadDictionary();
 					dictionaries.Add(dict);
 				}
 			}
@@ -74,7 +75,13 @@ namespace Satolist2.Model
 			tempDescript.DeserializeFromFile(FullGhostDescriptPath);
 			GhostDescriptSakuraName = tempDescript.GetValue("sakura.name");
 			GhostDescriptName = tempDescript.GetValue("name");
+		}
 
+		public DictionaryModel AddNewDictionary(string filename)
+		{
+			var newDictionary = new Model.DictionaryModel(this, DictionaryUtility.NormalizePath(filename));
+			dictionaries.Add(newDictionary);
+			return newDictionary;
 		}
 	}
 
@@ -83,9 +90,14 @@ namespace Satolist2.Model
 	{
 		private string body;
 		private bool bodyAvailable; //false ならbodyは無効。里々辞書形式でデシリアライズされているなど直接テキストファイルとして編集できない
-		private bool isChanged;		//変更検出
+		private bool isChanged;     //変更検出
+		private bool isDeleted;		//削除扱いにされているか(保存操作時に消す予定か）
+
 
 		public GhostModel Ghost { get; }
+
+		//削除通知
+		public event Action<TextFileModel> OnDelete;
 
 		//フルパス
 		public string FullPath
@@ -138,6 +150,28 @@ namespace Satolist2.Model
 			{
 				isChanged = value;
 				NotifyChanged();
+			}
+		}
+
+		public bool IsDeleted
+		{
+			get => isDeleted;
+			set
+			{
+				if (isDeleted != value)
+				{
+					if (!value)
+						throw new InvalidOperationException();	//復活は対応してない
+					isDeleted = value;
+					Changed();
+					NotifyChanged();
+
+					if(isDeleted)
+					{
+						//削除になった場合削除イベントを発生する
+						OnDelete?.Invoke(this);
+					}
+				}
 			}
 		}
 
@@ -227,19 +261,28 @@ namespace Satolist2.Model
 		public DictionaryModel(GhostModel ghost, string fullPath): base(ghost, fullPath)
 		{
 			events = new ObservableCollection<EventModel>();
-			LoadDictionary();
+			OnDelete += DictionaryModel_OnDelete;
 		}
 
 		public DictionaryModel() : base(null, null)
 		{
 			events = new ObservableCollection<EventModel>();
+			OnDelete += DictionaryModel_OnDelete;
+		}
+
+		private void DictionaryModel_OnDelete(TextFileModel obj)
+		{
+			//ファイルが削除扱いにされた。
+			//リストモードであればイベントの除去をまとめて行い、リスト系から表示を消す。
+			if(!IsSerialized)
+				ClearEvent();
 		}
 
 		protected override void LoadFile()
 		{
 			//nop
 		}
-		protected void LoadDictionary()
+		public void LoadDictionary()
 		{
 			//TODO: エスケープやインラインなどややこしげなモノも読むようにする
 			var text = File.ReadAllText(FullPath, Constants.EncodingShiftJis);
@@ -363,18 +406,26 @@ namespace Satolist2.Model
 		{
 			try
 			{
-				string saveText;
-				if (IsSerialized)
+				if (!IsDeleted)
 				{
-					//保存
-					saveText = Body;
+					string saveText;
+					if (IsSerialized)
+					{
+						//保存
+						saveText = Body;
+					}
+					else
+					{
+						//シリアライズして保存
+						saveText = Serialize();
+					}
+					File.WriteAllText(FullPath, saveText, Constants.EncodingShiftJis);
 				}
 				else
 				{
-					//シリアライズして保存
-					saveText = Serialize();
+					//削除済みなので、ゴミ箱いき
+					DictionaryUtility.RecycleFile(FullPath);
 				}
-				File.WriteAllText(FullPath, saveText, Constants.EncodingShiftJis);
 				IsChanged = false;
 				return true;
 			}

@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.VisualBasic.FileIO;
 
 namespace Satolist2.Utility
 {
@@ -153,6 +154,22 @@ namespace Satolist2.Utility
 			}
 			return true;
 		}
+
+		//ファイルをゴミ箱に捨てる
+		public static bool RecycleFile(string path)
+		{
+			try
+			{
+				FileSystem.DeleteFile(path, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin, UICancelOption.DoNothing);
+				return true;
+			}
+			catch
+			{
+				return false;
+			}
+
+		}
+
 	}
 
 	internal static class Constants

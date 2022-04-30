@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -197,6 +198,7 @@ namespace Satolist2
 				newWindow.CanClose = true;
 				newWindow.CanHide = false;
 				newWindow.Closing += TextEditorClosing;
+				text.OnDelete += TextFileDeleted;
 
 				TextEditors.Add(newWindow);
 				DocumentPane.Children.Add(newWindow);
@@ -210,12 +212,25 @@ namespace Satolist2
 			return editor;
 		}
 
+		private void TextFileDeleted(TextFileModel obj)
+		{
+			var deletedEditor = TextEditors.FirstOrDefault(
+				o => ((TextEditorViewModel)o.ViewModel).TextFile == obj
+				);
+			if (deletedEditor != null)
+				deletedEditor.Close();
+		}
+
 		private void TextEditorClosing(object sender, System.ComponentModel.CancelEventArgs e)
 		{
 			if (sender is DockingWindow window)
 			{
 				TextEditors.Remove(window);
 				window.Closing -= TextEditorClosing;
+				if(window.ViewModel is TextEditorViewModel vm)
+				{
+					vm.TextFile.OnDelete -= TextFileDeleted;
+				}
 			}
 		}
 
@@ -451,6 +466,8 @@ namespace Satolist2
 
 		//汎用コマンド
 		public ActionCommand SaveFileCommand { get; }
+		public ActionCommand AddSatoriDictionaryFileCommand { get; }
+		public ActionCommand AddTextFileCommand { get; }
 		public ActionCommand OpenGhostDirectoryCommand { get; }
 		public ActionCommand BootSSPCommand { get; }
 		public ActionCommand EditInsertPaletteCommand { get; }
@@ -560,6 +577,74 @@ namespace Satolist2
 
 			SaveFileCommand = new ActionCommand(
 				o => AskSave(),
+				o => Ghost != null
+				);
+
+			AddSatoriDictionaryFileCommand = new ActionCommand(
+				o =>
+				{
+					var saveDialog = new SaveFileDialog();
+					saveDialog.Filter = "里々辞書ファイル(dic*.txt)|dic*.txt";
+					saveDialog.InitialDirectory = DictionaryUtility.NormalizeWindowsPath(Ghost.FullDictionaryPath);
+					saveDialog.AddExtension = true;
+					saveDialog.OverwritePrompt = false;
+					saveDialog.FileName = "dic_ghost.txt";
+					saveDialog.FileOk += (sender, e) =>
+					{
+						
+						if (!DictionaryUtility.IsChildPath(Ghost.FullDictionaryPath, saveDialog.FileName))
+						{
+							//ghost/master以下、辞書としてのみ追加が可能
+							MessageBox.Show("ゴーストの辞書フォルダにのみファイルを追加できます。");
+							e.Cancel = true;
+							return;
+						}
+
+						if (System.IO.File.Exists(saveDialog.FileName))
+						{
+							MessageBox.Show("すでに存在するファイルは新規作成できません。");
+							e.Cancel = true;
+							return;
+						}
+
+						//既存のファイル名を拒否する。ファイルシステムかさとりすと上に存在するファイルは拒否
+						if (Ghost.Dictionaries.Any(f => f.FullPath == saveDialog.FileName))
+						{
+							MessageBox.Show("さとりすとに読み込まれているファイルは新規作成できません。");
+							e.Cancel = true;
+							return;
+						}
+
+						//里々の辞書形式成約
+						if(!Regex.IsMatch(System.IO.Path.GetFileName(saveDialog.FileName), "^dic.+\\.txt$"))
+						{
+							MessageBox.Show("里々の辞書は「dic*.txt」のファイル名の形式で保存する必要があります。");
+							e.Cancel = true;
+						}
+					};
+
+					if(saveDialog.ShowDialog() == true)
+					{
+						//ファイルを追加する
+						Ghost.AddNewDictionary(saveDialog.FileName);
+					}
+				},
+				o => Ghost != null
+				);
+
+			AddTextFileCommand = new ActionCommand(
+				o =>
+				{
+					var saveDialog = new SaveFileDialog();
+					saveDialog.Filter = "テキストファイル(*.txt)|*.txt";
+					saveDialog.AddExtension = true;
+					saveDialog.OverwritePrompt = false;
+					saveDialog.FileName = "text.txt";
+					saveDialog.FileOk += (sender, e) =>
+					{
+						//既存のファイル名を拒否する。ファイルシステムかさとりすと上に存在するファイルは拒否
+					};
+				},
 				o => Ghost != null
 				);
 
@@ -767,6 +852,7 @@ namespace Satolist2
 				//TODO: ロードエラー通知
 			}
 		}
+
 
 		//イベントエディタのオープン
 		public void OpenEventEditor(EventModel ev)

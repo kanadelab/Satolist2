@@ -286,7 +286,15 @@ namespace Satolist2.Control
 			TextFile = textFile;
 			TextFileLineNumber = lineNumber;
 			TextFileLinePreview = linePreviewString;
+			TextFile.OnDelete += Text_OnDelete;
 		}
+
+		private void Text_OnDelete(TextFileModel obj)
+		{
+			//削除
+			Parent.OnRemoveItem(this);
+		}
+
 		private void Event_OnRemove(EventModel obj)
 		{
 			//Model側の削除通知
@@ -325,6 +333,11 @@ namespace Satolist2.Control
 			{
 				Event.PropertyChanged -= Event_PropertyChanged;
 				Event.OnRemove -= Event_OnRemove;
+			}
+
+			if(TextFile != null)
+			{
+				TextFile.OnDelete -= Text_OnDelete;
 			}
 		}
 	}

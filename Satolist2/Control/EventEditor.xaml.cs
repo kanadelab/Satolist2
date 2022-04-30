@@ -118,7 +118,7 @@ namespace Satolist2.Control
 			}
 		}
 
-		public string DockingTitle => Event.Name;
+		public string DockingTitle => Event.Identifier;
 
 		public string DockingContentId => randomizedContentId;
 

@@ -4,8 +4,12 @@
 			 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
 			 xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
 			 xmlns:local="clr-namespace:Satolist2.Control"
+			 xmlns:util="clr-namespace:Satolist2.Utility"
 			 mc:Ignorable="d" 
 			 d:DesignHeight="450" d:DesignWidth="800">
+	<UserControl.Resources>
+		<util:InvertBoolToVisibilityConverter x:Key="InvertBoolToVisibilityConverter" />
+	</UserControl.Resources>
 	<Grid>
 		<TreeView ItemsSource="{Binding Dictionaries}" SelectedItemChanged="TreeView_SelectedItemChanged">
 			<TreeView.ItemTemplate>
@@ -18,11 +22,15 @@
 					<EventSetter Event="MouseDoubleClick" Handler="TreeViewItem_MouseDoubleClick" />
 					<Style.Triggers>
 						<DataTrigger Binding="{Binding NodeType}" Value="Dictionary">
+							<Setter Property="Visibility" Value="{Binding Dictionary.IsDeleted, Converter={StaticResource InvertBoolToVisibilityConverter}}" />
 							<Setter Property="ContextMenu">
 								<Setter.Value>
 									<ContextMenu>
 										<MenuItem Header="項目を追加" Command="{Binding AddItemCommand}" />
+										<Separator />
 										<MenuItem Header="リスト化を解除" IsCheckable="False" IsChecked="{Binding Dictionary.IsSerialized, Mode=OneWay}" Command="{Binding ChangeSerializeStatusCommand}" />
+										<Separator />
+										<MenuItem Header="ファイルを削除" Command="{Binding DeleteFileCommand}" />
 									</ContextMenu>
 								</Setter.Value>
 							</Setter>

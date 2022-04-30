@@ -67,7 +67,7 @@ namespace Satolist2.Control
 		}
 	}
 
-	internal class FileEventTreeViewModel : NotificationObject, IDockingWindowContent
+	internal class FileEventTreeViewModel : NotificationObject, IDockingWindowContent, IDisposable
 	{
 		public const string ContentId = "FileEventTree";
 		private ObservableCollection<FileEventTreeItemDictionaryViewModel> dictionaries;
@@ -100,6 +100,41 @@ namespace Satolist2.Control
 					var dictViewModel = new FileEventTreeItemDictionaryViewModel(this, dic);
 					dictionaries.Add(dictViewModel);
 				}
+
+				//辞書のコレクション変更ハンドラ
+				INotifyCollectionChanged dictionaryCollection = Ghost.Dictionaries;
+				dictionaryCollection.CollectionChanged += DictionaryCollection_CollectionChanged;
+			}
+		}
+
+		//辞書の追加削除への対応 今のところ削除は保存操作で消えないといけないので、Collapsedにしているだけ
+		private void DictionaryCollection_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+		{
+			/*
+			foreach (Model.DictionaryModel item in e.OldItems)
+			{
+				var itemViewModel = dictionaries.FirstOrDefault(o => ReferenceEquals(o.Dictionary, item));
+				if(itemViewModel != null)
+				{
+					dictionaries.Remove(itemViewModel);
+				}
+			}
+			*/
+			Debug.Assert((e.OldItems?.Count ?? 0) == 0);
+
+			foreach(Model.DictionaryModel item in e.NewItems)
+			{
+				var itemViewModel = new FileEventTreeItemDictionaryViewModel(this, item);
+				dictionaries.Add(itemViewModel);
+			}
+		}
+
+		public void Dispose()
+		{
+			if (Main.Ghost != null)
+			{
+				INotifyCollectionChanged dictionaryCollection = Ghost.Dictionaries;
+				dictionaryCollection.CollectionChanged -= DictionaryCollection_CollectionChanged;
 			}
 		}
 	}
@@ -126,6 +161,7 @@ namespace Satolist2.Control
 		//アイテムを追加
 		public ActionCommand AddItemCommand { get; }
 		public ActionCommand ChangeSerializeStatusCommand { get; }
+		public ActionCommand DeleteFileCommand { get; }
 
 		public FileEventTreeItemDictionaryViewModel(FileEventTreeViewModel parent, DictionaryModel dictionary)
 		{
@@ -146,6 +182,17 @@ namespace Satolist2.Control
 				{
 					FileEventTree.Main.MainWindow.CloseDictionaryEditors(Dictionary);
 					Dictionary.IsSerialized = !Dictionary.IsSerialized;
+				}
+				);
+
+			DeleteFileCommand = new ActionCommand(
+				o =>
+				{
+					var result = MessageBox.Show(string.Format("ファイル「{0}」を削除します。よろしいですか？", Label), "ファイルの削除", MessageBoxButton.YesNo, MessageBoxImage.Question);
+					if(result == MessageBoxResult.Yes)
+					{
+						Dictionary.IsDeleted = true;
+					}
 				}
 				);
 

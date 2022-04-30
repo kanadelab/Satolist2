@@ -1,4 +1,5 @@
-﻿using ICSharpCode.AvalonEdit.Document;
+﻿using AvalonDock.Converters;
+using ICSharpCode.AvalonEdit.Document;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -67,6 +68,22 @@ namespace Satolist2.Utility
 		public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
 		{
 			return !(bool)value;
+		}
+	}
+
+	//boolを反転した上でVisibilityに変換するコンバータ
+	public class InvertBoolToVisibilityConverter : IValueConverter
+	{
+		private static BoolToVisibilityConverter boolToVisibility = new BoolToVisibilityConverter();
+
+		public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+		{
+			return boolToVisibility.Convert(!(bool)value, targetType, parameter, culture);
+		}
+
+		public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+		{
+			return !(bool)boolToVisibility.ConvertBack(value, targetType, parameter, culture);
 		}
 	}
 
