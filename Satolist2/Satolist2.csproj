@@ -107,6 +107,9 @@
     <Compile Include="Control\TemporaryTextEditor.xaml.cs">
       <DependentUpon>TemporaryTextEditor.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Control\TextEditorSearchBox.xaml.cs">
+      <DependentUpon>TextEditorSearchBox.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Control\UpdateIgnoreList.xaml.cs">
       <DependentUpon>UpdateIgnoreList.xaml</DependentUpon>
     </Compile>
@@ -261,6 +264,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Control\TextEditor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Control\TextEditorSearchBox.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -18,6 +18,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Satolist2.Dialog;
+using ICSharpCode.AvalonEdit.Highlighting;
 
 namespace Satolist2.Control
 {
@@ -88,6 +89,7 @@ namespace Satolist2.Control
 	{
 		private bool disableBodyPropertyChanged;
 		private EventEditor control;
+		private bool isShowSearchBox;
 
 		public EventModel Event { get; }
 		public string randomizedContentId;
@@ -102,6 +104,16 @@ namespace Satolist2.Control
 			get => eventTypeList;
 		}
 
+		public bool IsShowSearchBox
+		{
+			get => isShowSearchBox;
+			set
+			{
+				isShowSearchBox = value;
+				NotifyChanged();
+			}
+		}
+
 		public string DockingTitle => Event.Name;
 
 		public string DockingContentId => randomizedContentId;
@@ -110,8 +122,11 @@ namespace Satolist2.Control
 
 		public ActionCommand SendToGhostCommand {get;}
 		public ActionCommand InsertCommand { get; }
+		public ActionCommand ShowSearchBoxCommand { get; }
 		public MainViewModel Main { get; }
+		public object HilightColors { get; private set; }
 
+		public HighlightingRule searchRule = new HighlightingRule();
 
 		public EventEditorViewModel(MainViewModel main, EventModel ev)
 		{
@@ -137,6 +152,14 @@ namespace Satolist2.Control
 				o =>
 				{
 					control.MainTextEditor.Document.Insert(control.MainTextEditor.CaretOffset, ((InsertItemPaletteModel)o).Body);
+				}
+				);
+
+			//検索
+			ShowSearchBoxCommand = new ActionCommand(
+				o =>
+				{
+					IsShowSearchBox = true;
 				}
 				);
 		}

@@ -69,6 +69,21 @@ namespace Satolist2.Control
 		{
 			base.OnInitialized(e);
 			this.Loaded += InitializeAdorner;
+			this.IsVisibleChanged += WartermarkedTextBox_IsVisibleChanged;
+		}
+
+		private void WartermarkedTextBox_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+		{
+			if ((bool)e.NewValue)
+			{
+				//表示になった場合は再表示を試みるので、テキスト変更と同じことをする
+				OnTextChanged(null);
+			}
+			else
+			{
+				//親が非表示なら消す
+				wartermarkedAdorner.Visibility = Visibility.Collapsed;
+			}
 		}
 
 		private void InitializeAdorner(object sender, RoutedEventArgs e)
@@ -84,7 +99,7 @@ namespace Satolist2.Control
 		{
 			if(wartermarkedAdorner != null)
 			{
-				if (string.IsNullOrEmpty(Text))
+				if (string.IsNullOrEmpty(Text) && IsVisible)
 					wartermarkedAdorner.Visibility = Visibility.Visible;
 				else
 					wartermarkedAdorner.Visibility = Visibility.Collapsed;

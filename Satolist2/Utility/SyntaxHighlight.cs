@@ -107,9 +107,17 @@ namespace Satolist2.Utility
 			{ ScriptSyntax.ReplaceAfter, 0x404070 }
 		};
 
+		public HighlightingRule SearchHilightRule { get; }
+
 		public SatoriSyntaxRuleSet()
 		{
 			Name = "Satori";
+			SearchHilightRule = new HighlightingRule();
+			SearchHilightRule.Color = new HighlightingColor();
+			SearchHilightRule.Color.Background = new SimpleHighlightingBrush(System.Windows.Media.Color.FromArgb(255,255,255,0));
+			SearchHilightRule.Regex = new System.Text.RegularExpressions.Regex(string.Empty);
+
+
 			foreach (var def in Definitions)
 			{
 				var rule = new HighlightingRule();
@@ -122,13 +130,34 @@ namespace Satolist2.Utility
 				Rules.Add(rule);
 			}
 		}
+
+		public void UpdateSearchHilighter()
+		{
+			if (!string.IsNullOrEmpty(SearchHilightRule.Regex.ToString()))
+			{
+				if (!Rules.Contains(SearchHilightRule))
+				{
+					//上から順に照合する様子なので最優先
+					Rules.Insert(0, SearchHilightRule);
+				}
+			}
+			else
+			{
+				if (Rules.Contains(SearchHilightRule))
+				{
+					Rules.Remove(SearchHilightRule);
+				}
+			}
+		}
 	}
 
 	class SatoriSyntaxHilighter : IHighlightingDefinition
 	{
 		public string Name => "Satori";
+		private SatoriSyntaxRuleSet mainRuleSet;
 
-		public HighlightingRuleSet MainRuleSet { get; }
+		public HighlightingRule SearchHilightRule => mainRuleSet.SearchHilightRule;
+		public HighlightingRuleSet MainRuleSet => mainRuleSet;
 
 		public IEnumerable<HighlightingColor> NamedHighlightingColors => throw new NotImplementedException();
 
@@ -146,7 +175,12 @@ namespace Satolist2.Utility
 
 		public SatoriSyntaxHilighter()
 		{
-			MainRuleSet = new SatoriSyntaxRuleSet();
+			mainRuleSet = new SatoriSyntaxRuleSet();
+		}
+
+		public void UpdateSearchHilighter()
+		{
+			mainRuleSet.UpdateSearchHilighter();
 		}
 	}
 
