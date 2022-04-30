@@ -36,6 +36,7 @@ namespace Satolist2.Control
 				if(item.DataContext is EventListItemViewModel itemViewModel)
 				{
 					itemViewModel.OpenEditor();
+					e.Handled = true;
 				}
 			}
 		}

@@ -128,13 +128,13 @@ namespace Satolist2
 				ev.OnRemove += OpendEventRemoved;
 
 				EventEditors.Add(newWindow);
-				//DockingManager.
 				DocumentPane.Children.Add(newWindow);
 				currentWindow = newWindow;
 			}
 
 			//アクティベート
 			currentWindow.IsActive = true;
+			((EventEditor)currentWindow.Content).RequestFocus();
 		}
 
 		//一致するテキストファイルの編集画面を閉じる
@@ -196,6 +196,7 @@ namespace Satolist2
 				var newWindow = new DockingWindow(new TextEditor(), new TextEditorViewModel(mainViewModel, text));
 				newWindow.CanClose = true;
 				newWindow.CanHide = false;
+				newWindow.Closing += TextEditorClosing;
 
 				TextEditors.Add(newWindow);
 				DocumentPane.Children.Add(newWindow);
@@ -204,11 +205,18 @@ namespace Satolist2
 
 			//アクティベート
 			currentWindow.IsActive = true;
-			
-			//TODO: このあたりテキストエディタ本体をアクティブにする方法がいまいちわからない・・・
 			var editor = (TextEditor)currentWindow.Content;
-			editor.MainTextEditor.Focus();
+			editor.RequestFocus();
 			return editor;
+		}
+
+		private void TextEditorClosing(object sender, System.ComponentModel.CancelEventArgs e)
+		{
+			if (sender is DockingWindow window)
+			{
+				TextEditors.Remove(window);
+				window.Closing -= TextEditorClosing;
+			}
 		}
 
 		internal TemporaryTextEditor OpenTemporaryTextEditor(string body, string title)
@@ -226,6 +234,7 @@ namespace Satolist2
 
 			//アクティベート
 			newWindow.IsActive = true;
+			editor.RequestFocus();
 			return editor;
 		}
 

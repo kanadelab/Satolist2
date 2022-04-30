@@ -60,6 +60,10 @@ namespace Satolist2.Control
 			}
 		}
 
+		public void RequestFocus()
+		{
+			Dispatcher.Invoke(new Action(() => { MainTextEditor.Focus(); }), System.Windows.Threading.DispatcherPriority.Render);
+		}
 	}
 
 	//クラス識別用

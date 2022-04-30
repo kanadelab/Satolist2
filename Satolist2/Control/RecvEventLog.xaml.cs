@@ -47,6 +47,7 @@ namespace Satolist2.Control
 				if (item.DataContext is RecvEventLogListItemViewModel itemViewModel)
 				{
 					itemViewModel.OpenTextEditor();
+					e.Handled = true;
 				}
 			}
 		}

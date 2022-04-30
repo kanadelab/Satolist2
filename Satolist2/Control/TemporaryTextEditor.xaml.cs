@@ -26,6 +26,11 @@ namespace Satolist2.Control
 		{
 			InitializeComponent();
 		}
+
+		public void RequestFocus()
+		{
+			Dispatcher.BeginInvoke(new Action(() => { MainTextEditor.Focus(); }), System.Windows.Threading.DispatcherPriority.Render);
+		}
 	}
 
 	internal class TemporaryTextEditorViewModel : NotificationObject, IDockingWindowContent

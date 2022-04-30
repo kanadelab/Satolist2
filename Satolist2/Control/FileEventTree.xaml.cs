@@ -60,6 +60,7 @@ namespace Satolist2.Control
 					if(ev.Items.Count==1)
 					{
 						ev.OpenFirstEventEditor();
+						e.Handled = true;
 					}
 				}
 			}

@@ -33,6 +33,7 @@ namespace Satolist2.Control
 			if(DataContext is SearchResultViewModel vm)
 			{
 				vm.OpenSelectedItemEditor();
+				e.Handled = true;
 			}
 		}
 	}
