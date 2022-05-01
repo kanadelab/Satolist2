@@ -400,7 +400,7 @@ namespace Satolist2.Dialog
 		{
 			get
 			{
-				if(Text.IndexOfAny(System.IO.Path.GetInvalidFileNameChars()) >= 0)
+				if(!DictionaryUtility.IsValidFileName(Text))
 				{
 					return "フォルダ名で使用できない文字が使用されています。";
 				}

@@ -928,7 +928,10 @@ namespace Satolist2.Utility
 			LoadFailed = false;
 			try
 			{
-				Image = new Bitmap(path, false);
+				//Bitmapの引数でロードするとロックしちゃうので、一旦byteに展開して読む
+				byte[] bitmapBytes = System.IO.File.ReadAllBytes(path);
+				var stream = new MemoryStream(bitmapBytes);
+				Image = new Bitmap(stream, false);
 			}
 			catch
 			{
@@ -1038,17 +1041,10 @@ namespace Satolist2.Utility
 
 		public void RenderingLayer(Bitmap source, Bitmap sourcePna, Bitmap dest, int targetX, int targetY, RenderingMethod renderingMethod)
 		{
-			//element0は全部描画するので
-			var targetBits = dest.LockBits(new Rectangle(0, 0, dest.Width, dest.Height), ImageLockMode.ReadWrite, PixelFormat.Format32bppArgb);
-			var sourceBits = source.LockBits(new Rectangle(0, 0, source.Width, source.Height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
-			var sourcePnaBits = sourcePna?.LockBits(new Rectangle(0, 0, source.Width, source.Height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
-
-			//透過色
-			FloatColor leftTopColor = GetPixel(sourceBits, 0, 0);
-
 			//使用不可能な合成メソッドはなにもせず終了
 			switch(renderingMethod)
 			{
+				case RenderingMethod.Base:
 				case RenderingMethod.Add:
 				case RenderingMethod.Overlay:
 				case RenderingMethod.Bind:
@@ -1062,8 +1058,16 @@ namespace Satolist2.Utility
 					return;
 			}
 
+			//element0は全部描画するので
+			var targetBits = dest.LockBits(new Rectangle(0, 0, dest.Width, dest.Height), ImageLockMode.ReadWrite, PixelFormat.Format32bppArgb);
+			var sourceBits = source.LockBits(new Rectangle(0, 0, source.Width, source.Height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+			var sourcePnaBits = sourcePna?.LockBits(new Rectangle(0, 0, source.Width, source.Height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+
+			//透過色
+			FloatColor leftTopColor = GetPixel(sourceBits, 0, 0);
+
 			//ピクセルごとの合成
-			for(int x = 0; x < sourceBits.Width; x++)
+			for (int x = 0; x < sourceBits.Width; x++)
 			{
 				for(int y = 0; y < sourceBits.Height; y++)
 				{

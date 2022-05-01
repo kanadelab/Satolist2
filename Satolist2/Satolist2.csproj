@@ -157,6 +157,9 @@
     <Compile Include="Dialog\GeneralSettingsDialog.xaml.cs">
       <DependentUpon>GeneralSettingsDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dialog\NewGhostDialog.xaml.cs">
+      <DependentUpon>NewGhostDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dialog\ProgressDialog.xaml.cs">
       <DependentUpon>ProgressDialog.xaml</DependentUpon>
     </Compile>
@@ -180,6 +183,7 @@
     </Compile>
     <Compile Include="Model\Dictionary.cs" />
     <Compile Include="Model\EditorSettings.cs" />
+    <Compile Include="Model\GhostTemplate.cs" />
     <Compile Include="Model\TextEditor.cs" />
     <Compile Include="Model\UploadSettings.cs" />
     <Compile Include="Utility\Converter.cs" />
@@ -289,6 +293,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Dialog\GeneralSettingsDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialog\NewGhostDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

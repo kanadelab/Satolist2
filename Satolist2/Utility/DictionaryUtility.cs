@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.VisualBasic.FileIO;
+using System.Text.RegularExpressions;
 
 namespace Satolist2.Utility
 {
@@ -137,6 +138,15 @@ namespace Satolist2.Utility
 			return baseUri.MakeRelativeUri(targetUri).ToString();
 		}
 
+		//末尾にスラッシュがあってもなくてもファイル名部分を取得
+		public static string GetDirectoryName(string path)
+		{
+			if (path.Last() != '/')
+				return System.IO.Path.GetFileName(path);
+			else
+				return System.IO.Path.GetFileName(System.IO.Path.GetDirectoryName(path));
+		}
+
 		//baseFullpathの配下にあるかどうかチェックする
 		public static bool IsChildPath(string baseFullPath, string targetFullPath)
 		{
@@ -153,6 +163,18 @@ namespace Satolist2.Utility
 				return false;
 			}
 			return true;
+		}
+
+		//ファイル名として使用できる文字列か
+		public static bool IsValidFileName(string fileName)
+		{
+			return fileName.IndexOfAny(System.IO.Path.GetInvalidFileNameChars()) < 0;
+		}
+
+		//ファイルパスとして使用できる文字列か
+		public static bool IsValidFilePath(string filePath)
+		{
+			return filePath.IndexOfAny(System.IO.Path.GetInvalidPathChars()) < 0;
 		}
 
 		//ファイルをゴミ箱に捨てる
@@ -206,6 +228,9 @@ namespace Satolist2.Utility
 
 		//インラインイベント
 		public const string InlineEventSeparator = "＃＃＃インラインイベント";
+
+		//辞書命名
+		public static readonly Regex SatoriDictionaryPattern = new Regex("^dic.+\\.txt$");
 
 		//EventTypeに対応する文字を取得
 		public static string GetEventHead(EventType type)

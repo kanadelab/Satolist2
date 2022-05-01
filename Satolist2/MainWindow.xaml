@@ -27,6 +27,8 @@
 				<Separator />
 				<MenuItem Header="編集中のゴーストをエクスプローラで開く" Command="{Binding OpenGhostDirectoryCommand}" />
 				<MenuItem Header="編集中のゴーストをSSPで起動" Command="{Binding BootSSPCommand}" />
+				<Separator />
+				<MenuItem Header="ゴーストを新規作成" Command="{Binding NewGhostCommand}" />
 			</MenuItem>
 			<MenuItem Header="表示">
 				<MenuItem Header="ファイルイベントツリー" x:Name="FileEventTreeVisibleMenu" IsCheckable="True" IsChecked="{Binding IsVisible, Mode=TwoWay}" />
@@ -57,6 +59,8 @@
 			<MenuItem Header="オプション">
 				<MenuItem Header="挿入メニューのカスタマイズ" Command="{Binding EditInsertPaletteCommand}" />
 				<MenuItem Header="アップロード設定" Command="{Binding EditUploadSettingCommand}" />
+				<Separator />
+				<MenuItem Header="さとりすと本体フォルダを開く" Command="{Binding OpenSatolistDirectoryCommand}" />
 			</MenuItem>
 		</Menu>
 		

@@ -470,8 +470,10 @@ namespace Satolist2
 		public ActionCommand AddTextFileCommand { get; }
 		public ActionCommand OpenGhostDirectoryCommand { get; }
 		public ActionCommand BootSSPCommand { get; }
+		public ActionCommand NewGhostCommand { get; }
 		public ActionCommand EditInsertPaletteCommand { get; }
 		public ActionCommand EditUploadSettingCommand { get; }
+		public ActionCommand OpenSatolistDirectoryCommand { get; }
 		public ActionCommand ReloadShioriCommand { get; }
 		public ActionCommand ExportNarCommand { get; }
 		public ActionCommand MakeUpdateFileCommand { get; }
@@ -698,6 +700,19 @@ namespace Satolist2
 				o => Ghost != null
 				);
 
+			NewGhostCommand = new ActionCommand(
+				o =>
+				{
+					var dialog = new NewGhostDialog();
+					if( dialog.ShowDialog() == true)
+					{
+						//ゴーストの作成が実際に行われたのでそれを開く
+						MainWindow.OpenGhost(dialog.DataContext.CreatePath);
+					}
+				},
+				o => Ghost == null	//開いてない場合のみ
+				);
+
 			EditInsertPaletteCommand = new ActionCommand(
 				o =>
 				{
@@ -722,6 +737,17 @@ namespace Satolist2
 						EditorSettings.UploadSettings = d.DataContext.GetItems();
 						EditorSettings.SaveUploadSettings();
 					}
+				}
+				);
+
+			OpenSatolistDirectoryCommand = new ActionCommand(
+				o =>
+				{
+					try
+					{
+						Process.Start(Environment.CurrentDirectory);
+					}
+					catch { }
 				}
 				);
 

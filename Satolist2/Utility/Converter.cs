@@ -117,4 +117,18 @@ namespace Satolist2.Utility
 			throw new NotImplementedException();
 		}
 	}
+
+	//アンダースコアをエスケープしてアンダースコア２個にするコンバータ
+	internal class EscapeUnderScoreConverter : IValueConverter
+	{
+		public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+		{
+			return value.ToString().Replace("_", "__");
+		}
+
+		public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+		{
+			throw new NotImplementedException();
+		}
+	}
 }
