@@ -1,0 +1,52 @@
+// シェルの設定
+// 詳細な情報はhttp://ukadoc.googlecode.com/svn/trunk/manual/descript_shell.html
+
+// ←先頭が//で始まる行は、コメント（動作に反映されないメモ）として使用可能
+
+// surfaces.txtの設定も忘れずに行うこと
+
+//------------------------------------------------------------------------------
+// charset,[文字コード]
+// WindowsはデフォルトがShift_JISなので、分からない場合このまま
+charset,Shift_JIS
+
+// type,[分類]
+// これはシェルのdescript.txtなので、[分類]＝shell
+type,shell
+
+// name,[シェル名]
+name,master
+
+// craftmanw,[作者名]
+// 基本的に、その絵を描いた作者名が記入されることが多い
+craftmanw,作者名
+
+// craftmanurl,[URL]
+// craftmanwで記入した作者のwebページ
+craftmanurl,URL
+
+//------------------------------------------------------------------------------
+// 着せ替え設定(不要なら以下全て削除)
+// [対象].bindoption.group,[表示カテゴリ名],[オプション]
+// [対象]は本体側sakura(またはchar0),相方側kero(またはchar1),3人目以降はchar2～
+// [表示カテゴリ名]はメニューに表示される名前を自由につける
+// [オプション]
+// mustselectでパーツを必ず1つ選択
+// multipleで同じ[表示カテゴリ名]のパーツをいくつでも選択可（全て外すことも可能）
+// ,[オプション]自体が無い場合、パーツを1つ選択（全て外すことも可能）
+sakura.bindoption.group,頭,multiple
+
+// [対象].bindgroup[数値].name,[表示カテゴリ名],[表示パーツ名],[サムネイルファイル名]
+// [数値]はsurfaces.txtで設定した着せ替え設定のanimation[数値]の部分
+// [表示カテゴリ名]は上で設定した表示カテゴリ名
+// [表示パーツ名]はメニューに表示される名前を自由につける
+// ,[サムネイルファイル名]はなくても良い
+sakura.bindgroup100.name,頭,狐耳
+
+// 以下を記述すると、最初からそのパーツを装着している
+// [対象].bindgroup[数値].name,default,1
+sakura.bindgroup100.default,1
+
+// 相方側着せ替え設定
+kero.bindoption.group,頭
+kero.bindgroup100.name,頭,ヘッドドレス

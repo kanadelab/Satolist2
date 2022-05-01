@@ -1,0 +1,125 @@
+システムイベント用
+概ね分かっている人向けのテンプレートなので説明についてはほぼ省略。
+めんどくさい場合はこの辞書を弄らずそのままでもOK。
+
+マウス操作表記については基本的に、なで→「なでられ」、ダブルクリック→「つつかれ」。
+ホイールマウスの場合、ホイール回転→「ころころ」、ホイールクリック→「ころくり」になります。
+
+
+
+＊OnMouseDoubleClick
+＞（Ｒ３）（Ｒ４）つつかれ
+（）
+
+＊OnMouseClick
+＞（Ｒ３）（Ｒ４）ころくり	（Ｒ５）＝＝２
+
+
+＊OnMouseWheel
+＞（Ｒ３）（Ｒ４）ころころ上方向	（Ｒ２）＞０
+＞（Ｒ３）（Ｒ４）ころころ下方向	（Ｒ２）＜０
+
+＃基本的に＞（Ｒ３）（Ｒ４）なでられ、ころころといった分岐
+＃（Ｒ３）は0/1（本体または相方）、（Ｒ４）は当り判定の名前
+
+
+＊OnMinuteChange
+＞（現在時）時	（現在分）＝＝０
+
+＃時間イベント
+
+
+
+＊OnWindowStateRestore
+：（最小化から復帰）
+
+＃最小化
+
+＊OnShellChanging
+：（shellφ：（Ｒ０）に変更します）
+＊OnShellChanged
+：（shellφ：（Ｒ０）に変更しました）
+
+＃シェル
+
+
+＊OnInstallBegin
+：（インストール確認）
+＊OnInstallComplete
+＞（Ｒ１）をインストール
+：（Ｒ１）/（Ｒ０）
+（インストール完了）
+＊OnInstallFailure
+：（インストール失敗）
+＊OnInstallRefuse
+：（accept違いによりインストール失敗）
+
+＃インストール
+
+＃（Ｒ０）＝識別子または失敗理由またはaccept先
+＃（Ｒ１）名前　（Ｒ２）バルーンつきゴーストのバルーン名
+＃識別子＝shell/ghost/balloon/plugin/headline/supplement/ghost with balloon/shell with balloon
+
+
+＊OnUpdatedataCreating
+：（アップデートファイル作成開始）
+＊OnUpdatedataCreated
+：（アップデートファイル作成完了）
+＊OnNarCreating
+：（Narアーカイブ作成開始）
+＊OnNarCreated
+：（Narアーカイブ作成完了）
+
+＃開発関係
+＃（Ｒ０）＝名前、（Ｒ１）＝ファイル名、（Ｒ２）＝識別子
+
+＊OnChoiceTimeout
+：（選択肢タイムアウト）
+＊OnChoiceSelect
+＞（Ｒ０）
+：（選択肢のジャンプ先「（Ｒ０）」がありません）
+
+＃選択枝
+
+
+
+
+＊OnNetworkHeavy
+：（ネットワークが重たいようです）
+
+＊OnSSTPBreak
+：……！？
+
+＊OnKeyPress
+＞（Ｒ０）が押された
+：（Ｒ０）キーが押されました
+
+＃その他
+
+＊rが押された
+＄辞書リロード	実行
+
+＊tが押された
+（）
+
+
+＊OnUserInput
+＞（Ｒ０）を空打ちされた	（is_empty（バイト値,1）（Ｒ１））
+＄（Ｒ０）	（Ｒ１）
+＞（Ｒ０）を教えてもらった
+
+
+＊OnUserInputCancel
+＞（Ｒ０）を空打ちされた	（compare,（Ｒ１）,close）
+
+
+
+
+＊OnSatoriLoad
+＄文「＊」の重複回避	有効、起動中
+＄単語群「＊」の重複回避	有効、トーク中
+＃起動時に必ず呼ばれる
+
+＊OnSatoriUnload
+＄トーク予約のキャンセル	＊
+＃終了時に必ず呼ばれる

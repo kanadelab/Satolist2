@@ -12,7 +12,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SatoriProxy", "SatoriProxy\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SatolistTest", "SatolistTest\SatolistTest.csproj", "{005B4FD0-9715-4627-8217-42CD2BBABB98}"
 EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "SatolistResource", "SatolistResource\SatolistResource.shproj", "{B1229B67-46C4-4A31-8EA9-6736D543C08D}"
+EndProject
 Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		SatolistResource\SatolistResource.projitems*{63f464cc-8796-40b0-a823-18c07b7c86aa}*SharedItemsImports = 4
+		SatolistResource\SatolistResource.projitems*{b1229b67-46c4-4a31-8ea9-6736d543c08d}*SharedItemsImports = 13
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Debug|x64 = Debug|x64

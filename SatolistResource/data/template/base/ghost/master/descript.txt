@@ -1,0 +1,7 @@
+type,ghost
+charset,Shift_JIS
+shiori,satori.dll
+name,新しいゴースト名
+sakura.name,新しいさくら名
+craftman,developer_name
+craftmanw,作者名

@@ -1,0 +1,5 @@
+satolist_template
+name,ゴーストキット改良版Plus
+craftman,神夜 みゅん
+check_default,1
+ignore_saori/ssu.dll,1

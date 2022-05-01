@@ -1,0 +1,65 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects Condition="'$(MSBuildVersion)' == '' Or '$(MSBuildVersion)' &lt; '16.0'">$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>b1229b67-46c4-4a31-8ea9-6736d543c08d</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>SatolistResource</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Content Include="$(MSBuildThisFileDirectory)data\descript.json" />
+    <Content Include="$(MSBuildThisFileDirectory)data\install.json" />
+    <Content Include="$(MSBuildThisFileDirectory)data\template\base\ghost\master\descript.txt" />
+    <Content Include="$(MSBuildThisFileDirectory)data\template\base\ghost\master\satori_conf.txt" />
+    <Content Include="$(MSBuildThisFileDirectory)data\template\satori_license.txt" />
+    <Content Include="$(MSBuildThisFileDirectory)data\template\shell\master\descript.txt" />
+    <Content Include="$(MSBuildThisFileDirectory)data\template\shell\master\readme.txt" />
+    <Content Include="$(MSBuildThisFileDirectory)data\template\shell\master\surface0.png" />
+    <Content Include="$(MSBuildThisFileDirectory)data\template\shell\master\surface01.png" />
+    <Content Include="$(MSBuildThisFileDirectory)data\template\shell\master\surface02.png" />
+    <Content Include="$(MSBuildThisFileDirectory)data\template\shell\master\surface03.png" />
+    <Content Include="$(MSBuildThisFileDirectory)data\template\shell\master\surface04.png" />
+    <Content Include="$(MSBuildThisFileDirectory)data\template\shell\master\surface05.png" />
+    <Content Include="$(MSBuildThisFileDirectory)data\template\shell\master\surface06.png" />
+    <Content Include="$(MSBuildThisFileDirectory)data\template\shell\master\surface07.png" />
+    <Content Include="$(MSBuildThisFileDirectory)data\template\shell\master\surface08.png" />
+    <Content Include="$(MSBuildThisFileDirectory)data\template\shell\master\surface09.png" />
+    <Content Include="$(MSBuildThisFileDirectory)data\template\shell\master\surface10.png" />
+    <Content Include="$(MSBuildThisFileDirectory)data\template\shell\master\surface100.png" />
+    <Content Include="$(MSBuildThisFileDirectory)data\template\shell\master\surface101.png" />
+    <Content Include="$(MSBuildThisFileDirectory)data\template\shell\master\surface11.png" />
+    <Content Include="$(MSBuildThisFileDirectory)data\template\shell\master\surface12.png" />
+    <Content Include="$(MSBuildThisFileDirectory)data\template\shell\master\surface13.png" />
+    <Content Include="$(MSBuildThisFileDirectory)data\template\shell\master\surface14.png" />
+    <Content Include="$(MSBuildThisFileDirectory)data\template\shell\master\surface19.png" />
+    <Content Include="$(MSBuildThisFileDirectory)data\template\shell\master\surface20.png" />
+    <Content Include="$(MSBuildThisFileDirectory)data\template\shell\master\surface21.png" />
+    <Content Include="$(MSBuildThisFileDirectory)data\template\shell\master\surface22.png" />
+    <Content Include="$(MSBuildThisFileDirectory)data\template\shell\master\surface23.png" />
+    <Content Include="$(MSBuildThisFileDirectory)data\template\shell\master\surface24.png" />
+    <Content Include="$(MSBuildThisFileDirectory)data\template\shell\master\surface25.png" />
+    <Content Include="$(MSBuildThisFileDirectory)data\template\shell\master\surface26.png" />
+    <Content Include="$(MSBuildThisFileDirectory)data\template\shell\master\surface30.png" />
+    <Content Include="$(MSBuildThisFileDirectory)data\template\shell\master\surfaces.txt" />
+    <Content Include="$(MSBuildThisFileDirectory)data\template\shell\master\surfacetable.txt" />
+    <Content Include="$(MSBuildThisFileDirectory)data\template\template\ghostkit_plus\descript.txt" />
+    <Content Include="$(MSBuildThisFileDirectory)data\template\template\ghostkit_plus\dic_advanced.txt" />
+    <Content Include="$(MSBuildThisFileDirectory)data\template\template\ghostkit_plus\dic_base.txt" />
+    <Content Include="$(MSBuildThisFileDirectory)data\template\template\ghostkit_plus\dic_extraevent.txt" />
+    <Content Include="$(MSBuildThisFileDirectory)data\template\template\ghostkit_plus\dic_menu.txt" />
+    <Content Include="$(MSBuildThisFileDirectory)data\template\template\ghostkit_plus\dic_network.txt" />
+    <Content Include="$(MSBuildThisFileDirectory)data\template\template\ghostkit_plus\dic_resource.txt" />
+    <Content Include="$(MSBuildThisFileDirectory)data\template\template\ghostkit_plus\dic_talk.txt" />
+    <Content Include="$(MSBuildThisFileDirectory)data\template\template\ghostkit_plus\replace.txt" />
+    <Content Include="$(MSBuildThisFileDirectory)data\template\template\ghostkit_plus\replace_after.txt" />
+    <Content Include="$(MSBuildThisFileDirectory)data\template\template\ghostkit_plus\satori_conf.txt" />
+    <Content Include="$(MSBuildThisFileDirectory)data\template\template\ghostkit_plus\template.txt" />
+    <Content Include="$(MSBuildThisFileDirectory)data\template\template\ghostkit_plus\template_readme.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)data\template\satori.dll" />
+    <None Include="$(MSBuildThisFileDirectory)data\template\template\ghostkit_plus\saori\ssu.dll" />
+  </ItemGroup>
+</Project>

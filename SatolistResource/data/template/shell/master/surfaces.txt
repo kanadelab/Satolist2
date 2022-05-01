@@ -1,0 +1,393 @@
+// シェルの動作設定
+// 詳細な情報はhttp://ukadoc.googlecode.com/svn/trunk/manual/descript_shell_surfaces.html
+
+// ←先頭が//で始まる行は、コメント（動作に反映されないメモ）として使用可能
+
+// descript.txtの設定も忘れずに行うこと
+
+//------------------------------------------------------------------------------
+// さとりすと用サーフェスパレット設定(先頭の//込み)
+// //satolistで始まる記述自体は、さとりすとでのビューに使われるもので、シェル設定には不要
+//satolist.palette.offset,50,45
+
+//------------------------------------------------------------------------------
+// 文字コード設定
+// charset,[文字コード]
+// WindowsはデフォルトがShift_JISなので、分からない場合このまま
+charset,Shift_JIS
+
+//------------------------------------------------------------------------------
+// 基本設定
+descript
+{
+// version,[バージョン]
+// [バージョン]は0にすると旧定義扱い、1で新定義
+// 基本的に1の新定義を推奨
+version,1
+}
+
+//------------------------------------------------------------------------------
+// ここから個別のサーフェス設定
+// 基本の書き方は以下
+// surface[サーフェス番号]
+// {
+// [設定内容]
+// }
+// [サーフェス番号]は複数まとめて設定も可能
+// デフォルトでは[サーフェス番号]＝0が本体側の基本サーフェス、[サーフェス番号]＝10が相方側の基本サーフェスとなる
+// このシェルでは、0～9と20～には本体側サーフェス、10～19には相方側サーフェスを設定している
+//------------------------------------------------------------------------------
+// サーフェス一括設定
+
+// 本体側基本ポーズ
+// サーフェス0～9番と20～22番が、下地は同じで表情だけ違うものなので、共通部分を一括設定する
+// ここで下地の画像や、当たり判定領域など、共通の設定をまとめて行う
+surface0-9,20-22
+{
+// 下地画像を設定
+// element[管理ID],[描画方法],[画像ファイル名],[表示x座標],[表示y座標]
+// [管理ID]は、サーフェスごとに0～
+// 複数枚の画像を合成して表示できる
+// このシェルでは下地の画像を[管理ID]＝0で複数のサーフェスに一括設定し、
+// 表情差分はサーフェスごとに[管理ID]＝1で設定する
+// [描画方法]
+// baseで今までの画像を消去して[画像ファイル名]を表示
+// overlayで現在の画像に上から重ねる形で[画像ファイル名]を表示
+// overlayfastで透明でない部分にだけ[画像ファイル名]を重ねる
+// interpolateで透明な部分にだけ[画像ファイル名]を重ねる
+// replaceで現在の画像に上から重ねる形で追加し、[画像ファイル名]の透明部分はサーフェスも透明になる
+element0,base,surface0.png,0,0
+
+// 当たり判定領域の設定
+// collisionex[数字],[名前],[範囲指定方法],[範囲]
+// [範囲指定方法]
+// rectの場合、四角形での指定となり、[範囲]には[左上x座標,左上y座標,右下x座標,右下y座標]を指定する
+// polygonの場合、多角形での指定となり、[範囲]には[頂点1x座標,頂点1y座標,頂点2x座標,頂点2y座標...]を指定する
+// 設定した範囲にマウスを乗せると指差しアイコンになるが、
+// 例外的に[名前]がbustだと手のひらアイコンになる
+collisionex0,head,rect,34,20,157,72
+collisionex1,bust,rect,63,159,122,198
+collisionex2,skirt,rect,24,301,163,383
+collisionex3,hand,rect,132,252,157,304
+
+// 着せ替えの設定(不要ならanimation100.～を全て削除)
+// ↓この1行は全サーフェスに同じ記述をする
+// animation[数値].interval,bind
+// ↓は[数値]のみ同じ、他は状況に応じて書き換える。[ID]は0～で、多数のパーツを同時につけることも可能
+// animation[数値].pattern[ID],add,[装着するサーフェス番号],0,[表示x座標],[表示y座標]
+// addは上の方にある下地画像設定の描画方法overlayと同じく、上に被せる形となる
+// 0は変化にかかる時間。着せ替えのみであれば、0固定で特に問題は起こらない
+// [数値]はdescript.txtにも設定する必要があるので、分かりやすい番号を推奨
+animation100.interval,bind
+animation100.pattern0,add,100,0,0,0
+}
+
+// 本体側腕組みポーズ
+surface30-42
+{
+// 下地画像を設定
+element0,base,surface30.png,0,0
+
+// 触り反応領域の設定
+collisionex0,head,rect,34,20,157,72
+collisionex1,bust,rect,63,159,122,198
+collisionex2,skirt,rect,24,301,163,383
+
+// 着せ替えの設定
+animation100.interval,bind
+animation100.pattern0,add,100,0,0,0
+}
+
+// 本体側高笑いポーズ
+surface23-26
+{
+// 下地画像を設定
+element0,base,surface23.png,0,0
+
+// 触り反応領域の設定
+collisionex0,head,rect,26,23,151,76
+collisionex1,bust,rect,64,161,96,201
+collisionex2,skirt,rect,29,285,170,382
+collisionex3,hand,rect,49,124,96,149
+
+// 着せ替えの設定
+animation100.interval,bind
+animation100.pattern0,add,101,0,0,0
+}
+
+// 相方側基本ポーズ
+surface10-13
+{
+// 下地画像を設定
+element0,base,surface10.png,0,0
+
+// 触り反応領域の設定
+collisionex0,head,rect,40,71,111,105
+
+// 着せ替えの設定
+animation100.interval,bind
+animation100.pattern0,add,19,0,0,0
+}
+
+// 相方側ツッコミポーズ
+surface14-17
+{
+// 下地画像を設定
+element0,base,surface14.png,0,0
+
+// 触り反応領域の設定
+collisionex0,head,rect,40,71,111,105
+
+// 着せ替えの設定
+animation100.interval,bind
+animation100.pattern0,add,19,0,0,0
+}
+
+//------------------------------------------------------------------------------
+// 着せ替えパーツに使うサーフェスの設定
+// 本体側猫耳、基本ポーズと腕組みポーズで使用
+surface100
+{
+element0,base,surface100.png,0,0
+}
+
+// 本体側猫耳、高笑いポーズで使用
+surface101
+{
+element0,base,surface101.png,0,0
+}
+
+// 相方側ヘッドドレス
+surface19
+{
+element0,base,surface19.png,0,0
+}
+
+surface.append19,100,101
+{
+// さとりすとのサーフェスパレットにこのサーフェスは非表示
+//satolist.palette.visible,0
+// さとりすとのサーフェスビューワにこのサーフェスは非表示
+//satolist.viewer.visible,0
+}
+
+//------------------------------------------------------------------------------
+// サーフェス個別に表情差分を追加
+// 以下のように書くと、既に設定されてるサーフェスに内容を追加できる
+// surface.append[サーフェス番号]
+// {
+// [設定内容]
+// }
+// ただし、表示した行よりも前でsurface[サーフェス番号]が設定済みでないと無効化される
+surface.append0
+{
+// まばたきするアニメーションの設定
+// animation[数値].interval,[タイミング]
+// [数値]は好きな番号、基本的には0～。着せ替えと被らないように注意
+// [タイミング]
+// random,[数字]で、毎秒[数字]分の1の確率でアニメーションが発動
+// runonceでサーフェスが切り替わった時のみ、必ず発動
+// neverで発動しない。ゴースト側から強制的に発動するアニメーションで使うことが多い。例としてはスカートめくりなど
+animation0.interval,random,3
+// animation[数値].pattern[アニメーション番号],[描画方法],[サーフェス番号],[変化にかかる時間(ミリ秒、1000ミリ秒＝1秒)],[x座標],[y座標]
+// [数値]は上で設定したものと同じ値を設定する
+// [アニメーション番号]は0から。コマ送りのように、0から1コマずつ、[変化にかかる時間]だけかけて切り替わるアニメーションとなる
+// [描画方法]は48行目くらいにある一括設定で書いたものと同じ
+// [サーフェス番号]
+// 表示するサーフェス番号
+// アニメーションで表示したい画像は、着せ替えパーツのようにサーフェスにしておく必要がある
+// ここに-1を指定すると、今までのアニメーションの画像処理をクリアする処理となり、-1指定の場合のみ[描画方法],[x座標],[y座標]が無視される
+// [x座標],[y座標]は[サーフェス番号]を表示する場所
+animation0.pattern0,base,6,0,0,0
+animation0.pattern1,base,-1,85,0,0
+// 上記は、pattern0で0ミリ秒後(瞬時)にサーフェス6番(目を瞑ったサーフェス)を、描画方法base(画像置き換え)で表示し、
+// pattern1で85ミリ秒(0.085秒)待ってアニメーション効果をクリアする動作となる
+}
+
+surface.append1
+{
+// 表情差分を上から被せる
+element1,overlay,surface01.png,0,0
+}
+
+surface.append2
+{
+element1,overlay,surface02.png,0,0
+}
+
+surface.append3
+{
+element1,overlay,surface03.png,0,0
+}
+
+surface.append4
+{
+element1,overlay,surface04.png,0,0
+}
+
+surface.append5
+{
+element1,overlay,surface05.png,0,0
+}
+
+surface.append6
+{
+element1,overlay,surface06.png,0,0
+}
+
+surface.append7
+{
+element1,overlay,surface07.png,0,0
+}
+
+surface.append8
+{
+element1,overlay,surface08.png,0,0
+}
+
+surface.append9
+{
+element1,overlay,surface09.png,0,0
+}
+
+surface.append20
+{
+element1,overlay,surface20.png,0,0
+}
+
+surface.append21
+{
+element1,overlay,surface21.png,0,0
+}
+
+surface.append22
+{
+element1,overlay,surface22.png,0,0
+}
+
+surface.append23
+{
+}
+
+surface.append24
+{
+element1,overlay,surface24.png,0,0
+}
+
+surface.append25
+{
+element1,overlay,surface25.png,0,0
+}
+
+surface.append26
+{
+element1,overlay,surface26.png,0,0
+}
+
+surface.append30
+{
+// まばたきするアニメーションの設定
+animation0.interval,random,3
+animation0.pattern0,base,36,0,0,0
+animation0.pattern1,base,-1,80,0,0
+}
+
+surface.append31
+{
+element1,overlay,surface01.png,0,0
+}
+
+surface.append32
+{
+element1,overlay,surface02.png,0,0
+}
+
+surface.append33
+{
+element1,overlay,surface03.png,0,0
+}
+
+surface.append34
+{
+element1,overlay,surface04.png,0,0
+}
+
+surface.append35
+{
+element1,overlay,surface05.png,0,0
+}
+
+surface.append36
+{
+element1,overlay,surface06.png,0,0
+}
+
+surface.append37
+{
+element1,overlay,surface07.png,0,0
+}
+
+surface.append38
+{
+element1,overlay,surface08.png,0,0
+}
+
+surface.append39
+{
+element1,overlay,surface09.png,0,0
+}
+
+surface.append40
+{
+element1,overlay,surface20.png,0,0
+}
+
+surface.append41
+{
+element1,overlay,surface21.png,0,0
+}
+
+surface.append42
+{
+element1,overlay,surface22.png,0,0
+}
+
+//------------------------------------------------------------------------------
+// 相方側のサーフェスに表情差分を追加
+surface.append10
+{
+}
+
+surface.append11
+{
+element1,overlay,surface11.png,0,0
+}
+
+surface.append12
+{
+element1,overlay,surface12.png,0,0
+}
+
+surface.append13
+{
+element1,overlay,surface13.png,0,0
+}
+
+surface.append14
+{
+}
+
+surface.append15
+{
+element1,overlay,surface11.png,0,0
+}
+
+surface.append16
+{
+element1,overlay,surface12.png,0,0
+}
+
+surface.append17
+{
+element1,overlay,surface13.png,0,0
+}
