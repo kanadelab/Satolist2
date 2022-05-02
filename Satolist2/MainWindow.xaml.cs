@@ -33,7 +33,6 @@ namespace Satolist2
 		private List<DockingWindow> EventEditors { get; }
 		private List<DockingWindow> TextEditors { get; }
 		private MainViewModel mainViewModel;
-
 		private LayoutDocumentPane DocumentPane { get; set; }
 
 
@@ -466,6 +465,7 @@ namespace Satolist2
 
 		//汎用コマンド
 		public ActionCommand SaveFileCommand { get; }
+		public ActionCommand ReopenGhostCommand { get; }
 		public ActionCommand AddSatoriDictionaryFileCommand { get; }
 		public ActionCommand AddTextFileCommand { get; }
 		public ActionCommand OpenGhostDirectoryCommand { get; }
@@ -579,6 +579,17 @@ namespace Satolist2
 
 			SaveFileCommand = new ActionCommand(
 				o => AskSave(),
+				o => Ghost != null
+				);
+
+			ReopenGhostCommand = new ActionCommand(
+				o =>
+				{
+					if(AskDiscard())
+					{
+						MainWindow.OpenGhost(initializeData.Ghost, initializeData.ShellDirectoryName);
+					}
+				},
 				o => Ghost != null
 				);
 
@@ -989,6 +1000,19 @@ namespace Satolist2
 			{
 				return false;
 			}
+		}
+
+		//破棄の確認。保存するのではなく破棄だけ。
+		public bool AskDiscard()
+		{
+			//変更点がない
+			if (!IsChanged)
+				return true;
+
+			var result = MessageBox.Show("変更点を破棄してゴーストを読み込み直してもよろしいですか？", "さとりすと", MessageBoxButton.YesNo, MessageBoxImage.Question);
+			if (result == MessageBoxResult.Yes)
+				return true;
+			return false;
 		}
 
 
