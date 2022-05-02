@@ -587,7 +587,7 @@ namespace Satolist2
 				{
 					if(AskDiscard())
 					{
-						MainWindow.OpenGhost(initializeData.Ghost, initializeData.ShellDirectoryName);
+						MainWindow.OpenGhost(Ghost.FullPath, initializeData.ShellDirectoryName);
 					}
 				},
 				o => Ghost != null
@@ -648,6 +648,8 @@ namespace Satolist2
 			AddTextFileCommand = new ActionCommand(
 				o =>
 				{
+					throw new NotImplementedException();
+
 					var saveDialog = new SaveFileDialog();
 					saveDialog.Filter = "テキストファイル(*.txt)|*.txt";
 					saveDialog.AddExtension = true;
