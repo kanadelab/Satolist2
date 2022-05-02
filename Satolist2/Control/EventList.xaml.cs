@@ -1,4 +1,5 @@
-﻿using Satolist2.Model;
+﻿using Satolist2.Dialog;
+using Satolist2.Model;
 using Satolist2.Utility;
 using System;
 using System.Collections.Generic;
@@ -111,6 +112,22 @@ namespace Satolist2.Control
 			}
 		}
 
+		//選択中のアイテムを別のファイルに移動
+		public void MoveSelectedItem()
+		{
+			var dialog = new DictionarySelectDialog(Main);
+			if (dialog.ShowDialog() == true)
+			{
+				foreach (var item in Items.Where(o => o.IsSelected).ToArray())
+				{
+					if (item.Event.Dictionary != dialog.SelectedItem)
+					{
+						item.Event.MoveTo(dialog.SelectedItem);
+					}
+				}
+			}
+		}
+
 		//新規アイテムの追加
 		public void AddSameNameItem(EventModel ev, bool sameCondition)
 		{
@@ -213,6 +230,7 @@ namespace Satolist2.Control
 		public ActionCommand OpenCommand { get; }
 		public ActionCommand AddItemCommand { get; }
 		public ActionCommand AddSameConditionItemCommand { get; }
+		public ActionCommand MoveItemCommand { get; }
 		public ActionCommand RemoveItemCommand { get; }
 
 		public bool IsSelected
@@ -241,6 +259,9 @@ namespace Satolist2.Control
 			AddItemCommand = new ActionCommand(
 				o => Parent.AddSameNameItem(Event, false)
 				);
+			MoveItemCommand = new ActionCommand(
+				o => Parent.MoveSelectedItem()
+				);
 			AddSameConditionItemCommand = new ActionCommand(
 				o => parent.AddSameNameItem(Event, true)
 				);
@@ -255,6 +276,9 @@ namespace Satolist2.Control
 
 			OpenCommand = new ActionCommand(
 				o => Parent.OpenSelectedItemEditor()
+				);
+			MoveItemCommand = new ActionCommand(
+				null, false
 				);
 			RemoveItemCommand = new ActionCommand(
 				null, false

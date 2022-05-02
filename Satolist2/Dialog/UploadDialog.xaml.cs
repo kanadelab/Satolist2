@@ -45,7 +45,7 @@ namespace Satolist2.Dialog
 			base.OnClosing(e);
 		}
 
-		internal UploadDialog(Model.UploadServerSettingModelBase[] servers, Model.GhostModel ghost, Model.GhostTemporarySettings ghostSettings)
+		internal UploadDialog(Model.UploadServerSettingModelBase[] servers, Model.GhostModel ghost, Model.GhostLocalSettings ghostSettings)
 		{
 			Ghost = ghost;
 			Cancellation = new CancellationTokenSource();

@@ -21,52 +21,56 @@ namespace Satolist2.Utility
 		//里々のスクリプトをゴーストに送信
 		public static void SendSatori(GhostModel ghost, string script, EventType type)
 		{
-			var saveData = new SaveDataBuilder(ghost);
-			var dictionaryDirectory = ".";
-
-			if(saveData.Loaded && saveData.SaveData.ContainsKey(Constants.VariableDictionaryDirectory))
+			try
 			{
-				dictionaryDirectory = null;
+				var saveData = new SaveDataBuilder(ghost);
+				var dictionaryDirectory = ".";
 
-				//ロードするよう指定されているフォルダの１つを取り出してそこに配置するようする
-				var sp = saveData.SaveData[Constants.VariableDictionaryDirectory].Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-				foreach(var dir in sp)
+				if (saveData.Loaded && saveData.SaveData.ContainsKey(Constants.VariableDictionaryDirectory))
 				{
-					//有効なフォルダを選択していたらそれを使用する
-					if(Directory.Exists(ghost.FullDictionaryPath + "/" + dir))
+					dictionaryDirectory = null;
+
+					//ロードするよう指定されているフォルダの１つを取り出してそこに配置するようする
+					var sp = saveData.SaveData[Constants.VariableDictionaryDirectory].Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+					foreach (var dir in sp)
 					{
-						dictionaryDirectory = dir;
-						break;
+						//有効なフォルダを選択していたらそれを使用する
+						if (Directory.Exists(ghost.FullDictionaryPath + "/" + dir))
+						{
+							dictionaryDirectory = dir;
+							break;
+						}
 					}
 				}
+
+				//このタイミングで起動できなかったらゴーストがそもそも辞書をロードしようとしてない？
+				if (string.IsNullOrEmpty(dictionaryDirectory))
+					throw new Exception("辞書フォルダが無効");
+
+				//さとりてに読ませる辞書を作成
+				string filePath = ghost.FullDictionaryPath + "/" + dictionaryDirectory + "/" + TemporaryDictionaryFileName;
+				var writer = new StreamWriter(filePath, false, Constants.EncodingShiftJis);
+				writer.WriteLine(Constants.GetEventHead(type) + SatoriteEventName);
+				writer.WriteLine(script);
+				writer.Close();
+
+				//里々にリクエストを投げてイベントを実行
+				var result = ExecuteSatori(ghost.FullDictionaryPath, SatoriteEventName);
+
+				//実行を終えたので一時的な辞書を終了
+				File.Delete(filePath);
+
+				//出力されたさくらスクリプトをSSTPでゴーストに投げる
+				var parsedResult = new ProtocolBuilder();
+				parsedResult.Deserialize(result);
+
+				if (parsedResult.Parameters.ContainsKey("Value"))
+				{
+					string resultScript = parsedResult.Parameters["Value"];
+					SendSakuraScript(ghost, resultScript, true);
+				}
 			}
-
-			//このタイミングで起動できなかったらゴーストがそもそも辞書をロードしようとしてない？
-			if (string.IsNullOrEmpty(dictionaryDirectory))
-				throw new Exception("辞書フォルダが無効");
-
-			//さとりてに読ませる辞書を作成
-			string filePath = ghost.FullDictionaryPath + "/" + dictionaryDirectory + "/" + TemporaryDictionaryFileName;
-			var writer = new StreamWriter(filePath, false, Constants.EncodingShiftJis);
-			writer.WriteLine(Constants.GetEventHead(type) + SatoriteEventName);
-			writer.WriteLine(script);
-			writer.Close();
-
-			//里々にリクエストを投げてイベントを実行
-			var result = ExecuteSatori(ghost.FullDictionaryPath, SatoriteEventName);
-
-			//実行を終えたので一時的な辞書を終了
-			File.Delete(filePath);
-
-			//出力されたさくらスクリプトをSSTPでゴーストに投げる
-			var parsedResult = new ProtocolBuilder();
-			parsedResult.Deserialize(result);
-			
-			if(parsedResult.Parameters.ContainsKey("Value"))
-			{
-				string resultScript = parsedResult.Parameters["Value"];
-				SendSakuraScript(ghost, resultScript, true);
-			}
+			catch { }
 		}
 
 		//さくらスクリプトをゴーストに送信

@@ -25,6 +25,7 @@ namespace Satolist2.Control
 		public TemporaryTextEditor()
 		{
 			InitializeComponent();
+			MainTextEditor.SyntaxHighlighting = new SatoriSyntaxHilighter();
 		}
 
 		public void RequestFocus()
@@ -33,7 +34,7 @@ namespace Satolist2.Control
 		}
 	}
 
-	internal class TemporaryTextEditorViewModel : NotificationObject, IDockingWindowContent
+	internal class TemporaryTextEditorViewModel : TextEditorViewModelBase, IDockingWindowContent
 	{
 		private TextDocument document;
 		private string title;

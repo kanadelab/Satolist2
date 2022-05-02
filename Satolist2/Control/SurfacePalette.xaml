@@ -8,7 +8,7 @@
 			 mc:Ignorable="d" 
 			 d:DesignHeight="450" d:DesignWidth="800">
 	<UserControl.Resources>
-		<util:BitmapImageSourceConverter x:Key="BitmapConverter" />
+		<local:SurfacePaletteViewModelToImageSourceConverter x:Key="BitmapConverter" />
 	</UserControl.Resources>
 	<Grid>
 
@@ -22,7 +22,7 @@
 			<ListView.ItemTemplate>
 				<DataTemplate>
 					<StackPanel>
-						<Image Width="100" Height="100" Source="{Binding Image, Converter={StaticResource BitmapConverter}}" />
+						<Image Width="{Binding SizeX}" Height="{Binding SizeY}" Source="{Binding ., Converter={StaticResource BitmapConverter}}" />
 						<TextBlock Text="{Binding Label}" />
 					</StackPanel>
 				</DataTemplate>

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Satolist2.Model;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Drawing;
@@ -59,7 +60,7 @@ namespace Satolist2.Utility
 
 		public void Load(string shellDirectory)
 		{
-			ShellDirectoryPath = Path.GetFullPath(shellDirectory);
+			ShellDirectoryPath = DictionaryUtility.NormalizeFullPath(shellDirectory);
 
 			var files = Directory.GetFiles(shellDirectory, "*.png");
 			foreach(var file in files)
@@ -960,6 +961,19 @@ namespace Satolist2.Utility
 				images.Add(filePath, result);
 			}
 			return result;
+		}
+	}
+
+	//シェル描画しない版
+	public class FileBaseSurfaceRenderer
+	{
+		public string CacheSurfacePath = "profile/satolist/surfaceviewer/";
+		public Bitmap Image { get; private set; }
+
+		public void Rendering(ShellAnalyzer shell, long id, ShellImageCache cache)
+		{
+			var surfacePath = DictionaryUtility.ConbinePath(CacheSurfacePath, "surface" + id.ToString() + ".png");
+			Image = cache.LoadImage(surfacePath).Image;
 		}
 	}
 

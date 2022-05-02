@@ -24,7 +24,7 @@ namespace Satolist2.Model
 		public InsertItemPaletteModel InsertPalette { get; set; }
 		public UploadServerSettingModelBase[] UploadSettings { get; set; }
 		public TemporarySettings TemporarySettings { get; set; }
-		public GhostTemporarySettings GhostTemporarySettings { get; set; }
+		public GhostLocalSettings GhostTemporarySettings { get; set; }
 		public GeneralSettings GeneralSettings { get; set; }
 
 		[JsonIgnore]
@@ -55,14 +55,14 @@ namespace Satolist2.Model
 			{
 				if (System.IO.File.Exists(path))
 				{
-					GhostTemporarySettings = JsonUtility.DeserializeFromFile<GhostTemporarySettings>(path);
+					GhostTemporarySettings = JsonUtility.DeserializeFromFile<GhostLocalSettings>(path);
 				}
 				if (GhostTemporarySettings == null)
 					throw new Exception();
 			}
 			catch
 			{
-				GhostTemporarySettings = new GhostTemporarySettings();
+				GhostTemporarySettings = new GhostLocalSettings();
 			}
 		}
 
@@ -179,6 +179,8 @@ namespace Satolist2.Model
 		[JsonProperty]
 		public bool UseOwnedSSTP { get; set; }
 		[JsonProperty]
+		public bool IsTextModeDefault { get; set; }
+		[JsonProperty]
 		public int ListedDictionaryInsertEmptyLines { get; set; }
 
 
@@ -187,6 +189,7 @@ namespace Satolist2.Model
 			return new GeneralSettings()
 			{
 				UseOwnedSSTP = UseOwnedSSTP,
+				IsTextModeDefault = IsTextModeDefault,
 				ListedDictionaryInsertEmptyLines = ListedDictionaryInsertEmptyLines
 			};
 		}
@@ -196,6 +199,8 @@ namespace Satolist2.Model
 			if (UseOwnedSSTP != obj.UseOwnedSSTP)
 				return false;
 			if (ListedDictionaryInsertEmptyLines != obj.ListedDictionaryInsertEmptyLines)
+				return false;
+			if (IsTextModeDefault != obj.IsTextModeDefault)
 				return false;
 			return true;
 

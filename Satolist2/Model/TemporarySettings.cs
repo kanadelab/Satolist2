@@ -58,24 +58,5 @@ namespace Satolist2.Model
 		}
 	}
 
-	//ゴースト単位で保存される一時的データ
-	//sspに便乗してghost/master/profileにいれちゃう
-	public class GhostTemporarySettings
-	{
-		//前回アップロードに使用した設定
-		[JsonProperty]
-		public string LastUploadSettingId { get; set; }
-		//前回アップロードで差分更新を使用した(ftp)
-		[JsonProperty]
-		public bool LastUploadUseDiff { get; set; }
-		//前回アップロードでnar更新を使用した
-		[JsonProperty]
-		public bool LastUploadUseNar { get; set; }
-		//前回アップロードで更新ファイルアップロードを使用した
-		[JsonProperty]
-		public bool LastUploadUseFiles { get; set; }
-		//最後に起動を確認した実行ファイル
-		[JsonProperty]
-		public string LastBootExecutePath { get; set; }
-	}
+	
 }

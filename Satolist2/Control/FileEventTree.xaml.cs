@@ -49,6 +49,10 @@ namespace Satolist2.Control
 
 		private void TreeViewItem_MouseDoubleClick(object sender, MouseButtonEventArgs e)
 		{
+			//ハンドル済でもイベントをバブルする問題があるので蹴る
+			if (e.Handled)
+				return;
+
 			if(sender is TreeViewItem item)
 			{
 				if (item.DataContext is FileEventTreeItemDictionaryViewModel dic)
@@ -59,12 +63,28 @@ namespace Satolist2.Control
 				{
 					if(ev.Items.Count==1)
 					{
-						ev.OpenFirstEventEditor();
+						//Handledを立てても最後までイベントがバブルするせいでウインドウをアクティブにしてしまい、イベントエディタからフォーカスを奪ってしまうので
+						//BeginInvokeをここでもかけて多重にすることでイベントエディタ側のフォーカシングを遅延させる
+						Dispatcher.BeginInvoke(
+							new Action(() =>
+							{
+								ev.OpenFirstEventEditor();
+							}), System.Windows.Threading.DispatcherPriority.Render);
 						e.Handled = true;
 					}
 				}
+				else if(item.DataContext is FileEventTreeItemInlineEventViewModel inlineEv)
+				{
+					Dispatcher.BeginInvoke(
+						new Action(() =>
+						{
+							inlineEv.OpenFirstEventEditor();
+						}), System.Windows.Threading.DispatcherPriority.Render);
+					e.Handled = true;
+				}
 			}
 		}
+
 	}
 
 	internal class FileEventTreeViewModel : NotificationObject, IDockingWindowContent, IDisposable
@@ -386,6 +406,7 @@ namespace Satolist2.Control
 		public FileEventTreeItemDictionaryViewModel Dictionary { get; }
 		public ActionCommand AddItemCommand { get; }
 		public ActionCommand MoveItemCommand { get; }
+		public ActionCommand DeleteItemCommand { get; }
 
 		public string Label
 		{
@@ -420,15 +441,35 @@ namespace Satolist2.Control
 			inlineEvents = new Dictionary<string, ObservableCollection<InlineEventModel>>();
 			Dictionary = dict;
 
+			//項目の追加
 			AddItemCommand = new ActionCommand(
 				o => Dictionary.FileEventTree.Main.OpenAddEventDialog(addTarget: Dictionary.Dictionary)
 				);
 
+			//項目の移動
 			MoveItemCommand = new ActionCommand(
 				o =>
 				{
 					var dialog = new DictionarySelectDialog(Dictionary.FileEventTree.Main);
-					dialog.ShowDialog();
+					if(dialog.ShowDialog() == true && Dictionary.Dictionary != dialog.SelectedItem)
+					{
+						foreach(var item in events.ToArray())
+						{
+							item.MoveTo(dialog.SelectedItem);
+						}
+					}
+				}
+				);
+
+			//項目の削除
+			DeleteItemCommand = new ActionCommand(
+				o =>
+				{
+					//TODO: 確認を出すようにしたいところ
+					foreach(var item in events.ToArray())
+					{
+						item.Remove();
+					}
 				}
 				);
 
@@ -558,6 +599,12 @@ namespace Satolist2.Control
 			parentViewModel = parent;
 			EventList = new ReadOnlyObservableCollection<InlineEventModel>(events);
 			Label = events.First().Identifier;
+		}
+
+		public void OpenFirstEventEditor()
+		{
+			if (EventList.Count > 0)
+				parentViewModel.Dictionary.FileEventTree.Main.OpenEventEditor(EventList.First());
 		}
 	}
 }

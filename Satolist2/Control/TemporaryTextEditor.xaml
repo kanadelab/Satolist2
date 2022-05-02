@@ -7,10 +7,32 @@
 			 xmlns:avalonEdit="http://icsharpcode.net/sharpdevelop/avalonedit"
 			 mc:Ignorable="d" 
 			 d:DesignHeight="450" d:DesignWidth="800">
+	<UserControl.Resources>
+		<BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+	</UserControl.Resources>
 	<Grid>
-		<avalonEdit:TextEditor x:Name="MainTextEditor"
+		<Grid.RowDefinitions>
+			<RowDefinition Height="auto" />
+			<RowDefinition Height="*" />
+		</Grid.RowDefinitions>
+		
+		<avalonEdit:TextEditor Grid.Row="1" x:Name="MainTextEditor"
 							   Margin="3" Document="{Binding Document, Mode=OneWay}">
-			
+			<avalonEdit:TextEditor.InputBindings>
+				<KeyBinding Gesture="CTRL+F" Command="{Binding ShowSearchBoxCommand}" />
+			</avalonEdit:TextEditor.InputBindings>
+			<avalonEdit:TextEditor.ContextMenu>
+				<ContextMenu x:Name="ContextMenuRoot">
+					<MenuItem Header="コピー" Command="ApplicationCommands.Copy" InputGestureText="Ctrl+C" />
+					<MenuItem Header="切り取り" Command="ApplicationCommands.Cut" InputGestureText="Ctrl+X" />
+					<MenuItem Header="貼り付け" Command="ApplicationCommands.Paste" InputGestureText="Ctrl+V" />
+					<MenuItem Header="検索" Command="{Binding ShowSearchBoxCommand}" InputGestureText="Ctrl+F" />
+				</ContextMenu>
+			</avalonEdit:TextEditor.ContextMenu>
 		</avalonEdit:TextEditor>
+
+		<local:TextEditorSearchBox x:Name="SearchBox" Grid.Row="0"
+								   AttachEditor="{Binding .,ElementName=MainTextEditor}"
+								   Visibility="{Binding IsShowSearchBox, Converter={StaticResource BoolToVisibilityConverter}, Mode=TwoWay}" />
 	</Grid>
 </UserControl>

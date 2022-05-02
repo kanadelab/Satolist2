@@ -4,8 +4,12 @@
 			 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
 			 xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
 			 xmlns:local="clr-namespace:Satolist2.Control"
+			 xmlns:util="clr-namespace:Satolist2.Utility"
 			 mc:Ignorable="d" 
 			 d:DesignHeight="450" d:DesignWidth="800" SizeChanged="UserControl_SizeChanged">
+	<UserControl.Resources>
+		<util:InvertBoolConverter x:Key="InvertBoolConverter" />
+	</UserControl.Resources>
 	<Grid>
 		<ListView ItemsSource="{Binding Items}" x:Name="MainListView" SelectionMode="Extended" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
 			<ListView.View>
@@ -25,8 +29,12 @@
 								<Separator />
 								<MenuItem Header="同名の項目を追加" Command="{Binding AddItemCommand}" />
 								<MenuItem Header="同名・同条件の項目を追加" Command="{Binding AddSameConditionItemCommand}" />
+								<MenuItem Header="項目を無効化" IsChecked="{Binding Event.Disabled, Mode=TwoWay}" IsCheckable="True" IsEnabled="{Binding Event.IsInlineEvent, Converter={StaticResource InvertBoolConverter}}" />
+								<Separator />
+								<MenuItem Header="項目を別のファイルに移動" Command="{Binding MoveItemCommand}"/>
+								<Separator />
 								<MenuItem Header="項目を削除" Command="{Binding RemoveItemCommand}" />
-								<MenuItem Header="項目を無効化" IsChecked="{Binding Event.Disabled, Mode=TwoWay}" IsCheckable="True" />
+
 							</ContextMenu>
 						</Setter.Value>
 					</Setter>

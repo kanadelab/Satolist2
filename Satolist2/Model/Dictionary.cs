@@ -299,11 +299,11 @@ namespace Satolist2.Model
 			{
 				//削除イベントは発生しない
 				//ObservableCollectionからは外れる
-				RemoveEventInternal(ev);
+				DetachEvent(ev);
 			}
-
 			events.Add(ev);
 			ev.Dictionary = this;
+			Changed();
 		}
 
 		//イベントの削除
@@ -313,6 +313,17 @@ namespace Satolist2.Model
 			if (events.Contains(ev))
 			{
 				ev.RaiseRemoveEvent();
+				ev.Dictionary = null;
+				RemoveEventInternal(ev);
+			}
+		}
+
+		//イベントのデタッチ(削除イベントを発しないが、dictionaryからイベントを切り離す)
+		public void DetachEvent(EventModel ev)
+		{
+			Debug.Assert(events.Contains(ev));
+			if(events.Contains(ev))
+			{
 				ev.Dictionary = null;
 				RemoveEventInternal(ev);
 			}
@@ -333,12 +344,14 @@ namespace Satolist2.Model
 		private void RemoveEventInternal(EventModel ev)
 		{
 			events.Remove(ev);
+			Changed();
 		}
 
 
 		//辞書のシリアライズ
 		public string Serialize()
 		{
+			bool isChanged = IsChanged;
 			var serializedEvents = new List<string>();
 			
 			foreach(var ev in events)
@@ -350,33 +363,38 @@ namespace Satolist2.Model
 				serializedEvents.Add(ev.Serialize());
 			}
 
+			//isChangedの状態を復元
+			IsChanged = isChanged;
+
 			//TODO: 1行あけたい（古いさとりすとのほうはデフォルト０で指定可能だった）
 			return string.Join(Constants.NewLine, serializedEvents);
 		}
 
 		public void Deserialize(string text)
 		{
+			bool isChanged = IsChanged;
 			var lines = text.Split(Constants.NewLineSeparator, StringSplitOptions.None);
-
 			var eventLines = new List<string>();
 			string eventName = null;
 			string eventCondition = null;
+			int eventLineIndex = 0;
 			EventType eventType = EventType.Header;
 
 			bool inlineEvent = false;
-			List<string> escapedLines = new List<string>();
-
-			foreach (var line in lines)
+			for(var index = 0; index < lines.Length; index++)
 			{
+				var line = lines[index];
+
 				//NOTE: エスケープ文字を解釈するかどうか悩ましいところ。１行に解釈まとめられないのでそのまま読んでしまう。
 				EventType nextType;
 				string nextName, nextCondition;
 				if (DictionaryUtility.SplitEventHeader(line, out nextType, out nextName, out nextCondition) && !inlineEvent)
 				{
 					//フラッシュ
-					var ev = new EventModel(eventType, eventName, eventCondition, string.Join(Constants.NewLine, eventLines), IsInlineEventAnalyze);
+					var ev = new EventModel(eventType, eventName, eventCondition, string.Join(Constants.NewLine, eventLines), IsInlineEventAnalyze, eventLineIndex);
 					AddEvent(ev);
 
+					eventLineIndex = index + 1;
 					eventType = nextType;
 					eventName = nextName;
 					eventCondition = nextCondition;
@@ -392,8 +410,11 @@ namespace Satolist2.Model
 				}
 			}
 
-			var lastEvent = new EventModel(eventType, eventName, eventCondition, string.Join(Constants.NewLine, eventLines), IsInlineEventAnalyze);
+			var lastEvent = new EventModel(eventType, eventName, eventCondition, string.Join(Constants.NewLine, eventLines), IsInlineEventAnalyze, eventLineIndex);
 			AddEvent(lastEvent);
+
+			//isChangedの状態を復元
+			IsChanged = isChanged;
 		}
 
 		//変更済みとしてマーク
@@ -448,6 +469,7 @@ namespace Satolist2.Model
 		private EventType type;
 		private bool disabled;
 		private bool isInlineEvent;
+		private int analyzeLineIndex;
 
 		private ObservableCollection<InlineEventModel> inlineEvents = new ObservableCollection<InlineEventModel>();
 
@@ -478,6 +500,17 @@ namespace Satolist2.Model
 			}
 		}
 
+		//インラインかどうか
+		public bool IsInlineEvent
+		{
+			get => isInlineEvent;
+		}
+
+		//解析時の行番号（編集中にずれるので、あくまでも解析時の位置）
+		public int AnalyzeLineIndex
+		{
+			get => analyzeLineIndex;
+		}
 		//本文
 		public string Body
 		{
@@ -606,8 +639,9 @@ namespace Satolist2.Model
 
 		public event Action<EventModel> OnRemove;
 
-		public EventModel(EventType type, string name, string condition, string body, bool isInline = false)
+		public EventModel(EventType type, string name, string condition, string body, bool isInline = false, int analyzeLineIndex = 0)
 		{
+			this.analyzeLineIndex = analyzeLineIndex;
 			isInlineEvent = isInline;
 			Type = type;
 			Name = name;
@@ -653,6 +687,19 @@ namespace Satolist2.Model
 			{
 				Dictionary?.MarkChanged();
 			}
+		}
+
+		//イベントを削除
+		public void Remove()
+		{
+			dictionary.RemoveEvent(this);
+		}
+
+		//イベントを別の辞書に移動
+		public void MoveTo(DictionaryModel target)
+		{
+			dictionary.DetachEvent(this);
+			target.AddEvent(this);
 		}
 	}
 

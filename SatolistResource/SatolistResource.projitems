@@ -9,57 +9,157 @@
     <Import_RootNamespace>SatolistResource</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Content Include="$(MSBuildThisFileDirectory)data\descript.json" />
-    <Content Include="$(MSBuildThisFileDirectory)data\install.json" />
-    <Content Include="$(MSBuildThisFileDirectory)data\template\base\ghost\master\descript.txt" />
-    <Content Include="$(MSBuildThisFileDirectory)data\template\base\ghost\master\satori_conf.txt" />
-    <Content Include="$(MSBuildThisFileDirectory)data\template\satori_license.txt" />
-    <Content Include="$(MSBuildThisFileDirectory)data\template\shell\master\descript.txt" />
-    <Content Include="$(MSBuildThisFileDirectory)data\template\shell\master\readme.txt" />
-    <Content Include="$(MSBuildThisFileDirectory)data\template\shell\master\surface0.png" />
-    <Content Include="$(MSBuildThisFileDirectory)data\template\shell\master\surface01.png" />
-    <Content Include="$(MSBuildThisFileDirectory)data\template\shell\master\surface02.png" />
-    <Content Include="$(MSBuildThisFileDirectory)data\template\shell\master\surface03.png" />
-    <Content Include="$(MSBuildThisFileDirectory)data\template\shell\master\surface04.png" />
-    <Content Include="$(MSBuildThisFileDirectory)data\template\shell\master\surface05.png" />
-    <Content Include="$(MSBuildThisFileDirectory)data\template\shell\master\surface06.png" />
-    <Content Include="$(MSBuildThisFileDirectory)data\template\shell\master\surface07.png" />
-    <Content Include="$(MSBuildThisFileDirectory)data\template\shell\master\surface08.png" />
-    <Content Include="$(MSBuildThisFileDirectory)data\template\shell\master\surface09.png" />
-    <Content Include="$(MSBuildThisFileDirectory)data\template\shell\master\surface10.png" />
-    <Content Include="$(MSBuildThisFileDirectory)data\template\shell\master\surface100.png" />
-    <Content Include="$(MSBuildThisFileDirectory)data\template\shell\master\surface101.png" />
-    <Content Include="$(MSBuildThisFileDirectory)data\template\shell\master\surface11.png" />
-    <Content Include="$(MSBuildThisFileDirectory)data\template\shell\master\surface12.png" />
-    <Content Include="$(MSBuildThisFileDirectory)data\template\shell\master\surface13.png" />
-    <Content Include="$(MSBuildThisFileDirectory)data\template\shell\master\surface14.png" />
-    <Content Include="$(MSBuildThisFileDirectory)data\template\shell\master\surface19.png" />
-    <Content Include="$(MSBuildThisFileDirectory)data\template\shell\master\surface20.png" />
-    <Content Include="$(MSBuildThisFileDirectory)data\template\shell\master\surface21.png" />
-    <Content Include="$(MSBuildThisFileDirectory)data\template\shell\master\surface22.png" />
-    <Content Include="$(MSBuildThisFileDirectory)data\template\shell\master\surface23.png" />
-    <Content Include="$(MSBuildThisFileDirectory)data\template\shell\master\surface24.png" />
-    <Content Include="$(MSBuildThisFileDirectory)data\template\shell\master\surface25.png" />
-    <Content Include="$(MSBuildThisFileDirectory)data\template\shell\master\surface26.png" />
-    <Content Include="$(MSBuildThisFileDirectory)data\template\shell\master\surface30.png" />
-    <Content Include="$(MSBuildThisFileDirectory)data\template\shell\master\surfaces.txt" />
-    <Content Include="$(MSBuildThisFileDirectory)data\template\shell\master\surfacetable.txt" />
-    <Content Include="$(MSBuildThisFileDirectory)data\template\template\ghostkit_plus\descript.txt" />
-    <Content Include="$(MSBuildThisFileDirectory)data\template\template\ghostkit_plus\dic_advanced.txt" />
-    <Content Include="$(MSBuildThisFileDirectory)data\template\template\ghostkit_plus\dic_base.txt" />
-    <Content Include="$(MSBuildThisFileDirectory)data\template\template\ghostkit_plus\dic_extraevent.txt" />
-    <Content Include="$(MSBuildThisFileDirectory)data\template\template\ghostkit_plus\dic_menu.txt" />
-    <Content Include="$(MSBuildThisFileDirectory)data\template\template\ghostkit_plus\dic_network.txt" />
-    <Content Include="$(MSBuildThisFileDirectory)data\template\template\ghostkit_plus\dic_resource.txt" />
-    <Content Include="$(MSBuildThisFileDirectory)data\template\template\ghostkit_plus\dic_talk.txt" />
-    <Content Include="$(MSBuildThisFileDirectory)data\template\template\ghostkit_plus\replace.txt" />
-    <Content Include="$(MSBuildThisFileDirectory)data\template\template\ghostkit_plus\replace_after.txt" />
-    <Content Include="$(MSBuildThisFileDirectory)data\template\template\ghostkit_plus\satori_conf.txt" />
-    <Content Include="$(MSBuildThisFileDirectory)data\template\template\ghostkit_plus\template.txt" />
-    <Content Include="$(MSBuildThisFileDirectory)data\template\template\ghostkit_plus\template_readme.txt" />
+    <Content Include="$(MSBuildThisFileDirectory)data\descript.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="$(MSBuildThisFileDirectory)data\install.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="$(MSBuildThisFileDirectory)data\template\base\ghost\master\descript.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="$(MSBuildThisFileDirectory)data\template\base\ghost\master\satori_conf.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="$(MSBuildThisFileDirectory)data\template\satori_license.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="$(MSBuildThisFileDirectory)data\template\shell\master\descript.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="$(MSBuildThisFileDirectory)data\template\shell\master\readme.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="$(MSBuildThisFileDirectory)data\template\shell\master\surface0.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="$(MSBuildThisFileDirectory)data\template\shell\master\surface01.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="$(MSBuildThisFileDirectory)data\template\shell\master\surface02.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="$(MSBuildThisFileDirectory)data\template\shell\master\surface03.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="$(MSBuildThisFileDirectory)data\template\shell\master\surface04.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="$(MSBuildThisFileDirectory)data\template\shell\master\surface05.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="$(MSBuildThisFileDirectory)data\template\shell\master\surface06.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="$(MSBuildThisFileDirectory)data\template\shell\master\surface07.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="$(MSBuildThisFileDirectory)data\template\shell\master\surface08.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="$(MSBuildThisFileDirectory)data\template\shell\master\surface09.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="$(MSBuildThisFileDirectory)data\template\shell\master\surface10.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="$(MSBuildThisFileDirectory)data\template\shell\master\surface100.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="$(MSBuildThisFileDirectory)data\template\shell\master\surface101.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="$(MSBuildThisFileDirectory)data\template\shell\master\surface11.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="$(MSBuildThisFileDirectory)data\template\shell\master\surface12.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="$(MSBuildThisFileDirectory)data\template\shell\master\surface13.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="$(MSBuildThisFileDirectory)data\template\shell\master\surface14.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="$(MSBuildThisFileDirectory)data\template\shell\master\surface19.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="$(MSBuildThisFileDirectory)data\template\shell\master\surface20.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="$(MSBuildThisFileDirectory)data\template\shell\master\surface21.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="$(MSBuildThisFileDirectory)data\template\shell\master\surface22.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="$(MSBuildThisFileDirectory)data\template\shell\master\surface23.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="$(MSBuildThisFileDirectory)data\template\shell\master\surface24.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="$(MSBuildThisFileDirectory)data\template\shell\master\surface25.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="$(MSBuildThisFileDirectory)data\template\shell\master\surface26.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="$(MSBuildThisFileDirectory)data\template\shell\master\surface30.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="$(MSBuildThisFileDirectory)data\template\shell\master\surfaces.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="$(MSBuildThisFileDirectory)data\template\shell\master\surfacetable.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="$(MSBuildThisFileDirectory)data\template\template\ghostkit_plus\descript.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="$(MSBuildThisFileDirectory)data\template\template\ghostkit_plus\dic_advanced.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="$(MSBuildThisFileDirectory)data\template\template\ghostkit_plus\dic_base.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="$(MSBuildThisFileDirectory)data\template\template\ghostkit_plus\dic_extraevent.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="$(MSBuildThisFileDirectory)data\template\template\ghostkit_plus\dic_menu.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="$(MSBuildThisFileDirectory)data\template\template\ghostkit_plus\dic_network.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="$(MSBuildThisFileDirectory)data\template\template\ghostkit_plus\dic_resource.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="$(MSBuildThisFileDirectory)data\template\template\ghostkit_plus\dic_talk.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="$(MSBuildThisFileDirectory)data\template\template\ghostkit_plus\replace.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="$(MSBuildThisFileDirectory)data\template\template\ghostkit_plus\replace_after.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="$(MSBuildThisFileDirectory)data\template\template\ghostkit_plus\satori_conf.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="$(MSBuildThisFileDirectory)data\template\template\ghostkit_plus\template.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="$(MSBuildThisFileDirectory)data\template\template\ghostkit_plus\template_readme.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
-    <None Include="$(MSBuildThisFileDirectory)data\template\satori.dll" />
-    <None Include="$(MSBuildThisFileDirectory)data\template\template\ghostkit_plus\saori\ssu.dll" />
+    <None Include="$(MSBuildThisFileDirectory)data\template\satori.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="$(MSBuildThisFileDirectory)data\template\template\ghostkit_plus\saori\ssu.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 </Project>

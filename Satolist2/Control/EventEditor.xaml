@@ -58,6 +58,7 @@
 						<MenuItem Header="コピー" Command="ApplicationCommands.Copy" InputGestureText="Ctrl+C" />
 						<MenuItem Header="切り取り" Command="ApplicationCommands.Cut" InputGestureText="Ctrl+X" />
 						<MenuItem Header="貼り付け" Command="ApplicationCommands.Paste" InputGestureText="Ctrl+V" />
+						<MenuItem Header="検索" Command="{Binding ShowSearchBoxCommand}" InputGestureText="Ctrl+F" />
 						<Separator />
 						<MenuItem Header="ゴーストに送信" Command="{Binding SendToGhostCommand}" InputGestureText="Alt+Q" />
 						<Separator />

@@ -12,17 +12,25 @@
 	<UserControl.Resources>
 		<model:InsertItemPaletteShortCutGestureConverter x:Key="ShortCutGestureConverter" />
 		<util:ReferenceToBoolConverter x:Key="ReferenceToBoolConverter" />
+		<BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
 	</UserControl.Resources>
 	<Grid>
-		<avalonEdit:TextEditor x:Name="MainTextEditor" Margin="3" Document="{Binding Document, Mode=OneWay}">
+		<Grid.RowDefinitions>
+			<RowDefinition Height="auto" />
+			<RowDefinition Height="*" />
+		</Grid.RowDefinitions>
+		
+		<avalonEdit:TextEditor Grid.Row="1" x:Name="MainTextEditor" Margin="3" Document="{Binding Document, Mode=OneWay}">
 			<avalonEdit:TextEditor.InputBindings>
 				<KeyBinding Gesture="ALT+Q" Command="{Binding SendToGhostCommand}" />
+				<KeyBinding Gesture="CTRL+F" Command="{Binding ShowSearchBoxCommand}" />
 			</avalonEdit:TextEditor.InputBindings>
 			<avalonEdit:TextEditor.ContextMenu>
 				<ContextMenu x:Name="ContextMenuRoot">
 					<MenuItem Header="コピー" Command="ApplicationCommands.Copy" InputGestureText="Ctrl+C" />
 					<MenuItem Header="切り取り" Command="ApplicationCommands.Cut" InputGestureText="Ctrl+X" />
 					<MenuItem Header="貼り付け" Command="ApplicationCommands.Paste" InputGestureText="Ctrl+V" />
+					<MenuItem Header="検索" Command="{Binding ShowSearchBoxCommand}" InputGestureText="Ctrl+F" />
 					<Separator />
 					<MenuItem Header="ゴーストに送信" Command="{Binding SendToGhostCommand}" InputGestureText="Alt+Q" />
 					<MenuItem Header="挿入" ItemsSource="{Binding Main.InsertPalette.Items, FallbackValue={x:Null}}" IsEnabled="{Binding Main.InsertPalette, Converter={StaticResource ReferenceToBoolConverter}}">
@@ -38,7 +46,11 @@
 					</MenuItem>
 				</ContextMenu>
 			</avalonEdit:TextEditor.ContextMenu>
-			
 		</avalonEdit:TextEditor>
+		
+		<local:TextEditorSearchBox x:Name="SearchBox" Grid.Row="0"
+								   AttachEditor="{Binding .,ElementName=MainTextEditor}"
+								   Visibility="{Binding IsShowSearchBox, Converter={StaticResource BoolToVisibilityConverter}, Mode=TwoWay}" />
+		
 	</Grid>
 </UserControl>

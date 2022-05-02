@@ -41,10 +41,12 @@ namespace Satolist2.Dialog
 		{
 			InitializeComponent();
 			this.main = main;
+			Owner = main.MainWindow;
 
 			OkCommand = new ActionCommand(
 				o =>
 				{
+					DialogResult = true;
 					Close();
 				},
 				o =>

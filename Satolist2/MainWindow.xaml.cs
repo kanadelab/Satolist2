@@ -114,7 +114,7 @@ namespace Satolist2
 			}
 		}
 
-		internal void OpenEventEditor(EventModel ev)
+		internal EventEditor OpenEventEditor(EventModel ev)
 		{
 			var currentWindow = EventEditors.FirstOrDefault(o => ((EventEditorViewModel)o.ViewModel).Event == ev);
 			if (currentWindow == null)
@@ -134,7 +134,9 @@ namespace Satolist2
 
 			//アクティベート
 			currentWindow.IsActive = true;
-			((EventEditor)currentWindow.Content).RequestFocus();
+			var editor = (EventEditor)currentWindow.Content;
+			editor.RequestFocus();
+			return editor;
 		}
 
 		//一致するテキストファイルの編集画面を閉じる
@@ -901,8 +903,11 @@ namespace Satolist2
 
 		public void OpenEventEditor(InlineEventModel ev)
 		{
-			//TODO: 親のイベントを開くので、カレットの位置をインラインイベントに合わせたい
-			MainWindow.OpenEventEditor(ev.ParentEvent);
+			var eventEditor = MainWindow.OpenEventEditor(ev.ParentEvent);
+			if (eventEditor.DataContext is EventEditorViewModel vm)
+			{
+				vm.MoveCaretToLine(ev.InlineEvent.AnalyzeLineIndex);
+			}
 		}
 
 		//テキストエディタのオープン

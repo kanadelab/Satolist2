@@ -89,11 +89,39 @@ namespace Satolist2.Control
 		}
 	}
 
-	internal class EventEditorViewModel : NotificationObject, IDockingWindowContent, IDisposable, IControlBindedReceiver
+	internal class TextEditorViewModelBase : NotificationObject
+	{
+		private bool isShowSearchBox;
+
+		public bool IsShowSearchBox
+		{
+			get => isShowSearchBox;
+			set
+			{
+				isShowSearchBox = value;
+				NotifyChanged();
+			}
+		}
+
+		public ActionCommand ShowSearchBoxCommand { get; }
+
+		public TextEditorViewModelBase()
+		{
+			//検索
+			ShowSearchBoxCommand = new ActionCommand(
+				o =>
+				{
+					IsShowSearchBox = true;
+				}
+				);
+		}
+	}
+
+	internal class EventEditorViewModel : TextEditorViewModelBase, IDockingWindowContent, IDisposable, IControlBindedReceiver
 	{
 		private bool disableBodyPropertyChanged;
 		private EventEditor control;
-		private bool isShowSearchBox;
+		
 
 		public EventModel Event { get; }
 		public string randomizedContentId;
@@ -108,16 +136,6 @@ namespace Satolist2.Control
 			get => eventTypeList;
 		}
 
-		public bool IsShowSearchBox
-		{
-			get => isShowSearchBox;
-			set
-			{
-				isShowSearchBox = value;
-				NotifyChanged();
-			}
-		}
-
 		public string DockingTitle => Event.Identifier;
 
 		public string DockingContentId => randomizedContentId;
@@ -126,7 +144,6 @@ namespace Satolist2.Control
 
 		public ActionCommand SendToGhostCommand {get;}
 		public ActionCommand InsertCommand { get; }
-		public ActionCommand ShowSearchBoxCommand { get; }
 		public MainViewModel Main { get; }
 		public object HilightColors { get; private set; }
 
@@ -158,14 +175,6 @@ namespace Satolist2.Control
 					control.MainTextEditor.Document.Insert(control.MainTextEditor.CaretOffset, ((InsertItemPaletteModel)o).Body);
 				}
 				);
-
-			//検索
-			ShowSearchBoxCommand = new ActionCommand(
-				o =>
-				{
-					IsShowSearchBox = true;
-				}
-				);
 		}
 
 		private void Main_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -185,13 +194,21 @@ namespace Satolist2.Control
 			Event.Body = Document.Text;
 			disableBodyPropertyChanged = false;
 		}
-
 		private void Event_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
 		{
 			if (e.PropertyName == nameof(EventModel.Name))
 				NotifyChanged(nameof(DockingTitle));
 			else if (e.PropertyName == nameof(EventModel.Body) && !disableBodyPropertyChanged)
 				Document.Text = Event.Body;
+		}
+
+		public void MoveCaretToLine(int lineIndex)
+		{
+			if (lineIndex < control.MainTextEditor.LineCount)
+			{
+				control.MainTextEditor.ScrollToLine(lineIndex);
+				control.MainTextEditor.CaretOffset = Document.Lines[lineIndex].Offset;
+			}
 		}
 
 		public void Dispose()

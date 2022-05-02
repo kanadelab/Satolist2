@@ -26,6 +26,7 @@ namespace Satolist2.Control
 		public TextEditor()
 		{
 			InitializeComponent();
+			MainTextEditor.SyntaxHighlighting = new SatoriSyntaxHilighter();
 		}
 
 		internal void UpdateInsertPaletteKeyBindings(InsertItemPaletteModel palette, ICommand command)
@@ -61,7 +62,7 @@ namespace Satolist2.Control
 		}
 	}
 
-	internal class TextEditorViewModel : NotificationObject, IDockingWindowContent, IDisposable, IControlBindedReceiver
+	internal class TextEditorViewModel : TextEditorViewModelBase, IDockingWindowContent, IDisposable, IControlBindedReceiver
 	{
 		private TextEditor control;
 		private bool disableBodyPropertyChanged;

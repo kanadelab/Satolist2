@@ -190,6 +190,7 @@ namespace Satolist2.Control
 						//決定
 						control.AttachEditor.TextArea.Selection = Selection.Create(control.AttachEditor.TextArea, item.Index, item.Index + item.Length);
 						control.AttachEditor.CaretOffset = item.Index;
+						control.AttachEditor.ScrollTo(control.AttachEditor.TextArea.Caret.Line, control.AttachEditor.TextArea.Caret.Column);
 						SetSearchInformation(i);
 						found = true;
 						break;
@@ -206,6 +207,7 @@ namespace Satolist2.Control
 						//決定
 						control.AttachEditor.TextArea.Selection = Selection.Create(control.AttachEditor.TextArea, item.Index, item.Index + item.Length);
 						control.AttachEditor.CaretOffset = item.Index;
+						control.AttachEditor.ScrollTo(control.AttachEditor.TextArea.Caret.Line, control.AttachEditor.TextArea.Caret.Column);
 						SetSearchInformation(i);
 						found = true;
 						break;
@@ -222,6 +224,7 @@ namespace Satolist2.Control
 				Match item = currentMatches[targetIndex];
 				control.AttachEditor.TextArea.Selection = Selection.Create(control.AttachEditor.TextArea, item.Index, item.Index + item.Length);
 				control.AttachEditor.CaretOffset = item.Index;
+				control.AttachEditor.ScrollTo(control.AttachEditor.TextArea.Caret.Line, control.AttachEditor.TextArea.Caret.Column);
 			}
 		}
 

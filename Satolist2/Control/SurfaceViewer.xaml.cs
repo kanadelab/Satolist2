@@ -36,7 +36,7 @@ namespace Satolist2.Control
 		public const string ContentId = "SurfaceViewer";
 		private string shellPath;
 		private ShellAnalyzer shell;
-		private SurfaceRenderer renderer;
+		private FileBaseSurfaceRenderer renderer;
 		private ShellImageCache cache;
 
 		private long selectedSurfaceID;
@@ -71,7 +71,7 @@ namespace Satolist2.Control
 				shell = new ShellAnalyzer();
 				shell.Load(shellPath);
 				cache = new ShellImageCache(shell.ShellDirectoryPath);
-				renderer = new SurfaceRenderer();
+				renderer = new FileBaseSurfaceRenderer();
 
 				NotifyChanged(nameof(SurfaceIDList));
 			}
