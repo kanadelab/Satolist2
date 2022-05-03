@@ -200,6 +200,8 @@ namespace Satolist2.Utility
 		public const char SentenceHead = '＊';
 		//単語群の先頭
 		public const char WordHead = '＠';
+		//文と単語群先頭いずれか
+		public static readonly char[] SentenceOrWordHead = { SentenceHead, WordHead };
 		//変数
 		public const char VariableHead = '＄';
 		//エスケープ

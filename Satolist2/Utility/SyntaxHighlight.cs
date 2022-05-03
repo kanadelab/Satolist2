@@ -137,7 +137,7 @@ namespace Satolist2.Utility
 			{
 				if (!Rules.Contains(SearchHilightRule))
 				{
-					//上から順に照合する様子なので最優先
+					//上から順に照合する様子なので最優先(と思ったけど実際はそうでもなかった…正規表現の複雑さか何かで見られてそう)
 					Rules.Insert(0, SearchHilightRule);
 				}
 			}

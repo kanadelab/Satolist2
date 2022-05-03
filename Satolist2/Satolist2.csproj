@@ -148,6 +148,8 @@
     <Compile Include="Core\FtpClient.cs" />
     <Compile Include="Core\NarNaLoaderClient.cs" />
     <Compile Include="Core\SatoriRecv.cs" />
+    <Compile Include="Core\SSTPCallBackNativeWindow.cs" />
+    <Compile Include="Core\SurfacePreviewImageGenerator.cs" />
     <Compile Include="Dialog\AddEventDialog.xaml.cs">
       <DependentUpon>AddEventDialog.xaml</DependentUpon>
     </Compile>

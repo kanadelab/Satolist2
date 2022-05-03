@@ -68,12 +68,22 @@ namespace Satolist2
 			//スタートメニューは自動で閉じるので復活する
 			StartMenu.Show();
 
+			//さとりすとのSSTP受信用ウインドウを起動
+			Closed += MainWindow_Closed;
+			Core.SSTPCallBackNativeWindow.Create((new System.Windows.Interop.WindowInteropHelper(this)).Handle, null);
+
 #if DEPLOY
 			//公開時はデバッグメニューを封じておく。今のところ根本に消すわけではないけど
 			DebugMainMenuVisibleMenu.Visibility = Visibility.Collapsed;
 			DebugMainMenuVisibleMenu.IsEnabled = false;
 			DebugMainMenu.Hide();
 #endif
+		}
+
+		private void MainWindow_Closed(object sender, EventArgs e)
+		{
+			//SSTPのウインドウ登録も消す
+			Core.SSTPCallBackNativeWindow.Destory();
 		}
 
 		private LayoutDocumentPane FindDocumentPane(ILayoutContainer panel)
@@ -473,6 +483,7 @@ namespace Satolist2
 		public ActionCommand OpenGhostDirectoryCommand { get; }
 		public ActionCommand BootSSPCommand { get; }
 		public ActionCommand NewGhostCommand { get; }
+		public ActionCommand EditGeneralSettingsCommand { get; }
 		public ActionCommand EditInsertPaletteCommand { get; }
 		public ActionCommand EditUploadSettingCommand { get; }
 		public ActionCommand OpenSatolistDirectoryCommand { get; }
@@ -726,6 +737,17 @@ namespace Satolist2
 					}
 				},
 				o => Ghost == null	//開いてない場合のみ
+				);
+
+			EditGeneralSettingsCommand = new ActionCommand(
+				o =>
+				{
+					var dialog = new GeneralSettingsDialog(this);
+					if(dialog.ShowDialog() == true)
+					{
+						EditorSettings.GeneralSettings = dialog.DataContext.Model;
+					}
+				}
 				);
 
 			EditInsertPaletteCommand = new ActionCommand(

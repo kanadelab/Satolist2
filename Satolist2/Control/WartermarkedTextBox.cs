@@ -79,7 +79,7 @@ namespace Satolist2.Control
 				//表示になった場合は再表示を試みるので、テキスト変更と同じことをする
 				OnTextChanged(null);
 			}
-			else
+			else if(wartermarkedAdorner != null)
 			{
 				//親が非表示なら消す
 				wartermarkedAdorner.Visibility = Visibility.Collapsed;

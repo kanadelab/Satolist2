@@ -211,6 +211,65 @@ namespace Satolist2.Control
 			}
 		}
 
+		public void SendToGhost()
+		{
+			var currentLine = control.MainTextEditor.TextArea.Caret.Line;
+			var beginLine = 0;
+			var endLine = 0;
+			EventType type = EventType.Header;
+
+			//開始行の検索(＠または＊を含まない範囲)
+			for (int i = currentLine; i >= 0; i--)
+			{
+				var lineData = control.MainTextEditor.Document.Lines[i];
+				var lineString = control.MainTextEditor.Text.Substring(lineData.Offset, lineData.Length);
+				if (lineString.IndexOf(Constants.SentenceHead) == 0)
+				{
+					//決定。ヘッダの次の行までが対象になる
+					beginLine = i + 1;
+					type = EventType.Sentence;
+					break;
+				}
+				else if (lineString.IndexOf(Constants.WordHead) == 0)
+				{
+					beginLine = i + 1;
+					type = EventType.Word;
+					break;
+				}
+			}
+
+			//最終的に文か単語群が見つからなければ、編集中本体の物なのでそれを使う
+			if (type == EventType.Header)
+				type = Event.Type;
+
+			//終了行の検索
+			for (int i = currentLine + 1; i < control.MainTextEditor.LineCount; i++)
+			{
+				var lineData = control.MainTextEditor.Document.Lines[i];
+				var lineString = control.MainTextEditor.Text.Substring(lineData.Offset, lineData.Length);
+				if (lineString.IndexOfAny(Constants.SentenceOrWordHead) == 0)
+				{
+					//決定。ヘッダの前の行までが対象になる
+					endLine = i - 1;
+					break;
+				}
+			}
+
+			//開始行と終了行が逆になっているようであれば１行に満たない内容なので出力なし
+			if (beginLine >= endLine)
+				return;
+
+			//出力
+			StringBuilder builder = new StringBuilder();
+			for (int i = beginLine; i <= endLine; i++)
+			{
+				var lineData = control.MainTextEditor.Document.Lines[i];
+				var lineString = control.MainTextEditor.Text.Substring(lineData.Offset, lineData.Length);
+				builder.AppendLine(lineString);
+			}
+			Satorite.SendSatori(Main.Ghost, builder.ToString(), type);
+		}
+
 		public void Dispose()
 		{
 			Event.PropertyChanged -= Event_PropertyChanged;

@@ -58,6 +58,7 @@
 				<MenuItem Header="サーバにファイルをアップロード" Command="{Binding UploadGhostCommand}" />
 			</MenuItem>
 			<MenuItem Header="オプション">
+				<MenuItem Header="基本設定" Command="{Binding EditGeneralSettingsCommand}" />
 				<MenuItem Header="挿入メニューのカスタマイズ" Command="{Binding EditInsertPaletteCommand}" />
 				<MenuItem Header="アップロード設定" Command="{Binding EditUploadSettingCommand}" />
 				<Separator />

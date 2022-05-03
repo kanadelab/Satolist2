@@ -5,21 +5,34 @@
 		xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 		xmlns:local="clr-namespace:Satolist2.Dialog"
 		mc:Ignorable="d"
-		Title="GeneralSettingsDialog" Height="450" Width="800">
+		Title="基本設定" Height="450" Width="800">
 	<Grid>
 		<Grid.RowDefinitions>
 			<RowDefinition Height="*" />
 			<RowDefinition Height="auto" />
 		</Grid.RowDefinitions>
 		
-		<StackPanel Margin="5" Grid.Row="0">
-			<CheckBox Content="Owned SSTPによるトークの送信" />
-			<TextBlock Text="リスト化した辞書の項目感に空白行を挿入する" />
-			<TextBox Text="" />
+		<StackPanel Grid.Row="0" Margin="3">
+			<TextBlock Text="さとりすと本体の設定を変更できます。" Margin="3"/>
+			<Separator />
+
+			<CheckBox Content="Owned SSTPによるトークの送信" IsChecked="{Binding Model.UseOwnedSSTP, Mode=TwoWay}" Margin="3"/>
+			<CheckBox Content="リスト化解除モードをデフォルトにする" IsChecked="{Binding Model.IsTextModeDefault, Mode=TwoWay}" Margin="3"/>
+			<StackPanel Margin="3">
+				<TextBlock Text="リスト化した辞書の項目感に空白行を挿入する" Margin="1"/>
+				<ComboBox SelectedItem="{Binding Model.ListedDictionaryInsertEmptyLines, Mode=TwoWay}" Width="100" HorizontalAlignment="Left" Margin="1">
+					<ComboBoxItem>0</ComboBoxItem>
+					<ComboBoxItem>1</ComboBoxItem>
+					<ComboBoxItem>2</ComboBoxItem>
+					<ComboBoxItem>3</ComboBoxItem>
+					<ComboBoxItem>4</ComboBoxItem>
+					<ComboBoxItem>5</ComboBoxItem>
+				</ComboBox>
+			</StackPanel>
 		</StackPanel>
 		<StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right">
-			<Button Content="OK" Margin="3" Width="100"/>
-			<Button Content="キャンセル" Margin="3" Width="100" />
+			<Button Content="OK" Margin="3" Width="100" Command="{Binding OkCommand}"/>
+			<Button Content="キャンセル" Margin="3" Width="100" Command="{Binding CancelCommand}"/>
 		</StackPanel>
 	</Grid>
 </Window>
