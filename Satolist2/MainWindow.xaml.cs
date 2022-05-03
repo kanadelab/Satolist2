@@ -70,7 +70,11 @@ namespace Satolist2
 
 			//さとりすとのSSTP受信用ウインドウを起動
 			Closed += MainWindow_Closed;
-			Core.SSTPCallBackNativeWindow.Create((new System.Windows.Interop.WindowInteropHelper(this)).Handle, null);
+			Dispatcher.BeginInvoke(new Action(() =>
+			{
+				Core.SSTPCallBackNativeWindow.Create((new System.Windows.Interop.WindowInteropHelper(this)).Handle);
+			}), System.Windows.Threading.DispatcherPriority.Render);
+			
 
 #if DEPLOY
 			//公開時はデバッグメニューを封じておく。今のところ根本に消すわけではないけど
@@ -488,6 +492,7 @@ namespace Satolist2
 		public ActionCommand EditUploadSettingCommand { get; }
 		public ActionCommand OpenSatolistDirectoryCommand { get; }
 		public ActionCommand ReloadShioriCommand { get; }
+		public ActionCommand SurfacePreviewTest { get; }
 		public ActionCommand ExportNarCommand { get; }
 		public ActionCommand MakeUpdateFileCommand { get; }
 		public ActionCommand UploadGhostCommand { get; }
@@ -790,6 +795,15 @@ namespace Satolist2
 
 			ReloadShioriCommand = new ActionCommand(
 				o => GhostRuntimeRequest.ReloadShiori(Ghost),
+				o => Ghost != null
+				);
+
+			SurfacePreviewTest = new ActionCommand(
+				o =>
+				{
+					var gen = new Core.SurfacePreviewImageGenerator();
+					gen.Generate(null, this);
+				},
 				o => Ghost != null
 				);
 

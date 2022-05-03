@@ -88,14 +88,11 @@ namespace Satolist2.Core
 		}
 
 		//ウインドウプロシージャ
-		private static IntPtr WindowProc(IntPtr hWnd, int msg, UIntPtr wParam, IntPtr lParam)
+		private static IntPtr WindowProc(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam)
 		{
-			if(msg == 0x004a)	//WM_COPYDATA
+			if(msg == Win32Import.WM_COPYDATA)	//WM_COPYDATA
 			{
-				CopyDataStruct cds = (CopyDataStruct)Marshal.PtrToStructure<CopyDataStruct>(lParam);
-				byte[] data = new byte[cds.cbData];
-				Marshal.Copy(cds.lpData, data, 0, data.Length);
-				var body = Constants.EncodingShiftJis.GetString(data);
+				var body = Win32Import.CopyDataStructToString(lParam);
 				Data(body);
 			}
 			return Win32Import.DefWindowProc(hWnd, msg, wParam, lParam);
@@ -113,7 +110,11 @@ namespace Satolist2.Core
 
 	public static class Win32Import
 	{
-		public delegate IntPtr WndProcDelegate(IntPtr hwnd, int msg, UIntPtr wParam, IntPtr lParam);
+		public const int WM_COPYDATA = 0x004a;
+
+		public static readonly UIntPtr SSTP_DWDATA = (UIntPtr)9801;
+
+		public delegate IntPtr WndProcDelegate(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam);
 		public struct NativeWindowClassEx
 		{
 			public uint cbSize;
@@ -133,6 +134,25 @@ namespace Satolist2.Core
 			public IntPtr hIconSm;
 		}
 
+		public struct CopyDataStruct
+		{
+			public UIntPtr dwData;
+			public uint cbData;
+			public IntPtr lpData;
+		}
+
+		public static string CopyDataStructToString(IntPtr lParam)
+		{
+			CopyDataStruct cds = (CopyDataStruct)Marshal.PtrToStructure<CopyDataStruct>(lParam);
+			if (cds.dwData != SSTP_DWDATA)
+				return null;	//想定外
+
+			byte[] data = new byte[cds.cbData];
+			Marshal.Copy(cds.lpData, data, 0, data.Length);
+			var body = Constants.EncodingShiftJis.GetString(data);
+			return body;
+		}
+
 		//れしばとしてやりとりするためのウインドウ操作系API
 		[DllImport("user32.dll", EntryPoint = "RegisterClassExA", SetLastError = true)]
 		public static extern ushort RegisterClassEx(ref NativeWindowClassEx classEx);
@@ -141,10 +161,12 @@ namespace Satolist2.Core
 		[DllImport("user32.dll", EntryPoint = "CreateWindowExA", SetLastError = true)]
 		public static extern IntPtr CreateWindow(int exstyle, [MarshalAs(UnmanagedType.LPStr)] string className, [MarshalAs(UnmanagedType.LPStr)] string windowName, int style, int x, int y, int width, int height, IntPtr parent, IntPtr menu, IntPtr hInstance, IntPtr param);
 		[DllImport("user32.dll", EntryPoint = "DefWindowProc", SetLastError = true)]
-		public static extern IntPtr DefWindowProc(IntPtr hWnd, int msg, UIntPtr wParam, IntPtr lParam);
+		public static extern IntPtr DefWindowProc(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam);
 		[DllImport("user32.dll", EntryPoint = "UnregisterClassA", SetLastError = true)]
 		public static extern int UnregisterClass([MarshalAs(UnmanagedType.LPStr)] string className, IntPtr hInstance);
 		[DllImport("user32.dll", EntryPoint = "DestroyWindow", SetLastError = true)]
 		public static extern int DestroyWindow(IntPtr hWnd);
+		[DllImport("user32.dll")]
+		public static extern IntPtr SendMessageTimeoutA(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam, uint flags, uint timeout, IntPtr lpdwResult);
 	}
 }

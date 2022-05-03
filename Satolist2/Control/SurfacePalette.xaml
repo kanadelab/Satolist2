@@ -12,22 +12,31 @@
 	</UserControl.Resources>
 	<Grid>
 
-		<ListView ItemsSource="{Binding Items}" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
-			<ListView.ItemsPanel>
-				<ItemsPanelTemplate>
-					<WrapPanel  />
-				</ItemsPanelTemplate>
-			</ListView.ItemsPanel>
+		<Grid>
+			<StackPanel>
+				<TextBlock Text="サーフェスプレビューはロードされていません。&gt;あああ" Margin="3" />
+				<Button Content="ロードする" />
+			</StackPanel>
+		</Grid>
 
-			<ListView.ItemTemplate>
-				<DataTemplate>
-					<StackPanel>
-						<Image Width="{Binding SizeX}" Height="{Binding SizeY}" Source="{Binding ., Converter={StaticResource BitmapConverter}}" />
-						<TextBlock Text="{Binding Label}" />
-					</StackPanel>
-				</DataTemplate>
-			</ListView.ItemTemplate>
-		</ListView>
-		
+		<Grid>
+			<ListView ItemsSource="{Binding Items}" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+				<ListView.ItemsPanel>
+					<ItemsPanelTemplate>
+						<WrapPanel  />
+					</ItemsPanelTemplate>
+				</ListView.ItemsPanel>
+
+				<ListView.ItemTemplate>
+					<DataTemplate>
+						<StackPanel>
+							<Image Width="{Binding SizeX}" Height="{Binding SizeY}" Source="{Binding ., Converter={StaticResource BitmapConverter}}" />
+							<TextBlock Text="{Binding Label}" />
+						</StackPanel>
+					</DataTemplate>
+				</ListView.ItemTemplate>
+			</ListView>
+		</Grid>
+
 	</Grid>
 </UserControl>

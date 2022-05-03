@@ -67,19 +67,25 @@ namespace Satolist2.Utility
 				if (parsedResult.Parameters.ContainsKey("Value"))
 				{
 					string resultScript = parsedResult.Parameters["Value"];
-					SendSakuraScript(ghost, resultScript, true);
+					SendSSTP(ghost, resultScript, true);
 				}
 			}
 			catch { }
 		}
-
-		//さくらスクリプトをゴーストに送信
-		public static void SendSakuraScript(GhostModel ghost, string script, bool useOwnedSSTP)
+		
+		//SEND SSTPの送信
+		public static void SendSSTP(GhostModel ghost, string script, bool useOwnedSSTP, IntPtr hWnd = default(IntPtr))
 		{
+			//TODO: NoTranslate
 			var sstpBuilder = new ProtocolBuilder();
 			sstpBuilder.Command = "SEND SSTP/1.0";
 			sstpBuilder.Parameters["Script"] = script;
 			sstpBuilder.Parameters["Sender"] = "さとりすと";
+
+			if(hWnd != default(IntPtr))
+			{
+				sstpBuilder.Parameters["HWnd"] = hWnd.ToString();
+			}
 
 			//ifghostを設定
 			if (!string.IsNullOrEmpty(ghost.GhostDescriptSakuraName))
@@ -93,7 +99,6 @@ namespace Satolist2.Utility
 			if (useOwnedSSTP)
 			{
 				var fmoRecord = fmoReader.Find(ghost);
-
 				if (fmoRecord != null)
 				{
 					sstpBuilder.Parameters["ID"] = fmoRecord.ID;
@@ -101,6 +106,30 @@ namespace Satolist2.Utility
 			}
 
 			RaiseSSTP(sstpBuilder, fmoReader.Records.First().Value);
+		}
+
+		//EXECUTE SSTPの送信
+		public static void ExecuteSSTP(GhostModel ghost, string command, IntPtr hWnd = default(IntPtr))
+		{
+			var sstpBuilder = new ProtocolBuilder();
+			sstpBuilder.Command = "EXECUTE SSTP/1.1";
+			sstpBuilder.Parameters["Sender"] = "さとりすと";
+			sstpBuilder.Parameters["Charset"] = "Shift_JIS";
+			sstpBuilder.Parameters["Command"] = command;
+			sstpBuilder.Parameters["Reference0"] = "currentghost.shelllist.current.path";
+
+			if (hWnd != default(IntPtr))
+			{
+				sstpBuilder.Parameters["HWnd"] = hWnd.ToString();
+			}
+
+			var fmoReader = new SakuraFMOReader();
+			fmoReader.Read();
+
+			var fmoRecord = fmoReader.Find(ghost);
+			if (fmoRecord == null)
+				throw new Exception();  //ゴーストが見つからない。おそらく、起動していない
+			RaiseSSTP(sstpBuilder, fmoRecord);
 		}
 
 		//里々を起動
@@ -141,30 +170,23 @@ namespace Satolist2.Utility
 			var dataPtr = Marshal.AllocHGlobal(dataBytes.Length);
 			Marshal.Copy(dataBytes, 0, dataPtr, dataBytes.Length);
 
-			var copydata = new CopyDataStruct()
+			var copydata = new Core.Win32Import.CopyDataStruct()
 			{
-				dwData = (UIntPtr)9801,
+				dwData = Core.Win32Import.SSTP_DWDATA,
 				cbData = (uint)dataBytes.Length,
 				lpData = dataPtr
 			};
 			var h = GCHandle.Alloc(copydata, GCHandleType.Pinned);
 
 			//TODO: マジックナンバーフラグの定数化
-			SendMessageTimeoutA(target.HWnd, 0x004A, UIntPtr.Zero, h.AddrOfPinnedObject(), 2, 5000, IntPtr.Zero);
+			Core.Win32Import.SendMessageTimeoutA(target.HWnd, Core.Win32Import.WM_COPYDATA, IntPtr.Zero, h.AddrOfPinnedObject(), 2, 5000, IntPtr.Zero);
 
 			Marshal.FreeHGlobal(dataPtr);
 		}
 
-		[DllImport("USER32.dll")]
-		private static extern IntPtr SendMessageTimeoutA(IntPtr hWnd, uint msg, UIntPtr wParam, IntPtr lParam, uint flags, uint timeout, IntPtr lpdwResult);
 	}
 
 
-	internal struct CopyDataStruct
-	{
-		public UIntPtr dwData;
-		public uint cbData;
-		public IntPtr lpData;
-	}
+
 
 }

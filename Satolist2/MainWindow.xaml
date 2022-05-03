@@ -50,6 +50,7 @@
 			</MenuItem>
 			<MenuItem Header="デバッグ">
 				<MenuItem Header="SHIORI Reload" Command="{Binding ReloadShioriCommand}" InputGestureText="Ctrl+Alt+R" />
+				<MenuItem Header="サーフェスプレビュー更新テスト" Command="{Binding SurfacePreviewTest}" />
 			</MenuItem>
 			<MenuItem Header="更新">
 				<MenuItem Header="narファイル作成" Command="{Binding ExportNarCommand}" />

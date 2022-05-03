@@ -39,6 +39,7 @@ namespace Satolist2.Control
 		private ShellImageCache cache;
 
 		public ObservableCollection<SurfacePaletteItemViewModel> Items { get; }
+		public ActionCommand GenerateSurfacePreviewCommand { get; }
 
 		public SurfacePaletteViewModel(string shellPath)
 		{
@@ -46,6 +47,13 @@ namespace Satolist2.Control
 
 			if (string.IsNullOrEmpty(shellPath))
 				return;
+
+			GenerateSurfacePreviewCommand = new ActionCommand(
+				o =>
+				{
+
+				}
+				);
 
 			//TODO: SurfacePaletteと共有したい
 			shell = new ShellAnalyzer();
