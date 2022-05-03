@@ -13,7 +13,7 @@ namespace Satolist2.Utility
 		public static void ReloadShiori(GhostModel ghost, string message = "SHIORIリロード。")
 		{
 			string script = @"\0\![reload,shiori]\![quicksession,true]" + message;
-			Satorite.SendSSTP(ghost, script, true);
+			Satorite.SendSSTP(ghost, script, true, true);
 		}
 
 	}

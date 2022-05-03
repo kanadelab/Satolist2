@@ -16,7 +16,7 @@
 		
 		<TextBlock Grid.Row="0" Text="{Binding Message}" />
 		<ProgressBar Grid.Row="1" Height="20" Margin="3" IsIndeterminate="{Binding IsIndeterminate}" Value="{Binding Progress}"/>
-		<TextBox Grid.Row="2" AcceptsReturn="True" Text="{Binding Logs}" />
+		<TextBox Grid.Row="2" x:Name="MainTextBox"  AcceptsReturn="True" Text="{Binding Logs}" />
 		<StackPanel Grid.Row="3">
 			<Button Content="OK" x:Name="CloseButton" IsEnabled="False" Click="Button_Click" HorizontalAlignment="Center" Width="100" Height="25" Margin="5"/>
 		</StackPanel>

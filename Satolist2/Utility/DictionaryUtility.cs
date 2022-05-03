@@ -312,6 +312,8 @@ namespace Satolist2.Utility
 		public const string CommandGetShiori = "GET SHIORI/3.0";
 
 		public string Command { get; set; }
+		//EXECUTEについてくる追加データ
+		public string AppendData { get; set; }
 		public Dictionary<string, string> Parameters{get;}
 
 		public ProtocolBuilder()
@@ -331,8 +333,14 @@ namespace Satolist2.Utility
 			foreach(var line in lines.Skip(1))
 			{
 				var sp = line.Split(new string[] { ": " }, 2, StringSplitOptions.None);
-				if(sp.Length == 2)
+				if (sp.Length == 2)
+				{
 					Parameters[sp[0]] = sp[1];
+				}
+				else if (!string.IsNullOrEmpty(line) && line != "\0")
+				{
+					AppendData = line;
+				}
 			}
 		}
 

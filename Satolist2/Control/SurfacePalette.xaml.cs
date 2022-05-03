@@ -33,20 +33,31 @@ namespace Satolist2.Control
 	internal class SurfacePaletteViewModel : NotificationObject, IDockingWindowContent
 	{
 		public const string ContentId = "SurfacePalette";
-		//TODO: SurfaceViewerと独立して持ってしまっているので一緒にしたい
-		private ShellAnalyzer shell;
-		private FileBaseSurfaceRenderer renderer;
+		private MainViewModel main;
 		private ShellImageCache cache;
-
-		public ObservableCollection<SurfacePaletteItemViewModel> Items { get; }
-		public ActionCommand GenerateSurfacePreviewCommand { get; }
-
-		public SurfacePaletteViewModel(string shellPath)
+		private bool isPreviewDataEnable;
+		private ObservableCollection<SurfacePaletteItemViewModel> items;
+		public ReadOnlyObservableCollection<SurfacePaletteItemViewModel> Items
 		{
-			Items = new ObservableCollection<SurfacePaletteItemViewModel>();
+			get => new ReadOnlyObservableCollection<SurfacePaletteItemViewModel>(items);
+		}
 
-			if (string.IsNullOrEmpty(shellPath))
-				return;
+		public ActionCommand GenerateSurfacePreviewCommand { get; }
+		public bool IsPreviewDataEnable
+		{
+			get => isPreviewDataEnable;
+			set
+			{
+				isPreviewDataEnable = value;
+				NotifyChanged();
+			}
+		}
+
+		public SurfacePaletteViewModel(MainViewModel main)
+		{
+			this.main = main;
+			items = new ObservableCollection<SurfacePaletteItemViewModel>();
+
 
 			GenerateSurfacePreviewCommand = new ActionCommand(
 				o =>
@@ -55,35 +66,37 @@ namespace Satolist2.Control
 				}
 				);
 
-			//TODO: SurfacePaletteと共有したい
-			shell = new ShellAnalyzer();
-			shell.Load(shellPath);
-			cache = new ShellImageCache(shell.ShellDirectoryPath);
-			renderer = new FileBaseSurfaceRenderer();
-
-			//存在しているサーフェスをループ
-			foreach(var id in shell.SurfaceIDList)
+			if(main.Ghost != null)
 			{
-				var record = shell.Records[id];
-				if (!record.SatolistPaletteVisible)
-					continue;
+				UpdateSurfacePreviewData();
+			}
+		}
 
-				//画像ファイルとしてしか存在しないモノはパス
-				if (record.IsImageFileOnly)
-					continue;
+		public void UpdateSurfacePreviewData()
+		{
+			if(main.SurfacePreviewData != null)
+			{
+				items.Clear();
+				IsPreviewDataEnable = true;
+				cache = new ShellImageCache(DictionaryUtility.ConbinePath(main.Ghost.FullDictionaryPath, MainViewModel.SurfacePreviewPath));
 
-				var offsetX = record.SatolistPaletteOffsetX;
-				var offsetY = record.SatolistPaletteOffsetY;
-
-				renderer.Rendering(shell, id, cache/*, 100, 100, offsetX, offsetY*/);
-				var imageViewModel = new SurfacePaletteItemViewModel(id, renderer.Image)
+				foreach (var surface in main.SurfacePreviewData.Items)
 				{
-					OffsetX = offsetX,
-					OffsetY = offsetY,
-					SizeX = 100,
-					SizeY = 100
-				};
-				Items.Add(imageViewModel);
+					if (!surface.IsEnableSurfacePalette)
+						continue;
+
+					var item = new SurfacePaletteItemViewModel(surface.Id, surface.FileName, cache)
+					{
+						OffsetX = surface.OffsetX,
+						OffsetY = surface.OffsetY
+					};
+					items.Add(item);
+				}
+			}
+			else
+			{
+				IsPreviewDataEnable = false;
+				items.Clear();
 			}
 		}
 
@@ -95,17 +108,25 @@ namespace Satolist2.Control
 
 	internal class SurfacePaletteItemViewModel
 	{
-		public Bitmap Image { get; set; }
+		public Bitmap Image
+		{
+			get => imageCache.LoadImage(FileName).Image;
+		}
+		private ShellImageCache imageCache;
 		public string Label { get; set; }
+		public string FileName { get; set; }
 		public int OffsetX { get; set; }
 		public int OffsetY { get; set; }
 		public int SizeX { get; set; }
 		public int SizeY { get; set; }
 
-		public SurfacePaletteItemViewModel(long id, Bitmap image)
+		public SurfacePaletteItemViewModel(long id, string fileName, ShellImageCache cache)
 		{
+			imageCache = cache;
 			Label = id.ToString();
-			Image = image;
+			FileName = fileName;
+			SizeX = 100;
+			SizeY = 100;
 		}
 	}
 
@@ -117,9 +138,13 @@ namespace Satolist2.Control
 		{
 			if (value is SurfacePaletteItemViewModel vm)
 			{
-				System.Drawing.Rectangle r = new System.Drawing.Rectangle(vm.OffsetX, vm.OffsetY, vm.SizeX, vm.SizeY);
-				var cloneBitmap = vm.Image.Clone(r, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-				return innerConverter.Convert(cloneBitmap, targetType, parameter, culture);
+				if (vm.Image != null)
+				{
+					System.Drawing.Rectangle r = new System.Drawing.Rectangle(vm.OffsetX, vm.OffsetY, vm.SizeX, vm.SizeY);
+					var cloneBitmap = vm.Image.Clone(r, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+					return innerConverter.Convert(cloneBitmap, targetType, parameter, culture);
+				}
+				return null;
 			}
 			throw new NotImplementedException();
 		}

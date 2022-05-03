@@ -12,23 +12,16 @@
 	</UserControl.Resources>
 	<Grid>
 		<Grid.RowDefinitions>
-			<RowDefinition Height="auto" />
 			<RowDefinition Height="*" />
 		</Grid.RowDefinitions>
 
-		<!--
-		<Menu Grid.Row="0">
-			<MenuItem Header="ファイル" />
-		</Menu>
-		-->
-		<TextBox Text="{Binding ShellPath, Mode=TwoWay}" />
-		<Grid Grid.Row="1">
+		<Grid Grid.Row="0">
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition Width="auto"/>
 				<ColumnDefinition Width="*" />
 			</Grid.ColumnDefinitions>
 
-			<ListView Grid.Column="0" ItemsSource="{Binding SurfaceIDList}" SelectedItem="{Binding SelectedSurfaceID}" />
+			<ListView Grid.Column="0" ItemsSource="{Binding SurfaceList}" SelectedItem="{Binding SelectedSurface}" DisplayMemberPath="Id" />
 			<Image Grid.Column="1" Source="{Binding SelectedSurfaceBitmap, Converter={StaticResource BitmapConverter}}" Width="{Binding SelectedSurfaceBitmap.Width}" />
 		</Grid>
 	</Grid>

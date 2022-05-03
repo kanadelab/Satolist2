@@ -1,6 +1,7 @@
 ﻿using Satolist2.Utility;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Globalization;
@@ -34,80 +35,52 @@ namespace Satolist2.Control
 	internal class SurfaceViewerViewModel : NotificationObject, IDockingWindowContent
 	{
 		public const string ContentId = "SurfaceViewer";
-		private string shellPath;
-		private ShellAnalyzer shell;
-		private FileBaseSurfaceRenderer renderer;
+		private MainViewModel main;
 		private ShellImageCache cache;
+		private bool isPreviewDataEnable;
+		private Core.SurfacePreviewMetaData previewData;
+		private ICollectionView surfaceList;
+		private Core.SurfacePreviewMetaDataRecord selectedSurface;
 
-		private long selectedSurfaceID;
-
-		public SurfaceViewerViewModel(string shellPath)
+		public SurfaceViewerViewModel(MainViewModel main)
 		{
-			if (string.IsNullOrEmpty(shellPath))
-				return;
-			ShellPath = shellPath;
-		}
-
-		public ShellAnalyzer Shell
-		{
-			get => shell;
-			set
+			this.main = main;
+			CollectionViewSource.GetDefaultView(main.SurfacePreviewData);
+			if (main.Ghost != null)
 			{
-				shell = value;
-				NotifyChanged();
-				NotifyChanged(nameof(SurfaceIDList));
+				UpdateSurfacePreviewData();
 			}
 		}
 
-		public string ShellPath
+		public void UpdateSurfacePreviewData()
 		{
-			get => shellPath;
-			set
+			if (main.SurfacePreviewData != null)
 			{
-				shellPath = value;
-				NotifyChanged();
-
-				//リロード
-				shell = new ShellAnalyzer();
-				shell.Load(shellPath);
-				cache = new ShellImageCache(shell.ShellDirectoryPath);
-				renderer = new FileBaseSurfaceRenderer();
-
-				NotifyChanged(nameof(SurfaceIDList));
-			}
-		}
-
-		public IEnumerable<long> SurfaceIDList
-		{
-			get
-			{
-				if (shell != null)
+				cache = new ShellImageCache(DictionaryUtility.ConbinePath(main.Ghost.FullDictionaryPath, MainViewModel.SurfacePreviewPath));
+				IsPreviewDataEnable = true;
+				previewData = main.SurfacePreviewData;
+				SurfaceList = CollectionViewSource.GetDefaultView(previewData.Items);
+				SurfaceList.Filter = (o) =>
 				{
-
-					//フィルタリング
-					foreach (var id in shell.SurfaceIDList)
-					{
-						var record = shell.Records[id];
-
-						if (!record.SatolistViewerVisible)
-							continue;
-
-						//画像ファイルとしてしか存在しないものはパス
-						if (record.IsImageFileOnly)
-							continue;
-
-						yield return id;
-					}
-				}
+					var item = (Core.SurfacePreviewMetaDataRecord)o;
+					return item.IsEnableSurfaceViewer;
+				};
+				SurfaceList.SortDescriptions.Add(new SortDescription("Id", ListSortDirection.Ascending));
+			}
+			else
+			{
+				//プレビューデータが正しくない
+				IsPreviewDataEnable = false;
+				SurfaceList = CollectionViewSource.GetDefaultView(Array.Empty<Core.SurfacePreviewMetaDataRecord>());
 			}
 		}
 
-		public long SelectedSurfaceID
+		public Core.SurfacePreviewMetaDataRecord SelectedSurface
 		{
-			get => selectedSurfaceID;
+			get => selectedSurface;
 			set
 			{
-				selectedSurfaceID = value;
+				selectedSurface = value;
 				NotifyChanged();
 				NotifyChanged(nameof(SelectedSurfaceBitmap));
 			}
@@ -117,13 +90,33 @@ namespace Satolist2.Control
 		{
 			get
 			{
-				if (renderer != null)
+				if (SelectedSurface != null)
 				{
-					renderer.Rendering(shell, selectedSurfaceID, cache);
-					return renderer.Image;
-
+					var path = SelectedSurface.FileName;
+					var loadedImage = cache.LoadImage(path);
+					return loadedImage.Image;
 				}
 				return null;
+			}
+		}
+
+		public bool IsPreviewDataEnable
+		{
+			get => isPreviewDataEnable;
+			private set
+			{
+				isPreviewDataEnable = value;
+				NotifyChanged();
+			}
+		}
+
+		public ICollectionView SurfaceList
+		{
+			get => surfaceList;
+			private set
+			{
+				surfaceList = value;
+				NotifyChanged();
 			}
 		}
 
@@ -132,7 +125,6 @@ namespace Satolist2.Control
 		public string DockingContentId => ContentId;
 
 	}
-
 	
 
 }

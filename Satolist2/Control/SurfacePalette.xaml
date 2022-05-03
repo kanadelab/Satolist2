@@ -9,17 +9,19 @@
 			 d:DesignHeight="450" d:DesignWidth="800">
 	<UserControl.Resources>
 		<local:SurfacePaletteViewModelToImageSourceConverter x:Key="BitmapConverter" />
+		<BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+		<util:InvertBoolToVisibilityConverter x:Key="InvertBoolToVisibilityConverter" />
 	</UserControl.Resources>
 	<Grid>
 
-		<Grid>
+		<Grid Visibility="{Binding IsPreviewDataEnable, Converter={StaticResource InvertBoolToVisibilityConverter}}">
 			<StackPanel>
-				<TextBlock Text="サーフェスプレビューはロードされていません。&gt;あああ" Margin="3" />
-				<Button Content="ロードする" />
+				<TextBlock Text="プレビューデータが作成されていません。&#xa;SSPでゴーストを起動した状態でボタンを押すと、プレビューを構築できます。" Margin="5" />
+				<Button Content="サーフェスプレビューの構築" HorizontalAlignment="Left" Padding="3" Margin="5"/>
 			</StackPanel>
 		</Grid>
 
-		<Grid>
+		<Grid Visibility="{Binding IsPreviewDataEnable, Converter={StaticResource BoolToVisibilityConverter}}">
 			<ListView ItemsSource="{Binding Items}" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
 				<ListView.ItemsPanel>
 					<ItemsPanelTemplate>

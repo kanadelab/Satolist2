@@ -67,14 +67,14 @@ namespace Satolist2.Utility
 				if (parsedResult.Parameters.ContainsKey("Value"))
 				{
 					string resultScript = parsedResult.Parameters["Value"];
-					SendSSTP(ghost, resultScript, true);
+					SendSSTP(ghost, resultScript, true, false);
 				}
 			}
 			catch { }
 		}
 		
 		//SEND SSTPの送信
-		public static void SendSSTP(GhostModel ghost, string script, bool useOwnedSSTP, IntPtr hWnd = default(IntPtr))
+		public static void SendSSTP(GhostModel ghost, string script, bool useOwnedSSTP, bool noTranslate, IntPtr hWnd = default(IntPtr))
 		{
 			//TODO: NoTranslate
 			var sstpBuilder = new ProtocolBuilder();
@@ -91,6 +91,11 @@ namespace Satolist2.Utility
 			if (!string.IsNullOrEmpty(ghost.GhostDescriptSakuraName))
 			{
 				sstpBuilder.Parameters["IfGhost"] = ghost.GhostDescriptSakuraName;
+			}
+
+			if(noTranslate)
+			{
+				sstpBuilder.Parameters["Option"] = "notranslate";
 			}
 
 			var fmoReader = new SakuraFMOReader();
@@ -116,7 +121,6 @@ namespace Satolist2.Utility
 			sstpBuilder.Parameters["Sender"] = "さとりすと";
 			sstpBuilder.Parameters["Charset"] = "Shift_JIS";
 			sstpBuilder.Parameters["Command"] = command;
-			sstpBuilder.Parameters["Reference0"] = "currentghost.shelllist.current.path";
 
 			if (hWnd != default(IntPtr))
 			{

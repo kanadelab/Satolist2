@@ -124,12 +124,20 @@ namespace Satolist2.Dialog
 		{
 			Message = message;
 			Logs = Logs + message + Constants.NewLine;
+			dialog.MainTextBox.ScrollToEnd();
 		}
 
 		public void SetMessage(string message, double progress)
 		{
 			SetMessage(message);
 			Progress = progress;
+		}
+
+		public void SetProgress(Progress progress)
+		{
+			SetMessage(progress.Message);
+			IsIndeterminate = !progress.UseProgress;
+			Progress = progress.Value;
 		}
 	}
 }

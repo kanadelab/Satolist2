@@ -929,10 +929,18 @@ namespace Satolist2.Utility
 			LoadFailed = false;
 			try
 			{
-				//Bitmapの引数でロードするとロックしちゃうので、一旦byteに展開して読む
-				byte[] bitmapBytes = System.IO.File.ReadAllBytes(path);
-				var stream = new MemoryStream(bitmapBytes);
-				Image = new Bitmap(stream, false);
+				if (System.IO.File.Exists(path))
+				{
+					//Bitmapの引数でロードするとロックしちゃうので、一旦byteに展開して読む
+					byte[] bitmapBytes = System.IO.File.ReadAllBytes(path);
+					var stream = new MemoryStream(bitmapBytes);
+					Image = new Bitmap(stream, false);
+				}
+				else
+				{
+					//存在しない
+					LoadFailed = true;
+				}
 			}
 			catch
 			{

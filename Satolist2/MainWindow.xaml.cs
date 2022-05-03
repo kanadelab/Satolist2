@@ -453,10 +453,25 @@ namespace Satolist2
 	//ワークスペースは切り離せるのが望ましそう。Dockのビューモデルとかもくっついてそうだし
 	internal class MainViewModel : NotificationObject
 	{
+		public const string SurfacePreviewPath = "profile/satolist/surfacepreview";
+		private const string SurfacePreviewMetadataPath = "surfaces.json";
+
 		public static EditorSettings EditorSettings { get; private set; }
+		private Core.SurfacePreviewMetaData surfacePreviewData;
 
 		public MainWindow MainWindow { get; }
 		public GhostModel Ghost { get; private set; }
+
+		//サーフェスプレビューデータ
+		public Core.SurfacePreviewMetaData SurfacePreviewData
+		{
+			get => surfacePreviewData;
+			set
+			{
+				surfacePreviewData = value;
+				NotifyChanged();
+			}
+		}
 
 		//それぞれのドッキングウィンドウ
 		public FileEventTreeViewModel FileEventTreeViewModel { get; }
@@ -572,6 +587,9 @@ namespace Satolist2
 				{
 					shellPath = Ghost.FullPath + "/shell/" + initializeData.ShellDirectoryName;
 				}
+
+				//サーフェスプレビューデータを読込
+				LoadSurfacePreviewData();
 			}
 
 			EventEditors = new List<EventEditorViewModel>();
@@ -579,8 +597,8 @@ namespace Satolist2
 			EventListViewModel = new EventListViewModel(this);
 			SearchMenuViewModel = new SearchMenuViewModel(this);
 			SearchResultViewModel = new SearchResultViewModel(this);
-			SurfaceViewerViewModel = new SurfaceViewerViewModel(shellPath);
-			SurfacePaletteViewModel = new SurfacePaletteViewModel(shellPath);
+			SurfaceViewerViewModel = new SurfaceViewerViewModel(this);
+			SurfacePaletteViewModel = new SurfacePaletteViewModel(this);
 			DebugMainMenuViewModel = new DebugMainMenuViewModel(this,
 				System.IO.Path.GetFullPath("../../../TestSampleGhost"),
 				"master"
@@ -802,7 +820,35 @@ namespace Satolist2
 				o =>
 				{
 					var gen = new Core.SurfacePreviewImageGenerator();
-					gen.Generate(null, this);
+					var dialog = new ProgressDialog();
+
+					var task = gen.Generate(this, (success) =>
+					{
+						if (success)
+						{
+							//ProgressDialog
+							dialog.DataContext.SetMessage("成功しました。");
+						}
+						else
+						{
+							dialog.DataContext.SetMessage("失敗しました。");
+						}
+
+					},
+					(progress) =>
+					{
+
+						dialog.DataContext.SetProgress(progress);
+
+					});
+
+					dialog.SetTask(task);
+					dialog.ShowDialog();
+
+					//再読み込み
+					LoadSurfacePreviewData();
+					SurfacePaletteViewModel.UpdateSurfacePreviewData();
+					SurfaceViewerViewModel.UpdateSurfacePreviewData();
 				},
 				o => Ghost != null
 				);
@@ -1058,6 +1104,21 @@ namespace Satolist2
 			return false;
 		}
 
+
+		//シェルプレビューデータの読込
+		private void LoadSurfacePreviewData()
+		{
+			var metadataPath = DictionaryUtility.ConbinePath(Ghost.FullDictionaryPath, SurfacePreviewPath, SurfacePreviewMetadataPath);
+			try
+			{
+				SurfacePreviewData = JsonUtility.DeserializeFromFile<Core.SurfacePreviewMetaData>(metadataPath);
+			}
+			catch
+			{
+				SurfacePreviewData = null;
+			}
+		}
+		
 
 	}
 }
