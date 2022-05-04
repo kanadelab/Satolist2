@@ -203,7 +203,6 @@ namespace Satolist2.Control
 					var fileBody = System.IO.File.ReadAllText(fullPath, Constants.EncodingShiftJis);
 					Deserialize(fileBody);
 				}
-				throw new Exception();
 				loadState = EditorLoadState.Loaded;
 				return true;
 			}
