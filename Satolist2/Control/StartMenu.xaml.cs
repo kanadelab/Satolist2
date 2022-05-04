@@ -76,6 +76,9 @@ namespace Satolist2.Control
 					RefleshList();
 				}
 				);
+
+			//リスト構築
+			RefleshList();
 		}
 
 		public void OpenSelectedGhost()

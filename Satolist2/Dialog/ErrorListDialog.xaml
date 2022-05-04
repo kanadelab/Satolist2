@@ -1,0 +1,41 @@
+﻿<Window x:Class="Satolist2.Dialog.ErrorListDialog"
+		xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+		xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+		xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+		xmlns:local="clr-namespace:Satolist2.Dialog"
+		mc:Ignorable="d"
+		Title="{Binding Title}" Height="450" Width="800" WindowStartupLocation="CenterOwner">
+	<Grid>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="auto" />
+			<RowDefinition Height="*" />
+			<RowDefinition Height="auto" />
+		</Grid.RowDefinitions>
+
+		<StackPanel Grid.Row="0" Margin="3">
+			<TextBlock Text="{Binding Description}" TextWrapping="Wrap" />
+		</StackPanel>
+
+		<ListView Grid.Row="1" Margin="3" ItemsSource="{Binding Items}">
+			<ListView.ItemTemplate>
+				<DataTemplate>
+					<StackPanel>
+						<TextBlock Text="{Binding Title}" Foreground="DarkRed" TextWrapping="Wrap" />
+						<TextBlock Text="{Binding Description}" TextWrapping="Wrap" />
+					</StackPanel>
+				</DataTemplate>
+			</ListView.ItemTemplate>
+		</ListView>
+
+		<StackPanel Visibility="Collapsed" x:Name="OkButtonPanel" Grid.Row="2" Orientation="Horizontal" Margin="3" HorizontalAlignment="Center">
+			<Button Command="{Binding OkCommand}" Content="OK" Padding="2" Width="100" Margin="3"/>
+		</StackPanel>
+
+		<StackPanel Visibility="Visible" x:Name="YesNoButtonPanel" Grid.Row="2" Orientation="Horizontal" Margin="3" HorizontalAlignment="Center">
+			<Button Command="{Binding OkCommand}" Content="はい" Padding="2" Width="100" Margin="3"/>
+			<Button Command="{Binding CancelCommand}" Content="いいえ" Padding="2" Width="100" Margin="3"/>
+		</StackPanel>
+		
+	</Grid>
+</Window>

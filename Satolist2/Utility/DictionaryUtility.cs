@@ -127,6 +127,16 @@ namespace Satolist2.Utility
 			return path.Replace('/', '\\');
 		}
 
+		//末尾がパス区切りなら取り除く
+		public static string RemoveLastSlash(string path)
+		{
+			if (string.IsNullOrEmpty(path))
+				return string.Empty;
+			if (path.Last() == '/')
+				return path.Substring(0, path.Length - 1);
+			return path;
+		}
+
 		//フルパス同士から相対パスの作成
 		public static string MakeRelativePath(string baseFullPath, string targetFullPath)
 		{

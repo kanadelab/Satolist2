@@ -24,6 +24,9 @@ namespace Satolist2.Model
 		//ゴーストのprofile格納
 		private const string GhostLocalSettingPath = "profile/satolist/ghost.json";
 
+		//ロードエラー定型文
+		private const string LoadErrorMessage = "設定ファイルのロードに失敗しました。";
+
 		public InsertItemPaletteModel InsertPalette { get; set; }
 		public UploadServerSettingModelBase[] UploadSettings { get; set; }
 		public TemporarySettings TemporarySettings { get; set; }
@@ -31,13 +34,12 @@ namespace Satolist2.Model
 		public GeneralSettings GeneralSettings { get; set; }
 
 		[JsonIgnore]
-		public bool IsLoadFailed { get; set; }
+		public List<Dialog.ErrorListDialogItemViewModel> LoadErrors { get; }
 
 		public EditorSettings()
 		{
+			LoadErrors = new List<Dialog.ErrorListDialogItemViewModel>();
 			LoadTemporarySettings();
-
-			//TODO: 起動失敗処理？
 			LoadInsertPalette();
 			LoadUploadSettings();
 			LoadGeneralSettings();
@@ -60,8 +62,8 @@ namespace Satolist2.Model
 			}
 			catch
 			{
+				//エラー
 				GhostTemporarySettings = new GhostLocalSettings();
-				IsLoadFailed = true;
 			}
 		}
 
@@ -83,7 +85,13 @@ namespace Satolist2.Model
 					InsertPalette = JsonUtility.DeserializeFromFile<InsertItemPaletteModel>(InsertPaettePath);
 				}
 			}
-			catch { }
+			catch
+			{
+				var err = new Dialog.ErrorListDialogItemViewModel();
+				err.Title = DictionaryUtility.NormalizeFullPath(InsertPaettePath);
+				err.Description = LoadErrorMessage;
+				LoadErrors.Add(err);
+			}
 		}
 
 		public void SaveInsertPalette()
@@ -93,7 +101,9 @@ namespace Satolist2.Model
 				System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(InsertPaettePath));
 				JsonUtility.SerializeToFile(InsertPaettePath, InsertPalette);
 			}
-			catch { }
+			catch
+			{
+			}
 		}
 
 		public void LoadUploadSettings()
@@ -124,7 +134,10 @@ namespace Satolist2.Model
 			}
 			catch
 			{
-				IsLoadFailed = true;
+				var err = new Dialog.ErrorListDialogItemViewModel();
+				err.Title = DictionaryUtility.NormalizeFullPath(UploadSettingPath);
+				err.Description = LoadErrorMessage;
+				LoadErrors.Add(err);
 			}
 		}
 
@@ -152,7 +165,10 @@ namespace Satolist2.Model
 			catch
 			{
 				TemporarySettings = new TemporarySettings();
-				IsLoadFailed = true;
+				var err = new Dialog.ErrorListDialogItemViewModel();
+				err.Title = DictionaryUtility.NormalizeFullPath(TemporarySettingsPath);
+				err.Description = LoadErrorMessage;
+				LoadErrors.Add(err);
 			}
 		}
 
@@ -191,7 +207,10 @@ namespace Satolist2.Model
 			}
 			catch
 			{
-				IsLoadFailed = true;
+				var err = new Dialog.ErrorListDialogItemViewModel();
+				err.Title = DictionaryUtility.NormalizeFullPath(GeneralSettingPath);
+				err.Description = LoadErrorMessage;
+				LoadErrors.Add(err);
 			}
 
 			if(GeneralSettings == null)

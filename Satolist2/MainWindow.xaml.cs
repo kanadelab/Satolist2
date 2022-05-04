@@ -643,8 +643,29 @@ namespace Satolist2
 			if(EditorSettings == null)
 			{
 				EditorSettings = new EditorSettings();
+
+				if (EditorSettings.LoadErrors.Count > 0)
+				{
+					var errDialog = new ErrorListDialog(null, true);
+					errDialog.DataContext.Title = "設定ファイル読込エラー";
+					errDialog.DataContext.Description = "さとりすとの設定ファイルの読込でエラーが発生しました。\r\nファイルが破損している可能性があります。\r\nこのまま編集すると読込に失敗した設定が初期状態に戻りますが、続行しますか？";
+					errDialog.DataContext.SetErrorItems(EditorSettings.LoadErrors);
+					if (errDialog.ShowDialog() != true)
+					{
+						Environment.Exit(1);
+					}
+				}
+
 				//同じタイミングでリストデータ周辺をロード
-				DataModelManager.Load();
+				try
+				{
+					DataModelManager.Load();
+				}
+				catch(Exception ex)
+				{
+					MessageBox.Show("さとりすとの起動に必要な設定ファイルのロードに失敗したため起動できません。\r\nさとりすとを上書き再インストールすると解決するかもしれません。\r\n\r\n" + ex, "エラー");
+					Environment.Exit(1);
+				}
 			}
 
 			//ゴーストのローカル情報のロード
@@ -1060,9 +1081,31 @@ namespace Satolist2
 
 
 			//読込エラーが発生している場合に通知
+			List<ErrorListDialogItemViewModel> errorItems = new List<ErrorListDialogItemViewModel>();
 			foreach (var err in SaveLoadPanes.Where(o => o.LoadState == EditorLoadState.LoadFailed))
 			{
-				//TODO: ロードエラー通知
+				var item = new ErrorListDialogItemViewModel()
+				{
+					Title = err.SaveFilePath,
+					Description = "ファイルの読込または解析に失敗しました。"
+				};
+				errorItems.Add(item);
+			}
+
+			//エラーダイアログ表示
+			if(errorItems.Count > 0)
+			{
+				//エラーダイアログの表示
+				MainWindow.Dispatcher.BeginInvoke(
+					new Action(() =>
+					{
+						var errDialog = new ErrorListDialog(this, false);
+						errDialog.DataContext.Title = "ゴースト読込エラー";
+						errDialog.DataContext.Description = "ゴーストの一部ファイルのロードに失敗しています。\r\n上書き保存でデータが消える可能性もあるので、一度さとりすとを閉じてファイルの状態を確認してからゴーストを開き直すことをおすすめします。";
+						errDialog.DataContext.SetErrorItems(errorItems);
+						errDialog.ShowDialog();
+					}
+					));
 			}
 		}
 
@@ -1152,20 +1195,28 @@ namespace Satolist2
 			if(dialog.Result == MessageBoxResult.Yes)
 			{
 				//現時点ではエラーはダイアログに表示するだけにしておく
-				var errorList = new List<string>();
+				var errorList = new List<ErrorListDialogItemViewModel>();
 
 				//保存
 				foreach( var saveItem in dialogViewModel.Items.Where(o => o.IsSave))
 				{
 					bool success = saveItem.SaveItem.Save();
 					if (!success)
-						errorList.Add(saveItem.SaveFilePath);
+					{
+						var error = new ErrorListDialogItemViewModel();
+						error.Description = "保存に失敗しました。";
+						error.Title = saveItem.SaveFilePath;
+						errorList.Add(error);
+					}
 				}
 
 				if(errorList.Count > 0)
 				{
-					var message = string.Format("保存に失敗しました。\r\n\r\n{0}", DictionaryUtility.JoinLines(errorList));
-					MessageBox.Show(message, "さとりすと", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+					var errDialog = new ErrorListDialog(this, false);
+					errDialog.DataContext.Description = "保存に失敗したファイルがあります。";
+					errDialog.DataContext.Title = "保存";
+					errDialog.DataContext.SetErrorItems(errorList);
+					errDialog.ShowDialog();
 					return false;
 				}
 				return true;

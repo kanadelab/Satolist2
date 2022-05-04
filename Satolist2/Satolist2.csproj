@@ -156,6 +156,9 @@
     <Compile Include="Dialog\DictionarySelectDialog.xaml.cs">
       <DependentUpon>DictionarySelectDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dialog\ErrorListDialog.xaml.cs">
+      <DependentUpon>ErrorListDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dialog\GeneralSettingsDialog.xaml.cs">
       <DependentUpon>GeneralSettingsDialog.xaml</DependentUpon>
     </Compile>
@@ -293,6 +296,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Dialog\DictionarySelectDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialog\ErrorListDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
