@@ -5,7 +5,8 @@
 		xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 		xmlns:local="clr-namespace:Satolist2.Dialog"
 		mc:Ignorable="d"
-		Title="新しい項目を追加する" Height="200" Width="500" FocusManager.FocusedElement="{Binding ElementName=NameInputBox}">
+		Title="新しい項目を追加する" Height="200" Width="500" FocusManager.FocusedElement="{Binding ElementName=NameInputBox}"
+		WindowStartupLocation="CenterOwner">
 	<Grid>
 		<StackPanel Margin="5">
 			

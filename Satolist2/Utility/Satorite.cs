@@ -76,7 +76,10 @@ namespace Satolist2.Utility
 		//SEND SSTPの送信
 		public static void SendSSTP(GhostModel ghost, string script, bool useOwnedSSTP, bool noTranslate, IntPtr hWnd = default(IntPtr))
 		{
-			//TODO: NoTranslate
+			var fmoRecord = SakuraFMOReader.Read(ghost);
+			if (fmoRecord == null)
+				return; //送信できてない
+
 			var sstpBuilder = new ProtocolBuilder();
 			sstpBuilder.Command = "SEND SSTP/1.0";
 			sstpBuilder.Parameters["Script"] = script;
@@ -87,30 +90,17 @@ namespace Satolist2.Utility
 				sstpBuilder.Parameters["HWnd"] = hWnd.ToString();
 			}
 
-			//ifghostを設定
-			if (!string.IsNullOrEmpty(ghost.GhostDescriptSakuraName))
-			{
-				sstpBuilder.Parameters["IfGhost"] = ghost.GhostDescriptSakuraName;
-			}
-
 			if(noTranslate)
 			{
 				sstpBuilder.Parameters["Option"] = "notranslate";
 			}
 
-			var fmoReader = new SakuraFMOReader();
-			fmoReader.Read();
-
 			if (useOwnedSSTP)
 			{
-				var fmoRecord = fmoReader.Find(ghost);
-				if (fmoRecord != null)
-				{
-					sstpBuilder.Parameters["ID"] = fmoRecord.ID;
-				}
+				sstpBuilder.Parameters["ID"] = fmoRecord.ID;
 			}
 
-			RaiseSSTP(sstpBuilder, fmoReader.Records.First().Value);
+			RaiseSSTP(sstpBuilder, fmoRecord);
 		}
 
 		//EXECUTE SSTPの送信

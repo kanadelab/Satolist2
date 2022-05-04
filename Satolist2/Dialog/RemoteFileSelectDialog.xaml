@@ -6,7 +6,7 @@
 		xmlns:local="clr-namespace:Satolist2.Dialog"
 		xmlns:ctl="clr-namespace:Satolist2.Control"
 		mc:Ignorable="d"
-		Title="{Binding Domain}" Height="450" Width="800">
+		Title="{Binding Domain}" Height="450" Width="800" WindowStartupLocation="CenterOwner">
 	<Window.Resources>
 		<BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
 	</Window.Resources>

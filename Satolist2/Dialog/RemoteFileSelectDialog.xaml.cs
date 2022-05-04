@@ -33,9 +33,10 @@ namespace Satolist2.Dialog
 			Empty
 		}
 
-		public RemoteFileSelectDialog()
+		public RemoteFileSelectDialog(Window ownerWindow)
 		{
 			InitializeComponent();
+			Owner = ownerWindow;
 		}
 
 		private void ListViewItem_MouseDoubleClick(object sender, MouseButtonEventArgs e)
@@ -151,7 +152,7 @@ namespace Satolist2.Dialog
 				{
 					//現在のディレクトリをリストアップ
 					var currentItems = items.Select(s => s.Name);
-					var inputDialog = new TextInputDialog();
+					var inputDialog = new TextInputDialog(dialog);
 					var vm = new CreateDirectoryDialogViewModel(inputDialog, currentItems);
 					inputDialog.DataContext = vm;
 					if (inputDialog.ShowDialog() == true)

@@ -34,8 +34,9 @@ namespace Satolist2.Control
 		}
 	}
 
-	internal class TemporaryTextEditorViewModel : TextEditorViewModelBase, IDockingWindowContent
+	internal class TemporaryTextEditorViewModel : TextEditorViewModelBase, IControlBindedReceiver
 	{
+		private TemporaryTextEditor control;
 		private TextDocument document;
 		private string title;
 
@@ -67,19 +68,27 @@ namespace Satolist2.Control
 			set
 			{
 				title = value;
+				NotifyDocumentTitleChanged();
 				NotifyChanged();
 			}
 		}
 
-		public string DockingTitle => Title;
+		public override string DocumentTitle => Title;
 
-		public string DockingContentId { get; } = Guid.NewGuid().ToString();
+		public override string DockingContentId { get; } = Guid.NewGuid().ToString();
+
+		public override ICSharpCode.AvalonEdit.TextEditor MainTextEditor => control.MainTextEditor;
 
 		public TemporaryTextEditorViewModel()
 		{
 			document = new TextDocument();
 			title = "無題";
 			document.Text = string.Empty;
+		}
+
+		public void ControlBind(System.Windows.Controls.Control control)
+		{
+			this.control = (TemporaryTextEditor)control;
 		}
 	}
 }

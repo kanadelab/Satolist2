@@ -89,10 +89,12 @@ namespace Satolist2.Control
 		}
 	}
 
-	internal class TextEditorViewModelBase : NotificationObject
+	internal abstract class TextEditorViewModelBase : NotificationObject, IDockingWindowContent
 	{
 		private bool isShowSearchBox;
+		private bool isActiveTextEditor;
 
+		//検索ボックスの表示
 		public bool IsShowSearchBox
 		{
 			get => isShowSearchBox;
@@ -103,7 +105,36 @@ namespace Satolist2.Control
 			}
 		}
 
+		//アクティブなテキストエディタか（サーフェスパレットダブルクリックで挿入の対象）
+		public virtual bool IsActiveTextEditor
+		{
+			get => isActiveTextEditor;
+			set
+			{
+				isActiveTextEditor = value;
+				NotifyChanged();
+				NotifyChanged(nameof(DockingTitle));
+			}
+		}
+
+		//編集ウインドウのタイトル
+		public abstract string DocumentTitle { get; }
+
 		public ActionCommand ShowSearchBoxCommand { get; }
+
+		public abstract ICSharpCode.AvalonEdit.TextEditor MainTextEditor { get; }
+
+		public string DockingTitle
+		{
+			get
+			{
+				if (isActiveTextEditor)
+					return string.Format("<{0}>", DocumentTitle);
+				else
+					return DocumentTitle;
+			}
+		}
+		public abstract string DockingContentId {get;}
 
 		public TextEditorViewModelBase()
 		{
@@ -115,9 +146,15 @@ namespace Satolist2.Control
 				}
 				);
 		}
+
+		protected void NotifyDocumentTitleChanged()
+		{
+			NotifyChanged(nameof(DocumentTitle));
+			NotifyChanged(nameof(DockingTitle));
+		}
 	}
 
-	internal class EventEditorViewModel : TextEditorViewModelBase, IDockingWindowContent, IDisposable, IControlBindedReceiver
+	internal class EventEditorViewModel : TextEditorViewModelBase, IDisposable, IControlBindedReceiver
 	{
 		private bool disableBodyPropertyChanged;
 		private EventEditor control;
@@ -136,15 +173,16 @@ namespace Satolist2.Control
 			get => eventTypeList;
 		}
 
-		public string DockingTitle => Event.Identifier;
+		public override string DocumentTitle => Event.Identifier;
 
-		public string DockingContentId => randomizedContentId;
+		public override string DockingContentId => randomizedContentId;
 
 		public TextDocument Document { get; }
 
 		public ActionCommand SendToGhostCommand {get;}
 		public ActionCommand InsertCommand { get; }
 		public MainViewModel Main { get; }
+		public override ICSharpCode.AvalonEdit.TextEditor MainTextEditor => control.MainTextEditor;
 		public object HilightColors { get; private set; }
 
 		public HighlightingRule searchRule = new HighlightingRule();
@@ -211,9 +249,10 @@ namespace Satolist2.Control
 			}
 		}
 
+		//ゴーストにトークを送信
 		public void SendToGhost()
 		{
-			var currentLine = control.MainTextEditor.TextArea.Caret.Line;
+			var currentLine = control.MainTextEditor.TextArea.Caret.Line - 1;	//indexにするので-1
 			var beginLine = 0;
 			var endLine = 0;
 			EventType type = EventType.Header;
@@ -221,8 +260,18 @@ namespace Satolist2.Control
 			//開始行の検索(＠または＊を含まない範囲)
 			for (int i = currentLine; i >= 0; i--)
 			{
+				//ヘッダ行の上がエスケープされてないことが必要
+				if (i > 0)
+				{
+					var nextLineData = control.MainTextEditor.Document.Lines[i - 1];
+					var nextLine = control.MainTextEditor.Text.Substring(nextLineData.Offset, nextLineData.Length);
+					if (DictionaryUtility.IsLineEndEscaped(nextLine))
+						continue;
+				}
+
 				var lineData = control.MainTextEditor.Document.Lines[i];
 				var lineString = control.MainTextEditor.Text.Substring(lineData.Offset, lineData.Length);
+
 				if (lineString.IndexOf(Constants.SentenceHead) == 0)
 				{
 					//決定。ヘッダの次の行までが対象になる
@@ -245,6 +294,15 @@ namespace Satolist2.Control
 			//終了行の検索
 			for (int i = currentLine + 1; i < control.MainTextEditor.LineCount; i++)
 			{
+				//ヘッダ行の上がエスケープされてないことが必要
+				if (i > 0)
+				{
+					var nextLineData = control.MainTextEditor.Document.Lines[i - 1];
+					var nextLine = control.MainTextEditor.Text.Substring(nextLineData.Offset, nextLineData.Length);
+					if (DictionaryUtility.IsLineEndEscaped(nextLine))
+						continue;
+				}
+
 				var lineData = control.MainTextEditor.Document.Lines[i];
 				var lineString = control.MainTextEditor.Text.Substring(lineData.Offset, lineData.Length);
 				if (lineString.IndexOfAny(Constants.SentenceOrWordHead) == 0)

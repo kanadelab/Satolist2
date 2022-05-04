@@ -33,6 +33,7 @@ namespace Satolist2.Dialog
 		internal AddEventDialog(MainViewModel main)
 		{
 			InitializeComponent();
+			Owner = main.MainWindow;
 			DataContext = new AddEventDialogViewModel(main);
 			DataContext.AddTarget = DataContext.Main.Ghost.Dictionaries.FirstOrDefault();
 		}

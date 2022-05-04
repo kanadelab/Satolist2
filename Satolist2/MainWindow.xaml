@@ -11,6 +11,7 @@
 	<Window.InputBindings>
 		<KeyBinding Gesture="CTRL+S" Command="{Binding SaveFileCommand}" />
 		<KeyBinding Gesture="CTRL+ALT+R" Command="{Binding ReloadShioriCommand}" />
+		<KeyBinding Gesture="CTRL+SHIFT+F" Command="{Binding ShowSearchBoxCommand}" />
 	</Window.InputBindings>
 	<Grid>
 		<Grid.RowDefinitions>
@@ -31,10 +32,13 @@
 				<Separator />
 				<MenuItem Header="ゴーストを新規作成" Command="{Binding NewGhostCommand}" />
 			</MenuItem>
+			<MenuItem Header="編集">
+				<MenuItem Header="サーフェスプレビュー画像を再生成" Command="{Binding GenerateSurfacePreviewCommand}" />
+			</MenuItem>
 			<MenuItem Header="表示">
 				<MenuItem Header="ファイルイベントツリー" x:Name="FileEventTreeVisibleMenu" IsCheckable="True" IsChecked="{Binding IsVisible, Mode=TwoWay}" />
 				<MenuItem Header="単語群・文リスト" x:Name="EventListVisibleMenu" IsCheckable="True" IsChecked="{Binding IsVisible, Mode=TwoWay}" />
-				<MenuItem Header="検索" x:Name="SearchMenuVisibleMenu" IsCheckable="True" IsChecked="{Binding IsVisible, Mode=TwoWay}" />
+				<MenuItem Header="検索" x:Name="SearchMenuVisibleMenu" IsCheckable="True" IsChecked="{Binding IsVisible, Mode=TwoWay}" InputGestureText="Ctrl+Shift+F" />
 				<MenuItem Header="検索結果" x:Name="SearchResultVisibleMenu" IsCheckable="True" IsChecked="{Binding IsVisible, Mode=TwoWay}" />
 				<MenuItem Header="サーフェスビューワ" x:Name="SurfaceViewerVisibleMenu" IsCheckable="True" IsChecked="{Binding IsVisible, Mode=TwoWay}" />
 				<MenuItem Header="サーフェスパレット" x:Name="SurfacePaletteVisibleMenu" IsCheckable="True" IsChecked="{Binding IsVisible, Mode=TwoWay}" />
@@ -50,7 +54,6 @@
 			</MenuItem>
 			<MenuItem Header="デバッグ">
 				<MenuItem Header="SHIORI Reload" Command="{Binding ReloadShioriCommand}" InputGestureText="Ctrl+Alt+R" />
-				<MenuItem Header="サーフェスプレビュー更新テスト" Command="{Binding SurfacePreviewTest}" />
 			</MenuItem>
 			<MenuItem Header="更新">
 				<MenuItem Header="narファイル作成" Command="{Binding ExportNarCommand}" />

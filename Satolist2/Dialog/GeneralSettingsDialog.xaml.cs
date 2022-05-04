@@ -31,6 +31,7 @@ namespace Satolist2.Dialog
 		{
 			InitializeComponent();
 			Owner = main.MainWindow;
+			DataContext = new GeneralSettingsDialogViewModel(main, this);
 		}
 
 		
@@ -45,13 +46,14 @@ namespace Satolist2.Dialog
 
 		public bool IsChanged
 		{
-			get => Model.Equals(MainViewModel.EditorSettings.GeneralSettings);
+			get => !Model.IsEqlals(MainViewModel.EditorSettings.GeneralSettings);
 		}
 
 		public GeneralSettingsDialogViewModel(MainViewModel main, GeneralSettingsDialog dialog)
 		{
 			Dialog = dialog;
 			Model = MainViewModel.EditorSettings.GeneralSettings.Clone();
+			dialog.Closing += Dialog_Closing;
 
 			OkCommand = new ActionCommand(
 				o =>
@@ -67,18 +69,27 @@ namespace Satolist2.Dialog
 			CancelCommand = new ActionCommand(
 				o =>
 				{
-					if(IsChanged)
-					{
-						var result = MessageBox.Show("変更を保存せずに閉じてもよろしいですか？", "基本設定", MessageBoxButton.YesNo, MessageBoxImage.Question);
-						if (result != MessageBoxResult.Yes)
-						{
-							return;
-						}
-					}
+					
 					dialog.Close();
 				}
 				);
 		}
 
+		private void Dialog_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+		{
+			if (Dialog.DialogResult.HasValue)
+				return;
+
+			if (IsChanged)
+			{
+				var result = MessageBox.Show("変更を保存せずに閉じてもよろしいですか？", "基本設定", MessageBoxButton.YesNo, MessageBoxImage.Question);
+				if (result != MessageBoxResult.Yes)
+				{
+					e.Cancel = true;
+					return;
+				}
+			}
+			Dialog.DialogResult = false;
+		}
 	}
 }

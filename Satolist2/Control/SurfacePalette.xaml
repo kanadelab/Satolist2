@@ -12,12 +12,11 @@
 		<BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
 		<util:InvertBoolToVisibilityConverter x:Key="InvertBoolToVisibilityConverter" />
 	</UserControl.Resources>
-	<Grid>
-
+	<Grid Visibility="{Binding Main.IsGhostEnable, Converter={StaticResource BoolToVisibilityConverter}}">
 		<Grid Visibility="{Binding IsPreviewDataEnable, Converter={StaticResource InvertBoolToVisibilityConverter}}">
 			<StackPanel>
-				<TextBlock Text="プレビューデータが作成されていません。&#xa;SSPでゴーストを起動した状態でボタンを押すと、プレビューを構築できます。" Margin="5" />
-				<Button Content="サーフェスプレビューの構築" HorizontalAlignment="Left" Padding="3" Margin="5"/>
+				<TextBlock Text="プレビューデータが作成されていません。&#xa;SSPでゴーストを起動した状態でボタンを押すと、プレビューを構築できます。" Margin="5" TextWrapping="Wrap" />
+				<Button Content="サーフェスプレビューの構築" Command="{Binding Main.GenerateSurfacePreviewCommand}" HorizontalAlignment="Left" Padding="3" Margin="5"/>
 			</StackPanel>
 		</Grid>
 
@@ -29,11 +28,27 @@
 					</ItemsPanelTemplate>
 				</ListView.ItemsPanel>
 
+				<ListView.ItemContainerStyle>
+					<Style TargetType="ListViewItem">
+						<EventSetter Event="MouseDoubleClick" Handler="ListViewItem_MouseDoubleClick" />
+						<Setter Property="ContextMenu">
+							<Setter.Value>
+								<ContextMenu>
+									<MenuItem Header="サーフェス切り替えをトークに挿入" Command="{Binding InsertSurfaceCommand}" />
+									<MenuItem Header="サーフェス切り替えをトークに挿入(さくらスクリプト形式)" Command="{Binding InsertSurfaceCommandSakuraScript}" />
+									<Separator />
+									<MenuItem Header="サーフェス切り替えを起動中のゴーストに送信" Command="{Binding RuntimeChangeSurfaceCommand}" />
+								</ContextMenu>
+							</Setter.Value>
+						</Setter>
+					</Style>
+				</ListView.ItemContainerStyle>
+
 				<ListView.ItemTemplate>
 					<DataTemplate>
 						<StackPanel>
 							<Image Width="{Binding SizeX}" Height="{Binding SizeY}" Source="{Binding ., Converter={StaticResource BitmapConverter}}" />
-							<TextBlock Text="{Binding Label}" />
+							<TextBlock Text="{Binding Label}" MaxWidth="{Binding SizeX}" />
 						</StackPanel>
 					</DataTemplate>
 				</ListView.ItemTemplate>

@@ -103,6 +103,18 @@ namespace Satolist2.Utility
 			return records.FirstOrDefault(o => o.Value.GhostPath == ghost.FullPath).Value;
 		}
 
+		//ヘルパ
+		public static SakuraFMORecord Read(GhostModel ghost)
+		{
+			var reader = new SakuraFMOReader();
+			reader.Read();
+			return reader.Find(ghost);
+		}
+
+		public static bool Exists(GhostModel ghost)
+		{
+			return Read(ghost) != null;
+		}
 	}
 
 	public class SakuraFMORecord

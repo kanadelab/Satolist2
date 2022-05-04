@@ -5,7 +5,7 @@
 		xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 		xmlns:local="clr-namespace:Satolist2.Dialog"
 		mc:Ignorable="d"
-		Title="上書き保存" Height="300" Width="400">
+		Title="上書き保存" Height="300" Width="400" WindowStartupLocation="CenterOwner">
 	<Grid>
 		<Grid.RowDefinitions>
 			<RowDefinition Height="auto" />

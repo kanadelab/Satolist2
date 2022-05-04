@@ -24,16 +24,16 @@ namespace Satolist2.Core
 			mutex = new Mutex();
 		}
 
-		public Task Generate(MainViewModel main, Action<bool> completedCallback, Action<Progress> progressCallback)
+		public Task Generate(MainViewModel main, Action<bool> completedCallback, Action<Progress> progressCallback, CancellationToken cancel)
 		{
 			this.completedCallback = completedCallback;
 			this.progressCallback = progressCallback;
-			return Task.Run(() => GenerateSurfaceTask(main) );
+			return Task.Run(() => GenerateSurfaceTask(main, cancel) );
 		}
 
 		private void RetryableAction(Action action)
 		{
-			//３秒以内に処理できる想定で
+			//タイムアウト
 			for(int i = 0; i < 3; i++)
 			{
 				action.Invoke();
@@ -46,7 +46,7 @@ namespace Satolist2.Core
 			throw new Exception();
 		}
 
-		private void GenerateSurfaceTask(MainViewModel main)
+		private void GenerateSurfaceTask(MainViewModel main, CancellationToken cancel)
 		{
 			string targetDirectory = DictionaryUtility.ConbinePath(main.Ghost.FullDictionaryPath, "profile/satolist/surfacepreview");
 			try
@@ -61,8 +61,10 @@ namespace Satolist2.Core
 					}
 
 					//シェルデータを読み込んで、さとりすとが出力すべき情報をもってくる
-					var shell = new ShellAnalyzer();
+					cancel.ThrowIfCancellationRequested();
+					var shell = new LiteSurfaceAnalyzer();
 					shell.Load(shellPath);
+					cancel.ThrowIfCancellationRequested();
 
 					//さとりすとが選択するサーフェス情報を持ってくる
 					//TODO: scope対応
@@ -81,9 +83,11 @@ namespace Satolist2.Core
 							IsEnableSurfaceViewer = record.SatolistViewerVisible,
 							OffsetX = record.SatolistPaletteOffsetX,
 							OffsetY = record.SatolistPaletteOffsetY,
+							SurfaceTableLabel = record.SurfaceTableLabel,
 							Scope = 0
 						});
 					}
+					cancel.ThrowIfCancellationRequested();
 
 					//サーフェス生成
 					if (System.IO.Directory.Exists(targetDirectory))
@@ -91,6 +95,7 @@ namespace Satolist2.Core
 						System.IO.Directory.Delete(targetDirectory, true);
 					}
 					System.IO.Directory.CreateDirectory(targetDirectory);
+					cancel.ThrowIfCancellationRequested();
 
 					//ループ中邪魔が入らないようにパッシブモードに入れる
 					Satorite.SendSSTP(main.Ghost, @"\![enter,passivemode]", true, true);
@@ -99,6 +104,7 @@ namespace Satolist2.Core
 						//foreach (var item in generateSurfaces)
 						for (var i = 0; i < generateSurfaces.Count; i++)
 						{
+							cancel.ThrowIfCancellationRequested();
 							var item = generateSurfaces[i];
 
 							//出力対象のサーフェスIdとスコープ
@@ -120,10 +126,11 @@ namespace Satolist2.Core
 							RetryableAction(() => Satorite.SendSSTP(main.Ghost, generateScript, true, true, SSTPCallBackNativeWindow.Instance.HWnd));
 
 							//進捗の通知
+							var progressMessage = string.Format("({1}/{2}) surface{0}.png", surfaceId, i+1, generateSurfaces.Count);
 							main.MainWindow.Dispatcher.Invoke(() =>
 							progressCallback(new Progress()
 							{
-								Message = string.Format("surface{0}.png", surfaceId),
+								Message = progressMessage,
 								UseProgress = true,
 								Value = ((double)i / (double)generateSurfaces.Count) * 100.0
 							}));
@@ -146,6 +153,27 @@ namespace Satolist2.Core
 					JsonUtility.SerializeToFile(metadataPath, metadata);
 				}
 				main.MainWindow.Dispatcher.Invoke(() => Complete(true));
+			}
+			catch(OperationCanceledException)
+			{
+				main.MainWindow.Dispatcher.Invoke(() =>
+				progressCallback(new Progress()
+				{
+					Message = "キャンセルしました。",
+					UseProgress = true,
+					Value = 0
+				}));
+
+				//失敗したら削除
+				try
+				{
+					if (System.IO.Directory.Exists(targetDirectory))
+					{
+						System.IO.Directory.Delete(targetDirectory, true);
+					}
+				}
+				catch { }
+				main.MainWindow.Dispatcher.Invoke(() => Complete(false));
 			}
 			catch(Exception ex)
 			{
@@ -228,6 +256,8 @@ namespace Satolist2.Core
 		public int OffsetX { get; set; }
 		[JsonProperty]
 		public int OffsetY { get; set; }
+		[JsonProperty]
+		public string SurfaceTableLabel { get; set; }
 
 		[JsonIgnore]
 		public string FileName
@@ -235,6 +265,18 @@ namespace Satolist2.Core
 			get
 			{
 				return string.Format("surface{0}.png", Id);
+			}
+		}
+
+		[JsonIgnore]
+		public string Label
+		{
+			get
+			{
+				if (string.IsNullOrEmpty(SurfaceTableLabel))
+					return Id.ToString();
+				else
+					return string.Format("{0} [{1}]", Id, SurfaceTableLabel);
 			}
 		}
 

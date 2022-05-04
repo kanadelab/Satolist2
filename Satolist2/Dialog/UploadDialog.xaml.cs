@@ -45,11 +45,12 @@ namespace Satolist2.Dialog
 			base.OnClosing(e);
 		}
 
-		internal UploadDialog(Model.UploadServerSettingModelBase[] servers, Model.GhostModel ghost, Model.GhostLocalSettings ghostSettings)
+		internal UploadDialog(Model.UploadServerSettingModelBase[] servers, MainViewModel main, Model.GhostLocalSettings ghostSettings)
 		{
-			Ghost = ghost;
+			Ghost = main.Ghost;
 			Cancellation = new CancellationTokenSource();
 			InitializeComponent();
+			Owner = main.MainWindow;
 			DataContext = new DialogViewModel();
 
 			//viewmodel作成

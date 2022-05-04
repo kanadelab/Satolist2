@@ -284,11 +284,23 @@ namespace Satolist2.Model
 		}
 		public void LoadDictionary()
 		{
-			//TODO: エスケープやインラインなどややこしげなモノも読むようにする
+			//TODO: 辞書単体の設定を考慮する必要
 			var text = File.ReadAllText(FullPath, Constants.EncodingShiftJis);
-			Deserialize(text);
-			isSerialized = false;
-			BodyAvailable = false;
+			if (!MainViewModel.EditorSettings.GeneralSettings.IsTextModeDefault)
+			{
+				//リストモード
+				Deserialize(text);
+				isSerialized = false;
+				BodyAvailable = false;
+			}
+			else
+			{
+				//テキストモード
+				Body = text;
+				IsChanged = false;
+				BodyAvailable = true;
+				isSerialized = true;
+			}
 		}
 
 		//イベントを追加
@@ -360,7 +372,12 @@ namespace Satolist2.Model
 				if (ev.Type == EventType.Header && string.IsNullOrEmpty(ev.Body))
 					continue;
 
+				//イベント本体
 				serializedEvents.Add(ev.Serialize());
+
+				//区切りの空行追加
+				for (int i = 0; i < MainViewModel.EditorSettings.GeneralSettings.ListedDictionaryInsertEmptyLineCount; i++)
+					serializedEvents.Add(string.Empty);
 			}
 
 			//isChangedの状態を復元
@@ -378,7 +395,9 @@ namespace Satolist2.Model
 			string eventName = null;
 			string eventCondition = null;
 			int eventLineIndex = 0;
+			int eventLastEmptyLineCount = 0;			//末尾の空白行。保存設定で自動挿入する文、読み込み時は捨てるためのもの
 			EventType eventType = EventType.Header;
+			bool eventLineEscape = false;
 
 			bool inlineEvent = false;
 			for(var index = 0; index < lines.Length; index++)
@@ -388,12 +407,20 @@ namespace Satolist2.Model
 				//NOTE: エスケープ文字を解釈するかどうか悩ましいところ。１行に解釈まとめられないのでそのまま読んでしまう。
 				EventType nextType;
 				string nextName, nextCondition;
-				if (DictionaryUtility.SplitEventHeader(line, out nextType, out nextName, out nextCondition) && !inlineEvent)
+				if (DictionaryUtility.SplitEventHeader(line, out nextType, out nextName, out nextCondition) && !inlineEvent && !eventLineEscape)
 				{
+					//設定値だけ末尾の空白行をとりのぞく
+					{
+						int removeCount = Math.Min(eventLastEmptyLineCount, MainViewModel.EditorSettings.GeneralSettings.ListedDictionaryInsertEmptyLineCount);
+						if (removeCount > 0)
+							eventLines.RemoveRange(eventLines.Count - removeCount, removeCount);
+					}
+
 					//フラッシュ
 					var ev = new EventModel(eventType, eventName, eventCondition, string.Join(Constants.NewLine, eventLines), IsInlineEventAnalyze, eventLineIndex);
 					AddEvent(ev);
 
+					eventLastEmptyLineCount = 0;
 					eventLineIndex = index + 1;
 					eventType = nextType;
 					eventName = nextName;
@@ -402,14 +429,45 @@ namespace Satolist2.Model
 				}
 				else
 				{
+					eventLineEscape = false;
 					inlineEvent = false;
-					if (line == Constants.InlineEventSeparator)	//インラインイベントを検出したら次の行はフラッシュせず同一の中に続ける
+					if (line == Constants.InlineEventSeparator) //インラインイベントを検出したら次の行はフラッシュせず同一の中に続ける
 						inlineEvent = true;
 					else
+					{
+						if (string.IsNullOrEmpty(line))
+						{
+							//末尾の空白行画の数を数える
+							eventLastEmptyLineCount++;
+						}
+						else
+						{
+							//末尾ではなかったのでカウンタをリセット
+							eventLastEmptyLineCount = 0;
+
+							//行末エスケープか確認
+							var match = Constants.LineEndEscapePattern.Match(line);
+							if(match.Success)
+							{
+								//エスケープ文字が奇数個ならば行末エスケープされている
+								if (match.Groups[1].Length % 2 == 1)
+									eventLineEscape = true;
+							}
+						}
+
 						eventLines.Add(line);
+					}
 				}
 			}
 
+			//設定値だけ末尾の空白行をとりのぞく
+			{
+				int removeCount = Math.Min(eventLastEmptyLineCount, MainViewModel.EditorSettings.GeneralSettings.ListedDictionaryInsertEmptyLineCount);
+				if (removeCount > 0)
+					eventLines.RemoveRange(eventLines.Count - removeCount, removeCount);
+			}
+
+			//最後のイベントをフラッシュ
 			var lastEvent = new EventModel(eventType, eventName, eventCondition, string.Join(Constants.NewLine, eventLines), IsInlineEventAnalyze, eventLineIndex);
 			AddEvent(lastEvent);
 

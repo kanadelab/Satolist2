@@ -19,9 +19,10 @@ namespace Satolist2.Dialog
 	/// </summary>
 	public partial class TextInputDialog : Window
 	{
-		public TextInputDialog()
+		public TextInputDialog(Window ownerWindow)
 		{
 			InitializeComponent();
+			Owner = ownerWindow;
 		}
 
 		private void CancelButtonClick(object sender, RoutedEventArgs e)

@@ -30,9 +30,10 @@ namespace Satolist2.Dialog
 			}
 		}
 
-		internal UploadSettingDialog(Model.UploadServerSettingModelBase[] uploadSettings)
+		internal UploadSettingDialog(Model.UploadServerSettingModelBase[] uploadSettings, MainViewModel main)
 		{
 			InitializeComponent();
+			Owner = main.MainWindow;
 			Closing += UploadSettingDialog_Closing;
 			DataContext = new UploadSettingDialogViewModel(uploadSettings, this);
 		}
@@ -50,12 +51,13 @@ namespace Satolist2.Dialog
 		{
 			private ObservableCollection<UploadSettingItemViewModelBase> items;
 			private Model.UploadServerSettingModelBase[] originalModel;
-			private UploadSettingDialog dialog;
 
 			public ReadOnlyObservableCollection<UploadSettingItemViewModelBase> Items
 			{
 				get => new ReadOnlyObservableCollection<UploadSettingItemViewModelBase>(items);
 			}
+
+			public UploadSettingDialog Dialog { get; private set; }
 
 			public bool CloseAccepted { get; private set; }
 
@@ -66,7 +68,7 @@ namespace Satolist2.Dialog
 
 			internal UploadSettingDialogViewModel(Model.UploadServerSettingModelBase[] uploadSettings, UploadSettingDialog dialog)
 			{
-				this.dialog = dialog;
+				Dialog = dialog;
 				originalModel = uploadSettings ?? Array.Empty<Model.UploadServerSettingModelBase>();
 				items = new ObservableCollection<UploadSettingItemViewModelBase>();
 				var models = uploadSettings?.Select(o => o.Clone()) ?? Array.Empty<Model.UploadServerSettingModelBase>();
@@ -241,10 +243,11 @@ namespace Satolist2.Dialog
 		private class FtpAccountUploadSettingViewModel : UploadSettingItemViewModelBase
 		{
 			private ObservableCollection<FtpUploadGhostSettingViewModel> items;
-			private UploadSettingDialogViewModel parent;
 			private Model.FtpServerSettingModel model;
 
 			public override ItemType Type => ItemType.FtpServer;
+
+			public UploadSettingDialogViewModel Parent { get; private set; }
 
 			public Model.FtpServerSettingModel Model
 			{
@@ -308,7 +311,7 @@ namespace Satolist2.Dialog
 
 			public FtpAccountUploadSettingViewModel(Model.FtpServerSettingModel model, UploadSettingDialogViewModel parent)
 			{
-				this.parent = parent;
+				Parent = parent;
 				this.model = model;
 				items = new ObservableCollection<FtpUploadGhostSettingViewModel>();
 
@@ -414,7 +417,7 @@ namespace Satolist2.Dialog
 							username = parent.UserName
 						};
 
-						RemoteFileSelectDialog dialog = new RemoteFileSelectDialog();
+						RemoteFileSelectDialog dialog = new RemoteFileSelectDialog(parent.Parent.Dialog);
 						var vm = new RemoteFileSelectDialogViewModel(dialog, account);
 						vm.ShowFileNameInput = false;
 						dialog.DataContext = vm;
@@ -435,7 +438,7 @@ namespace Satolist2.Dialog
 							username = parent.UserName
 						};
 
-						RemoteFileSelectDialog dialog = new RemoteFileSelectDialog();
+						RemoteFileSelectDialog dialog = new RemoteFileSelectDialog(parent.Parent.Dialog);
 						var vm = new RemoteFileSelectDialogViewModel(dialog, account);
 						vm.FileName = "ghost.nar";  //default
 					vm.ShowFileNameInput = true;

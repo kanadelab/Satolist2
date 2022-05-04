@@ -7,7 +7,7 @@
 		xmlns:util="clr-namespace:Satolist2.Utility"
 		xmlns:local="clr-namespace:Satolist2.Dialog"
 		mc:Ignorable="d"
-		Title="アップロード設定" Height="450" Width="900">
+		Title="アップロード設定" Height="450" Width="900" WindowStartupLocation="CenterOwner">
 	<Window.Resources>
 		<ResourceDictionary>
 			<ResourceDictionary.MergedDictionaries>

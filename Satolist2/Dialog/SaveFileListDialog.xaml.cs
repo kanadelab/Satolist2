@@ -22,9 +22,10 @@ namespace Satolist2.Dialog
 	{
 		public MessageBoxResult Result { get; private set; }
 
-		public SaveFileListDialog()
+		internal SaveFileListDialog(MainViewModel main)
 		{
 			InitializeComponent();
+			Owner = main.MainWindow;
 		}
 
 		private void SaveButton_Click(object sender, RoutedEventArgs e)
@@ -44,6 +45,7 @@ namespace Satolist2.Dialog
 			Result = MessageBoxResult.Cancel;
 			Close();
 		}
+
 	}
 
 	internal class SaveFileListViewModel

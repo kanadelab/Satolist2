@@ -62,15 +62,15 @@ namespace Satolist2.Control
 		}
 	}
 
-	internal class TextEditorViewModel : TextEditorViewModelBase, IDockingWindowContent, IDisposable, IControlBindedReceiver
+	internal class TextEditorViewModel : TextEditorViewModelBase, IDisposable, IControlBindedReceiver
 	{
 		private TextEditor control;
 		private bool disableBodyPropertyChanged;
 		private string randomizedContetnId;
 		
-		public string DockingTitle => TextFile.RelativeName;
+		public override string DocumentTitle => TextFile.RelativeName;
 
-		public string DockingContentId => randomizedContetnId;
+		public override string DockingContentId => randomizedContetnId;
 
 		
 		public TextFileModel TextFile { get; }
@@ -79,6 +79,7 @@ namespace Satolist2.Control
 		public ActionCommand SendToGhostCommand { get; }
 		public ActionCommand InsertCommand { get; }
 
+		public override ICSharpCode.AvalonEdit.TextEditor MainTextEditor => control.MainTextEditor;
 
 		public TextEditorViewModel(MainViewModel main, TextFileModel textFile)
 		{
@@ -135,7 +136,7 @@ namespace Satolist2.Control
 		//カレットの位置からトークを特定して送信する
 		public void SendToGhost()
 		{
-			var currentLine = control.MainTextEditor.TextArea.Caret.Line;
+			var currentLine = control.MainTextEditor.TextArea.Caret.Line - 1;	//indexにするので-1
 			var beginLine = 0;
 			var endLine = 0;
 			EventType type = EventType.Header;
@@ -143,6 +144,15 @@ namespace Satolist2.Control
 			//開始行の検索(＠または＊を含まない範囲)
 			for (int i = currentLine; i >= 0; i--)
 			{
+				//ヘッダ行の上がエスケープされてないことが必要
+				if (i > 0)
+				{
+					var nextLineData = control.MainTextEditor.Document.Lines[i - 1];
+					var nextLine = control.MainTextEditor.Text.Substring(nextLineData.Offset, nextLineData.Length);
+					if (DictionaryUtility.IsLineEndEscaped(nextLine))
+						continue;
+				}
+
 				var lineData = control.MainTextEditor.Document.Lines[i];
 				var lineString = control.MainTextEditor.Text.Substring(lineData.Offset, lineData.Length);
 				if (lineString.IndexOf(Constants.SentenceHead) == 0)
@@ -167,6 +177,15 @@ namespace Satolist2.Control
 			//終了行の検索
 			for (int i = currentLine + 1; i < control.MainTextEditor.LineCount; i++)
 			{
+				//ヘッダ行の上がエスケープされてないことが必要
+				if (i > 0)
+				{
+					var nextLineData = control.MainTextEditor.Document.Lines[i - 1];
+					var nextLine = control.MainTextEditor.Text.Substring(nextLineData.Offset, nextLineData.Length);
+					if (DictionaryUtility.IsLineEndEscaped(nextLine))
+						continue;
+				}
+
 				var lineData = control.MainTextEditor.Document.Lines[i];
 				var lineString = control.MainTextEditor.Text.Substring(lineData.Offset, lineData.Length);
 				if (lineString.IndexOfAny(Constants.SentenceOrWordHead) == 0)

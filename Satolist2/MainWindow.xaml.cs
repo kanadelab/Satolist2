@@ -12,6 +12,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -34,7 +35,35 @@ namespace Satolist2
 		private List<DockingWindow> TextEditors { get; }
 		private MainViewModel mainViewModel;
 		private LayoutDocumentPane DocumentPane { get; set; }
+		private DockingWindow ActiveEditor { get; set; }
 
+		public ICSharpCode.AvalonEdit.TextEditor ActiveTextEditor
+		{
+			get
+			{
+				if (ActiveEditor == null)
+					return null;
+				if(ActiveEditor.ViewModel is TextEditorViewModelBase vm)
+				{
+					return vm.MainTextEditor;
+				}
+				return null;
+			}
+		}
+
+		internal TextEditorViewModelBase ActiveTextEditorViewModel
+		{
+			get
+			{
+				if (ActiveEditor == null)
+					return null;
+				if (ActiveEditor.ViewModel is TextEditorViewModelBase vm)
+				{
+					return vm;
+				}
+				return null;
+			}
+		}
 
 		public MainWindow()
 		{
@@ -139,6 +168,7 @@ namespace Satolist2
 
 				//閉じたときのイベントを設定
 				newWindow.Closing += EventEditorClosing;
+				newWindow.IsActiveChanged += NewWindow_IsActiveChanged;
 				ev.OnRemove += OpendEventRemoved;
 
 				EventEditors.Add(newWindow);
@@ -151,6 +181,26 @@ namespace Satolist2
 			var editor = (EventEditor)currentWindow.Content;
 			editor.RequestFocus();
 			return editor;
+		}
+
+		private void NewWindow_IsActiveChanged(object sender, EventArgs e)
+		{
+			if(sender is DockingWindow dockWindow)
+			{
+				//アクティブになったのでアクティブなエディタをマークする
+				if(dockWindow.IsActive && ActiveEditor != dockWindow)
+				{
+					if(ActiveTextEditorViewModel != null)
+					{
+						ActiveTextEditorViewModel.IsActiveTextEditor = false;
+					}
+					ActiveEditor = dockWindow;
+					if (ActiveTextEditorViewModel != null)
+					{
+						ActiveTextEditorViewModel.IsActiveTextEditor = true;
+					}
+				}
+			}
 		}
 
 		//一致するテキストファイルの編集画面を閉じる
@@ -440,6 +490,29 @@ namespace Satolist2
 			//ウインドウを閉じるときに、複製する
 			MainViewModel.EditorSettings.TemporarySettings.SerializedDockingLayout = SerializeDockingLayout();
 		}
+
+		//アクティブなテキストエディタをアクティブにする
+		//挿入機能等で別のコントロールをアクティブにしている想定で、テキストエディタをアクティブにに戻す
+		public void ActivateActiveEditor()
+		{
+			if(!ActiveEditor.IsActive)
+			{
+				ActiveEditor.IsActive = true;
+				var content = ActiveEditor.Content;
+				if(content is EventEditor ev)
+				{
+					ev.RequestFocus();
+				}
+				else if(content is TemporaryTextEditor tte)
+				{
+					tte.RequestFocus();
+				}
+				else if(content is TextEditor te)
+				{
+					te.RequestFocus();
+				}
+			}
+		}
 	}
 
 	//MainViewModel起動オプション
@@ -461,6 +534,7 @@ namespace Satolist2
 
 		public MainWindow MainWindow { get; }
 		public GhostModel Ghost { get; private set; }
+		public bool IsGhostEnable { get; private set; }
 
 		//サーフェスプレビューデータ
 		public Core.SurfacePreviewMetaData SurfacePreviewData
@@ -507,10 +581,11 @@ namespace Satolist2
 		public ActionCommand EditUploadSettingCommand { get; }
 		public ActionCommand OpenSatolistDirectoryCommand { get; }
 		public ActionCommand ReloadShioriCommand { get; }
-		public ActionCommand SurfacePreviewTest { get; }
+		public ActionCommand ShowSearchBoxCommand { get; }
 		public ActionCommand ExportNarCommand { get; }
 		public ActionCommand MakeUpdateFileCommand { get; }
 		public ActionCommand UploadGhostCommand { get; }
+		public ActionCommand GenerateSurfacePreviewCommand { get; }
 
 		//設定情報
 		public InsertItemPaletteModel InsertPalette
@@ -561,6 +636,7 @@ namespace Satolist2
 			initializeData = initializeData ?? new MainViewModelInitializeData();
 			MainWindow = mainWindow;
 			Ghost = initializeData.Ghost;
+			IsGhostEnable = Ghost != null;
 			string shellPath = null;
 
 			//エディタ設定のロード
@@ -752,7 +828,7 @@ namespace Satolist2
 			NewGhostCommand = new ActionCommand(
 				o =>
 				{
-					var dialog = new NewGhostDialog();
+					var dialog = new NewGhostDialog(this);
 					if( dialog.ShowDialog() == true)
 					{
 						//ゴーストの作成が実際に行われたのでそれを開く
@@ -769,6 +845,7 @@ namespace Satolist2
 					if(dialog.ShowDialog() == true)
 					{
 						EditorSettings.GeneralSettings = dialog.DataContext.Model;
+						EditorSettings.SaveGeneralSettings();
 					}
 				}
 				);
@@ -776,13 +853,14 @@ namespace Satolist2
 			EditInsertPaletteCommand = new ActionCommand(
 				o =>
 				{
-					var dialog = new TextEditorInsertPaletteSettingsDialog();
+					var dialog = new TextEditorInsertPaletteSettingsDialog(this);
 					using (var vm = new TextEditorInsertPaletteSettingsDialogViewModel(dialog, InsertPalette))
 					{
 						dialog.DataContext = vm;
 						if(dialog.ShowDialog() == true)
 						{
 							InsertPalette = vm.Items.First().ToModel();
+							EditorSettings.SaveInsertPalette();
 						}
 					}
 				}
@@ -791,7 +869,7 @@ namespace Satolist2
 			EditUploadSettingCommand = new ActionCommand(
 				o =>
 				{
-					var d = new Dialog.UploadSettingDialog(EditorSettings.UploadSettings);
+					var d = new Dialog.UploadSettingDialog(EditorSettings.UploadSettings, this);
 					if( d.ShowDialog() == true)
 					{
 						EditorSettings.UploadSettings = d.DataContext.GetItems();
@@ -816,41 +894,13 @@ namespace Satolist2
 				o => Ghost != null
 				);
 
-			SurfacePreviewTest = new ActionCommand(
+			ShowSearchBoxCommand = new ActionCommand(
 				o =>
 				{
-					var gen = new Core.SurfacePreviewImageGenerator();
-					var dialog = new ProgressDialog();
-
-					var task = gen.Generate(this, (success) =>
-					{
-						if (success)
-						{
-							//ProgressDialog
-							dialog.DataContext.SetMessage("成功しました。");
-						}
-						else
-						{
-							dialog.DataContext.SetMessage("失敗しました。");
-						}
-
-					},
-					(progress) =>
-					{
-
-						dialog.DataContext.SetProgress(progress);
-
-					});
-
-					dialog.SetTask(task);
-					dialog.ShowDialog();
-
-					//再読み込み
-					LoadSurfacePreviewData();
-					SurfacePaletteViewModel.UpdateSurfacePreviewData();
-					SurfaceViewerViewModel.UpdateSurfacePreviewData();
-				},
-				o => Ghost != null
+					MainWindow.SearchMenu.Show();
+					MainWindow.SearchMenu.IsActive = true;
+					MainWindow.Dispatcher.BeginInvoke(new Action(() => { ((SearchMenu)MainWindow.SearchMenu.Content).SearchTextBox.Focus(); }), System.Windows.Threading.DispatcherPriority.Render);
+				}
 				);
 
 			ExportNarCommand = new ActionCommand(
@@ -870,7 +920,7 @@ namespace Satolist2
 
 						if(saveDialog.ShowDialog() == true)
 						{
-							var progressDialog = new ProgressDialog();
+							var progressDialog = new ProgressDialog(this);
 							progressDialog.DataContext.Title = "narファイルの作成";
 							progressDialog.DataContext.SetMessage("narファイルを作成します。");
 
@@ -908,7 +958,7 @@ namespace Satolist2
 				{
 					if(AskSave())
 					{
-						var progressDialog = new ProgressDialog();
+						var progressDialog = new ProgressDialog(this);
 						progressDialog.DataContext.Title = "更新ファイルの作成";
 						progressDialog.DataContext.SetMessage("更新ファイルを作成します。");
 						var task = Task.Run(() =>
@@ -948,7 +998,7 @@ namespace Satolist2
 					if (AskSave())
 					{
 						//ゴーストアップロード
-						var dialog = new UploadDialog(EditorSettings.UploadSettings, Ghost, EditorSettings.GhostTemporarySettings);
+						var dialog = new UploadDialog(EditorSettings.UploadSettings, this, EditorSettings.GhostTemporarySettings);
 						dialog.ShowDialog();
 						if(dialog.IsUploadStarted)
 						{
@@ -967,10 +1017,50 @@ namespace Satolist2
 				o => Ghost != null
 				);
 
-			
+			GenerateSurfacePreviewCommand = new ActionCommand(
+				o =>
+				{
+					//ゴーストの起動をチェック
+					if(!SakuraFMOReader.Exists(Ghost))
+					{
+						MessageBox.Show("SSPで起動中のゴーストからサーフェスプレビューを作る機能です。\r\nゴーストを起動した状態でこの機能を使用して下さい。");
+						return;
+					}
+
+					var gen = new Core.SurfacePreviewImageGenerator();
+					var dialog = new ProgressDialog(this);
+					dialog.DataContext.Title = "サーフェスプレビューの作成中";
+					dialog.DataContext.StableMessage = "SSPと通信しています。処理中はゴーストを操作しないでください。";
+
+					var task = gen.Generate(this, (success) =>
+					{
+						dialog.DataContext.Progress = 100.0;
+						if (success)
+						{
+							dialog.DataContext.SetMessage("完了しました。");
+						}
+					},
+					(progress) =>
+					{
+
+						dialog.DataContext.SetProgress(progress);
+
+					}, dialog.Cancellation.Token);
+
+					dialog.SetTask(task, true);
+					dialog.ShowDialog();
+
+					//再読み込み
+					LoadSurfacePreviewData();
+					SurfacePaletteViewModel.UpdateSurfacePreviewData();
+					SurfaceViewerViewModel.UpdateSurfacePreviewData();
+				},
+				o => Ghost != null
+				);
+
 
 			//読込エラーが発生している場合に通知
-			foreach(var err in SaveLoadPanes.Where(o => o.LoadState == EditorLoadState.LoadFailed))
+			foreach (var err in SaveLoadPanes.Where(o => o.LoadState == EditorLoadState.LoadFailed))
 			{
 				//TODO: ロードエラー通知
 			}
@@ -1054,7 +1144,7 @@ namespace Satolist2
 			if(Ghost != null)
 				objects.AddRange(Ghost.Dictionaries);
 
-			var dialog = new SaveFileListDialog();
+			var dialog = new SaveFileListDialog(this);
 			var dialogViewModel = new SaveFileListViewModel(objects);
 			dialog.DataContext = dialogViewModel;
 			dialog.ShowDialog();
@@ -1116,6 +1206,20 @@ namespace Satolist2
 			catch
 			{
 				SurfacePreviewData = null;
+			}
+		}
+
+		//アクティブなエディタに挿入
+		public void InsertToActiveEditor(string str, bool isActivate = true)
+		{
+			if(MainWindow.ActiveTextEditor != null)
+			{
+				MainWindow.ActiveTextEditor.Document.Insert(MainWindow.ActiveTextEditor.CaretOffset, str);
+
+				if(isActivate)
+				{
+					MainWindow.ActivateActiveEditor();
+				}
 			}
 		}
 		

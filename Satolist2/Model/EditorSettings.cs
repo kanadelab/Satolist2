@@ -35,15 +35,10 @@ namespace Satolist2.Model
 			LoadTemporarySettings();
 
 			//TODO: 起動失敗処理？
-			try
-			{
-				LoadInsertPalette();
-				LoadUploadSettings();
-			}
-			catch
-			{
-				IsLoadFailed = true;
-			}
+			LoadInsertPalette();
+			LoadUploadSettings();
+			LoadGeneralSettings();
+		
 		}
 
 		//ゴースト依存の情報をロード
@@ -63,6 +58,7 @@ namespace Satolist2.Model
 			catch
 			{
 				GhostTemporarySettings = new GhostLocalSettings();
+				IsLoadFailed = true;
 			}
 		}
 
@@ -75,49 +71,68 @@ namespace Satolist2.Model
 
 		private void LoadInsertPalette()
 		{
-			if(System.IO.File.Exists(InsertPaettePath))
+			try
 			{
-				//TODO: エラー対応?
-				//エラーの場合は殆ど起動失敗と同じになるのが注意？強制終了でもいい？
-				InsertPalette = JsonUtility.DeserializeFromFile<InsertItemPaletteModel>(InsertPaettePath);
+				if (System.IO.File.Exists(InsertPaettePath))
+				{
+					//TODO: エラー対応?
+					//エラーの場合は殆ど起動失敗と同じになるのが注意？強制終了でもいい？
+					InsertPalette = JsonUtility.DeserializeFromFile<InsertItemPaletteModel>(InsertPaettePath);
+				}
 			}
+			catch { }
 		}
 
-		void SaveInsertPalette()
+		public void SaveInsertPalette()
 		{
-			System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(InsertPaettePath));
-			JsonUtility.SerializeToFile(InsertPaettePath, InsertPalette);
+			try
+			{
+				System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(InsertPaettePath));
+				JsonUtility.SerializeToFile(InsertPaettePath, InsertPalette);
+			}
+			catch { }
 		}
 
 		public void LoadUploadSettings()
 		{
-			if (System.IO.File.Exists(UploadSettingPath))
+			try
 			{
-				var itemArray = JsonUtility.DeserializeFromFile(UploadSettingPath) as JArray;
-				var uploadSettings = new List<UploadServerSettingModelBase>();
-				foreach (JObject item in itemArray)
+				if (System.IO.File.Exists(UploadSettingPath))
 				{
-					var itemType = item["ItemType"].ToString();
-					switch (itemType)
+					var itemArray = JsonUtility.DeserializeFromFile(UploadSettingPath) as JArray;
+					var uploadSettings = new List<UploadServerSettingModelBase>();
+					foreach (JObject item in itemArray)
 					{
-						case FtpServerSettingModel.Type:
-							uploadSettings.Add(item.ToObject<FtpServerSettingModel>());
-							break;
-						case NarnaloaderV2ServerSettingModel.Type:
-							uploadSettings.Add(item.ToObject<NarnaloaderV2ServerSettingModel>());
-							break;
-						default:
-							throw new Exception("アップロード設定に不明なエントリがあります");
+						var itemType = item["ItemType"].ToString();
+						switch (itemType)
+						{
+							case FtpServerSettingModel.Type:
+								uploadSettings.Add(item.ToObject<FtpServerSettingModel>());
+								break;
+							case NarnaloaderV2ServerSettingModel.Type:
+								uploadSettings.Add(item.ToObject<NarnaloaderV2ServerSettingModel>());
+								break;
+							default:
+								throw new Exception("アップロード設定に不明なエントリがあります");
+						}
 					}
+					UploadSettings = uploadSettings.ToArray();
 				}
-				UploadSettings = uploadSettings.ToArray();
+			}
+			catch
+			{
+				IsLoadFailed = true;
 			}
 		}
 
 		public void SaveUploadSettings()
 		{
-			System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(UploadSettingPath));
-			JsonUtility.SerializeToFile(UploadSettingPath, UploadSettings);
+			try
+			{
+				System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(UploadSettingPath));
+				JsonUtility.SerializeToFile(UploadSettingPath, UploadSettings);
+			}
+			catch { }
 		}
 
 		private void LoadTemporarySettings()
@@ -134,6 +149,7 @@ namespace Satolist2.Model
 			catch
 			{
 				TemporarySettings = new TemporarySettings();
+				IsLoadFailed = true;
 			}
 		}
 
@@ -157,18 +173,34 @@ namespace Satolist2.Model
 			}
 		}
 
+		//基本設定の読込
 		public void LoadGeneralSettings()
 		{
-			if(System.IO.File.Exists(GeneralSettingPath))
+			try
 			{
-
+				if (System.IO.File.Exists(GeneralSettingPath))
+				{
+					GeneralSettings = JsonUtility.DeserializeFromFile<GeneralSettings>(GeneralSettingPath);
+				}
 			}
+			catch
+			{
+				IsLoadFailed = true;
+			}
+
+			if(GeneralSettings == null)
+				GeneralSettings = new GeneralSettings();
 		}
 
+		//基本設定の保存
 		public void SaveGeneralSettings()
 		{
 			System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(TemporarySettingsPath));
-
+			try
+			{
+				JsonUtility.SerializeToFile(GeneralSettingPath, GeneralSettings);
+			}
+			catch { }
 		}
 
 	}
@@ -181,8 +213,15 @@ namespace Satolist2.Model
 		[JsonProperty]
 		public bool IsTextModeDefault { get; set; }
 		[JsonProperty]
-		public int ListedDictionaryInsertEmptyLines { get; set; }
+		public int ListedDictionaryInsertEmptyLineCount { get; set; }
 
+		public GeneralSettings()
+		{
+			//デフォルト値
+			UseOwnedSSTP = false;
+			IsTextModeDefault = false;
+			ListedDictionaryInsertEmptyLineCount = 1;
+		}
 
 		public GeneralSettings Clone()
 		{
@@ -190,7 +229,7 @@ namespace Satolist2.Model
 			{
 				UseOwnedSSTP = UseOwnedSSTP,
 				IsTextModeDefault = IsTextModeDefault,
-				ListedDictionaryInsertEmptyLines = ListedDictionaryInsertEmptyLines
+				ListedDictionaryInsertEmptyLineCount = ListedDictionaryInsertEmptyLineCount
 			};
 		}
 
@@ -198,7 +237,7 @@ namespace Satolist2.Model
 		{
 			if (UseOwnedSSTP != obj.UseOwnedSSTP)
 				return false;
-			if (ListedDictionaryInsertEmptyLines != obj.ListedDictionaryInsertEmptyLines)
+			if (ListedDictionaryInsertEmptyLineCount != obj.ListedDictionaryInsertEmptyLineCount)
 				return false;
 			if (IsTextModeDefault != obj.IsTextModeDefault)
 				return false;

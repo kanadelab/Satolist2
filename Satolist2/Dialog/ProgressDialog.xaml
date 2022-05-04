@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Satolist2.Dialog"
         mc:Ignorable="d"
-        Title="{Binding Title}" Height="200" Width="400">
+        Title="{Binding Title}" Height="300" Width="400" WindowStartupLocation="CenterOwner">
     <Grid>
 		<Grid.RowDefinitions>
 			<RowDefinition Height="auto" />
@@ -13,12 +13,16 @@
 			<RowDefinition Height="*" />
 			<RowDefinition Height="auto" />
 		</Grid.RowDefinitions>
-		
-		<TextBlock Grid.Row="0" Text="{Binding Message}" />
+
+		<StackPanel Grid.Row="0" Margin="5">
+			<TextBlock Text="{Binding StableMessage}" />
+			<TextBlock Text="{Binding Message}" />
+		</StackPanel>
 		<ProgressBar Grid.Row="1" Height="20" Margin="3" IsIndeterminate="{Binding IsIndeterminate}" Value="{Binding Progress}"/>
-		<TextBox Grid.Row="2" x:Name="MainTextBox"  AcceptsReturn="True" Text="{Binding Logs}" />
-		<StackPanel Grid.Row="3">
+		<TextBox Grid.Row="2" x:Name="MainTextBox"  AcceptsReturn="True" Text="{Binding Logs}" IsReadOnly="True" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Visible" />
+		<StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center">
 			<Button Content="OK" x:Name="CloseButton" IsEnabled="False" Click="Button_Click" HorizontalAlignment="Center" Width="100" Height="25" Margin="5"/>
+			<Button Content="キャンセル" x:Name="CancelButton" Visibility="Collapsed" Click="CancelButton_Click" HorizontalAlignment="Center" Width="100" Height="25" Margin="5" />
 		</StackPanel>
 	</Grid>
 </Window>

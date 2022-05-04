@@ -6,7 +6,7 @@
 		xmlns:local="clr-namespace:Satolist2.Dialog"
 		xmlns:util="clr-namespace:Satolist2.Utility"
 		mc:Ignorable="d"
-		Title="新規ゴーストの作成" Height="450" Width="800">
+		Title="新規ゴーストの作成" Height="450" Width="800" WindowStartupLocation="CenterOwner">
 	<Window.Resources>
 		<util:EscapeUnderScoreConverter x:Key="EscapeUnderScoreConverter" />
 		<util:InvertBoolConverter x:Key="InvertBoolConverter" />

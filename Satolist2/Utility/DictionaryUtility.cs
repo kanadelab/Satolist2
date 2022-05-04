@@ -189,13 +189,50 @@ namespace Satolist2.Utility
 			{
 				return false;
 			}
+		}
 
+		//行末エスケープされているか
+		public static bool IsLineEndEscaped(string line)
+		{
+			if (string.IsNullOrEmpty(line))
+				return false;
+			var match = Constants.LineEndEscapePattern.Match(line);
+			if(match.Success)
+			{
+				if (match.Groups[1].Length % 2 == 1)
+					return true;
+			}
+			return false;
+		}
+
+		//数値文字列を全角半角置換
+		public static string NumberZen2Han(string number)
+		{
+			Tuple<char, char>[] replaceList =
+			{
+				new Tuple<char,char>('1','１'),
+				new Tuple<char,char>('2','２'),
+				new Tuple<char,char>('3','３'),
+				new Tuple<char,char>('4','４'),
+				new Tuple<char,char>('5','５'),
+				new Tuple<char,char>('6','６'),
+				new Tuple<char,char>('7','７'),
+				new Tuple<char,char>('8','８'),
+				new Tuple<char,char>('9','９'),
+				new Tuple<char,char>('0','０'),
+			};
+
+			var result = number;
+			foreach (var item in replaceList)
+				result = result.Replace(item.Item1, item.Item2);
+			return result;
 		}
 
 	}
 
 	internal static class Constants
 	{
+
 		//文の先頭
 		public const char SentenceHead = '＊';
 		//単語群の先頭
@@ -233,6 +270,9 @@ namespace Satolist2.Utility
 
 		//辞書命名
 		public static readonly Regex SatoriDictionaryPattern = new Regex("^dic.+\\.txt$");
+
+		//行末エスケープの検出
+		public static readonly Regex LineEndEscapePattern = new Regex("(φ+)$");
 
 		//EventTypeに対応する文字を取得
 		public static string GetEventHead(EventType type)

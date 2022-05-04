@@ -28,9 +28,10 @@ namespace Satolist2.Dialog
 			set => base.DataContext = value;
 		}
 
-		public NewGhostDialog()
+		internal NewGhostDialog(MainViewModel main)
 		{
 			InitializeComponent();
+			Owner = main.MainWindow;
 			DataContext = new NewGhostDialogViewModel(this);
 		}
 	}

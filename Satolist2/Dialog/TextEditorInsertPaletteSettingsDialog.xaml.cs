@@ -23,9 +23,10 @@ namespace Satolist2.Dialog
 	/// </summary>
 	public partial class TextEditorInsertPaletteSettingsDialog : Window
 	{
-		public TextEditorInsertPaletteSettingsDialog()
+		internal TextEditorInsertPaletteSettingsDialog(MainViewModel main)
 		{
 			InitializeComponent();
+			Owner = main.MainWindow;
 		}
 
 		private void TreeViewItem_DragOver(object sender, DragEventArgs e)
@@ -92,6 +93,8 @@ namespace Satolist2.Dialog
 		private TextEditorInsertPaletteSettingsDialog control;
 		private ObservableCollection<TextEditorInsertPaletteSettingsDialogItemViewModel> items;
 		private TextEditorInsertPaletteSettingsDialogItemViewModel selectedItem;
+		private bool isChanged;
+
 		public ReadOnlyObservableCollection<TextEditorInsertPaletteSettingsDialogItemViewModel> Items => new ReadOnlyObservableCollection<TextEditorInsertPaletteSettingsDialogItemViewModel>(items);
 		public TextEditorInsertPaletteSettingsDialogItemViewModel SelectedItem
 		{
@@ -104,6 +107,17 @@ namespace Satolist2.Dialog
 				AddGroupCommand.NotifyCanExecuteChanged();
 			}
 		}
+
+		public bool IsChanged
+		{
+			get => isChanged;
+			private set
+			{
+				isChanged = value;
+				NotifyChanged();
+			}
+		}
+
 		public ActionCommand AddItemCommand { get; }
 		public ActionCommand AddGroupCommand { get; }
 		public ActionCommand OkCommand { get; }
@@ -113,13 +127,17 @@ namespace Satolist2.Dialog
 		{
 			this.control = control;
 			this.control.MainList.SelectedItemChanged += MainList_SelectedItemChanged;
+			control.Closing += Control_Closing;
+
 			items = new ObservableCollection<TextEditorInsertPaletteSettingsDialogItemViewModel>();
 
 			//ルートアイテムの生成
-			var rootItem = new TextEditorInsertPaletteSettingsDialogItemViewModel(model)
+			var rootItem = new TextEditorInsertPaletteSettingsDialogItemViewModel(this, model)
 			{
 				Type = InsertItemPaletteModel.NodeType.Root,
-				Label = "(挿入メニュートップ)"
+				Label = "(挿入メニュートップ)",
+				IsSelected = true,
+				IsExpanded = true
 			};
 
 			items.Add(rootItem);
@@ -129,14 +147,15 @@ namespace Satolist2.Dialog
 			AddItemCommand = new ActionCommand(
 				o =>
 				{
-					var newItem = new TextEditorInsertPaletteSettingsDialogItemViewModel()
+					var newItem = new TextEditorInsertPaletteSettingsDialogItemViewModel(this)
 					{
 						Type = InsertItemPaletteModel.NodeType.Item,
 						Label = "新しいアイテム",
 						Body = "挿入内容"
 					};
 					selectedItem.AddItem(newItem);
-					selectedItem.IsExpanded = true;	//追加先を展開する
+					selectedItem.IsExpanded = true; //追加先を展開する
+					Changed();
 				},
 				o =>
 				{
@@ -151,13 +170,14 @@ namespace Satolist2.Dialog
 			AddGroupCommand = new ActionCommand(
 				o =>
 				{
-					var newItem = new TextEditorInsertPaletteSettingsDialogItemViewModel()
+					var newItem = new TextEditorInsertPaletteSettingsDialogItemViewModel(this)
 					{
 						Type = InsertItemPaletteModel.NodeType.Group,
 						Label = "新しいグループ"
 					};
 					selectedItem.AddItem(newItem);
 					selectedItem.IsExpanded = true; //追加先を展開する
+					Changed();
 				},
 				o =>
 				{
@@ -172,7 +192,8 @@ namespace Satolist2.Dialog
 			OkCommand = new ActionCommand(
 				o =>
 				{
-					control.DialogResult = true;
+					if(IsChanged)
+						control.DialogResult = true;
 					control.Close();
 				}
 				);
@@ -185,6 +206,21 @@ namespace Satolist2.Dialog
 				);
 		}
 
+		private void Control_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+		{
+			if(IsChanged && control.DialogResult == null)
+			{
+				//破棄警告
+				var result = MessageBox.Show("変更を保存せずに閉じてもいいですか？", "挿入メニューのカスタマイズ", MessageBoxButton.YesNo, MessageBoxImage.Question);
+				if(result != MessageBoxResult.Yes)
+				{
+					e.Cancel = true;
+					return;
+				}
+			}
+			control.DialogResult = false;
+		}
+
 		public void Dispose()
 		{
 			this.control.MainList.SelectedItemChanged -= MainList_SelectedItemChanged;
@@ -193,6 +229,12 @@ namespace Satolist2.Dialog
 		private void MainList_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
 		{
 			SelectedItem = (TextEditorInsertPaletteSettingsDialogItemViewModel)control.MainList.SelectedItem;
+		}
+
+		//変更フラグを立てる
+		public void Changed()
+		{
+			IsChanged = true;
 		}
 	}
 
@@ -211,6 +253,11 @@ namespace Satolist2.Dialog
 		private bool isExpanded;
 		private ObservableCollection<TextEditorInsertPaletteSettingsDialogItemViewModel> items;
 		private TextEditorInsertPaletteSettingsDialogItemViewModel parent;
+		private TextEditorInsertPaletteSettingsDialogViewModel dialogViewModel;
+
+		public ActionCommand UpItemCommand { get; }
+		public ActionCommand DownItemCommand { get; }
+		public ActionCommand RemoveItemCommand { get; }
 
 		public InsertItemPaletteModel.NodeType Type { get; set; }
 		public string Label
@@ -218,9 +265,13 @@ namespace Satolist2.Dialog
 			get => label;
 			set
 			{
-				label = value;
-				NotifyChanged();
-				NotifyChanged(nameof(ListLabel));
+				if (label != value)
+				{
+					label = value;
+					NotifyChanged();
+					NotifyChanged(nameof(ListLabel));
+					dialogViewModel.Changed();
+				}
 			}
 		}
 
@@ -229,8 +280,12 @@ namespace Satolist2.Dialog
 			get => body;
 			set
 			{
-				body = value;
-				NotifyChanged();
+				if (body != value)
+				{
+					body = value;
+					NotifyChanged();
+					dialogViewModel.Changed();
+				}
 			}
 		}
 
@@ -239,9 +294,13 @@ namespace Satolist2.Dialog
 			get => shortcutKeyNumber;
 			set
 			{
-				shortcutKeyNumber = value;
-				NotifyChanged();
-				NotifyChanged(nameof(ListLabel));
+				if (shortcutKeyNumber != value)
+				{
+					shortcutKeyNumber = value;
+					NotifyChanged();
+					NotifyChanged(nameof(ListLabel));
+					dialogViewModel.Changed();
+				}
 			}
 		}
 
@@ -250,9 +309,13 @@ namespace Satolist2.Dialog
 			get => shortcutKeyCtrl;
 			set
 			{
-				shortcutKeyCtrl = value;
-				NotifyChanged();
-				NotifyChanged(nameof(ListLabel));
+				if (shortcutKeyCtrl != value)
+				{
+					shortcutKeyCtrl = value;
+					NotifyChanged();
+					NotifyChanged(nameof(ListLabel));
+					dialogViewModel.Changed();
+				}
 			}
 		}
 
@@ -261,9 +324,13 @@ namespace Satolist2.Dialog
 			get => shortcutKeyAlt;
 			set
 			{
-				shortcutKeyAlt = value;
-				NotifyChanged();
-				NotifyChanged(nameof(ListLabel));
+				if (shortcutKeyAlt != value)
+				{
+					shortcutKeyAlt = value;
+					NotifyChanged();
+					NotifyChanged(nameof(ListLabel));
+					dialogViewModel.Changed();
+				}
 			}
 		}
 
@@ -272,9 +339,13 @@ namespace Satolist2.Dialog
 			get => shortcutKeyShift;
 			set
 			{
-				shortcutKeyShift = value;
-				NotifyChanged();
-				NotifyChanged(nameof(ListLabel));
+				if (shortcutKeyShift != value)
+				{
+					shortcutKeyShift = value;
+					NotifyChanged();
+					NotifyChanged(nameof(ListLabel));
+					dialogViewModel.Changed();
+				}
 			}
 		}
 
@@ -333,13 +404,16 @@ namespace Satolist2.Dialog
 			addItem.parent = this;
 		}
 
+
 		public ReadOnlyObservableCollection<TextEditorInsertPaletteSettingsDialogItemViewModel> Items => new ReadOnlyObservableCollection<TextEditorInsertPaletteSettingsDialogItemViewModel>(items);
 
 		public TextEditorInsertPaletteSettingsDialogItemViewModel Parent => parent;
 
 
-		public TextEditorInsertPaletteSettingsDialogItemViewModel(InsertItemPaletteModel fromModel = null, TextEditorInsertPaletteSettingsDialogItemViewModel parentViewModel = null)
+		public TextEditorInsertPaletteSettingsDialogItemViewModel(TextEditorInsertPaletteSettingsDialogViewModel dialogViewModel, InsertItemPaletteModel fromModel = null, TextEditorInsertPaletteSettingsDialogItemViewModel parentViewModel = null)
 		{
+			this.dialogViewModel = dialogViewModel;
+
 			if (fromModel == null)
 			{
 				items = new ObservableCollection<TextEditorInsertPaletteSettingsDialogItemViewModel>();
@@ -355,9 +429,41 @@ namespace Satolist2.Dialog
 				parent = parentViewModel;
 				Type = fromModel.Type;
 				items = new ObservableCollection<TextEditorInsertPaletteSettingsDialogItemViewModel>(
-					fromModel.Items?.Select(o => new TextEditorInsertPaletteSettingsDialogItemViewModel(o, this)) ?? Array.Empty<TextEditorInsertPaletteSettingsDialogItemViewModel>()
+					fromModel.Items?.Select(o => new TextEditorInsertPaletteSettingsDialogItemViewModel(dialogViewModel, o, this)) ?? Array.Empty<TextEditorInsertPaletteSettingsDialogItemViewModel>()
 					);
 			}
+
+			UpItemCommand = new ActionCommand(o =>
+			{
+				var currentIndex = parent.items.IndexOf(this);
+				if(currentIndex > 0)
+				{
+					parent.items.Remove(this);
+					parent.items.Insert(currentIndex - 1, this);
+					dialogViewModel.Changed();
+				}
+			});
+
+			DownItemCommand = new ActionCommand(
+				o =>
+				{
+					var currentIndex = parent.items.IndexOf(this);
+					if(currentIndex < parent.items.Count-1)
+					{
+						parent.items.Remove(this);
+						parent.items.Insert(currentIndex + 1, this);
+						dialogViewModel.Changed();
+					}
+				}
+				);
+
+			RemoveItemCommand = new ActionCommand(
+				o =>
+				{
+					parent.items.Remove(this);
+					dialogViewModel.Changed();
+				}
+				);
 		}
 
 		public InsertItemPaletteModel ToModel()

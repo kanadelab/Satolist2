@@ -35,45 +35,13 @@ namespace Satolist2.Control
 	internal class SurfaceViewerViewModel : NotificationObject, IDockingWindowContent
 	{
 		public const string ContentId = "SurfaceViewer";
-		private MainViewModel main;
 		private ShellImageCache cache;
 		private bool isPreviewDataEnable;
 		private Core.SurfacePreviewMetaData previewData;
 		private ICollectionView surfaceList;
 		private Core.SurfacePreviewMetaDataRecord selectedSurface;
 
-		public SurfaceViewerViewModel(MainViewModel main)
-		{
-			this.main = main;
-			CollectionViewSource.GetDefaultView(main.SurfacePreviewData);
-			if (main.Ghost != null)
-			{
-				UpdateSurfacePreviewData();
-			}
-		}
-
-		public void UpdateSurfacePreviewData()
-		{
-			if (main.SurfacePreviewData != null)
-			{
-				cache = new ShellImageCache(DictionaryUtility.ConbinePath(main.Ghost.FullDictionaryPath, MainViewModel.SurfacePreviewPath));
-				IsPreviewDataEnable = true;
-				previewData = main.SurfacePreviewData;
-				SurfaceList = CollectionViewSource.GetDefaultView(previewData.Items);
-				SurfaceList.Filter = (o) =>
-				{
-					var item = (Core.SurfacePreviewMetaDataRecord)o;
-					return item.IsEnableSurfaceViewer;
-				};
-				SurfaceList.SortDescriptions.Add(new SortDescription("Id", ListSortDirection.Ascending));
-			}
-			else
-			{
-				//プレビューデータが正しくない
-				IsPreviewDataEnable = false;
-				SurfaceList = CollectionViewSource.GetDefaultView(Array.Empty<Core.SurfacePreviewMetaDataRecord>());
-			}
-		}
+		public MainViewModel Main { get; }
 
 		public Core.SurfacePreviewMetaDataRecord SelectedSurface
 		{
@@ -119,6 +87,41 @@ namespace Satolist2.Control
 				NotifyChanged();
 			}
 		}
+
+		public SurfaceViewerViewModel(MainViewModel main)
+		{
+			Main = main;
+			CollectionViewSource.GetDefaultView(main.SurfacePreviewData);
+			if (main.Ghost != null)
+			{
+				UpdateSurfacePreviewData();
+			}
+		}
+
+		public void UpdateSurfacePreviewData()
+		{
+			if (Main.SurfacePreviewData != null)
+			{
+				cache = new ShellImageCache(DictionaryUtility.ConbinePath(Main.Ghost.FullDictionaryPath, MainViewModel.SurfacePreviewPath));
+				IsPreviewDataEnable = true;
+				previewData = Main.SurfacePreviewData;
+				SurfaceList = CollectionViewSource.GetDefaultView(previewData.Items);
+				SurfaceList.Filter = (o) =>
+				{
+					var item = (Core.SurfacePreviewMetaDataRecord)o;
+					return item.IsEnableSurfaceViewer;
+				};
+				SurfaceList.SortDescriptions.Add(new SortDescription("Id", ListSortDirection.Ascending));
+			}
+			else
+			{
+				//プレビューデータが正しくない
+				IsPreviewDataEnable = false;
+				SurfaceList = CollectionViewSource.GetDefaultView(Array.Empty<Core.SurfacePreviewMetaDataRecord>());
+			}
+		}
+
+		
 
 		public string DockingTitle => "サーフェスビューワ";
 

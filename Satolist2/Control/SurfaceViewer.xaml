@@ -9,20 +9,31 @@
 			 d:DesignHeight="450" d:DesignWidth="800">
 	<UserControl.Resources>
 		<util:BitmapImageSourceConverter x:Key="BitmapConverter" />
+		<BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+		<util:InvertBoolToVisibilityConverter x:Key="InvertBoolToVisibilityConverter" />
 	</UserControl.Resources>
-	<Grid>
-		<Grid.RowDefinitions>
-			<RowDefinition Height="*" />
-		</Grid.RowDefinitions>
+	<Grid Visibility="{Binding Main.IsGhostEnable, Converter={StaticResource BoolToVisibilityConverter}}">
+		<Grid Visibility="{Binding IsPreviewDataEnable, Converter={StaticResource InvertBoolToVisibilityConverter}}">
+			<StackPanel>
+				<TextBlock Text="プレビューデータが作成されていません。&#xa;SSPでゴーストを起動した状態でボタンを押すと、プレビューを構築できます。" Margin="5" TextWrapping="Wrap"/>
+				<Button Content="サーフェスプレビューの構築" Command="{Binding Main.GenerateSurfacePreviewCommand}" HorizontalAlignment="Left" Padding="3" Margin="5"/>
+			</StackPanel>
+		</Grid>
 
-		<Grid Grid.Row="0">
-			<Grid.ColumnDefinitions>
-				<ColumnDefinition Width="auto"/>
-				<ColumnDefinition Width="*" />
-			</Grid.ColumnDefinitions>
+		<Grid Visibility="{Binding IsPreviewDataEnable, Converter={StaticResource BoolToVisibilityConverter}}">
+			<Grid.RowDefinitions>
+				<RowDefinition Height="*" />
+			</Grid.RowDefinitions>
 
-			<ListView Grid.Column="0" ItemsSource="{Binding SurfaceList}" SelectedItem="{Binding SelectedSurface}" DisplayMemberPath="Id" />
-			<Image Grid.Column="1" Source="{Binding SelectedSurfaceBitmap, Converter={StaticResource BitmapConverter}}" Width="{Binding SelectedSurfaceBitmap.Width}" />
+			<Grid Grid.Row="0">
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="auto"/>
+					<ColumnDefinition Width="*" />
+				</Grid.ColumnDefinitions>
+
+				<ListView Grid.Column="0" ItemsSource="{Binding SurfaceList}" SelectedItem="{Binding SelectedSurface}" DisplayMemberPath="Label" />
+				<Image Grid.Column="1" Source="{Binding SelectedSurfaceBitmap, Converter={StaticResource BitmapConverter}}" Width="{Binding SelectedSurfaceBitmap.Width}" />
+			</Grid>
 		</Grid>
 	</Grid>
 </UserControl>
