@@ -59,6 +59,8 @@ namespace Satolist2.Control
 			}
 		}
 
+		public ActionCommand ReloadCommand { get; }
+
 		public string DockingTitle => "スタートメニュー";
 
 		public string DockingContentId => ContentId;
@@ -66,13 +68,33 @@ namespace Satolist2.Control
 		public StartMenuViewModel(MainViewModel main)
 		{
 			mainVm = main;
-			var fmoReader = new SakuraFMOReader();
-			fmoReader.Read();
-
 			items = new ObservableCollection<GhostItemViewModel>();
 
+			ReloadCommand = new ActionCommand(
+				o =>
+				{
+					RefleshList();
+				}
+				);
+		}
+
+		public void OpenSelectedGhost()
+		{
+			if(selectedItem != null)
+			{
+				mainVm.MainWindow.OpenGhost(selectedItem.Path, executablePath: selectedItem.RunningExecutablePath);
+			}
+		}
+
+		//リスト表示の再構築
+		public void RefleshList()
+		{
+			var fmoReader = new SakuraFMOReader();
+			fmoReader.Read();
+			items.Clear();
+
 			//起動中のゴーストを一番最初に表示
-			foreach(var item in fmoReader.Records)
+			foreach (var item in fmoReader.Records)
 			{
 				items.Add(new GhostItemViewModel()
 				{
@@ -84,7 +106,7 @@ namespace Satolist2.Control
 			}
 
 			//ヒストリーから表示
-			foreach(var item in MainViewModel.EditorSettings.TemporarySettings.GhostHistory)
+			foreach (var item in MainViewModel.EditorSettings.TemporarySettings.GhostHistory)
 			{
 				//既に起動中ならスキップ
 				var foundItem = items.FirstOrDefault(o => o.Path == item.Path);
@@ -104,19 +126,10 @@ namespace Satolist2.Control
 				}
 			}
 		}
-
-		public void OpenSelectedGhost()
-		{
-			if(selectedItem != null)
-			{
-				mainVm.MainWindow.OpenGhost(selectedItem.Path, executablePath: selectedItem.RunningExecutablePath);
-			}
-		}
 	}
 
 	internal class GhostItemViewModel : NotificationObject
 	{
-		//TODO: 起動中でヒストリーにない状態でお気に入りにされたらどうしよう？
 		private string path;
 		private bool isFavorite;
 		private OpenGhostHistory historyModel;
@@ -136,16 +149,28 @@ namespace Satolist2.Control
 		public string RunningExecutablePath { get; set; }
 
 		public ActionCommand ToggleFavoriteCommand { get;}
+	
 
 		public bool IsFavorite
 		{
 			get => isFavorite;
 			set
 			{
-				isFavorite = value;
-				if (historyModel != null)
-					historyModel.IsFavorite = isFavorite;
-				NotifyChanged();
+				if (isFavorite != value)
+				{
+					isFavorite = value;
+					if (historyModel != null)
+					{
+						historyModel.IsFavorite = isFavorite;
+					}
+					else if(isFavorite)
+					{
+						//ヒストリに存在しない情報でお気に入りに設定した場合は、その時点でヒストリに追加する
+						var addedModel = MainViewModel.EditorSettings.TemporarySettings.AddHistory(Path, Name, isFavorite);
+						SetHistoryModel(addedModel);
+					}
+					NotifyChanged();
+				}
 			}
 		}
 

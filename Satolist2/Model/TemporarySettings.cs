@@ -14,6 +14,8 @@ namespace Satolist2.Model
 	[JsonObject]
 	public class TemporarySettings
 	{
+		public const int HistoryCount = 10;	//お気に入りを除くヒストリーの最大許容数
+
 		[JsonProperty]
 		public ObservableCollection<OpenGhostHistory> GhostHistory { get; set; }
 		[JsonProperty]
@@ -34,6 +36,30 @@ namespace Satolist2.Model
 
 			//TODO: 多くなりすぎたら捨てる
 		}
+
+		public OpenGhostHistory AddHistory(string path, string name, bool isFavorite)
+		{
+			var history = new OpenGhostHistory(name, path);
+			var item = GhostHistory.FirstOrDefault(o => o.IsEquals(history));
+			if(item != null)
+				throw new Exception();  //知ってるものは追加しないはず
+			history.IsFavorite = isFavorite;
+			GhostHistory.Insert(0, history);
+			return history;
+		}
+
+		//ヒストリーを整理
+		public void TruncateHistory()
+		{
+			var items = GhostHistory.Where(o => !o.IsFavorite).ToArray();
+			if(items.Length > HistoryCount)
+			{
+				//捨てる必要性
+				var removeItems = items.Skip(HistoryCount).ToArray();
+				foreach (var r in removeItems)
+					GhostHistory.Remove(r);
+			}
+		}
 	}
 
 	[JsonObject]
@@ -49,7 +75,7 @@ namespace Satolist2.Model
 		public OpenGhostHistory(string name, string path)
 		{
 			Name = string.IsNullOrEmpty(name) ? "(無題のゴースト)" : name;
-			Path = path;
+			Path = DictionaryUtility.RemoveLastSlash(path);
 		}
 
 		public bool IsEquals(OpenGhostHistory item)

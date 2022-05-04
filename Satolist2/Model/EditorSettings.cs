@@ -21,6 +21,9 @@ namespace Satolist2.Model
 		private const string TemporarySettingsPath = "settings/temporary.json";
 		private const string GeneralSettingPath = "settings/general.json";
 
+		//ゴーストのprofile格納
+		private const string GhostLocalSettingPath = "profile/satolist/ghost.json";
+
 		public InsertItemPaletteModel InsertPalette { get; set; }
 		public UploadServerSettingModelBase[] UploadSettings { get; set; }
 		public TemporarySettings TemporarySettings { get; set; }
@@ -45,7 +48,7 @@ namespace Satolist2.Model
 		//基本的にはロードできてなくても初期状態にしてたいして差し支えない情報群
 		public void LoadGhostTemporarySettings(GhostModel ghost)
 		{
-			var path = Utility.DictionaryUtility.ConbinePath(ghost.FullDictionaryPath, "profile/satolist.json");
+			var path = Utility.DictionaryUtility.ConbinePath(ghost.FullDictionaryPath, GhostLocalSettingPath);
 			try
 			{
 				if (System.IO.File.Exists(path))
@@ -64,7 +67,7 @@ namespace Satolist2.Model
 
 		public void SaveGhostTemporarySettings(GhostModel ghost)
 		{
-			var path = Utility.DictionaryUtility.ConbinePath(ghost.FullDictionaryPath, "profile/satolist.json");
+			var path = Utility.DictionaryUtility.ConbinePath(ghost.FullDictionaryPath, GhostLocalSettingPath);
 			System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(path));
 			JsonUtility.SerializeToFile(path, GhostTemporarySettings);
 		}
@@ -157,6 +160,9 @@ namespace Satolist2.Model
 		{
 			try
 			{
+				//ヒストリーの掃除
+				TemporarySettings.TruncateHistory();
+
 				System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(TemporarySettingsPath));
 				var jsonSerializer = new JsonSerializer();
 				using (var writer = new System.IO.StreamWriter(TemporarySettingsPath))
