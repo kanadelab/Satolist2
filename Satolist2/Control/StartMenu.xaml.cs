@@ -1,4 +1,5 @@
-﻿using Satolist2.Utility;
+﻿using Satolist2.Model;
+using Satolist2.Utility;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -92,14 +93,14 @@ namespace Satolist2.Control
 					var addItem = new GhostItemViewModel()
 					{
 						Name = item.Name,
-						Path = item.Path,
-						IsHistory = true
+						Path = item.Path
 					};
+					addItem.SetHistoryModel(item);
 					items.Add(addItem);
 				}
 				else
 				{
-					foundItem.IsHistory = true;
+					foundItem.SetHistoryModel(item);
 				}
 			}
 		}
@@ -115,9 +116,10 @@ namespace Satolist2.Control
 
 	internal class GhostItemViewModel : NotificationObject
 	{
+		//TODO: 起動中でヒストリーにない状態でお気に入りにされたらどうしよう？
 		private string path;
 		private bool isFavorite;
-
+		private OpenGhostHistory historyModel;
 
 		public string Name { get; set; }
 		public string Path
@@ -127,7 +129,7 @@ namespace Satolist2.Control
 		}
 
 		//ヒストリーに存在するレコード
-		public bool IsHistory { get; set; }
+		public bool IsHistory { get; private set; }
 		//起動中のゴースト
 		public bool IsRunning { get; set; }
 		//起動中のゴーストを実行しているsspのパス
@@ -141,6 +143,8 @@ namespace Satolist2.Control
 			set
 			{
 				isFavorite = value;
+				if (historyModel != null)
+					historyModel.IsFavorite = isFavorite;
 				NotifyChanged();
 			}
 		}
@@ -154,6 +158,13 @@ namespace Satolist2.Control
 					IsFavorite = !IsFavorite;
 				}
 				);
+		}
+
+		public void SetHistoryModel(OpenGhostHistory history)
+		{
+			IsHistory = true;
+			historyModel = history;
+			IsFavorite = historyModel.IsFavorite;
 		}
 	}
 }

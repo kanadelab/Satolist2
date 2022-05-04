@@ -23,21 +23,28 @@
 					<StackPanel>
 						<TextBlock FontSize="17" Text="{Binding Name}" />
 						<StackPanel Orientation="Horizontal">
-							<Button Command="{Binding ToggleFavoriteCommand}">
-								<Path Fill="Yellow">
-									<Path.Style>
-										<Style TargetType="Path">
-											<Setter Property="Data" Value="M12,15.39L8.24,17.66L9.23,13.38L5.91,10.5L10.29,10.13L12,6.09L13.71,10.13L18.09,10.5L14.77,13.38L15.76,17.66M22,9.24L14.81,8.63L12,2L9.19,8.63L2,9.24L7.45,13.97L5.82,21L12,17.27L18.18,21L16.54,13.97L22,9.24Z" />
-											<Style.Triggers>
-												<DataTrigger Binding="{Binding IsFavorite}" Value="True">
-													<Setter Property="Data" Value="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z"/>
-												</DataTrigger>
-											</Style.Triggers>
-										</Style>
-									</Path.Style>
-								</Path>
+							<Button Command="{Binding ToggleFavoriteCommand}" Margin="0 -5 0 0">
+								<Button.Template>
+									<ControlTemplate>
+										<Grid>
+											<Path Fill="DarkGoldenrod"><!--いい色があれば… 背景白で浮いてしまってる-->
+												<Path.Style>
+													<Style TargetType="Path">
+														<Setter Property="Data" Value="M12,15.39L8.24,17.66L9.23,13.38L5.91,10.5L10.29,10.13L12,6.09L13.71,10.13L18.09,10.5L14.77,13.38L15.76,17.66M22,9.24L14.81,8.63L12,2L9.19,8.63L2,9.24L7.45,13.97L5.82,21L12,17.27L18.18,21L16.54,13.97L22,9.24Z" />
+														<Style.Triggers>
+															<DataTrigger Binding="{Binding IsFavorite}" Value="True">
+																<Setter Property="Data" Value="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z"/>
+															</DataTrigger>
+														</Style.Triggers>
+													</Style>
+												</Path.Style>
+											</Path>
+											<Rectangle Fill="Transparent" />
+										</Grid>
+									</ControlTemplate>
+								</Button.Template>
 							</Button>
-							<TextBlock FontSize="12" Margin="0 0 10 0">
+							<TextBlock FontSize="12" Margin="0 0 10 0" VerticalAlignment="Center">
 								<TextBlock.Style>
 									<Style TargetType="TextBlock">
 										<Setter Property="Text" Value="最近開いたゴースト" />

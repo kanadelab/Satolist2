@@ -44,7 +44,7 @@ namespace Satolist2.Model
 		[JsonProperty]
 		public string Path { get; set; }
 		[JsonProperty]
-		public string IsFavorite { get; set; }
+		public bool IsFavorite { get; set; }
 
 		public OpenGhostHistory(string name, string path)
 		{
