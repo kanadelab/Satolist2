@@ -65,6 +65,7 @@
 				<MenuItem Header="基本設定" Command="{Binding EditGeneralSettingsCommand}" />
 				<MenuItem Header="挿入メニューのカスタマイズ" Command="{Binding EditInsertPaletteCommand}" />
 				<MenuItem Header="アップロード設定" Command="{Binding EditUploadSettingCommand}" />
+				<MenuItem Header="テキストエディタのフォント設定" Command="{Binding EditTextEditorFontCommand}" />
 				<Separator />
 				<MenuItem Header="さとりすと本体フォルダを開く" Command="{Binding OpenSatolistDirectoryCommand}" />
 			</MenuItem>

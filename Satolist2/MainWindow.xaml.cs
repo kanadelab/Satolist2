@@ -162,7 +162,8 @@ namespace Satolist2
 			var currentWindow = EventEditors.FirstOrDefault(o => ((EventEditorViewModel)o.ViewModel).Event == ev);
 			if (currentWindow == null)
 			{
-				var newWindow = new DockingWindow(new EventEditor(), new EventEditorViewModel(mainViewModel, ev));
+				var viewModel = new EventEditorViewModel(mainViewModel, ev);
+				var newWindow = new DockingWindow(new EventEditor(), viewModel);
 				newWindow.CanClose = true;
 				newWindow.CanHide = false;
 
@@ -171,6 +172,7 @@ namespace Satolist2
 				newWindow.IsActiveChanged += NewWindow_IsActiveChanged;
 				ev.OnRemove += OpendEventRemoved;
 
+				viewModel.UpdateFontSettings();
 				EventEditors.Add(newWindow);
 				DocumentPane.Children.Add(newWindow);
 				currentWindow = newWindow;
@@ -246,6 +248,7 @@ namespace Satolist2
 			{
 				EventEditors.Remove(window);
 				window.Closing -= EventEditorClosing;
+				window.IsActiveChanged -= NewWindow_IsActiveChanged;
 				if (window.ViewModel is EventEditorViewModel viewModel)
 					viewModel.Event.OnRemove -= OpendEventRemoved;
 			}
@@ -259,11 +262,14 @@ namespace Satolist2
 			var currentWindow = TextEditors.FirstOrDefault(o => ((TextEditorViewModel)o.ViewModel).TextFile == text);
 			if(currentWindow == null)
 			{
-				var newWindow = new DockingWindow(new TextEditor(), new TextEditorViewModel(mainViewModel, text));
+				var viewModel = new TextEditorViewModel(mainViewModel, text);
+				var newWindow = new DockingWindow(new TextEditor(), viewModel);
 				newWindow.CanClose = true;
 				newWindow.CanHide = false;
 				newWindow.Closing += TextEditorClosing;
+				newWindow.IsActiveChanged += NewWindow_IsActiveChanged;
 				text.OnDelete += TextFileDeleted;
+				viewModel.UpdateFontSettings();
 
 				TextEditors.Add(newWindow);
 				DocumentPane.Children.Add(newWindow);
@@ -292,7 +298,8 @@ namespace Satolist2
 			{
 				TextEditors.Remove(window);
 				window.Closing -= TextEditorClosing;
-				if(window.ViewModel is TextEditorViewModel vm)
+				window.IsActiveChanged -= NewWindow_IsActiveChanged;
+				if (window.ViewModel is TextEditorViewModel vm)
 				{
 					vm.TextFile.OnDelete -= TextFileDeleted;
 				}
@@ -302,13 +309,15 @@ namespace Satolist2
 		internal TemporaryTextEditor OpenTemporaryTextEditor(string body, string title)
 		{
 			var editor = new TemporaryTextEditor();
-			var newWindow = new DockingWindow(editor, new TemporaryTextEditorViewModel()
+			var viewModel = new TemporaryTextEditorViewModel()
 			{
 				Title = title,
 				Text = body
-			});
+			};
+			var newWindow = new DockingWindow(editor, viewModel);
 			newWindow.CanClose = true;
 			newWindow.CanHide = false;
+			viewModel.UpdateFontSettings();
 
 			DocumentPane.Children.Add(newWindow);
 
@@ -316,6 +325,28 @@ namespace Satolist2
 			newWindow.IsActive = true;
 			editor.RequestFocus();
 			return editor;
+		}
+
+		//テキストエディタのフォントを更新
+		internal void UpdateTextEditorFonts()
+		{
+			foreach(var item in EventEditors)
+			{
+				if( item.ViewModel is TextEditorViewModelBase vm)
+				{
+					vm.UpdateFontSettings();
+				}
+			}
+
+			foreach (var item in TextEditors)
+			{
+				if (item.ViewModel is TextEditorViewModelBase vm)
+				{
+					vm.UpdateFontSettings();
+				}
+			}
+
+			//NOTE: テンポラリエディタはすぐ閉じるだろうし一旦は考えてない
 		}
 
 		internal void OpenGhost(string ghostPath, string shellDirectoryName = "master", string executablePath = null)
@@ -579,6 +610,7 @@ namespace Satolist2
 		public ActionCommand EditGeneralSettingsCommand { get; }
 		public ActionCommand EditInsertPaletteCommand { get; }
 		public ActionCommand EditUploadSettingCommand { get; }
+		public ActionCommand EditTextEditorFontCommand { get; }
 		public ActionCommand OpenSatolistDirectoryCommand { get; }
 		public ActionCommand ReloadShioriCommand { get; }
 		public ActionCommand ShowSearchBoxCommand { get; }
@@ -895,6 +927,26 @@ namespace Satolist2
 					{
 						EditorSettings.UploadSettings = d.DataContext.GetItems();
 						EditorSettings.SaveUploadSettings();
+					}
+				}
+				);
+
+			EditTextEditorFontCommand = new ActionCommand(
+				o =>
+				{
+					var fontDialog = new System.Windows.Forms.FontDialog();
+					fontDialog.AllowScriptChange = false;
+					fontDialog.AllowVerticalFonts = false;
+					fontDialog.AllowSimulations = false;
+					fontDialog.AllowVectorFonts = true;
+					fontDialog.FontMustExist = true;
+
+					if (fontDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+					{
+						EditorSettings.GeneralSettings.TextEditorFontName = fontDialog.Font.Name;
+						EditorSettings.GeneralSettings.TextEditorFontSize = fontDialog.Font.SizeInPoints;
+						MainWindow.UpdateTextEditorFonts();
+						EditorSettings.SaveGeneralSettings();
 					}
 				}
 				);

@@ -152,6 +152,16 @@ namespace Satolist2.Control
 			NotifyChanged(nameof(DocumentTitle));
 			NotifyChanged(nameof(DockingTitle));
 		}
+
+		//フォント設定を最新のものを使うようにする
+		public void UpdateFontSettings()
+		{
+			if(!string.IsNullOrEmpty(MainViewModel.EditorSettings.GeneralSettings.TextEditorFontName) && MainViewModel.EditorSettings.GeneralSettings.TextEditorFontSize > 0 )
+			{
+				MainTextEditor.FontFamily = new FontFamily(MainViewModel.EditorSettings.GeneralSettings.TextEditorFontName);
+				MainTextEditor.FontSize = MainViewModel.EditorSettings.GeneralSettings.TextEditorFontSize;
+			}
+		}
 	}
 
 	internal class EventEditorViewModel : TextEditorViewModelBase, IDisposable, IControlBindedReceiver

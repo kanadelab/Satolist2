@@ -239,6 +239,10 @@ namespace Satolist2.Model
 		public bool IsTextModeDefault { get; set; }
 		[JsonProperty]
 		public int ListedDictionaryInsertEmptyLineCount { get; set; }
+		[JsonProperty]
+		public double TextEditorFontSize { get; set; }
+		[JsonProperty]
+		public string TextEditorFontName { get; set; }
 
 		public GeneralSettings()
 		{
