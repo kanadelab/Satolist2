@@ -355,6 +355,7 @@ namespace Satolist2
 		{
 			//ゴーストのロード
 			var ghost = new GhostModel(ghostPath);
+			Title = string.Format("{0} - さとりすとv2", ghost.GhostDescriptSakuraName);
 
 			//メインの起動
 			var init = new MainViewModelInitializeData();
