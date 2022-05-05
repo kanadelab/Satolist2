@@ -23,6 +23,11 @@ jobs:
         run: |
           MSBuild.exe Satolist2.sln -property:Configuration=Deploy;Platform="Any CPU" -t:rebuild
 
+      - name: set version
+        shell: cmd
+        run: |
+          echo Satolist Development Version: #%GITHUB_RUN_NUMBER% >> Satolist2/bin/Deploy/version.txt
+
       - name: upload artifacts
         uses: actions/upload-artifact@v3
         with:
