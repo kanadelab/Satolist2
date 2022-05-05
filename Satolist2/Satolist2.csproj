@@ -394,12 +394,6 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Windows Logo.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="license.txt" />
-  </ItemGroup>
   <Import Project="..\SatolistResource\SatolistResource.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
