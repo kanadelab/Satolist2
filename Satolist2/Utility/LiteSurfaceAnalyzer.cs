@@ -48,6 +48,8 @@ namespace Satolist2.Utility
 		public void Load(string shellDirectory)
 		{
 			ShellDirectoryPath = DictionaryUtility.NormalizeFullPath(shellDirectory);
+			GlobalPaletteVisible = true;
+			GlobalViewerVisible = true;
 
 			//ファイルとして存在するサーフェスを列挙
 			var files = Directory.GetFiles(shellDirectory, "*.png");
