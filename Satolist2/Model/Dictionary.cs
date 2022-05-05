@@ -28,12 +28,12 @@ namespace Satolist2.Model
 
 		public string FullDictionaryPath
 		{
-			get => Path.Combine(FullPath, "ghost/master");
+			get => DictionaryUtility.ConbinePath(FullPath, "ghost/master");
 		}
 
 		public string FullGhostDescriptPath
 		{
-			get => Path.Combine(FullDictionaryPath, "descript.txt");
+			get => DictionaryUtility.ConbinePath(FullDictionaryPath, "descript.txt");
 		}
 
 		public string GhostDescriptSakuraName

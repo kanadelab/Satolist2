@@ -144,7 +144,7 @@ namespace Satolist2.Utility
 					SakuraName = value;
 					break;
 				case "ghostpath":
-					GhostPath = DictionaryUtility.NormalizeFullPath(value);
+					GhostPath = DictionaryUtility.RemoveLastSlash(DictionaryUtility.NormalizeFullPath(value));
 					break;
 				case "keroname":
 					KeroName = value;
