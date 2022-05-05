@@ -1,4 +1,4 @@
-name: test-build
+name: 開発版ビルド
 on: [push]
 jobs:
   build:
@@ -21,7 +21,7 @@ jobs:
       - name: run msbuild
         shell: cmd
         run: |
-          MSBuild.exe Satolist2/Satolist2.csproj -property:Configuration=Deploy;Platform=AnyCPU
+          MSBuild.exe Satolist2.sln -property:Configuration=Deploy;Platform=AnyCPU -t:rebuild
 
       - name: upload artifacts
         uses: actions/upload-artifact@v3
