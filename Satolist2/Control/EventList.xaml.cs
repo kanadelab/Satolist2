@@ -254,13 +254,23 @@ namespace Satolist2.Control
 				o => Parent.OpenSelectedItemEditor()
 				);
 			RemoveItemCommand = new ActionCommand(
-				o => Parent.RemoveSelectedItem()
+				o =>
+				{
+					var message = "選択した項目を削除します。よろしいですか？";
+					var result = MessageBox.Show(message, "項目の削除", MessageBoxButton.YesNo, MessageBoxImage.Question);
+					if (result != MessageBoxResult.Yes)
+						return;
+					Parent.RemoveSelectedItem();
+				}
 				);
 			AddItemCommand = new ActionCommand(
 				o => Parent.AddSameNameItem(Event, false)
 				);
 			MoveItemCommand = new ActionCommand(
-				o => Parent.MoveSelectedItem()
+				o =>
+				{
+					Parent.MoveSelectedItem();
+				}
 				);
 			AddSameConditionItemCommand = new ActionCommand(
 				o => parent.AddSameNameItem(Event, true)

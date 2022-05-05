@@ -266,6 +266,11 @@ namespace Satolist2.Control
 			RemoveItemCommand = new ActionCommand(
 				o =>
 				{
+					var message = "選択した項目を削除します。よろしいですか？";
+					var result = MessageBox.Show(message, "項目の削除", MessageBoxButton.YesNo, MessageBoxImage.Question);
+					if (result != MessageBoxResult.Yes)
+						return;
+
 					Parent.RemoveSelectedItem();
 				}
 				);

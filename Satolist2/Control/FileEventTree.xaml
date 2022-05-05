@@ -48,6 +48,15 @@
 								</Setter.Value>
 							</Setter>
 						</DataTrigger>
+
+						<DataTrigger Binding="{Binding IsHeader}" Value="True">
+							<Setter Property="ContextMenu">
+								<Setter.Value>
+									<x:Null />
+								</Setter.Value>
+							</Setter>
+						</DataTrigger>
+						
 						<DataTrigger Binding="{Binding NodeType}" Value="InlineEvent">
 							<!--なにもない-->
 						</DataTrigger>

@@ -418,6 +418,11 @@ namespace Satolist2.Control
 			}
 		}
 
+		public bool IsHeader
+		{
+			get => (events.FirstOrDefault()?.Type ?? EventType.Sentence) == EventType.Header;
+		}
+
 		public int ItemCount
 		{
 			get => events.Count;
@@ -465,7 +470,11 @@ namespace Satolist2.Control
 			DeleteItemCommand = new ActionCommand(
 				o =>
 				{
-					//TODO: 確認を出すようにしたいところ
+					var message = string.Format("{0}の「{1}」をまとめて削除します。よろしいですか？", Dictionary.Label, Label);
+					var result = MessageBox.Show(message, "項目の削除", MessageBoxButton.YesNo, MessageBoxImage.Question);
+					if (result != MessageBoxResult.Yes)
+						return;
+
 					foreach(var item in events.ToArray())
 					{
 						item.Remove();
