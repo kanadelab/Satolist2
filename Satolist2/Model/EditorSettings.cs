@@ -156,20 +156,23 @@ namespace Satolist2.Model
 			//ここは消えても対して気にしない方向
 			try
 			{
-				var jsonSerializer = new JsonSerializer();
-				TemporarySettings = jsonSerializer.Deserialize<TemporarySettings>(new JsonTextReader(new System.IO.StreamReader(TemporarySettingsPath)));
-
-				if (TemporarySettings == null)
-					throw new Exception();
+				if (System.IO.File.Exists(TemporarySettingsPath))
+				{
+					var jsonSerializer = new JsonSerializer();
+					TemporarySettings = jsonSerializer.Deserialize<TemporarySettings>(new JsonTextReader(new System.IO.StreamReader(TemporarySettingsPath)));
+				}
 			}
 			catch
 			{
-				TemporarySettings = new TemporarySettings();
+				
 				var err = new Dialog.ErrorListDialogItemViewModel();
 				err.Title = DictionaryUtility.NormalizeFullPath(TemporarySettingsPath);
 				err.Description = LoadErrorMessage;
 				LoadErrors.Add(err);
 			}
+
+			if(TemporarySettings == null)
+				TemporarySettings = new TemporarySettings();
 		}
 
 		public void SaveTemporarySettings()
