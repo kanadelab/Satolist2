@@ -76,6 +76,8 @@ namespace Satolist2
 			SaoriList.IsVisible = false;
 			ReplaceList.IsVisible = false;
 			VariableList.IsVisible = false;
+			SearchMenu.IsVisible = false;
+			RecvEventLog.IsVisible = false;
 
 			AllowDrop = true;
 			EventEditors = new List<DockingWindow>();
