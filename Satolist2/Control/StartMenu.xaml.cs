@@ -141,7 +141,7 @@ namespace Satolist2.Control
 		public string Path
 		{
 			get => path;
-			set => path = DictionaryUtility.NormalizeFullPath(value);
+			set => path = DictionaryUtility.RemoveLastSlash(DictionaryUtility.NormalizeFullPath(value));
 		}
 
 		//ヒストリーに存在するレコード
