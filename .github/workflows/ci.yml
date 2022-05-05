@@ -21,7 +21,7 @@ jobs:
       - name: run msbuild
         shell: cmd
         run: |
-          MSBuild.exe Satolist2.sln -property:Configuration=Deploy;Platform=AnyCPU -t:rebuild
+          MSBuild.exe Satolist2.sln -property:Configuration=Deploy;Platform="Any CPU" -t:rebuild
 
       - name: upload artifacts
         uses: actions/upload-artifact@v3
