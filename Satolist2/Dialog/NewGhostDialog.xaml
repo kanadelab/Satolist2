@@ -23,15 +23,22 @@
 			<StackPanel Grid.Row="0">
 				<TextBlock Text="ゴーストを新規作成します。" Margin="3"/>
 				<Separator Margin="3" />
-				<TextBlock Text="作成する場所" />
-				<Grid>
-					<Grid.ColumnDefinitions>
-						<ColumnDefinition Width="*" />
-						<ColumnDefinition Width="auto" />
-					</Grid.ColumnDefinitions>
-					<TextBox Grid.Column="0" Text="{Binding CreatePath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="3" VerticalAlignment="Center"/>
-					<Button Grid.Column="1" Command="{Binding OpenTargetSelectDialogCommand}" Content="参照" Padding="1" Width="50" Margin="3"/>
-				</Grid>
+				<StackPanel Margin="3">
+					<TextBlock Text="作成する場所" />
+					<Grid>
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="*" />
+							<ColumnDefinition Width="auto" />
+						</Grid.ColumnDefinitions>
+						<TextBox Grid.Column="0" Text="{Binding CreatePath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="3" VerticalAlignment="Center"/>
+						<Button Grid.Column="1" Command="{Binding OpenTargetSelectDialogCommand}" Content="参照" Padding="1" Width="50" Margin="3"/>
+					</Grid>
+				</StackPanel>
+				<StackPanel Margin="3">
+					<TextBlock Text="ゴーストフォルダ名" />
+					<TextBox Grid.Column="0" Text="{Binding CreateName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="3" VerticalAlignment="Center"/>
+				</StackPanel>
+				
 				<GroupBox Header="テンプレート詳細設定">
 					<StackPanel>
 						<CheckBox Content="さとりすと同梱のファイルを使用する" IsChecked="{Binding IsUseDefaultImportPath, Mode=TwoWay}" Margin="3"/>

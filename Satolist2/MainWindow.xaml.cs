@@ -888,7 +888,7 @@ namespace Satolist2
 					if( dialog.ShowDialog() == true)
 					{
 						//ゴーストの作成が実際に行われたのでそれを開く
-						MainWindow.OpenGhost(dialog.DataContext.CreatePath);
+						MainWindow.OpenGhost(dialog.DataContext.EffectiveCreatePath);
 					}
 				},
 				o => Ghost == null	//開いてない場合のみ

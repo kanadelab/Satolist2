@@ -1,4 +1,5 @@
 ﻿using Microsoft.Win32;
+using Microsoft.WindowsAPICodePack.Dialogs;
 using Satolist2.Utility;
 using System;
 using System.Collections.Generic;
@@ -46,6 +47,7 @@ namespace Satolist2.Dialog
 		private string descriptionText;
 
 		private string createPath;
+		private string createName;
 		private bool isUseDefaultImportPath;
 		private string importSatoriPath;
 		private string importLicencePath;
@@ -65,6 +67,26 @@ namespace Satolist2.Dialog
 				NotifyChanged();
 				NotifyChanged(nameof(IsValidIOPath));
 			}
+		}
+
+		//ゴーストフォルダ名
+		public string CreateName
+		{
+			get => createName;
+			set
+			{
+				createName = value;
+				NotifyChanged();
+				NotifyChanged(nameof(IsValidIOPath));
+			}
+		}
+
+		//結局の出力パス
+		public string EffectiveCreatePath
+		{
+			get => DictionaryUtility.ConbinePath(
+				DictionaryUtility.NormalizeFullPath(CreatePath),
+				CreateName);
 		}
 
 		//デフォルト設定を使う
@@ -131,7 +153,8 @@ namespace Satolist2.Dialog
 					!string.IsNullOrEmpty(CreatePath) &&
 					!string.IsNullOrEmpty(ImportSatoriPath) &&
 					!string.IsNullOrEmpty(ImportLicencePath) &&
-					!string.IsNullOrEmpty(ImportMasterShellPath);
+					!string.IsNullOrEmpty(ImportMasterShellPath) &&
+					!string.IsNullOrEmpty(CreateName);
 			}
 		}
 
@@ -224,7 +247,7 @@ namespace Satolist2.Dialog
 			OpenTargetSelectDialogCommand = new ActionCommand(
 				o =>
 				{
-					var path = OpenFileSelectDialog(CreatePath, "フォルダ|*", true);
+					var path = OpenFileSelectDialog(CreatePath, null, null, true);
 					if (!string.IsNullOrEmpty(path))
 						CreatePath = path;
 				}
@@ -233,7 +256,7 @@ namespace Satolist2.Dialog
 			OpenImportSatoriSelectDialogCommand = new ActionCommand(
 				o =>
 				{
-					var path = OpenFileSelectDialog(ImportSatoriPath, "里々モジュール(satori.dll)|satori.dll");
+					var path = OpenFileSelectDialog(ImportSatoriPath, "里々モジュール(satori.dll)", "dll");
 					if (!string.IsNullOrEmpty(path))
 						ImportSatoriPath = path;
 				}
@@ -242,7 +265,7 @@ namespace Satolist2.Dialog
 			OpenImportLicenceSelectDialogCommand = new ActionCommand(
 				o =>
 				{
-					var path = OpenFileSelectDialog(ImportLicencePath, "里々ライセンス(satori_licence.txt)|satori_licence.txt");
+					var path = OpenFileSelectDialog(ImportLicencePath, "里々ライセンス(satori_licence.txt)", "txt");
 					if (!string.IsNullOrEmpty(path))
 						ImportLicencePath = path;
 				}
@@ -251,7 +274,7 @@ namespace Satolist2.Dialog
 			OpenImportMasterShellSelectDialogCommand = new ActionCommand(
 				o =>
 				{
-					var path = OpenFileSelectDialog(ImportMasterShellPath, "シェルフォルダ|*", false, true);
+					var path = OpenFileSelectDialog(ImportMasterShellPath, null, null, false, true);
 					if (!string.IsNullOrEmpty(path))
 						ImportMasterShellPath = path;
 				}
@@ -291,7 +314,7 @@ namespace Satolist2.Dialog
 					{
 						try
 						{
-							CreateNewGhost(CreatePath, SelectedTemplate, ImportMasterShellPath, ImportSatoriPath, ImportLicencePath);
+							CreateNewGhost(EffectiveCreatePath, SelectedTemplate, ImportMasterShellPath, ImportSatoriPath, ImportLicencePath);
 							dialog.DialogResult = true;
 							dialog.Close();
 						}
@@ -304,58 +327,30 @@ namespace Satolist2.Dialog
 				);
 		}
 
-		private string OpenFileSelectDialog(string currentPath, string fileFilter,bool selectCreateDirectory = false, bool selectMasterShell = false)
+		private string OpenFileSelectDialog(string currentPath, string fileFilterLabel, string fileFilterExtension, bool selectCreateDirectory = false, bool selectMasterShell = false)
 		{
-			var fileDialog = new SaveFileDialog();
-			fileDialog.Filter = fileFilter;
-			fileDialog.FileName = System.IO.Path.GetFileName(currentPath);
-			fileDialog.InitialDirectory = System.IO.Path.GetDirectoryName(currentPath);
-			fileDialog.OverwritePrompt = false;
-
-			
-			if(selectMasterShell)
-				fileDialog.CheckFileExists = false;
+			//TODO: CommonOpenFileDialog にいれかえたいね
+			var fileDialog = new CommonOpenFileDialog();
 			
 
-			fileDialog.FileOk += (sender, e) =>
+			if(fileFilterLabel != null)
+				fileDialog.Filters.Add(new CommonFileDialogFilter(fileFilterLabel, fileFilterExtension));
+
+			if (selectCreateDirectory || selectMasterShell)
 			{
-				if(selectCreateDirectory)
-				{
-					//フォルダ作成の場合は存在してるフォルダを選んだら無効
-					if(System.IO.File.Exists(fileDialog.FileName))
-					{
-						MessageBox.Show("そのフォルダはすでに存在しているため、ゴーストの新規作成には使えません。");
-						e.Cancel = true;
-					}
-				}
-				else if(selectMasterShell)
-				{
-					//フォルダを選んだことにする
-					var effectivePath = System.IO.Path.GetDirectoryName(fileDialog.FileName);
-					if(!System.IO.Directory.Exists(effectivePath))
-					{
-						MessageBox.Show("そのファイルはありません。");
-						e.Cancel = true;
-					}
-
-					//確定
-					fileDialog.FileName = effectivePath;
-				}
-				else
-				{
-					//その他は存在してないといけない
-					if (!System.IO.File.Exists(fileDialog.FileName))
-					{
-						MessageBox.Show("そのファイルはありません。");
-						e.Cancel = true;
-					}
-				}
-
-			};
-
-			if( fileDialog.ShowDialog() == true)
+				fileDialog.IsFolderPicker = true;
+				fileDialog.DefaultFileName = string.Empty; ;
+				fileDialog.InitialDirectory = DictionaryUtility.NormalizeWindowsPath(currentPath);
+			}
+			else
 			{
-				return fileDialog.FileName;
+				fileDialog.DefaultFileName = System.IO.Path.GetFileName(currentPath);
+				fileDialog.InitialDirectory = System.IO.Path.GetDirectoryName(currentPath);
+			}
+
+			if (fileDialog.ShowDialog() == CommonFileDialogResult.Ok)
+			{
+				return DictionaryUtility.NormalizeFullPath(fileDialog.FileName);
 			}
 			return null;
 		}
@@ -363,13 +358,13 @@ namespace Satolist2.Dialog
 		//各種設定に問題ないかチェック、問題がある場合はメッセージを表示
 		private bool ValidatePathSettings()
 		{
-			if(System.IO.File.Exists(CreatePath))
+			if(System.IO.File.Exists(EffectiveCreatePath))
 			{
-				MessageBox.Show("すでに存在するフォルダは「作成する場所」には使えません。");
+				MessageBox.Show("すでに存在するフォルダには新規作成できません。");
 				return false;
 			}
 
-			if(!DictionaryUtility.IsValidFilePath(CreatePath))
+			if(!DictionaryUtility.IsValidFilePath(EffectiveCreatePath))
 			{
 				MessageBox.Show("「作成する場所」のファイルパスが誤っています。");
 				return false;

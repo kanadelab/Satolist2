@@ -112,19 +112,19 @@ namespace Satolist2.Utility
 		//パス区切りを統一
 		public static string NormalizePath(string path)
 		{
-			return path.Replace('\\', '/');
+			return path?.Replace('\\', '/');
 		}
 
 		//パス栗切りを\\に変更
 		public static string NormalizeWindowsPath(string path)
 		{
-			return path.Replace('/', '\\');
+			return path?.Replace('/', '\\');
 		}
 
 		//パス区切り文字を delete.exe 準拠の \ に統一
 		public static string NormalizeDeletePath(string path)
 		{
-			return path.Replace('/', '\\');
+			return path?.Replace('/', '\\');
 		}
 
 		//末尾がパス区切りなら取り除く
