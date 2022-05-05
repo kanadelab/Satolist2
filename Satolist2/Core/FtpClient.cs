@@ -40,9 +40,15 @@ namespace Satolist2.Core
 		{
 			//上書き、フォルダ自動生成
 			var bytes = System.IO.File.ReadAllBytes(localPath);
-			var status = Implement.Upload(bytes, remotePath, FtpRemoteExists.Overwrite, true);
-			if (status != FtpStatus.Success)
-				throw new Exception("アップロードに失敗しました。");
+
+			//5回までリトライ
+			for (int i = 0; i < 5; i++)
+			{
+				var status = Implement.Upload(bytes, remotePath, FtpRemoteExists.Overwrite, true);
+				if (status == FtpStatus.Success)
+					return;
+			}
+			throw new Exception("アップロードに失敗しました。");
 		}
 
 		public byte[] DownloadFile(string remotePath)
