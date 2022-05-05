@@ -311,10 +311,11 @@ namespace Satolist2.Dialog
 			fileDialog.FileName = System.IO.Path.GetFileName(currentPath);
 			fileDialog.InitialDirectory = System.IO.Path.GetDirectoryName(currentPath);
 			fileDialog.OverwritePrompt = false;
-			/*
-			if(selectShellDirectory)
+
+			
+			if(selectMasterShell)
 				fileDialog.CheckFileExists = false;
-			*/
+			
 
 			fileDialog.FileOk += (sender, e) =>
 			{
@@ -331,7 +332,7 @@ namespace Satolist2.Dialog
 				{
 					//フォルダを選んだことにする
 					var effectivePath = System.IO.Path.GetDirectoryName(fileDialog.FileName);
-					if(!System.IO.File.Exists(effectivePath))
+					if(!System.IO.Directory.Exists(effectivePath))
 					{
 						MessageBox.Show("そのファイルはありません。");
 						e.Cancel = true;
