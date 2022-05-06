@@ -74,10 +74,16 @@ namespace Satolist2.Control
 			{
 				if (currentTabIndex != value)
 				{
-					if (value == TabIndexList)
-						TextToList();
-					else
+					if(currentTabIndex == TabIndexList)
+					{
+						//リストから別の場所へ
 						ListToText();
+					}
+					else if(value == TabIndexList)
+					{
+						//別の場所からリストへ
+						TextToList();
+					}
 
 					currentTabIndex = value;
 					NotifyChanged();
@@ -260,7 +266,6 @@ namespace Satolist2.Control
 		private void DeserializeReplace(string body)
 		{
 			replaceCommonLine.Clear();
-			//items.Clear();
 			var lines = DictionaryUtility.SplitLines(body);
 			
 			foreach(var item in lines)
@@ -271,7 +276,8 @@ namespace Satolist2.Control
 					items.Add(new ReplaceListItemViewModel(this)
 					{
 						Before = sp[0],
-						After = sp[1]
+						After = sp[1],
+						IsReplace = true
 					});
 				}
 				else
@@ -295,7 +301,8 @@ namespace Satolist2.Control
 					items.Add(new ReplaceListItemViewModel(this)
 					{
 						Before = sp[0],
-						After = sp[1]
+						After = sp[1],
+						IsReplaceAfter = true
 					});
 				}
 				else
@@ -311,7 +318,7 @@ namespace Satolist2.Control
 			foreach(var item in items)
 			{
 				if(item.IsReplace)
-					lines.Add(string.Join("{0}\t{1}", item.Before, item.After));
+					lines.Add(string.Format("{0}\t{1}", item.Before, item.After));
 			}
 
 			lines.AddRange(replaceCommonLine);
@@ -324,14 +331,14 @@ namespace Satolist2.Control
 			foreach (var item in items)
 			{
 				if (item.IsReplaceAfter)
-					lines.Add(string.Join("{0}\t{1}", item.Before, item.After));
+					lines.Add(string.Format("{0}\t{1}", item.Before, item.After));
 			}
 
 			lines.AddRange(replaceAfterCommonLine);
 			return string.Join(Constants.NewLine, lines);
 		}
 
-		private void TextToList()
+		private void ListToText()
 		{
 			if (ReplaceDocument != null)
 				ReplaceDocument.TextChanged -= ReplaceDocument_TextChanged;
@@ -354,7 +361,7 @@ namespace Satolist2.Control
 			ReplaceSaveObject.Changed();
 		}
 
-		private void ListToText()
+		private void TextToList()
 		{
 			items.Clear();
 			DeserializeReplace(ReplaceDocument.Text);
