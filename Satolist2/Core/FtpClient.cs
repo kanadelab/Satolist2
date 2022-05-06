@@ -22,6 +22,8 @@ namespace Satolist2.Core
 			Implement = new FluentFTP.FtpClient(account.url);
 			Implement.Credentials = new System.Net.NetworkCredential(account.username, Utility.EncryptString.Decrypt(account.password));
 			Implement.EncryptionMode = FtpEncryptionMode.Auto;
+			Implement.UploadDataType = FtpDataType.Binary;
+			Implement.DownloadDataType = FtpDataType.Binary;
 		}
 
 		//同期実行
