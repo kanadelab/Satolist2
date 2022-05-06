@@ -27,7 +27,9 @@ namespace Satolist2.Utility
 			".ds_store",
 			"_catalog.vix",
 			"satori_savedata.txt",
-			"satori_savebackup.txt"
+			"satori_savebackup.txt",
+			"updates.txt",
+			"updates2.dau"
 		};
 
 		//組み込み無視フォルダ名
