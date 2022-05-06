@@ -34,17 +34,17 @@
 				
 				<!--次検索-->
 				<Button Command="{Binding SearchNextCommand}" Focusable="False">
-					<Path Fill="Black" Margin="-5 -5 0 0" Data="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+					<Path Fill="Black" Margin="-5 -5 0 0" Data="{StaticResource SearchNextIcon}" />
 				</Button>
 
 				<!--前検索-->
 				<Button Command="{Binding SearchPrevCommand}" Focusable="False">
-					<Path Fill="Black" Margin="-5 -5 0 0" Data="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+					<Path Fill="Black" Margin="-5 -5 0 0" Data="{StaticResource SearchPrevIcon}" />
 				</Button>
 
 				<!--閉じる-->
 				<Button Command="{Binding CloseSearchBoxCommand}" Focusable="False">
-					<Path Fill="Black" Margin="-5 -5 0 0" Data="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z" />
+					<Path Fill="Black" Margin="-5 -5 0 0" Data="{StaticResource RemoveIcon}" />
 				</Button>
 			</StackPanel>
 		</Border>

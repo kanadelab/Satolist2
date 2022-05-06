@@ -51,7 +51,7 @@
 										<Setter.Value>
 											<ControlTemplate>
 												<StackPanel Orientation="Horizontal">
-													<Path DockPanel.Dock="Left" Fill="CornflowerBlue" VerticalAlignment="Center" Margin="0 0 10 0" Data="M13,19H14A1,1 0 0,1 15,20H22V22H15A1,1 0 0,1 14,23H10A1,1 0 0,1 9,22H2V20H9A1,1 0 0,1 10,19H11V17H4A1,1 0 0,1 3,16V12A1,1 0 0,1 4,11H20A1,1 0 0,1 21,12V16A1,1 0 0,1 20,17H13V19M4,3H20A1,1 0 0,1 21,4V8A1,1 0 0,1 20,9H4A1,1 0 0,1 3,8V4A1,1 0 0,1 4,3M9,7H10V5H9V7M9,15H10V13H9V15M5,5V7H7V5H5M5,13V15H7V13H5Z" />
+													<Path DockPanel.Dock="Left" Fill="CornflowerBlue" VerticalAlignment="Center" Margin="0 0 10 0" Data="{StaticResource FTPServerIcon}" />
 													<StackPanel>
 														<TextBlock Text="{Binding Label}" FontSize="15" />
 														<TextBlock Text="{Binding Url}" />
@@ -68,7 +68,7 @@
 										<Setter.Value>
 											<ControlTemplate>
 												<StackPanel Orientation="Horizontal">
-													<Path Fill="CornflowerBlue" VerticalAlignment="Center" Margin="0 0 7 0" Data="M19.35,10.04C18.67,6.59 15.64,4 12,4C9.11,4 6.6,5.64 5.35,8.04C2.34,8.36 0,10.91 0,14A6,6 0 0,0 6,20H19A5,5 0 0,0 24,15C24,12.36 21.95,10.22 19.35,10.04M19,18H6A4,4 0 0,1 2,14C2,11.95 3.53,10.24 5.56,10.03L6.63,9.92L7.13,8.97C8.08,7.14 9.94,6 12,6C14.62,6 16.88,7.86 17.39,10.43L17.69,11.93L19.22,12.04C20.78,12.14 22,13.45 22,15A3,3 0 0,1 19,18M8,13H10.55V16H13.45V13H16L12,9L8,13Z" />
+													<Path Fill="CornflowerBlue" VerticalAlignment="Center" Margin="0 0 7 0" Data="{StaticResource UploadItemIcon}" />
 													<TextBlock Text="{Binding Label}" VerticalAlignment="Center" />
 												</StackPanel>
 											</ControlTemplate>
@@ -82,7 +82,7 @@
 										<Setter.Value>
 											<ControlTemplate>
 												<StackPanel Orientation="Horizontal">
-													<Path DockPanel.Dock="Left" Fill="CornflowerBlue" VerticalAlignment="Center" Margin="0 0 10 0" Data="M12 7.5C12.69 7.5 13.27 7.73 13.76 8.2S14.5 9.27 14.5 10C14.5 11.05 14 11.81 13 12.28V21H11V12.28C10 11.81 9.5 11.05 9.5 10C9.5 9.27 9.76 8.67 10.24 8.2S11.31 7.5 12 7.5M16.69 5.3C17.94 6.55 18.61 8.11 18.7 10C18.7 11.8 18.03 13.38 16.69 14.72L15.5 13.5C16.5 12.59 17 11.42 17 10C17 8.67 16.5 7.5 15.5 6.5L16.69 5.3M6.09 4.08C4.5 5.67 3.7 7.64 3.7 10S4.5 14.3 6.09 15.89L4.92 17.11C3 15.08 2 12.7 2 10C2 7.3 3 4.94 4.92 2.91L6.09 4.08M19.08 2.91C21 4.94 22 7.3 22 10C22 12.8 21 15.17 19.08 17.11L17.91 15.89C19.5 14.3 20.3 12.33 20.3 10S19.5 5.67 17.91 4.08L19.08 2.91M7.31 5.3L8.5 6.5C7.5 7.42 7 8.58 7 10C7 11.33 7.5 12.5 8.5 13.5L7.31 14.72C5.97 13.38 5.3 11.8 5.3 10C5.3 8.2 5.97 6.64 7.31 5.3Z" />
+													<Path DockPanel.Dock="Left" Fill="CornflowerBlue" VerticalAlignment="Center" Margin="0 0 10 0" Data="{StaticResource NarnaloaderV2ServerIcon}" />
 													<StackPanel>
 														<TextBlock Text="{Binding Label}" FontSize="15" />
 														<TextBlock Text="{Binding Url}" />
@@ -99,7 +99,7 @@
 										<Setter.Value>
 											<ControlTemplate>
 												<StackPanel Orientation="Horizontal">
-													<Path Fill="CornflowerBlue" VerticalAlignment="Center" Margin="0 0 7 0" Data="M19.35,10.04C18.67,6.59 15.64,4 12,4C9.11,4 6.6,5.64 5.35,8.04C2.34,8.36 0,10.91 0,14A6,6 0 0,0 6,20H19A5,5 0 0,0 24,15C24,12.36 21.95,10.22 19.35,10.04M19,18H6A4,4 0 0,1 2,14C2,11.95 3.53,10.24 5.56,10.03L6.63,9.92L7.13,8.97C8.08,7.14 9.94,6 12,6C14.62,6 16.88,7.86 17.39,10.43L17.69,11.93L19.22,12.04C20.78,12.14 22,13.45 22,15A3,3 0 0,1 19,18M8,13H10.55V16H13.45V13H16L12,9L8,13Z" />
+													<Path Fill="CornflowerBlue" VerticalAlignment="Center" Margin="0 0 7 0" Data="{StaticResource UploadItemIcon}" />
 													<TextBlock Text="{Binding Label}" VerticalAlignment="Center" />
 												</StackPanel>
 											</ControlTemplate>
@@ -143,13 +143,13 @@
 															<RowDefinition Height="auto" />
 														</Grid.RowDefinitions>
 
-														<Path Grid.Row="0" Grid.Column="0" Height="20" Width="20" HorizontalAlignment="Center" Stretch="Uniform" Fill="CornflowerBlue" VerticalAlignment="Center" Data="M19.35,10.04C18.67,6.59 15.64,4 12,4C9.11,4 6.6,5.64 5.35,8.04C2.34,8.36 0,10.91 0,14A6,6 0 0,0 6,20H19A5,5 0 0,0 24,15C24,12.36 21.95,10.22 19.35,10.04M19,18H6A4,4 0 0,1 2,14C2,11.95 3.53,10.24 5.56,10.03L6.63,9.92L7.13,8.97C8.08,7.14 9.94,6 12,6C14.62,6 16.88,7.86 17.39,10.43L17.69,11.93L19.22,12.04C20.78,12.14 22,13.45 22,15A3,3 0 0,1 19,18M8,13H10.55V16H13.45V13H16L12,9L8,13Z" />
+														<Path Grid.Row="0" Grid.Column="0" Height="20" Width="20" HorizontalAlignment="Center" Stretch="Uniform" Fill="CornflowerBlue" VerticalAlignment="Center" Data="{StaticResource FTPServerIcon}" />
 														<StackPanel Grid.Row="0" Grid.Column="2">
 															<TextBlock Text="サーバドメイン" />
 															<TextBlock Text="{Binding Url}" />
 														</StackPanel>
 
-														<Path Grid.Row="1" Grid.Column="0" Height="20" Width="20" HorizontalAlignment="Center" Stretch="Uniform" Fill="DarkSlateGray" VerticalAlignment="Center" Data="M7 14C5.9 14 5 13.1 5 12S5.9 10 7 10 9 10.9 9 12 8.1 14 7 14M12.6 10C11.8 7.7 9.6 6 7 6C3.7 6 1 8.7 1 12S3.7 18 7 18C9.6 18 11.8 16.3 12.6 14H16V18H20V14H23V10H12.6" />
+														<Path Grid.Row="1" Grid.Column="0" Height="20" Width="20" HorizontalAlignment="Center" Stretch="Uniform" Fill="DarkSlateGray" VerticalAlignment="Center" Data="{StaticResource PasswordIcon}" />
 														<StackPanel Grid.Row="1" Grid.Column="2">
 															<TextBlock Text="パスワード" />
 															<TextBlock>
@@ -193,19 +193,19 @@
 															<RowDefinition Height="auto" />
 														</Grid.RowDefinitions>
 
-														<Path Grid.Row="0" Grid.Column="0" Height="20" Width="20" HorizontalAlignment="Center" Stretch="Uniform" Fill="CornflowerBlue" VerticalAlignment="Center" Data="M19.35,10.04C18.67,6.59 15.64,4 12,4C9.11,4 6.6,5.64 5.35,8.04C2.34,8.36 0,10.91 0,14A6,6 0 0,0 6,20H19A5,5 0 0,0 24,15C24,12.36 21.95,10.22 19.35,10.04M19,18H6A4,4 0 0,1 2,14C2,11.95 3.53,10.24 5.56,10.03L6.63,9.92L7.13,8.97C8.08,7.14 9.94,6 12,6C14.62,6 16.88,7.86 17.39,10.43L17.69,11.93L19.22,12.04C20.78,12.14 22,13.45 22,15A3,3 0 0,1 19,18M8,13H10.55V16H13.45V13H16L12,9L8,13Z" />
+														<Path Grid.Row="0" Grid.Column="0" Height="20" Width="20" HorizontalAlignment="Center" Stretch="Uniform" Fill="CornflowerBlue" VerticalAlignment="Center" Data="{StaticResource FTPServerIcon}" />
 														<StackPanel Grid.Row="0" Grid.Column="2">
 															<TextBlock Text="サーバドメイン" />
 															<TextBlock Text="{Binding Parent.Url}" />
 														</StackPanel>
 
-														<Path Grid.Row="1" Grid.Column="0" Height="20" Width="20" HorizontalAlignment="Center" Stretch="Uniform" Fill="DarkGreen" Visibility="{Binding IsUploadFiles, Converter={StaticResource BoolToVisibilityConverter}}" Data="M22,4A2,2 0 0,1 24,6V16A2,2 0 0,1 22,18H6A2,2 0 0,1 4,16V4A2,2 0 0,1 6,2H12L14,4H22M2,6V20H20V22H2A2,2 0 0,1 0,20V11H0V6H2M6,6V16H22V6H6Z" />
+														<Path Grid.Row="1" Grid.Column="0" Height="20" Width="20" HorizontalAlignment="Center" Stretch="Uniform" Fill="DarkGreen" Visibility="{Binding IsUploadFiles, Converter={StaticResource BoolToVisibilityConverter}}" Data="{StaticResource UploadUpdatePathIcon}" />
 														<StackPanel Grid.Row="1" Grid.Column="2">
 															<TextBlock Text="更新データパス" />
 															<TextBlock Text="{Binding UpdatePath}" />
 														</StackPanel>
 
-														<Path Grid.Row="2" Grid.Column="0" Height="20" Width="20" HorizontalAlignment="Center" Stretch="Uniform" Fill="HotPink" Visibility="{Binding IsUploadNar, Converter={StaticResource BoolToVisibilityConverter}}" Data="M22,12V20A2,2 0 0,1 20,22H4A2,2 0 0,1 2,20V12A1,1 0 0,1 1,11V8A2,2 0 0,1 3,6H6.17C6.06,5.69 6,5.35 6,5A3,3 0 0,1 9,2C10,2 10.88,2.5 11.43,3.24V3.23L12,4L12.57,3.23V3.24C13.12,2.5 14,2 15,2A3,3 0 0,1 18,5C18,5.35 17.94,5.69 17.83,6H21A2,2 0 0,1 23,8V11A1,1 0 0,1 22,12M4,20H11V12H4V20M20,20V12H13V20H20M9,4A1,1 0 0,0 8,5A1,1 0 0,0 9,6A1,1 0 0,0 10,5A1,1 0 0,0 9,4M15,4A1,1 0 0,0 14,5A1,1 0 0,0 15,6A1,1 0 0,0 16,5A1,1 0 0,0 15,4M3,8V10H11V8H3M13,8V10H21V8H13Z" />
+														<Path Grid.Row="2" Grid.Column="0" Height="20" Width="20" HorizontalAlignment="Center" Stretch="Uniform" Fill="HotPink" Visibility="{Binding IsUploadNar, Converter={StaticResource BoolToVisibilityConverter}}" Data="{StaticResource UploadNarPathIcon}" />
 														<StackPanel Grid.Row="2" Grid.Column="2">
 															<TextBlock Text="Narアップロードパス" />
 															<TextBlock Text="{Binding NarPath}" />
@@ -237,13 +237,13 @@
 															<RowDefinition Height="auto" />
 														</Grid.RowDefinitions>
 
-														<Path Grid.Row="0" Grid.Column="0" Height="20" Width="20" HorizontalAlignment="Center" Stretch="Uniform" Fill="CornflowerBlue" VerticalAlignment="Center" Data="M19.35,10.04C18.67,6.59 15.64,4 12,4C9.11,4 6.6,5.64 5.35,8.04C2.34,8.36 0,10.91 0,14A6,6 0 0,0 6,20H19A5,5 0 0,0 24,15C24,12.36 21.95,10.22 19.35,10.04M19,18H6A4,4 0 0,1 2,14C2,11.95 3.53,10.24 5.56,10.03L6.63,9.92L7.13,8.97C8.08,7.14 9.94,6 12,6C14.62,6 16.88,7.86 17.39,10.43L17.69,11.93L19.22,12.04C20.78,12.14 22,13.45 22,15A3,3 0 0,1 19,18M8,13H10.55V16H13.45V13H16L12,9L8,13Z" />
+														<Path Grid.Row="0" Grid.Column="0" Height="20" Width="20" HorizontalAlignment="Center" Stretch="Uniform" Fill="CornflowerBlue" VerticalAlignment="Center" Data="{StaticResource NarnaloaderV2ServerIcon}" />
 														<StackPanel Grid.Row="0" Grid.Column="2">
 															<TextBlock Text="アップローダホスト" />
 															<TextBlock Text="{Binding Url}" />
 														</StackPanel>
 
-														<Path Grid.Row="1" Grid.Column="0" Height="20" Width="20" HorizontalAlignment="Center" Stretch="Uniform" Fill="DarkSlateGray" VerticalAlignment="Center" Data="M7 14C5.9 14 5 13.1 5 12S5.9 10 7 10 9 10.9 9 12 8.1 14 7 14M12.6 10C11.8 7.7 9.6 6 7 6C3.7 6 1 8.7 1 12S3.7 18 7 18C9.6 18 11.8 16.3 12.6 14H16V18H20V14H23V10H12.6" />
+														<Path Grid.Row="1" Grid.Column="0" Height="20" Width="20" HorizontalAlignment="Center" Stretch="Uniform" Fill="DarkSlateGray" VerticalAlignment="Center" Data="{StaticResource PasswordIcon}" />
 														<StackPanel Grid.Row="1" Grid.Column="2">
 															<TextBlock Text="パスワード" />
 															<TextBlock>
@@ -285,13 +285,13 @@
 															<RowDefinition Height="auto" />
 														</Grid.RowDefinitions>
 
-														<Path Grid.Row="0" Grid.Column="0" Height="20" Width="20" HorizontalAlignment="Center" Stretch="Uniform" Fill="CornflowerBlue" VerticalAlignment="Center" Data="M19.35,10.04C18.67,6.59 15.64,4 12,4C9.11,4 6.6,5.64 5.35,8.04C2.34,8.36 0,10.91 0,14A6,6 0 0,0 6,20H19A5,5 0 0,0 24,15C24,12.36 21.95,10.22 19.35,10.04M19,18H6A4,4 0 0,1 2,14C2,11.95 3.53,10.24 5.56,10.03L6.63,9.92L7.13,8.97C8.08,7.14 9.94,6 12,6C14.62,6 16.88,7.86 17.39,10.43L17.69,11.93L19.22,12.04C20.78,12.14 22,13.45 22,15A3,3 0 0,1 19,18M8,13H10.55V16H13.45V13H16L12,9L8,13Z" />
+														<Path Grid.Row="0" Grid.Column="0" Height="20" Width="20" HorizontalAlignment="Center" Stretch="Uniform" Fill="CornflowerBlue" VerticalAlignment="Center" Data="{StaticResource NarnaloaderV2ServerIcon}" />
 														<StackPanel Grid.Row="0" Grid.Column="2">
 															<TextBlock Text="アップローダホスト" />
 															<TextBlock Text="{Binding Parent.Url}" />
 														</StackPanel>
 
-														<Path Grid.Row="1" Grid.Column="0" Height="20" Width="20" HorizontalAlignment="Center" Stretch="Uniform" Fill="DarkGreen" Visibility="{Binding IsUploadFiles, Converter={StaticResource BoolToVisibilityConverter}}" Data="M12,15H10V13H12V15M18,15H14V13H18V15M8,11H6V9H8V11M18,11H10V9H18V11M20,20H4A2,2 0 0,1 2,18V6A2,2 0 0,1 4,4H20A2,2 0 0,1 22,6V18A2,2 0 0,1 20,20M4,6V18H20V6H4Z" />
+														<Path Grid.Row="1" Grid.Column="0" Height="20" Width="20" HorizontalAlignment="Center" Stretch="Uniform" Fill="DarkGreen" Visibility="{Binding IsUploadFiles, Converter={StaticResource BoolToVisibilityConverter}}" Data="{StaticResource UploadItemIcon}" />
 														<StackPanel Grid.Row="1" Grid.Column="2">
 															<TextBlock Text="アイテムID" />
 															<TextBlock Text="{Binding ItemId}" />
@@ -387,7 +387,20 @@
 						<RowDefinition Height="auto" />
 					</Grid.RowDefinitions>
 					
-					<Path Grid.Row="0" Grid.Column="0" Height="20" Width="20" HorizontalAlignment="Center" Stretch="Uniform" DockPanel.Dock="Left" Fill="CornflowerBlue" VerticalAlignment="Center" Data="M13,19H14A1,1 0 0,1 15,20H22V22H15A1,1 0 0,1 14,23H10A1,1 0 0,1 9,22H2V20H9A1,1 0 0,1 10,19H11V17H4A1,1 0 0,1 3,16V12A1,1 0 0,1 4,11H20A1,1 0 0,1 21,12V16A1,1 0 0,1 20,17H13V19M4,3H20A1,1 0 0,1 21,4V8A1,1 0 0,1 20,9H4A1,1 0 0,1 3,8V4A1,1 0 0,1 4,3M9,7H10V5H9V7M9,15H10V13H9V15M5,5V7H7V5H5M5,13V15H7V13H5Z" />
+					<Path Grid.Row="0" Grid.Column="0" Height="20" Width="20" HorizontalAlignment="Center" Stretch="Uniform" Fill="CornflowerBlue" VerticalAlignment="Center">
+						<Path.Style>
+							<Style TargetType="Path">
+								<Setter Property="Data" Value="{StaticResource NarnaloaderV2ServerIcon}" />
+								<Style.Triggers>
+									<DataTrigger Binding="{Binding SelectedItem.Parent.ItemType, ElementName=ServerList}" Value="FtpServer">
+										<Setter Property="Data" Value="{StaticResource FTPServerIcon}" />
+									</DataTrigger>
+								</Style.Triggers>
+							</Style>
+						</Path.Style>
+					</Path>
+
+					<Path Grid.Row="1" Grid.Column="0" Height="20" Width="20" HorizontalAlignment="Center" Stretch="Uniform" DockPanel.Dock="Left" Fill="CornflowerBlue" VerticalAlignment="Center" Data="{StaticResource UploadItemIcon}" />
 					<StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="2">
 						<TextBlock Text="{Binding SelectedItem.Parent.Label, ElementName=ServerList}" />
 					</StackPanel>
@@ -395,7 +408,7 @@
 					<Path Grid.Row="1" Grid.Column="0" Height="20" Width="20" HorizontalAlignment="Center" Stretch="Uniform" Fill="CornflowerBlue" VerticalAlignment="Center">
 						<Path.Style>
 							<Style TargetType="Path">
-								<Setter Property="Data" Value="M12 7.5C12.69 7.5 13.27 7.73 13.76 8.2S14.5 9.27 14.5 10C14.5 11.05 14 11.81 13 12.28V21H11V12.28C10 11.81 9.5 11.05 9.5 10C9.5 9.27 9.76 8.67 10.24 8.2S11.31 7.5 12 7.5M16.69 5.3C17.94 6.55 18.61 8.11 18.7 10C18.7 11.8 18.03 13.38 16.69 14.72L15.5 13.5C16.5 12.59 17 11.42 17 10C17 8.67 16.5 7.5 15.5 6.5L16.69 5.3M6.09 4.08C4.5 5.67 3.7 7.64 3.7 10S4.5 14.3 6.09 15.89L4.92 17.11C3 15.08 2 12.7 2 10C2 7.3 3 4.94 4.92 2.91L6.09 4.08M19.08 2.91C21 4.94 22 7.3 22 10C22 12.8 21 15.17 19.08 17.11L17.91 15.89C19.5 14.3 20.3 12.33 20.3 10S19.5 5.67 17.91 4.08L19.08 2.91M7.31 5.3L8.5 6.5C7.5 7.42 7 8.58 7 10C7 11.33 7.5 12.5 8.5 13.5L7.31 14.72C5.97 13.38 5.3 11.8 5.3 10C5.3 8.2 5.97 6.64 7.31 5.3Z" />
+								<Setter Property="Data" Value="{StaticResource UploadItemIcon}" />
 								<Style.Triggers>
 									<DataTrigger Binding="{Binding SelectedItem.Parent.ItemType, ElementName=ServerList}" Value="FtpServer">
 										<Setter Property="Data" Value="M19.35,10.04C18.67,6.59 15.64,4 12,4C9.11,4 6.6,5.64 5.35,8.04C2.34,8.36 0,10.91 0,14A6,6 0 0,0 6,20H19A5,5 0 0,0 24,15C24,12.36 21.95,10.22 19.35,10.04M19,18H6A4,4 0 0,1 2,14C2,11.95 3.53,10.24 5.56,10.03L6.63,9.92L7.13,8.97C8.08,7.14 9.94,6 12,6C14.62,6 16.88,7.86 17.39,10.43L17.69,11.93L19.22,12.04C20.78,12.14 22,13.45 22,15A3,3 0 0,1 19,18M8,13H10.55V16H13.45V13H16L12,9L8,13Z" />
@@ -406,7 +419,7 @@
 					</Path>
 					<TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding SelectedItem.Label, ElementName=ServerList}" />
 
-					<Path x:Name="UploadFilesIcon" Grid.Row="3" Grid.Column="0" Height="20" Width="20" HorizontalAlignment="Center" Stretch="Uniform" Fill="DarkGreen" Data="M22,4A2,2 0 0,1 24,6V16A2,2 0 0,1 22,18H6A2,2 0 0,1 4,16V4A2,2 0 0,1 6,2H12L14,4H22M2,6V20H20V22H2A2,2 0 0,1 0,20V11H0V6H2M6,6V16H22V6H6Z">
+					<Path x:Name="UploadFilesIcon" Grid.Row="3" Grid.Column="0" Height="20" Width="20" HorizontalAlignment="Center" Stretch="Uniform" Fill="DarkGreen" Data="{StaticResource UploadUpdatePathIcon}">
 						<Path.Style>
 							<Style TargetType="Path">
 								<Setter Property="Visibility" Value="Collapsed"/>
@@ -443,7 +456,7 @@
 						</TextBlock.Style>
 					</TextBlock>
 
-					<Path x:Name="UploadUseDiffIcon" Grid.Row="4" Grid.Column="0" Height="20" Width="20" HorizontalAlignment="Center" Stretch="Uniform" Fill="DarkGreen" Data="M10,18H6V16H10V18M10,14H6V12H10V14M10,1V2H6C4.89,2 4,2.89 4,4V20A2,2 0 0,0 6,22H10V23H12V1H10M20,8V20C20,21.11 19.11,22 18,22H14V20H18V11H14V9H18.5L14,4.5V2L20,8M16,14H14V12H16V14M16,18H14V16H16V18Z">
+					<Path x:Name="UploadUseDiffIcon" Grid.Row="4" Grid.Column="0" Height="20" Width="20" HorizontalAlignment="Center" Stretch="Uniform" Fill="DarkGreen" Data="{StaticResource UploadUseDiffIcon}">
 						<Path.Style>
 							<Style TargetType="Path">
 								<Setter Property="Visibility" Value="Collapsed"/>
@@ -480,7 +493,7 @@
 						</TextBlock.Style>
 					</TextBlock>
 
-					<Path x:Name="UploadNarIcon" Grid.Row="2" Grid.Column="0" Height="20" Width="20" HorizontalAlignment="Center" Stretch="Uniform" Fill="HotPink" Data="M22,12V20A2,2 0 0,1 20,22H4A2,2 0 0,1 2,20V12A1,1 0 0,1 1,11V8A2,2 0 0,1 3,6H6.17C6.06,5.69 6,5.35 6,5A3,3 0 0,1 9,2C10,2 10.88,2.5 11.43,3.24V3.23L12,4L12.57,3.23V3.24C13.12,2.5 14,2 15,2A3,3 0 0,1 18,5C18,5.35 17.94,5.69 17.83,6H21A2,2 0 0,1 23,8V11A1,1 0 0,1 22,12M4,20H11V12H4V20M20,20V12H13V20H20M9,4A1,1 0 0,0 8,5A1,1 0 0,0 9,6A1,1 0 0,0 10,5A1,1 0 0,0 9,4M15,4A1,1 0 0,0 14,5A1,1 0 0,0 15,6A1,1 0 0,0 16,5A1,1 0 0,0 15,4M3,8V10H11V8H3M13,8V10H21V8H13Z">
+					<Path x:Name="UploadNarIcon" Grid.Row="2" Grid.Column="0" Height="20" Width="20" HorizontalAlignment="Center" Stretch="Uniform" Fill="HotPink" Data="{StaticResource UploadNarPathIcon}">
 						<Path.Style>
 							<Style TargetType="Path">
 								<Setter Property="Visibility" Value="Collapsed"/>

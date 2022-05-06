@@ -184,12 +184,12 @@
 				<TextBox Grid.Column="0" Margin="3" Text="{Binding SelectedRange, Mode=OneWay}" VerticalAlignment="Center" IsReadOnly="True" />
 				<Button Grid.Column="1" Margin="3" Padding="2" Command="{Binding CopyToClipBoardCommand}" ToolTip="クリップボードに判定をコピー" Width="24" Height="24">
 					<Button.Content>
-						<Path Fill="Green" Stretch="UniformToFill" Data="M4 7V21H18V23H4C2.9 23 2 22.1 2 21V7H4M20 3C21.1 3 22 3.9 22 5V17C22 18.1 21.1 19 20 19H8C6.9 19 6 18.1 6 17V5C6 3.9 6.9 3 8 3H11.18C11.6 1.84 12.7 1 14 1C15.3 1 16.4 1.84 16.82 3H20M14 3C13.45 3 13 3.45 13 4C13 4.55 13.45 5 14 5C14.55 5 15 4.55 15 4C15 3.45 14.55 3 14 3M10 7V5H8V17H20V5H18V7M15 15H10V13H15M18 11H10V9H18V11Z" />
+						<Path Fill="Green" Stretch="UniformToFill" Data="{StaticResource ClipboardIcon}" />
 					</Button.Content>
 				</Button>
 				<Button Grid.Column="2" Margin="3" Padding="2" Command="{Binding CloseCollisionToolCommand}" ToolTip="判定の作成を終える" Width="24" Height="24">
 					<Button.Content>
-						<Path Fill="Red" Stretch="UniformToFill" Data="M20 6.91L17.09 4L12 9.09L6.91 4L4 6.91L9.09 12L4 17.09L6.91 20L12 14.91L17.09 20L20 17.09L14.91 12L20 6.91Z" />
+						<Path Fill="Red" Stretch="UniformToFill" Data="{StaticResource RemoveIcon}" />
 					</Button.Content>
 				</Button>
 			</Grid>

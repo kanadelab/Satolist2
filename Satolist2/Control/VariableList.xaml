@@ -20,7 +20,7 @@
 						<Button Margin="3" Command="{Binding AddItemCommand}" Padding="3 0 3 0">
 							<Button.Content>
 								<StackPanel Orientation="Horizontal">
-									<Path Fill="Green" Margin="-3 -3 2 2" Data="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z" />
+									<Path Fill="Green" Margin="-3 -3 2 2" Data="{StaticResource AddIcon}" />
 									<TextBlock Text="追加" />
 								</StackPanel>
 							</Button.Content>
@@ -66,7 +66,7 @@
 											<DataTemplate>
 												<Button Grid.Column="0" Margin="0 0 5 0" Command="{Binding RemoveSingleItemCommand}">
 													<Button.Content>
-														<Path Fill="Red" Margin="-3 -3 2 2" Data="M20 6.91L17.09 4L12 9.09L6.91 4L4 6.91L9.09 12L4 17.09L6.91 20L12 14.91L17.09 20L20 17.09L14.91 12L20 6.91Z" />
+														<Path Fill="Red" Margin="-3 -3 2 2" Data="{StaticResource RemoveIcon}" />
 													</Button.Content>
 												</Button>
 											</DataTemplate>

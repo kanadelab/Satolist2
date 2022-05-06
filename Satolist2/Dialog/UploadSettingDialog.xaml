@@ -38,7 +38,7 @@
 					<Button Margin="3" Padding="3 0 3 0" Command="{Binding AddFtpAccountCommand}">
 						<Button.Content>
 							<StackPanel Orientation="Horizontal">
-								<Path Fill="Green" Margin="-3 -3 2 2" Data="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z" />
+								<Path Fill="Green" Margin="-3 -3 2 2" Data="{StaticResource AddIcon}" />
 								<TextBlock Text="FTPサーバを追加" />
 							</StackPanel>
 						</Button.Content>
@@ -47,7 +47,7 @@
 					<Button Margin="3" Padding="3 0 3 0" Command="{Binding AddNarnaloaderAccountCommand}">
 						<Button.Content>
 							<StackPanel Orientation="Horizontal">
-								<Path Fill="Green" Margin="-3 -3 2 2" Data="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z" />
+								<Path Fill="Green" Margin="-3 -3 2 2" Data="{StaticResource AddIcon}" />
 								<TextBlock Text="ななろだv2サーバを追加" />
 							</StackPanel>
 						</Button.Content>
@@ -73,18 +73,18 @@
 														<Button Margin="3" Padding="3 0 3 0" Command="{Binding AddItemCommand}">
 															<Button.Content>
 																<StackPanel Orientation="Horizontal">
-																	<Path Fill="Green" Margin="-3 -3 2 2" Data="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z" />
+																	<Path Fill="Green" Margin="-3 -3 2 2" Data="{StaticResource AddIcon}" />
 																	<TextBlock Text="アイテム追加" />
 																</StackPanel>
 															</Button.Content>
 														</Button>
 														<Button Margin="3" Command="{Binding RemoveServerCommand}">
 															<Button.Content>
-																<Path Fill="Red" Margin="-3 -3 2 2" Data="M20 6.91L17.09 4L12 9.09L6.91 4L4 6.91L9.09 12L4 17.09L6.91 20L12 14.91L17.09 20L20 17.09L14.91 12L20 6.91Z" />
+																<Path Fill="Red" Margin="-3 -3 2 2" Data="{StaticResource RemoveIcon}" />
 															</Button.Content>
 														</Button>
 													</StackPanel>
-													<Path DockPanel.Dock="Left" Fill="CornflowerBlue" VerticalAlignment="Center" Margin="0 0 10 0" Data="M13,19H14A1,1 0 0,1 15,20H22V22H15A1,1 0 0,1 14,23H10A1,1 0 0,1 9,22H2V20H9A1,1 0 0,1 10,19H11V17H4A1,1 0 0,1 3,16V12A1,1 0 0,1 4,11H20A1,1 0 0,1 21,12V16A1,1 0 0,1 20,17H13V19M4,3H20A1,1 0 0,1 21,4V8A1,1 0 0,1 20,9H4A1,1 0 0,1 3,8V4A1,1 0 0,1 4,3M9,7H10V5H9V7M9,15H10V13H9V15M5,5V7H7V5H5M5,13V15H7V13H5Z" />
+													<Path DockPanel.Dock="Left" Fill="CornflowerBlue" VerticalAlignment="Center" Margin="0 0 10 0" Data="{StaticResource FTPServerIcon}" />
 													<StackPanel DockPanel.Dock="Left">
 														<TextBlock Text="{Binding Label}" FontSize="15" />
 														<StackPanel Orientation="Horizontal">
@@ -107,13 +107,13 @@
 													<StackPanel Orientation="Horizontal" VerticalAlignment="Center" DockPanel.Dock="Right">
 														<Button Command="{Binding RemoveItemCommand}" Margin="3">
 															<Button.Content>
-																<Path Fill="Red" Margin="-3 -3 2 2" Data="M20 6.91L17.09 4L12 9.09L6.91 4L4 6.91L9.09 12L4 17.09L6.91 20L12 14.91L17.09 20L20 17.09L14.91 12L20 6.91Z" />
+																<Path Fill="Red" Margin="-3 -3 2 2" Data="{StaticResource RemoveIcon}" />
 															</Button.Content>
 														</Button>
 													</StackPanel>
 
 													<StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
-														<Path Fill="CornflowerBlue" VerticalAlignment="Center" Margin="0 0 7 0" Data="M19.35,10.04C18.67,6.59 15.64,4 12,4C9.11,4 6.6,5.64 5.35,8.04C2.34,8.36 0,10.91 0,14A6,6 0 0,0 6,20H19A5,5 0 0,0 24,15C24,12.36 21.95,10.22 19.35,10.04M19,18H6A4,4 0 0,1 2,14C2,11.95 3.53,10.24 5.56,10.03L6.63,9.92L7.13,8.97C8.08,7.14 9.94,6 12,6C14.62,6 16.88,7.86 17.39,10.43L17.69,11.93L19.22,12.04C20.78,12.14 22,13.45 22,15A3,3 0 0,1 19,18M8,13H10.55V16H13.45V13H16L12,9L8,13Z" />
+														<Path Fill="CornflowerBlue" VerticalAlignment="Center" Margin="0 0 7 0" Data="{StaticResource UploadItemIcon}" />
 														<TextBlock Text="{Binding Label}" VerticalAlignment="Center" />
 													</StackPanel>
 												</DockPanel>
@@ -133,19 +133,19 @@
 															<Button Command="{Binding AddItemCommand}" Padding="3 0 3 0" Margin="3">
 																<Button.Content>
 																	<StackPanel Orientation="Horizontal">
-																		<Path Fill="Green" Margin="-3 -3 2 2" Data="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z" />
+																		<Path Fill="Green" Margin="-3 -3 2 2" Data="{StaticResource AddIcon}" />
 																		<TextBlock Text="アイテム追加" />
 																	</StackPanel>
 																</Button.Content>
 															</Button>
 															<Button Command="{Binding RemoveServerCommand}" Margin="3">
 																<Button.Content>
-																	<Path Fill="Red" Margin="-3 -3 2 2" Data="M20 6.91L17.09 4L12 9.09L6.91 4L4 6.91L9.09 12L4 17.09L6.91 20L12 14.91L17.09 20L20 17.09L14.91 12L20 6.91Z" />
+																	<Path Fill="Red" Margin="-3 -3 2 2" Data="{StaticResource RemoveIcon}" />
 																</Button.Content>
 															</Button>
 														</StackPanel>
 													</StackPanel>
-													<Path DockPanel.Dock="Left" Fill="CornflowerBlue" VerticalAlignment="Center" Margin="0 0 10 0" Data="M12 7.5C12.69 7.5 13.27 7.73 13.76 8.2S14.5 9.27 14.5 10C14.5 11.05 14 11.81 13 12.28V21H11V12.28C10 11.81 9.5 11.05 9.5 10C9.5 9.27 9.76 8.67 10.24 8.2S11.31 7.5 12 7.5M16.69 5.3C17.94 6.55 18.61 8.11 18.7 10C18.7 11.8 18.03 13.38 16.69 14.72L15.5 13.5C16.5 12.59 17 11.42 17 10C17 8.67 16.5 7.5 15.5 6.5L16.69 5.3M6.09 4.08C4.5 5.67 3.7 7.64 3.7 10S4.5 14.3 6.09 15.89L4.92 17.11C3 15.08 2 12.7 2 10C2 7.3 3 4.94 4.92 2.91L6.09 4.08M19.08 2.91C21 4.94 22 7.3 22 10C22 12.8 21 15.17 19.08 17.11L17.91 15.89C19.5 14.3 20.3 12.33 20.3 10S19.5 5.67 17.91 4.08L19.08 2.91M7.31 5.3L8.5 6.5C7.5 7.42 7 8.58 7 10C7 11.33 7.5 12.5 8.5 13.5L7.31 14.72C5.97 13.38 5.3 11.8 5.3 10C5.3 8.2 5.97 6.64 7.31 5.3Z" />
+													<Path DockPanel.Dock="Left" Fill="CornflowerBlue" VerticalAlignment="Center" Margin="0 0 10 0" Data="{StaticResource NarnaloaderV2ServerIcon}" />
 													<StackPanel DockPanel.Dock="Left">
 														<TextBlock Text="{Binding Label}" FontSize="15" />
 														<StackPanel Orientation="Horizontal">
@@ -169,13 +169,13 @@
 														<StackPanel VerticalAlignment="Center" DockPanel.Dock="Right">
 															<Button Command="{Binding RemoveItemCommand}" Margin="3">
 																<Button.Content>
-																	<Path Fill="Red" Margin="-3 -3 2 2" Data="M20 6.91L17.09 4L12 9.09L6.91 4L4 6.91L9.09 12L4 17.09L6.91 20L12 14.91L17.09 20L20 17.09L14.91 12L20 6.91Z" />
+																	<Path Fill="Red" Margin="-3 -3 2 2" Data="{StaticResource RemoveIcon}" />
 																</Button.Content>
 															</Button>
 														</StackPanel>
 													</StackPanel>
 													<StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
-														<Path Fill="CornflowerBlue" VerticalAlignment="Center" Margin="0 0 7 0" Data="M19.35,10.04C18.67,6.59 15.64,4 12,4C9.11,4 6.6,5.64 5.35,8.04C2.34,8.36 0,10.91 0,14A6,6 0 0,0 6,20H19A5,5 0 0,0 24,15C24,12.36 21.95,10.22 19.35,10.04M19,18H6A4,4 0 0,1 2,14C2,11.95 3.53,10.24 5.56,10.03L6.63,9.92L7.13,8.97C8.08,7.14 9.94,6 12,6C14.62,6 16.88,7.86 17.39,10.43L17.69,11.93L19.22,12.04C20.78,12.14 22,13.45 22,15A3,3 0 0,1 19,18M8,13H10.55V16H13.45V13H16L12,9L8,13Z" />
+														<Path Fill="CornflowerBlue" VerticalAlignment="Center" Margin="0 0 7 0" Data="{StaticResource UploadItemIcon}" />
 														<TextBlock Text="{Binding Label}" VerticalAlignment="Center" />
 													</StackPanel>
 												</DockPanel>
@@ -183,7 +183,6 @@
 										</Setter.Value>
 									</Setter>
 								</DataTrigger>
-
 
 							</HierarchicalDataTemplate.Triggers>
 

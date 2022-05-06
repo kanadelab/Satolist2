@@ -29,20 +29,19 @@
 		<StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal">
 			<Button Margin="3" Command="{Binding AddItemCommand}" Padding="5 2 5 2">
 				<StackPanel Orientation="Horizontal">
-					<Path Fill="Green" VerticalAlignment="Center" Stretch="UniformToFill" Data="M9,22A1,1 0 0,1 8,21V18H4A2,2 0 0,1 2,16V4C2,2.89 2.9,2 4,2H20A2,2 0 0,1 22,4V16A2,2 0 0,1 20,18H13.9L10.2,21.71C10,21.9 9.75,22 9.5,22V22H9M10,16V19.08L13.08,16H20V4H4V16H10M6,7H18V9H6V7M6,11H15V13H6V11Z">
+					<Path Fill="Green" VerticalAlignment="Center" Stretch="UniformToFill" Data="{StaticResource InsertMenuItemIcon}">
 					</Path>
 					<TextBlock VerticalAlignment="Center" Text="アイテム追加" />
 				</StackPanel>
 			</Button>
 			<Button Margin="3" Command="{Binding AddGroupCommand}" Padding="5 2 5 2">
 				<StackPanel Orientation="Horizontal">
-					<Path Fill="Green" VerticalAlignment="Center" Stretch="UniformToFill" Data="M6.1,10L4,18V8H21A2,2 0 0,0 19,6H12L10,4H4A2,2 0 0,0 2,6V18A2,2 0 0,0 4,20H19C19.9,20 20.7,19.4 20.9,18.5L23.2,10H6.1M19,18H6L7.6,12H20.6L19,18Z">
+					<Path Fill="Green" VerticalAlignment="Center" Stretch="UniformToFill" Data="{StaticResource InsertMenuGroupIcon}">
 					</Path>
 					<TextBlock VerticalAlignment="Center" Text="グループ追加" />
 				</StackPanel>
 			</Button>
 		</StackPanel>
-
 
 		<TreeView Grid.Row="1" Grid.Column="0" x:Name="MainList" ItemsSource="{Binding Items}" >
 			<TreeView.ItemContainerStyle>
@@ -103,17 +102,17 @@
 						<StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right">
 							<Button Margin="3" Command="{Binding UpItemCommand}">
 								<Button.Content>
-									<Path Fill="Green" Margin="-3 -3 2 2" Data="M14,20H10V11L6.5,14.5L4.08,12.08L12,4.16L19.92,12.08L17.5,14.5L14,11V20Z" />
+									<Path Fill="Green" Margin="-3 -3 2 2" Data="{StaticResource UpIcon}" />
 								</Button.Content>
 							</Button>
 							<Button Margin="3" Command="{Binding DownItemCommand}">
 								<Button.Content>
-									<Path Fill="Green" Margin="-3 -3 2 2" Data="M10,4H14V13L17.5,9.5L19.92,11.92L12,19.84L4.08,11.92L6.5,9.5L10,13V4Z" />
+									<Path Fill="Green" Margin="-3 -3 2 2" Data="{StaticResource DownIcon}" />
 								</Button.Content>
 							</Button>
 							<Button Margin="3" Command="{Binding RemoveItemCommand}">
 								<Button.Content>
-									<Path Fill="Red" Margin="-3 -3 2 2" Data="M20 6.91L17.09 4L12 9.09L6.91 4L4 6.91L9.09 12L4 17.09L6.91 20L12 14.91L17.09 20L20 17.09L14.91 12L20 6.91Z" />
+									<Path Fill="Red" Margin="-3 -3 2 2" Data="{StaticResource RemoveIcon}" />
 								</Button.Content>
 							</Button>
 							<StackPanel.Style>
