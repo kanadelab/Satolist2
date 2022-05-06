@@ -46,7 +46,7 @@ namespace Satolist2.Dialog
 		}
 	}
 
-	//エラーリスト、主に概要+
+	//エラーリスト、主に概要+説明
 	internal class ErrorListDialogViewModel : NotificationObject
 	{
 		private ObservableCollection<ErrorListDialogItemViewModel> items;
@@ -62,6 +62,7 @@ namespace Satolist2.Dialog
 		public ActionCommand OkCommand { get; }
 		public ActionCommand CancelCommand { get; }
 
+		//タイトルバー
 		public string Title
 		{
 			get => title;
@@ -72,6 +73,7 @@ namespace Satolist2.Dialog
 			}
 		}
 
+		//トップの説明
 		public string Description
 		{
 			get => description;
@@ -104,6 +106,7 @@ namespace Satolist2.Dialog
 				);
 		}
 
+		//エラー内容の設定
 		public void SetErrorItems(IEnumerable<ErrorListDialogItemViewModel> errorItems)
 		{
 			items.Clear();
@@ -112,11 +115,13 @@ namespace Satolist2.Dialog
 		}
 	}
 
+	//エラー内容ごと
 	internal class ErrorListDialogItemViewModel : NotificationObject
 	{
 		private string title;
 		private string description;
 
+		//主にファイル名想定
 		public string Title
 		{
 			get => title;
@@ -127,6 +132,7 @@ namespace Satolist2.Dialog
 			}
 		}
 
+		//説明
 		public string Description
 		{
 			get => description;

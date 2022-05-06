@@ -29,6 +29,7 @@ namespace Satolist2.Dialog
 			}
 		}
 
+		//選択中の物 いらなそうなので変更通知は仕込んでない
 		public Model.DictionaryModel SelectedItem
 		{
 			get; private set;

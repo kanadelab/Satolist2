@@ -51,6 +51,7 @@ namespace Satolist2.Dialog
 		}
 	}
 
+	//項目の追加ダイアログ
 	internal class AddEventDialogViewModel : NotificationObject
 	{
 		private string name;
@@ -60,6 +61,7 @@ namespace Satolist2.Dialog
 
 		public MainViewModel Main { get; }
 
+		//項目名
 		public string Name
 		{
 			get => name;
@@ -70,6 +72,7 @@ namespace Satolist2.Dialog
 			}
 		}
 
+		//条件 ウインドウには出さないけど追加項目の内容として保持
 		public string Condition
 		{
 			get => condition;
@@ -79,7 +82,8 @@ namespace Satolist2.Dialog
 				NotifyChanged();
 			}
 		}
-
+		
+		//追加先の辞書
 		public DictionaryModel AddTarget
 		{
 			get => addTarget;
@@ -90,6 +94,7 @@ namespace Satolist2.Dialog
 			}
 		}
 
+		//追加するのは「単語群」か
 		public bool IsWordSelected
 		{
 			get => type == EventType.Word;
@@ -103,6 +108,7 @@ namespace Satolist2.Dialog
 			}
 		}
 
+		//追加するのは「文」か
 		public bool IsSentenceSelected
 		{
 			get => type == EventType.Sentence;
@@ -116,6 +122,8 @@ namespace Satolist2.Dialog
 			}
 		}
 
+		//enumで追加するものの選択
+		//headerは想定してない
 		public EventType Type
 		{
 			get => type;
