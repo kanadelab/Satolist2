@@ -19,7 +19,7 @@
 			<CheckBox Content="Owned SSTPによるトークの送信" IsChecked="{Binding Model.UseOwnedSSTP, Mode=TwoWay}" Margin="3"/>
 			<CheckBox Content="リスト化解除モードをデフォルトにする" IsChecked="{Binding Model.IsTextModeDefault, Mode=TwoWay}" Margin="3"/>
 			<StackPanel Margin="3">
-				<TextBlock Text="リスト化した辞書の項目感に空白行を挿入する" Margin="1"/>
+				<TextBlock Text="リスト化した辞書の項目間に空白行を挿入する" Margin="1"/>
 				<ComboBox SelectedIndex="{Binding Model.ListedDictionaryInsertEmptyLineCount, Mode=TwoWay}" Width="100" HorizontalAlignment="Left" Margin="1">
 					<ComboBoxItem>0</ComboBoxItem>
 					<ComboBoxItem>1</ComboBoxItem>
