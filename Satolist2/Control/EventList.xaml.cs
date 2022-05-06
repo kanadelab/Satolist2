@@ -56,6 +56,7 @@ namespace Satolist2.Control
 		public const string ContentId = "EventList";
 		private ObservableCollection<EventListItemViewModel> items;
 		private INotifyCollectionChanged itemsSource;
+		private string eventTitleLabel;
 		private string dockingTitle;
 
 		public MainViewModel Main { get; }
@@ -160,8 +161,8 @@ namespace Satolist2.Control
 				items.Add(newItem);
 			}
 
-			DockingTitle = dictionary.Name + "/" + eventLabel;
-			NotifyChanged(nameof(DockingTitle));
+			eventTitleLabel = string.Format("{0}/{1}", dictionary.Name, eventLabel);
+			DockingTitle = string.Format("{0} ({1})", eventTitleLabel, items.Count);
 		}
 
 		public void SetItems(ReadOnlyObservableCollection<InlineEventModel> events, string eventLabel, DictionaryModel dictionary)
@@ -182,7 +183,9 @@ namespace Satolist2.Control
 				var newItem = new EventListItemViewModel(this, ev);
 				items.Add(newItem);
 			}
-			NotifyChanged(nameof(dockingTitle));
+
+			eventTitleLabel = string.Format("{0}/{1}", dictionary.Name, eventLabel);
+			DockingTitle = string.Format("{0} ({1})", eventTitleLabel, items.Count);
 		}
 
 		private void SourceCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -213,7 +216,7 @@ namespace Satolist2.Control
 			{
 				items.Clear();
 			}
-
+			DockingTitle = string.Format("{0} ({1})", eventTitleLabel, items.Count);
 		}
 
 	}

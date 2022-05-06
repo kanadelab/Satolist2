@@ -43,8 +43,17 @@ namespace Satolist2.Control
 		public const string ContentId = "SearchResult";
 		private ObservableCollection<SearchResultItemViewModel> items;
 		private MainViewModel Main { get; }
+		private string dockingTitle;
 
-		public string DockingTitle => "検索結果";
+		public string DockingTitle
+		{
+			get => dockingTitle;
+			set
+			{
+				dockingTitle = value;
+				NotifyChanged();
+			}
+		}
 
 		public string DockingContentId => ContentId;
 
@@ -58,6 +67,7 @@ namespace Satolist2.Control
 		{
 			Main = main;
 			items = new ObservableCollection<SearchResultItemViewModel>();
+			DockingTitle = "検索結果";
 		}
 
 		//検索の実行?
@@ -102,6 +112,7 @@ namespace Satolist2.Control
 			//ウインドウの表示・アクティブ化
 			Main.MainWindow.SearchResult.IsActive = true;
 			Main.MainWindow.SearchResult.IsVisible = true;
+			DockingTitle = string.Format("検索結果 ({0})", items.Count);
 		}
 
 		//選択中のアイテムを開く
@@ -136,6 +147,7 @@ namespace Satolist2.Control
 		{
 			item.Dispose();
 			items.Remove(item);
+			DockingTitle = string.Format("検索結果 ({0})", items.Count);
 		}
 
 		//念のため程度?
