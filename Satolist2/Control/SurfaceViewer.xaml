@@ -32,14 +32,14 @@
 					<ColumnDefinition Width="*" />
 				</Grid.ColumnDefinitions>
 
-				<ListView Grid.Column="0" ItemsSource="{Binding SurfaceList}" SelectedItem="{Binding SelectedSurface}" DisplayMemberPath="Label" />
+				
 
 				<!--サーフェス画像本体-->
 				<Image Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Top" x:Name="SurfaceImage"
 					   IsHitTestVisible="False" Source="{Binding SelectedSurfaceBitmap, Converter={StaticResource BitmapConverter}}" Width="{Binding SelectedSurfaceBitmap.Width}" />
 
 				<!--判定作成機能-->
-				<Canvas Grid.Column="1" Background="Transparent" IsHitTestVisible="False"
+				<Canvas Grid.Column="1" Background="Transparent" IsHitTestVisible="False" ClipToBounds="True"
 						Width="{Binding ActualWidth,ElementName=SurfaceImage}"
 					   Height="{Binding ActualHeight,ElementName=SurfaceImage}"
 					   HorizontalAlignment="Center" VerticalAlignment="Top">
@@ -62,6 +62,7 @@
 							 Visibility="{Binding IsCollisionModePolygon, Converter={StaticResource BoolToVisibilityConverter}}"/>
 				</Canvas>
 
+				<!--判定作成機能-->
 				<Canvas Grid.Column="1"
 						Width="{Binding ActualWidth,ElementName=SurfaceImage}"
 					   Height="{Binding ActualHeight,ElementName=SurfaceImage}"
@@ -157,7 +158,9 @@
 					</Thumb>
 					
 				</Canvas>
-				
+
+				<!--サーフェスリスト-->
+				<ListView Grid.Column="0" ItemsSource="{Binding SurfaceList}" SelectedItem="{Binding SelectedSurface}" DisplayMemberPath="Label" />
 			</Grid>
 
 			<!--生成判定情報-->
