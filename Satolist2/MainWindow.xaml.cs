@@ -370,6 +370,12 @@ namespace Satolist2
 			//無事に開けたらヒストリーに足す
 			MainViewModel.EditorSettings.TemporarySettings.AddHistory(ghost);
 
+			//テキストエディタ類を全部閉じる（開くより前のゴーストインスタンスに紐づく為）
+			foreach (var e in TextEditors.ToArray())
+				e.Close();
+			foreach (var e in EventEditors.ToArray())
+				e.Close();
+
 			//開けたらスタートメニューを閉じる
 			StartMenu.Hide();
 		}
