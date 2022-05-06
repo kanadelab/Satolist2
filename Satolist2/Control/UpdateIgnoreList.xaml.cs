@@ -172,7 +172,11 @@ namespace Satolist2.Control
 					UnSelectAll();
 
 					//アイテムを追加
-					items.Add(new UpdateIgnoreListItemViewModel(this));
+					items.Add(new UpdateIgnoreListItemViewModel(this) {
+						IsNoNar = true,
+						IsNoUpdate = true
+					}
+					);
 
 					//末尾追加のはずなので、追加したアイテムのとこに移動する
 					items.Last().IsSelected = true;
@@ -208,6 +212,8 @@ namespace Satolist2.Control
 			{
 				//ファイルを追加
 				var addItem = new UpdateIgnoreListItemViewModel(this);
+				addItem.IsNoNar = true;
+				addItem.IsNoUpdate = true;
 				addItem.IsSelected = true;
 				addItem.Path = DictionaryUtility.MakeRelativePath(main.Ghost.FullPath, item);
 				items.Add(addItem);
@@ -361,8 +367,6 @@ namespace Satolist2.Control
 			if(record != null)
 			{
 				record.IsDelete = true;
-				record.IsNoNar = false;
-				record.IsNoUpdate = false;
 			}
 			else
 			{
@@ -382,45 +386,6 @@ namespace Satolist2.Control
 			{
 				AddDeveloperOptionsRecord(item.Path, item.IsNonar, item.IsNoUpdate);
 			}
-
-#if false
-			//csvをロード
-			var csvBuilder = new CsvBuilder();
-			csvBuilder.Deserialize(body);
-
-			//フォーマットに沿っているデータを検索
-			foreach(var item in csvBuilder.Records)
-			{
-				//ファイルパスではないレコードは無視。"//"で始まる行もコメントとしてみなしておく
-				bool isInvalid = false;
-				if((item.Key?.IndexOfAny(System.IO.Path.GetInvalidPathChars()) ?? -1) >= 0)
-				{
-					isInvalid = true;
-				}
-				else if((item.Key?.IndexOf("//") ?? -1) == 0)
-				{
-					isInvalid = true;
-				}
-
-				if(!isInvalid && NoNarNoUpdateRegex.IsMatch(item.Value) && !string.IsNullOrEmpty(item.Key))
-				{
-					//developeroptionsとして有効なのでレコードに追加
-					bool isnonar = item.Value.IndexOf("nonar") >= 0;
-					bool isnoupdate = item.Value.IndexOf("noupdate") >= 0;
-					AddDeveloperOptionsRecord(item.Key, isnonar, isnoupdate);
-					continue;
-				}
-
-				if(!string.IsNullOrEmpty(item.Key))
-				{
-					developerOptionsCommonLine.Add(string.Concat(item.Key, ",", item.Value));
-				}
-				else
-				{
-					developerOptionsCommonLine.Add(item.Value);
-				}
-			}
-#endif
 		}
 
 		public void DeserializeDelete(string body)
@@ -649,8 +614,8 @@ namespace Satolist2.Control
 
 			//デフォルト。
 			path = string.Empty;
-			isNoNar = true;
-			isNoUpdate = true;
+			isNoNar = false;
+			isNoUpdate = false;
 
 			RemoveItemCommand = parent.RemoveItemCommand;
 			RemoveSingleItemCommand = new ActionCommand(

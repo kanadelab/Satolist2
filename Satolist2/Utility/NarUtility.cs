@@ -323,7 +323,7 @@ namespace Satolist2.Utility
 	public class DeveloperOptionsParser
 	{
 		//有効レコードかどうかを判定するためのもの
-		private static readonly Regex NoNarNoUpdateRegex = new Regex("(nonar|noupdate)(,nonar|,noupdate)?");
+		private static readonly Regex NoNarNoUpdateRegex = new Regex("(nonar|noupdate)\\s*,?\\s*(nonar|noupdate)?");
 
 		public ReadOnlyCollection<string> CommonLines { get; }
 		public ReadOnlyCollection<Record> Records { get; }
