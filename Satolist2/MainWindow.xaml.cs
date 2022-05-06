@@ -608,6 +608,8 @@ namespace Satolist2
 		public ActionCommand AddSatoriDictionaryFileCommand { get; }
 		public ActionCommand AddTextFileCommand { get; }
 		public ActionCommand OpenGhostDirectoryCommand { get; }
+		public ActionCommand OpenGhostDictionaryDirectoryCommand { get; }
+		public ActionCommand OpenGhostShellDirectoryCommand { get; }
 		public ActionCommand BootSSPCommand { get; }
 		public ActionCommand NewGhostCommand { get; }
 		public ActionCommand EditGeneralSettingsCommand { get; }
@@ -836,12 +838,34 @@ namespace Satolist2
 				{
 					try
 					{
-						Process.Start(Ghost.FullDictionaryPath);
+						Process.Start(Ghost.FullPath);
 					}
 					catch { }
 				},
 				o => Ghost != null
 
+				);
+
+			OpenGhostDictionaryDirectoryCommand = new ActionCommand(
+				o =>
+				{
+					try
+					{
+						Process.Start(Ghost.FullDictionaryPath);
+					}
+					catch { }
+				}
+				);
+
+			OpenGhostShellDirectoryCommand = new ActionCommand(
+				o =>
+				{
+					try
+					{
+						Process.Start(DictionaryUtility.ConbinePath(Ghost.FullPath, "shell"));
+					}
+					catch { }
+				}
 				);
 
 			BootSSPCommand = new ActionCommand(

@@ -22,13 +22,16 @@
 		<Menu Grid.Row="0">
 			<MenuItem Header="ファイル">
 				<MenuItem Header="上書き保存" Command="{Binding SaveFileCommand}" InputGestureText="Ctrl+S"/>
-				<MenuItem Header="編集中のゴーストを開き直す" Command="{Binding ReopenGhostCommand}" />
+				<MenuItem Header="開き直す" Command="{Binding ReopenGhostCommand}" />
 				<Separator />
 				<MenuItem Header="里々の辞書ファイルを追加" Command="{Binding AddSatoriDictionaryFileCommand}" />
 				<!--<MenuItem Header="テキストファイルを追加" Command="{Binding AddTextFileCommand}" />-->
 				<Separator />
-				<MenuItem Header="編集中のゴーストをエクスプローラで開く" Command="{Binding OpenGhostDirectoryCommand}" />
-				<MenuItem Header="編集中のゴーストをSSPで起動" Command="{Binding BootSSPCommand}" />
+				<MenuItem Header="ゴーストのフォルダを開く" Command="{Binding OpenGhostDirectoryCommand}" />
+				<MenuItem Header="ゴーストの辞書フォルダを開く" Command="{Binding OpenGhostDictionaryDirectoryCommand}" />
+				<MenuItem Header="ゴーストのシェルフォルダを開く" Command="{Binding OpenGhostShellDirectoryCommand}" />
+				<Separator/>
+				<MenuItem Header="ゴーストをSSPで起動" Command="{Binding BootSSPCommand}" />
 				<Separator />
 				<MenuItem Header="ゴーストを新規作成" Command="{Binding NewGhostCommand}" />
 			</MenuItem>
