@@ -84,7 +84,8 @@ namespace Satolist2.Core
 							OffsetX = record.SatolistPaletteOffsetX,
 							OffsetY = record.SatolistPaletteOffsetY,
 							SurfaceTableLabel = record.SurfaceTableLabel,
-							Scope = 0
+							Scope = record.SatolistScope,
+							Expand = record.SatolistPaletteExpand
 						});
 					}
 					cancel.ThrowIfCancellationRequested();
@@ -258,6 +259,8 @@ namespace Satolist2.Core
 		public int OffsetY { get; set; }
 		[JsonProperty]
 		public string SurfaceTableLabel { get; set; }
+		[JsonProperty]
+		public double Expand { get; set; }
 
 		[JsonIgnore]
 		public string FileName
@@ -284,6 +287,7 @@ namespace Satolist2.Core
 		{
 			OffsetX = 0;
 			OffsetY = 0;
+			Expand = 1.0;
 		}
 	}
 }

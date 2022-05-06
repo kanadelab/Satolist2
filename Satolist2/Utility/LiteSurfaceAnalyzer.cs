@@ -13,8 +13,9 @@ namespace Satolist2.Utility
 	//さとりすとでサーフェスのレンダリングを行わないようになったため。
 	public class LiteSurfaceAnalyzer
 	{
-		private static readonly Regex SurfaceRecordRegexPattern = new Regex("^surface(\\.append)?([0-9,]+)");
+		private static readonly Regex SurfaceRecordRegexPattern = new Regex("^surface(\\.append)?([0-9,-]+)");
 		private static readonly Regex SatolistPaletteOffsetRegiexPattern = new Regex("^//satolist.palette.offset,([0-9]+),([0-9]+)");
+		private static readonly Regex SatolistPaletteExpandRegiexPattern = new Regex("^//satolist.palette.expand,([0-9\\.]+)");
 		private static readonly Regex SatolistPaletteVisibleRegexPattern = new Regex("^//satolist.palette.visible,([0-9]+)");
 		private static readonly Regex SatolistViewerVisibleRegiexPattern = new Regex("^//satolist.viewer.visible,([0-9]+)");
 		private static readonly Regex SatolistSurfaceVisibleRegexPattern = new Regex("^//satolist.surface.visible,([0-9]+)");
@@ -25,6 +26,7 @@ namespace Satolist2.Utility
 		public string ShellDirectoryPath { get; private set; }
 		public int GlobalPaletteOffsetX { get; private set; }
 		public int GlobalPaletteOffsetY { get; private set; }
+		public double GlobalPaletteExpand { get; private set; }
 		public bool GlobalPaletteVisible { get; private set; }
 		public bool GlobalViewerVisible { get; private set; }
 
@@ -43,6 +45,7 @@ namespace Satolist2.Utility
 		public LiteSurfaceAnalyzer()
 		{
 			records = new Dictionary<long, LiteSurfaceRecord>();
+			GlobalPaletteExpand = 1.0;
 		}
 
 		public void Load(string shellDirectory)
@@ -69,8 +72,12 @@ namespace Satolist2.Utility
 			}
 
 			//surfaces.txtをロード
-			//連番方式もあるはず
-			LoadSurfaces(DictionaryUtility.ConbinePath(shellDirectory, "surfaces.txt"));
+			var surfaceFiles = Directory.GetFiles(shellDirectory, "surfaces*.txt");
+			foreach (var f in surfaceFiles)
+			{
+				var filename = Path.GetFileName(f);
+				LoadSurfaces(DictionaryUtility.ConbinePath(shellDirectory, filename));
+			}
 
 			//グローバル設定を書き込む
 			foreach (var record in records)
@@ -87,6 +94,10 @@ namespace Satolist2.Utility
 				if (!record.Value.UseSatolistViewerVisible)
 				{
 					record.Value.SatolistViewerVisible = GlobalViewerVisible;
+				}
+				if(!record.Value.UseSatolistPaletteExpand)
+				{
+					record.Value.SatolistPaletteExpand = GlobalPaletteExpand;
 				}
 			}
 
@@ -135,21 +146,46 @@ namespace Satolist2.Utility
 				var paletteOffsetMatch = SatolistPaletteOffsetRegiexPattern.Match(line);
 				if (paletteOffsetMatch.Success)
 				{
-					int x = int.Parse(paletteOffsetMatch.Groups[1].Value);
-					int y = int.Parse(paletteOffsetMatch.Groups[2].Value);
-
-					if (currentRecord != null)
+					int x, y;
+					if (
+						int.TryParse(paletteOffsetMatch.Groups[1].Value, out x) &&
+						int.TryParse(paletteOffsetMatch.Groups[2].Value, out y)
+						)
 					{
-						currentRecord.SatolistPaletteOffsetX = x;
-						currentRecord.SatolistPaletteOffsetY = y;
-						currentRecord.UseSatolistPaletteOffset = true;
-					}
-					else
-					{
-						GlobalPaletteOffsetX = x;
-						GlobalPaletteOffsetY = y;
+						if (currentRecord != null)
+						{
+							currentRecord.SatolistPaletteOffsetX = x;
+							currentRecord.SatolistPaletteOffsetY = y;
+							currentRecord.UseSatolistPaletteOffset = true;
+						}
+						else
+						{
+							GlobalPaletteOffsetX = x;
+							GlobalPaletteOffsetY = y;
+						}
 					}
 					continue;
+				}
+
+				//拡大
+				var paletteExpandMatch = SatolistPaletteExpandRegiexPattern.Match(line);
+				if(paletteExpandMatch.Success)
+				{
+					double ex;
+					if(
+						double.TryParse(paletteExpandMatch.Groups[1].Value, out ex)
+						)
+					{
+						if (currentRecord != null)
+						{
+							currentRecord.SatolistPaletteExpand = ex;
+							currentRecord.UseSatolistPaletteExpand = true;
+						}
+						else
+						{
+							GlobalPaletteExpand = ex;
+						}
+					}
 				}
 
 				//可視性
@@ -281,6 +317,8 @@ namespace Satolist2.Utility
 		public bool UseSatolistPaletteOffset { get; set; }
 		public int SatolistPaletteOffsetX { get; set; }
 		public int SatolistPaletteOffsetY { get; set; }
+		public bool UseSatolistPaletteExpand { get; set; }
+		public double SatolistPaletteExpand { get; set; }
 		public bool UseSatolistPaletteVisible { get; set; }
 		public bool SatolistPaletteVisible { get; set; }
 		public bool UseSatolistViewerVisible { get; set; }
@@ -296,6 +334,12 @@ namespace Satolist2.Utility
 				UseSatolistPaletteOffset = true;
 				SatolistPaletteOffsetX = record.SatolistPaletteOffsetX;
 				SatolistPaletteOffsetY = record.SatolistPaletteOffsetY;
+			}
+
+			if(record.UseSatolistPaletteExpand)
+			{
+				UseSatolistPaletteExpand = true;
+				SatolistPaletteExpand = record.SatolistPaletteExpand;
 			}
 
 			if(record.UseSatolistPaletteVisible)

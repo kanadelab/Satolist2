@@ -154,6 +154,7 @@ namespace Satolist2.Control
 		public int SizeY { get; set; }
 		public long Id { get; set; }
 		public int Scope { get; set; }
+		public double Expand { get; set; }
 
 		public ActionCommand InsertSurfaceCommand { get; }
 		public ActionCommand InsertSurfaceCommandSakuraScript { get; }
@@ -169,6 +170,7 @@ namespace Satolist2.Control
 			SizeX = 100;
 			SizeY = 100;
 			Scope = surface.Scope;
+			Expand = surface.Expand;
 
 			InsertSurfaceCommand = new ActionCommand(
 				o =>
@@ -203,7 +205,8 @@ namespace Satolist2.Control
 			{
 				if (vm.Image != null)
 				{
-					System.Drawing.Rectangle r = new System.Drawing.Rectangle(vm.OffsetX, vm.OffsetY, vm.SizeX, vm.SizeY);
+					double ex = vm.Expand <= 0.0 ? 1.0 : vm.Expand;
+					System.Drawing.Rectangle r = new System.Drawing.Rectangle(vm.OffsetX, vm.OffsetY, (int)(vm.SizeX / ex), (int)(vm.SizeY / ex));
 					var cloneBitmap = vm.Image.Clone(r, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
 					return innerConverter.Convert(cloneBitmap, targetType, parameter, culture);
 				}
