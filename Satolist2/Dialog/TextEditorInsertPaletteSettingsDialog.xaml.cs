@@ -208,17 +208,20 @@ namespace Satolist2.Dialog
 
 		private void Control_Closing(object sender, System.ComponentModel.CancelEventArgs e)
 		{
-			if(IsChanged && control.DialogResult == null)
+			if (control.DialogResult == null)
 			{
-				//破棄警告
-				var result = MessageBox.Show("変更を保存せずに閉じてもいいですか？", "挿入メニューのカスタマイズ", MessageBoxButton.YesNo, MessageBoxImage.Question);
-				if(result != MessageBoxResult.Yes)
+				if (IsChanged)
 				{
-					e.Cancel = true;
-					return;
+					//破棄警告
+					var result = MessageBox.Show("変更を保存せずに閉じてもいいですか？", "挿入メニューのカスタマイズ", MessageBoxButton.YesNo, MessageBoxImage.Question);
+					if (result != MessageBoxResult.Yes)
+					{
+						e.Cancel = true;
+						return;
+					}
 				}
+				control.DialogResult = false;
 			}
-			control.DialogResult = false;
 		}
 
 		public void Dispose()
