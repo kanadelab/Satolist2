@@ -67,9 +67,13 @@ namespace Satolist2.Utility
 			return false;
 		}
 
-		public static string SerializeEventHeader(EventType eventType, string eventName, string eventCondition)
+		public static string SerializeEventHeader(EventType eventType, string eventName, string eventCondition, bool isDisabled)
 		{
 			string nameAndCondition = eventName;
+
+			if (isDisabled)
+				nameAndCondition = Constants.DisabledEventMark + nameAndCondition;
+
 			if (!string.IsNullOrEmpty(eventCondition))
 				nameAndCondition += Constants.Tab + eventCondition;
 
@@ -277,6 +281,9 @@ namespace Satolist2.Utility
 
 		//インラインイベント
 		public const string InlineEventSeparator = "＃＃＃インラインイベント";
+
+		//無効化を示す
+		public const string DisabledEventMark = "さとりすとにより無効化_";
 
 		//辞書命名
 		public static readonly Regex SatoriDictionaryPattern = new Regex("^dic.+\\.txt$");

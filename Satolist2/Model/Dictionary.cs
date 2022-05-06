@@ -387,6 +387,26 @@ namespace Satolist2.Model
 			return string.Join(Constants.NewLine, serializedEvents);
 		}
 
+		private string TruncateDisableMark(string name, out bool isDisabled)
+		{
+			if (string.IsNullOrEmpty(name))
+			{
+				//名前がない。多分辞書ヘッダ
+				isDisabled = false;
+				return name;
+			}
+
+			var effectiveName = name;
+			if (effectiveName.IndexOf(Constants.DisabledEventMark) == 0)
+			{
+				effectiveName = effectiveName.Substring(Constants.DisabledEventMark.Length);
+				isDisabled = true;
+				return effectiveName;
+			}
+			isDisabled = false;
+			return effectiveName;
+		}
+
 		public void Deserialize(string text)
 		{
 			bool isChanged = IsChanged;
@@ -417,7 +437,10 @@ namespace Satolist2.Model
 					}
 
 					//フラッシュ
+					bool isDisabled;
+					eventName = TruncateDisableMark(eventName, out isDisabled);
 					var ev = new EventModel(eventType, eventName, eventCondition, string.Join(Constants.NewLine, eventLines), IsInlineEventAnalyze, eventLineIndex);
+					ev.Disabled = isDisabled;
 					AddEvent(ev);
 
 					eventLastEmptyLineCount = 0;
@@ -468,8 +491,13 @@ namespace Satolist2.Model
 			}
 
 			//最後のイベントをフラッシュ
-			var lastEvent = new EventModel(eventType, eventName, eventCondition, string.Join(Constants.NewLine, eventLines), IsInlineEventAnalyze, eventLineIndex);
-			AddEvent(lastEvent);
+			{
+				bool isDisabled;
+				eventName = TruncateDisableMark(eventName, out isDisabled);
+				var lastEvent = new EventModel(eventType, eventName, eventCondition, string.Join(Constants.NewLine, eventLines), IsInlineEventAnalyze, eventLineIndex);
+				lastEvent.Disabled = isDisabled;
+				AddEvent(lastEvent);
+			}
 
 			//isChangedの状態を復元
 			IsChanged = isChanged;
@@ -711,7 +739,7 @@ namespace Satolist2.Model
 		//イベントのシリアライズ
 		public string Serialize()
 		{
-			var header = DictionaryUtility.SerializeEventHeader(type, name, condition);
+			var header = DictionaryUtility.SerializeEventHeader(type, name, condition, disabled);
 
 			//インラインイベントを検出する
 			var lines = DictionaryUtility.SplitLines(body);

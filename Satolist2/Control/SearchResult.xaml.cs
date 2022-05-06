@@ -83,11 +83,14 @@ namespace Satolist2.Control
 			{
 				if (!dic.IsSerialized)
 				{
-					//各イベント処理？
+					//どこかにヒットするか
 					foreach (var ev in dic.Events)
 					{
-						//試しにイベント名をピックアップしてみる
-						if (ev.Name.IndexOf(searchString) >= 0)
+						if (
+							ev.Name.IndexOf(searchString) >= 0 ||
+							ev.Body.IndexOf(searchString) >= 0 ||
+							ev.Condition.IndexOf(searchString) >= 0
+							)
 						{
 							//hit
 							items.Add(new SearchResultItemViewModel(this, ev));
@@ -135,13 +138,13 @@ namespace Satolist2.Control
 		//選択中のアイテムを削除
 		public void RemoveSelectedItem()
 		{
-			foreach(var item in items.Where(o => o.IsSelected).ToArray())
+			//リスト化されてるものだけ
+			foreach(var item in items.Where(o => o.IsListedEvent && o.IsSelected).ToArray())
 			{
 				item.Event.Dictionary.RemoveEvent(item.Event);
 			}
 		}
 
-		
 		//外部から項目の削除通知を受けた際の内容削除
 		internal void OnRemoveItem(SearchResultItemViewModel item)
 		{
@@ -222,6 +225,11 @@ namespace Satolist2.Control
 			}
 		}
 
+		public bool IsListedEvent
+		{
+			get => Event != null;
+		}
+
 		public ActionCommand OpenCommand { get; }
 		public ActionCommand RemoveItemCommand { get; }
 
@@ -284,7 +292,8 @@ namespace Satolist2.Control
 						return;
 
 					Parent.RemoveSelectedItem();
-				}
+				},
+				o => IsListedEvent	//リスト化されてないと削除できない
 				);
 		}
 

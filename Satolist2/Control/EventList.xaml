@@ -34,10 +34,14 @@
 								<MenuItem Header="項目を別のファイルに移動" Command="{Binding MoveItemCommand}"/>
 								<Separator />
 								<MenuItem Header="項目を削除" Command="{Binding RemoveItemCommand}" />
-
 							</ContextMenu>
 						</Setter.Value>
 					</Setter>
+					<Style.Triggers>
+						<DataTrigger Binding="{Binding Event.Disabled}" Value="True">
+							<Setter Property="Background" Value="DarkGray" />
+						</DataTrigger>
+					</Style.Triggers>
 				</Style>
 			</ListView.ItemContainerStyle>
 		</ListView>
