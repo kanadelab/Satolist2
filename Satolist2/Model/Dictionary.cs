@@ -80,6 +80,7 @@ namespace Satolist2.Model
 		public DictionaryModel AddNewDictionary(string filename)
 		{
 			var newDictionary = new Model.DictionaryModel(this, DictionaryUtility.NormalizePath(filename));
+			newDictionary.IsSerialized = MainViewModel.EditorSettings.GeneralSettings.IsTextModeDefault;	//デフォルト設定のモードにする
 			dictionaries.Add(newDictionary);
 			return newDictionary;
 		}
