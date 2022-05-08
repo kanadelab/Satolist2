@@ -51,6 +51,8 @@ namespace Satolist2.Model
 		//最後に起動を確認した実行ファイル
 		[JsonProperty]
 		public string LastBootExecutePath { get; set; }
+		[JsonProperty]
+		public string SurfacePreviewShellDirectory { get; set; }
 
 		[JsonProperty]
 		public Dictionary<string, GhostLocalDictionarySettings> DictionarySettings { get; set; }
@@ -58,6 +60,7 @@ namespace Satolist2.Model
 		public GhostLocalSettings()
 		{
 			DictionarySettings = new Dictionary<string, GhostLocalDictionarySettings>();
+			SurfacePreviewShellDirectory = "master";
 		}
 	}
 }

@@ -12,6 +12,8 @@ namespace Satolist2.Utility
 		//SHIORIリロードスクリプトでリロードを行う
 		public static void ReloadShiori(GhostModel ghost, string message = "SHIORIリロード。")
 		{
+			Core.LogMessage.AddLog("SHIORIをリロードします。");
+
 			string script = @"\0\![reload,shiori]\![quicksession,true]" + message;
 			Satorite.SendSSTP(ghost, script, true, true);
 		}

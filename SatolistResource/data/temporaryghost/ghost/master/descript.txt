@@ -1,0 +1,7 @@
+charset,Shift_JIS
+type,ghost
+name,サーフェスプレビューの準備中
+id,temp
+craftman,satolist
+craftmanw,さとりすと
+sakura.name,サーフェスプレビュー

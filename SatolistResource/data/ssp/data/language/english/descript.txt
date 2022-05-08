@@ -1,0 +1,45 @@
+//This descript.txt *MUST* written with only ASCII characters except comments.
+//Because only characters that all Windows systems, or any other OSs, can recognize is ASCII.
+
+//Language name to display language menu.
+name,English
+
+//Locale for PLUGIN/2.0 Language Header
+//Japanese, Chinese-Simplified, Chinese-Traditional, English, Hangeoul etc...
+locale,English
+
+//Language Identifier.
+//https://www.relief.jp/docs/001403.html
+//1028=Taiwan Chinese 3076=Hong Kong Chinese 2052=Any other Chinese except Singapore
+//1041=Japanese 1042=Korean
+//This id is used for auto-recognition of system language. these ids are categorized by languages.
+//So, for example, If SSP cannot find Taiwan Chinese settings, it try to find any other Chinese setting.
+id,1033
+
+//Resource DLL. Must specify any other language except Japanese.
+dllname,resource.dll
+
+//Text resource table.
+messagename,message.txt
+
+//Calendar holiday settings except Sundays.
+//format is "Year-Month,day day day[CRLF]" Example, 2003-1,1 13
+holidayname,holidays.txt
+
+//Creator. Because for unification of other "descript.txt" format,using strange English "craftman".
+craftman,SSP BUGTRAQ
+craftmanurl,http://ssp.shillest.net/
+
+//Network Update URL
+homeurl,http://ssp.shillest.net/update/language/english/
+
+//Popup menu font name and height
+//menu.font.name,
+//menu.font.height,
+
+//relative path to the default ghost.
+//defaultghostpath,emily
+
+//Help document URL
+helpurl,http://ssp.shillest.net/ukadoc/ssphelp/
+

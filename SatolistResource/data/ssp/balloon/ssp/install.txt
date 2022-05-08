@@ -1,0 +1,5 @@
+charset,Shift_JIS
+type,balloon
+name,SSPデフォルト改
+directory,ssp_default
+refresh,1

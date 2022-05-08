@@ -17,6 +17,7 @@
 		<Grid.RowDefinitions>
 			<RowDefinition Height="auto" />
 			<RowDefinition Height="*" />
+			<RowDefinition Height="auto" />
 		</Grid.RowDefinitions>
 
 		<Menu Grid.Row="0">
@@ -37,6 +38,16 @@
 			</MenuItem>
 			<MenuItem Header="編集">
 				<MenuItem Header="サーフェスプレビュー画像を再生成" Command="{Binding GenerateSurfacePreviewCommand}" />
+				<MenuItem Header="プレビューに使用するシェル" ItemsSource="{Binding SurfacePreview.Shells}" IsEnabled="{Binding IsGhostEnable}" x:Name="PreviewShellSelector">
+					<MenuItem.ItemContainerStyle>
+						<Style TargetType="MenuItem">
+							<Setter Property="Header" Value="{Binding ShellName}" />
+							<Setter Property="IsChecked" Value="{Binding IsSelected}" />
+							<Setter Property="Command" Value="{Binding DataContext.SelectPreviewShellCommand, ElementName=PreviewShellSelector}" />
+							<Setter Property="CommandParameter" Value="{Binding DataContext, RelativeSource={RelativeSource Self}}" />
+						</Style>
+					</MenuItem.ItemContainerStyle>
+				</MenuItem>
 			</MenuItem>
 			<MenuItem Header="表示">
 				<MenuItem Header="ファイルイベントツリー" x:Name="FileEventTreeVisibleMenu" IsCheckable="True" IsChecked="{Binding IsVisible, Mode=TwoWay}" />
@@ -73,7 +84,7 @@
 				<MenuItem Header="さとりすと本体フォルダを開く" Command="{Binding OpenSatolistDirectoryCommand}" />
 			</MenuItem>
 		</Menu>
-		
+
 		<avalonDock:DockingManager Grid.Row="1" AllowMixedOrientation="True" x:Name="DockingManager">
 			<avalonDock:DockingManager.Theme>
 				<avalonDock:Vs2013LightTheme/>
@@ -84,76 +95,76 @@
 
 						<!--左ペイン-->
 						<avalonDock:LayoutAnchorablePane DockWidth="200" >
-							
+
 							<!--ファイルイベントツリー-->
 							<util:DockingWindow x:Name="FileEventTree">
 								<ctl:FileEventTree />
 							</util:DockingWindow>
-						
+
 						</avalonDock:LayoutAnchorablePane>
-						
+
 						<!--ドキュメントペイン-->
 						<avalonDock:LayoutDocumentPane>
-							
+
 							<!--スタートメニュー-->
 							<util:DockingWindow x:Name="StartMenu">
 								<ctl:StartMenu />
 							</util:DockingWindow>
-							
+
 							<!--デバッグメニュー-->
 							<util:DockingWindow x:Name="DebugMainMenu">
 								<ctl:DebugMainMenu />
 							</util:DockingWindow>
-							
+
 							<!--ゴーストプロパティ-->
 							<util:DockingWindow x:Name="GhostDescriptEditor">
 								<ctl:GhostDescriptEditor />
 							</util:DockingWindow>
-							
+
 							<!--インストール設定-->
 							<util:DockingWindow x:Name="GhostInstallEditor">
 								<ctl:GhostDescriptEditor />
 							</util:DockingWindow>
-							
+
 							<!--更新除外設定-->
 							<util:DockingWindow x:Name="UpdateIgnoreList">
 								<ctl:UpdateIgnoreList />
 							</util:DockingWindow>
-							
+
 							<!--SAORIリスト-->
 							<util:DockingWindow x:Name="SaoriList">
 								<ctl:SaoriList />
 							</util:DockingWindow>
-							
+
 							<!--文字置換リスト-->
 							<util:DockingWindow x:Name="ReplaceList">
 								<ctl:ReplaceList />
 							</util:DockingWindow>
-							
+
 							<!--変数リスト-->
 							<util:DockingWindow x:Name="VariableList">
 								<ctl:VariableList />
 							</util:DockingWindow>
-							
+
 							<!--検索-->
 							<util:DockingWindow x:Name="SearchMenu">
 								<ctl:SearchMenu />
 							</util:DockingWindow>
-							
+
 							<!--れしばイベントログ-->
 							<util:DockingWindow x:Name="RecvEventLog">
 								<ctl:RecvEventLog />
 							</util:DockingWindow>
-							
+
 						</avalonDock:LayoutDocumentPane>
-						
+
 						<!--右ペイン-->
 						<avalonDock:LayoutAnchorablePane DockWidth="300">
 							<!--サーフェスビューワ-->
 							<util:DockingWindow x:Name="SurfaceViewer">
 								<ctl:SurfaceViewer />
 							</util:DockingWindow>
-							
+
 							<!--サーフェスパレット-->
 							<util:DockingWindow x:Name="SurfacePalette">
 								<ctl:SurfacePalette />
@@ -181,5 +192,42 @@
 			</avalonDock:LayoutRoot>
 		</avalonDock:DockingManager>
 
+		<Grid Grid.Row="2">
+			<Button Command="{Binding ShowLogMessageCommand}" VerticalAlignment="Center" Margin="3" MaxHeight="20">
+				<Button.Template>
+					<ControlTemplate>
+						<Grid>
+							<Rectangle Fill="Transparent" />
+							<StackPanel Orientation="Horizontal" Margin="5 3 0 3">
+								<Path Fill="White" Stretch="Uniform" Data="{StaticResource LogMessageIcon}" VerticalAlignment="Center" />
+								<TextBlock Margin="6 0 0 0" Text="{Binding LogMessage.NewestLogMessage.Message}" Foreground="White" VerticalAlignment="Center"/>
+							</StackPanel>
+						</Grid>
+					</ControlTemplate>
+				</Button.Template>
+			</Button>
+			<Popup x:Name="LogPopup" StaysOpen="False" Placement="Top">
+				<!--<Border BorderBrush="#5544FF" BorderThickness="2">-->
+					<StackPanel Background="White">
+					<Button Content="ログをクリア" Margin="3" Command="{Binding ClearLogMessageCommand}" />
+					<!--<TextBlock Text="さとりすと ログ情報" />-->
+						<ListView ItemsSource="{Binding LogMessage.LogItems}" DisplayMemberPath="Message"
+									ScrollViewer.VerticalScrollBarVisibility="Visible"
+									Width="600" Height="200" x:Name="LogList">
+						</ListView>
+					</StackPanel>
+				<!--</Border>-->
+			</Popup>
+			<Grid.Style>
+				<Style TargetType="Grid">
+					<Setter Property="Background" Value="#007ACC" />
+					<Style.Triggers>
+						<DataTrigger Binding="{Binding LogMessage.NewestLogMessage.Type}" Value="Error">
+							<Setter Property="Background" Value="DarkRed" />
+						</DataTrigger>
+					</Style.Triggers>
+				</Style>
+			</Grid.Style>
+		</Grid>
 	</Grid>
 </Window>

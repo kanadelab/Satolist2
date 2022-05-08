@@ -78,7 +78,10 @@ namespace Satolist2.Utility
 		{
 			var fmoRecord = SakuraFMOReader.Read(ghost);
 			if (fmoRecord == null)
+			{
+				Core.LogMessage.AddLog("編集中のゴーストにアクセスできません。SSPでゴーストを起動していますか？", Core.LogMessageType.Error);
 				return; //送信できてない
+			}
 
 			var sstpBuilder = new ProtocolBuilder();
 			sstpBuilder.Command = "SEND SSTP/1.0";

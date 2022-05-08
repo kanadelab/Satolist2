@@ -28,7 +28,31 @@ namespace Satolist2.Core
 		{
 			this.completedCallback = completedCallback;
 			this.progressCallback = progressCallback;
-			return Task.Run(() => GenerateSurfaceTask(main, cancel) );
+			return Task.Run(() =>
+			{
+				var targetPath = DictionaryUtility.ConbinePath(main.Ghost.FullDictionaryPath, "profile/satolist/surfacepreview");
+				GenerateSurfaceTask(targetPath, main.Ghost, main, cancel);
+			});
+		}
+
+		public Task GenerateShellOnly(MainViewModel main, string shellPath, Action<bool> completedCallback, Action<Progress> progressCallback, CancellationToken cancel)
+		{
+			this.completedCallback = completedCallback;
+			this.progressCallback = progressCallback;
+
+			return Task.Run(() =>
+			{
+				var targetPath = DictionaryUtility.ConbinePath(shellPath, "profile/satolist/surfacepreview");
+				using (var temporaryRuntime = TemporaryGhostRuntime.PrepareShell(shellPath))
+				{
+					try
+					{
+						temporaryRuntime.Boot();
+						GenerateSurfaceTask(targetPath, temporaryRuntime.Ghost, main, cancel);
+					}
+					catch { }	//temporaryRuntime中は落ちないように保護
+				}
+			});
 		}
 
 		private void RetryableAction(Action action)
@@ -46,9 +70,18 @@ namespace Satolist2.Core
 			throw new Exception();
 		}
 
-		private void GenerateSurfaceTask(MainViewModel main, CancellationToken cancel)
+		private void GenerateSurfaceTask(string outputPath, Model.GhostModel ghost, MainViewModel main, CancellationToken cancel)
 		{
-			string targetDirectory = DictionaryUtility.ConbinePath(main.Ghost.FullDictionaryPath, "profile/satolist/surfacepreview");
+			//テンポラリのフォルダを用意
+			string temporaryDumpDirectory = DictionaryUtility.ConbinePath(ghost.FullDictionaryPath, "profile/satolist/surfacepreview");
+			try
+			{
+				System.IO.Directory.Delete(temporaryDumpDirectory);
+			}
+			catch { }
+			System.IO.Directory.CreateDirectory(temporaryDumpDirectory);
+			System.IO.Directory.CreateDirectory(outputPath);
+
 			try
 			{
 				//SSTP登録
@@ -57,7 +90,23 @@ namespace Satolist2.Core
 					using (var copyDataHandler = SSTPCallBackNativeWindow.Instance.RegisterCallback(Win32Import.WM_COPYDATA, OnCopyData))
 					{
 						main.MainWindow.Dispatcher.Invoke(() => { mutex.WaitOne(); });
-						RetryableAction(() => Satorite.ExecuteSSTP(main.Ghost, "GetProperty[currentghost.shelllist.current.path]", SSTPCallBackNativeWindow.Instance.HWnd));
+
+						main.MainWindow.Dispatcher.Invoke(() =>
+							progressCallback(new Progress()
+							{
+								Message = "SSPの起動を待機中...",
+								UseProgress = false
+							}));
+
+						//SSPの起動を待機
+						for (int i = 0; i < 10; i++)
+						{
+							if (SakuraFMOReader.Exists(ghost))
+								break;
+							Thread.Sleep(2000);
+							cancel.ThrowIfCancellationRequested();
+						}
+						RetryableAction(() => Satorite.ExecuteSSTP(ghost, "GetProperty[currentghost.shelllist.current.path]", SSTPCallBackNativeWindow.Instance.HWnd));
 					}
 
 					//シェルデータを読み込んで、さとりすとが出力すべき情報をもってくる
@@ -91,15 +140,15 @@ namespace Satolist2.Core
 					cancel.ThrowIfCancellationRequested();
 
 					//サーフェス生成
-					if (System.IO.Directory.Exists(targetDirectory))
+					if (System.IO.Directory.Exists(temporaryDumpDirectory))
 					{
-						System.IO.Directory.Delete(targetDirectory, true);
+						System.IO.Directory.Delete(temporaryDumpDirectory, true);
 					}
-					System.IO.Directory.CreateDirectory(targetDirectory);
+					System.IO.Directory.CreateDirectory(temporaryDumpDirectory);
 					cancel.ThrowIfCancellationRequested();
 
 					//ループ中邪魔が入らないようにパッシブモードに入れる
-					Satorite.SendSSTP(main.Ghost, @"\![enter,passivemode]", true, true);
+					Satorite.SendSSTP(ghost, @"\![enter,passivemode]", true, true);
 					try
 					{
 						//foreach (var item in generateSurfaces)
@@ -118,13 +167,17 @@ namespace Satolist2.Core
 
 							//次のスクリプトを実行
 							var generateScript = string.Format(@"\![execute,dumpsurface,{0},{1},{2}]\m[{3},{4},{5}]",
-								targetDirectory,
+								temporaryDumpDirectory,
 								scope,
 								surfaceId,
 								SSTPCallBackNativeWindow.OperationProgressMessage,
 								sessionId,
 								surfaceId);
-							RetryableAction(() => Satorite.SendSSTP(main.Ghost, generateScript, true, true, SSTPCallBackNativeWindow.Instance.HWnd));
+							RetryableAction(() => Satorite.SendSSTP(ghost, generateScript, true, true, SSTPCallBackNativeWindow.Instance.HWnd));
+
+							//出力した画像をコピー
+							var previewFileName = string.Format("surface{0}.png", surfaceId);
+							System.IO.File.Copy(DictionaryUtility.ConbinePath(temporaryDumpDirectory, previewFileName), DictionaryUtility.ConbinePath(outputPath, previewFileName), true);
 
 							//進捗の通知
 							var progressMessage = string.Format("({1}/{2}) surface{0}.png", surfaceId, i+1, generateSurfaces.Count);
@@ -144,13 +197,20 @@ namespace Satolist2.Core
 					finally
 					{
 						//パッシブモード解除
-						Satorite.SendSSTP(main.Ghost, @"\![leave,passivemode]", true, true);
+						Satorite.SendSSTP(ghost, @"\![leave,passivemode]", true, true);
 					}
+
+					//掃除
+					try
+					{
+						System.IO.Directory.Delete(temporaryDumpDirectory);
+					}
+					catch { }
 
 					//完了したらjsonに内容を保存
 					var metadata = new SurfacePreviewMetaData();
 					metadata.Items = generateSurfaces.ToArray();
-					var metadataPath = DictionaryUtility.ConbinePath(targetDirectory, "surfaces.json");
+					var metadataPath = DictionaryUtility.ConbinePath(outputPath, "surfaces.json");
 					JsonUtility.SerializeToFile(metadataPath, metadata);
 				}
 				main.MainWindow.Dispatcher.Invoke(() => Complete(true));
@@ -168,9 +228,9 @@ namespace Satolist2.Core
 				//失敗したら削除
 				try
 				{
-					if (System.IO.Directory.Exists(targetDirectory))
+					if (System.IO.Directory.Exists(temporaryDumpDirectory))
 					{
-						System.IO.Directory.Delete(targetDirectory, true);
+						System.IO.Directory.Delete(temporaryDumpDirectory, true);
 					}
 				}
 				catch { }
@@ -189,9 +249,9 @@ namespace Satolist2.Core
 				//失敗したら削除
 				try
 				{
-					if (System.IO.Directory.Exists(targetDirectory))
+					if (System.IO.Directory.Exists(temporaryDumpDirectory))
 					{
-						System.IO.Directory.Delete(targetDirectory, true);
+						System.IO.Directory.Delete(temporaryDumpDirectory, true);
 					}
 				}
 				catch { }
@@ -233,6 +293,9 @@ namespace Satolist2.Core
 	[JsonObject]
 	internal class SurfacePreviewMetaData
 	{
+		public const string SurfacePreviewPath = "profile/satolist/surfacepreview";
+		public const string SurfacePreviewMetadataPath = "surfaces.json";
+
 		[JsonProperty]
 		public SurfacePreviewMetaDataRecord[] Items { get; set; }
 

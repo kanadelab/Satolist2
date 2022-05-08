@@ -1,0 +1,543 @@
+charset,Shift_JIS
+
+//#mirrors
+//doichan.netbank.co.jp/ssp/update/
+
+#sspext_talkrandom
+count17
+
+#sspext_talkrandom0
+\u\s[10]『手のひらを太陽に』って、アンパンマンのやなせたかしが作ってたって知ってた?\w9\w9\h\s[5]以上、今日の一行豆知識でした。\w9\u\s[11]\n\n勝手に終わらすなっ!! \n\w4\e
+
+#sspext_talkrandom1
+\h\s[5]テディはムシャクシャしてるときどうする?\w9\w9\u\s[10]…そうだなぁ。まず誰も居ないことを確認する。\w9\w9\h\s[4]\n\n…踊るんだろ。\w9\w9\u\s[10]\n\nいやオモムロにマイマスターのマイドキュメント内ピクチャーフォルダを検索。\w9\h\s[7]\n\nするなっ!! \n\w4\e
+
+#sspext_talkrandom2
+\h\s[0]ネトゲー時代だと、一行ログでも気を使ったりするよね。\w9\w9\u\s[10]つまらない一言が口論の元になるからな。\w9\w9\h\s[5]\n\n一緒に組んだチームの人は長年の友人だと思って。\w9\w9\u\s[10]\n\n今までつのった恨みをはらそう。\w9\h\s[7]\n\nはらすなっ!!\n\w4\e
+
+#sspext_talkrandom3
+\h\s[0]不安でしょうがないときは、鏡を見るといいんだ。\w9\w9\u\s[10]へぇ。\w9\w9\h\s[0]\n\nそして、自分の笑顔を確かめながら、「大丈夫」って一言。\w9\h\s[5]\nすると、 額に「肉」の文字が!!\w9\u\s[10]\n\n浮かぶかっ!! \n\w4\e
+
+#sspext_talkrandom4
+\h\s[0]癒し系トークを一言。\w9\w9\u\s[10]ほぉ。\w9\w9\h\s[0]\n\nお寿司食べたい。特大パフェ食べたい。ケガニ食べたい。\nアイスクリーム食べたい。ネルネルネルネ食べたい。\w9\w9\u\s[11]\n\n『卑しい系トーク』だっ!! \n\w4\e
+
+#sspext_talkrandom5
+\h\s[0]まったりしたいときは絵板だね。\w9\w9\u\s[10]あそこは優しい人多いからな。\w9\w9\h\s[5]\n\n特に投稿作品のかわりに張り付いて、『うぉっ動いた感動した』なんてレスが付いた日にはもう有頂天。\w9\w9\u\s[11]\n\n人騙すなっ!! \n\w4\e
+
+#sspext_talkrandom6
+\u\s[10]自分の掲示板でもカキコが無いと見なくなっちゃうよね。\w9\w9\h\s[0]そういや半年ほどほったらかしのBBSあったっけ。行ってみよ。\w9\w9\u\s[10]\n\n… どうだった?\w9\w9\h\s[4]\n\n…アングラサイトのURLがびっしり書き込まれてた…\w9\w9\u\s[11]\n\nうぁ。\n\w4\e
+
+#sspext_talkrandom7
+\h\s[5]つらい時チェックする3つのC!!\w9\w9\u\s[10]3つのC!!\w9\w9\h\s[5]\n\nCognition!!\w9\w9\u\s[10]\n\n自分の心理状態を認識しよう。\w9\w9\h\s[5]\n\nControl!!\w9\w9\u\s[10]\n\n自分の気持ちが周囲に流されてないかチェック。\w9\w9\h\s[5]\n\nCommunication!!\w9\w9\u\s[10]\n\n自分を支えてくれる人たちと語り合おう!!\w9\w9\h\s[8]\n\nそれでもダメならCut マイリスト。\w9\w9\u\s[11]\n\n…きっ、禁止っ、禁止だよっ!!\e
+
+#sspext_talkrandom8
+\u\s[10]SSP癒しトークは、あなたの心を癒します。\w9\w9\h\s[5]効果は60度のウォッカ一気呑みクラスです。\w9\u\s[11]\n\n死ぬわっ!!\e
+
+#sspext_talkrandom9
+\h\s[5]気分がのらないときは、表にでよう!!\w9\w9\u\s[10]ぱんちゅイッチョで。\w9\w9\h\s[5]\n\n太陽の下思う存分羽根を伸ばそう!!\w9\w9\u\s[10]\n\nできれば公園の親子づれの前で。\w9\w9\h\s[8]\n\nこれであなたも、\w9\w9\u\s[10]\n\nめでたく犯罪者。\w9\h\s[7]\n変な合いの手やめろっ!!\e
+
+#sspext_talkrandom10
+\h\s[5]歌を歌おう!!\w9\w9\u\s[11]…それは我々Web配布プログラムにとって禁断の技だっ!!\e
+
+#sspext_talkrandom11
+\h\s[5]ブルー・トパーズって宝石を頭にあてるとスッキリするんだって！\w9\w9\u\s[10]特殊効果アイテムとしては価値が薄いんだけどね。\w9\w9\h\s[7]\n\n夢がな～い！\e
+
+#sspext_talkrandom12
+\h\s[0]早起きは\w9\u\s[10]三文の毒。\w9\w9\h\s[8]\n\n毒?\e
+
+#sspext_talkrandom13
+\h\s[0]ねえ、テディって、子犬とか拾ったことある?\w9\w9\u\s[10]猫なら今トナリに一匹…。\w9\h\s[7]\n\nどういう意味だーっ!!\e
+
+#sspext_talkrandom14
+\h\s[0]テディは子犬って拾ったことある?\w9\w9\u\s[10]猫なら今トナリに一匹飼ってる。\w9\h\s[7]\n\nどういう意味だっ!!\e
+
+#sspext_talkrandom15
+\h\s[8]あぅ～、\w8肉まん～。\w9\w9\w8\u\s[10]キミ、狐だっけ？\e
+
+#sspext_talkrandom16
+\h\s[8]うぐぅ、\w8た、たいやき…\w8\w8が…\w9\w9\u\s[10]エミリオ、水っ！\nはやくっ！\e
+
+
+#sstpbreak
+count2
+#sstpbreak0
+\h・・・・・\w5]\n\nんー、いまなんか言ってた？\u気のせいじゃないの？\w8\h\n\nそうか。\e
+#sstpbreak1
+\h\s[4]あう。\w8\nせっかくいいところだったのに。\uそういう問題かなぁ\e
+
+
+#kasanari
+count3
+#kasanari0
+\h\s[3]\w4・\w4・\w4・\w4・\w4重ならないでよぅ。\e
+#kasanari1
+\u蹴らないでね。\hうーん、そう言われると蹴りたくなっちゃうなぁ。\u\n避けます。ごめんなさい。\4\e
+
+
+#skinchanged
+count2
+#skinchanged0
+\hん？\n\w8出てきてもいいの？\e
+#skinchanged1
+\h呼んでくれてありがとう。\e
+
+#restore
+count2
+#restore0
+\h\s[0]うにゃ？\e
+#restore1
+\h\s[0]いないいない\w8・\w8・\w8・\w8ばぁ！\uってそんなことして%username喜ぶかなぁ\e
+
+
+#update retrylimit
+\s[4]がんばったんだけど、ダメだったみたい。\n\s[3]ごめんね。\e
+#update checkcrc
+のCRCをチェックするよ。
+#update checkcrc valid
+あってたみたいだね。
+#update checkcrc invalid
+なんか違うみたいだからやり直すね。
+#update checkmd5
+のMD5をチェックするよ。
+#update checkmd5 valid
+よくわからないけどあってたみたいだね。\w8
+#update checkmd5 invalid
+なんか違うみたいだからやり直すね。\w8
+#update start header
+\s[0]サーバに接続するよ。\n\e
+#update start header proxy
+\s[0]プロクシサーバに接続するよ。\n\e
+#update start data0
+\s[0]更新されたファイル\n\n
+#update start data1
+を受信してるよ。\e
+#update connected header
+\h更新情報の受信中。\n  \e
+#update failure 404
+count2
+#update failure 4040
+\h\s[4]ないって。\w8\w8\n\nま、いっか。\uよくないよ。\e
+#update failure 4041
+\h\s[2]うわ。ファイルないってさ。\w8\w8\s[0]\n\nなんか適当なファイル使っちゃえば良いよね。\uよくねぃってば。\e
+#update failure 403
+\h\s[4]んー、なんか嫌われてるんだけど。\e
+#update failure notconnect
+\h\s[4]つながんないんだけど。\n\w8\w8\s[0]まぁいいや。\e
+#update failure etc0
+\h\s[4]よくわからないんだけど失敗だって\n\n
+#update failure etc1
+\hほっとけばそのうち何とかなるとか。\uならねぃでぃす。\e
+#update slow
+count3
+#update slow0
+\h\s[4]おっそいなぁ。\e
+#update slow1
+\h\s[4]あー早く終わんないかなぁ。\e
+#update heavy
+count3
+#update heavy0
+\h\s[4]早くして～\e
+#update heavy1
+\h\s[4]重すぎ。\e
+#update heavy2
+\h\s[7]ってゆーか遅すぎ。\e
+#update noupdates
+\h\s[4]更新なしだって。\nせっかくがんばったのにな。\e
+#update end
+count2
+#update end0
+\h\s[0]更新されたみたいだよ。ちょっとは成長した？\e
+#update end1
+\h\s[4]\w4・\w4・\w4・\w4・\w4うっ。\n\w8お、\w8おなかが\w4・\w4・\w4・\w4\n\uどした？\h\w8\w8\w8\w8\s[0]\nなんちゃって。\u\nおい。\e
+
+#mikirezu
+\h\s[0]あんまりやると戻れなくなるからやめてね。\e
+
+#mikire
+\hなんか視界が狭いんだけど....\e
+
+
+#filedrop unknown
+\h‥‥\w8なにこれ？\n\w8\8棄てちゃっていい？\uそれはまずいんじゃ．．．\e
+#filedrop gif
+\hあー、それに関わるとろくなことがないからやめてね。\e
+#setwallpaper bmp
+\h壁紙換えるよ。\e
+#setwallpaper png
+\h壁紙換えるよ。\e
+
+#return4to0
+count3
+#return4to00
+\u%selfname2、いつまで落ち込んでるの。\w8\h‥‥\w8\w8\s[0]頑張ろう。\e
+#return4to01
+\u%selfname2、いつまで落ち込んでるの。\h\s[7]%selfname2じゃないっ！\e
+#return4to02
+\uそろそろたちなおっても良いんじゃ‥‥\w8\h\w8\w8\u\n\nまだなの？\e
+
+#return7to0
+\u%selfname2、いつまで怒ってるの？\w8\h誰が怒らせたのよぅ。\n\w8.\w8.\w8.\w8\s0\e
+
+
+#timeout alternate
+count5
+#timeout alternate0
+\h\s[4]ちゃんと選んでほしいな。\w8\u見てないんじゃないの？\e
+#timeout alternate1
+\h\s[4]むむ。\n無視されてる‥‥\w8\uんー\e
+#timeout alternate2
+\h\s[4]見てないのかなぁ。\e
+#timeout alternate3
+\h\s[4]今度無視したら勝手に選んじゃうぞ！\e
+#timeout alternate4
+\h\s[7]無視するなよぅ\e
+
+
+#mailcheck invalid
+\s[4]って、いろいろ設定してくんないとわかんないよぅ。\e
+#mailcheck start
+\s[0]メールサーバに接続するよ。\e
+#mailcheck nomail
+\h\s[4]メール来てないって。\e
+#mailcheck mail
+\s[0]メール来てるよ。\w8
+#mailcheck mailcount0
+んーっとねぇ‥‥\w8
+#mailcheck mailcount1
+だって。\e
+#mailcheck timeout
+count2
+#mailcheck timeout0
+\h\s[4]なんかつながんないんだって。\e
+#mailcheck timeout1
+\h\s[4]んー。時間もったいないからやめとくね。\e
+#mailcheck kicked
+count1
+#mailcheck kicked0
+\h\s[4]なんか、拒否されるんだけど。設定あってる？\e
+
+
+
+#terminate early morning
+\h\s[0]\tこんな時間まで．．．\w8\n遅刻してもしらないよ～\n
+#terminate morning
+\h\s[0]\t今から寝るって．．．\n\w8寝ないほうが良いじゃん。\n
+#terminate early night
+\h\s[0]\tもう寝るの？\nじゃ、わたしもお風呂入って寝よう。\n%keroname一緒に入る？\u\w8...いや、やめとく\h\n
+#terminate night
+\h\s[4]\tあー、寝てもいいですか？\n
+#terminate etc
+\h\s[0]\tん？お仕事終わり？\nおつかれ～。\n
+#terminate plus
+\hばいば～い。\-
+
+
+#timemessage 0
+\h\s[0]%h時だよ。\n\e
+#timemessage 1
+\h\s[0]%h時だよ。\n\e
+#timemessage 2
+\h\s[0]%h時だよ。\n\e
+#timemessage 3
+\h\s[0]%h時だよ。\n\e
+#timemessage 4
+\h\s[0]%h時だよ。\n\e
+#timemessage 5
+\h\s[0]%h時だよ。\n\e
+#timemessage 6
+\h\s[0]%h時だよ。\n\e
+#timemessage 7
+\h\s[0]%h時だよ。\n\e
+#timemessage 8
+\h\s[0]%h時だよ。\n\e
+#timemessage 9
+\h\s[0]%h時だよ。\n\e
+#timemessage 10
+\h\s[0]%h時だよ。\n\e
+#timemessage 11
+\h\s[0]%h時だよ。\n\e
+#timemessage 12
+\h\s[0]%h時だよ。\n\e
+#timemessage 13
+\h\s[0]%h時だよ。\n\e
+#timemessage 14
+\h\s[0]%h時だよ。\n\e
+#timemessage 15
+\h\s[0]%h時だよ。\n\e
+#timemessage 16
+\h\s[0]%h時だよ。\n\e
+#timemessage 17
+\h\s[0]%h時だよ。\n\e
+#timemessage 18
+\h\s[0]%h時だよ。\n\e
+#timemessage 19
+\h\s[0]%h時だよ。\n\e
+#timemessage 20
+\h\s[0]%h時だよ。\n\e
+#timemessage 21
+\h\s[0]%h時だよ。\n\e
+#timemessage 22
+\h\s[0]%h時だよ。\n\e
+#timemessage 23
+\h\s[0]%h時だよ。\n\e
+
+
+#mainmenu header
+\h\s[0]んー。\n\n
+#mainmenu
+\q0[#menu talk][話を聞く]\q1[#feedback][フィードバック]\q2[#mainmenu2][駄機能]\q3[#mainmenu3][未来予想図]\q4[#cancel][なんでもないよ]\z
+#mainmenu2
+\h無駄機能。\n\q0[#menu time][今何時]\q1[#execute timer][タイマー]\q2[#mainmenu][戻る]\z
+#mainmenu3
+\h準備中。未実装。\n\q0[#execute calendar][カレンダー]\q1[#execute memo][メモ帳]\q2[#execute cooking][お料理教室]\q3[#execute search][検索]\q3[#mainmenu][戻る]\z
+
+#menu talk
+\h\a\e
+#feedback
+\q0[#feedback todo][要望，バグ報告]\q1[#feedback bbs][雑談など]\z\e
+
+#feedback todo
+\j[http://todo.sherry.to/ssp/todo.cgi?design=simple]\h小さなことから大きなことまでうごかすちっからだ\uなんか違うぞ\h\n\n\w8あ...\w8\nどんなことでもいいから報告プリーズだってさ\e
+
+#feedback bbs
+\j[http://shillest.net/home/konomi/]\h雑談用掲示板はこっち～。\e
+
+
+#menu time
+\h%hour時%minute分です。\e
+
+#execute timer
+\h選んでね。\n\q0[#execute timer3][ラーメンタイマー(3分)]\q1[#execute timer1][１分タイマー]\q2[#cancel][やっぱりやめる]\z
+#execute timer1
+\h１分前！\_q\_w[15000]\c15秒経過\_w[15000]\c30秒経過\_w[10000]\c20秒前\_w[10000]\c10秒前\_w[1000]\c9\_w[1000]\c8\_w[1000]\c7\_w[1000]\c6\_w[1000]\c5\_w[1000]\c4\_w[1000]\c3\_w[1000]\c2\_w[1000]\c1\_w[1000]\c\_qはい、そこまで。\e
+#execute timer3
+\hお湯入れた？入れたらクリックしてね。\x\c3分前。\n\_q\_w[5000].\_w[5000].\_w[5000].\_w[5000].\_w[5000].\_w[5000].\_w[5000].\_w[5000].\_w[5000].\_w[5000].\_w[5000].\_w[5000].\c1分経過\_w[5000].\_w[5000].\_w[5000].\_w[5000].\_w[5000].\_w[5000].\_w[5000].\_w[5000].\_w[5000].\_w[5000].\_w[5000].\_w[5000].\cあと1分だよ～。\n待ち遠しいね。\n\_w[5000].\_w[5000].\_w[5000].\_w[5000].\_w[5000].\_w[5000].\cあと30秒。ん～、いい匂いしてきた。\n\_w[5000].\_w[5000].\_w[5000].\_w[5000]\c10秒前\_w[1000]\c9\_w[1000]\c8\_w[1000]\c7\_w[1000]\c6\_w[1000]\c5\_w[1000]\c4\_w[1000]\c3\_w[1000]\c2\_w[1000]\c1\_w[1000]\c\_qはい、できたよ。\n\w8\n私も食べたいな．．．\e
+
+#execute calendar
+\h今日は%month月%day日、%m?の日です。\w8\w8\u適当言うな。\![open,carendar]\e
+#execute memo
+\hえーと、なんだっけ、\n%msが%mhで%mtだっけ？\uちゃんとメモしとけ。\h...\w8\w8\nなんか付箋みたいのつくみたいよ。\u\nありがちだな。\e
+#execute cooking
+\hこないだ言ってた%meの作り方調べてくれた？\uえーと、確か、\n%me - 100g\n%me - 200g\n%me - %secondg\n\h\nで？\u\n煮るなり焼くなり好きにしてくれ。\h\n\n...\w8\w8なんか、ちゃんとレシピノート持たせたいみたいだけど、欲しい人いるかなぁ。\e
+#execute search
+何を調べるの？\n\q0[#execute search web][Webの検索]\q1[#execute search word][単語の検索]\q2[#execute search restaurant][レストラン]\z
+#execute search web
+count3
+#execute search web0
+\j[http://www.google.com/]\v自分で調べてね。\n\uそんないいかげんな。\h\n...\w8\w8\e
+#execute search web1
+\j[http://www.goo.ne.jp/]\v自分で調べてね。\n\uそんないいかげんな。\h\n...\w8\w8\e
+#execute search web2
+\j[http://www.infoseek.co.jp/]\v自分で調べてね。\n\uそんないいかげんな。\h\n...\w8\w8\e
+#execute search word
+\h%m?ってどんな意味？\uうーん、多分%msとか%mzあたりじゃないかな。\h\n\s[4]そ、そうなの？\n...\w8\w8\n\s[0]単語入れて勝手に探してきてくれる機能とか欲しいらしいよ。\u\nできるか、そんなもん。\e
+#execute search restaurant
+count2
+#execute search restaurant0
+\h%meのおいしい店知ってる？\uうーん、たしか、%mpにある%mhって店だったかな。\h\n\s[4]ほんとに？\n....\w8\w8\nなんかわたしにトラベルエージェントみたいなことさせたいらしいよ。\u\nそんな無茶な。\e
+#execute search restaurant1
+\h近くのとんこつよろしく。\u知るか。\e
+
+
+#cancel
+count4
+#cancel0
+\h\b[0]\s[4]はうぅ～。\e
+#cancel1
+\h\b[0]\s[4]ふ～ん。\e
+#cancel2
+\h\b[0]\s[4]\e
+#cancel3
+\h\b[0]\s[0]んー。\e
+
+
+#firstboot
+\h\w4.\w4.\w4.\w4.\w4.\w4.\w4.\w4.\n\nうにゅ。\nはじめまして、%selfnameだぉ。\u%keronameだよ。\n\w8\h\x\cSSPを立ち上げてくれてありがとう。\uありがと。\h\nあのね、わたしがSSPの案内役をつとめるんだって。\nたまに失敗したりへんなこと言ったりするかもしれないけど\u\n\_qたまにって、いつもじゃないのか？\_q\hよろしくね。\nうん、何とかなるよね。\x\cで、とりあえず私まだまだ開発中みたいだから、表情がこれしかなかったり、同じようなことばっかりしゃべったりするみたいだけど、日々進化してくらしいから、見捨てないでね。\u見捨てたら、燃やすゾ。\h\n\n%keronameそれはまずいかと。\u\n\nボクも%selfnameも炎属性だから気をつけたほうがいいよ。\h\n\w8.....\x\cとにかく、よろしくね。\n\w8ま、進化するまでは別のゴーストさん使ってるのも手かもしれないけど、たまにはわたしに戻してみてね。\nやくそくだぉ。\e
+
+#faceattack
+count3
+#faceattack0
+\h\s[4]痛いよ。\e
+#faceattack1
+\h\s[7]痛いって言ってるにょ～。燃やすゾ。\e
+#faceattack2
+\h\s[4]痛いのよ～ヒゲが。\uすみません。\n\w8.\w8.\w8.\w8\n剃りました。\e
+
+#bustattack
+count2
+#bustattack0
+\h\s[7]面白い？\e
+#bustattack1
+\h\s[4].......\e
+#bustattackhalf
+‥‥？\n  \e
+
+
+#headattack
+\h\s[1]えへへ\e
+
+
+#pet
+\u痛いよ。\e
+
+#date
+count2
+#date0
+今日は%month月%day日、%m?の日、%m?の日だよ。
+#date1
+今日は%month月%day日、%m?の日だよ。
+#o'clock
+count2
+#o'clock0
+現在時刻は%hour時%minute分だよ。
+#o'clock1
+%hour時%minute分だよ。
+
+#bootup early morning
+\h\s[4]寝てて良い？\e
+#bootup morning
+\hおはよー。\e
+#bootup early night
+\h夜はこれからだね。\n今日は何しようか？\e
+#bootup night
+\hすっかり夜だね。早く寝ないと遅刻するよ。\e
+
+#bootup etc
+count2
+#bootup etc0
+\hこんにちは。\e
+#bootup etc1
+\hちぇきら、ちぇきり。\uそういうばちもんくさいこといってると、消されるぞ。\e
+#bootup biorhythm check
+\j[#bootup etc]
+
+
+#extimemessage header
+\h\s[0]起動してから%exh時間経ってるらしいよ。\n\n\w8\w8
+#extimemessage shortshort
+\h\s[0]まだまだ。\e
+#extimemessage short
+\h\s[0]たまには休んだら？\e
+#extimemessage middle
+\h\s[0]そろそろお仕事終わりかな？\e
+#extimemessage long
+\h\s[4]ちゃんと家帰ってる？\n....\w8\nまさか、わたしだけ置き去り？\e
+#extimemessage verylong
+\h\s[0]このマシンよく落ちないね。\e
+
+
+#portalsitelist
+NYANee!http://www.da.il24.net/%7Eagrinion/haruna/nekoindex.htmnyanee
+J-oさんのアレhttp://www.remus.dti.ne.jp/~j-o/skin/skin.htmjoskin
+MOON PHASEさんの左http://cyan.maid.to/moonphase
+-
+もどき板http://nh.pv.to/nanika/index2.htmlmodoki
+開発板http://nh.pv.to/dev/index2.htmlmodokidev
+
+
+#recommendsitelist
+楢崎このみhttp://ssp.shillest.net/konomi.shtmlkonomi
+みれにぃhttp://www3.justnet.ne.jp/~toriatama/toriatama
+いもえみhttp://www5.ocn.ne.jp/~hoe/hoe
+理夢http://www.geocities.co.jp/Playtown-Yoyo/7033/khmix
+めもりhttp://member.nifty.ne.jp/417_NEKO/memory
+黒姉/せりこhttp://www.katch.ne.jp/~miy/extrastage
+奈留http://www.try-net.or.jp/~cla/rein/naru
+-
+ClearBrainSystemshttp://clearbrain.khsoft.gr.jp/clearblainsystems
+Tiny Palacehttp://www2.to/TinyPalace/imm
+-
+"華和梨"http://meister-d-i.hoops.ne.jp/kawari
+ゆなそふとhttp://www.yunasoft.gr.jp/yunasoft
+-
+ちぇりるhttp://www2.odn.ne.jp/cheriru/cheriru
+あれ以外のイベント with 任意＠大阪http://event.sstp.nu/eventosaka
+-
+ふくらみかけhttp://sakura.mikage.to/sakura
+SSP BUGTRAQhttp://ssp.shillest.net/bugtraq
+フィードバックhttp://todo.tir.ne.jp/ssp/todo.cgitodo
+
+#recommendsitelist2
+Ka2DA工房http://www.mars.dti.ne.jp/~ka2da/Ka2DA
+INTERNET STUDIO AKIhttp://www.mars.dti.ne.jp/~aki-m/misawa
+-
+YHMPhttp://www.sainet.or.jp/~cpunit/index-yhmp.htmyhmp
+全猫http://www.fics.org/~nekomimi/allneko
+
+
+#newssite noupdate
+\h\s[0]更新ないってさ。\e
+#newssite failure download
+\h\s0\h繋がんないってさ。別に良いけどね。\e
+#failure download
+\h\s[4]ダウンロードできないらしいよ。\h適当に処理して良い？\uよくないよ\e
+#headline analyzemiss
+\h\s[4]って、解析できないみたいだけど。\nなんとかしといてね。\e
+
+
+#sakura exist
+\h\s8あ、任意さんがいる\w1・\w1・\w1・\w1・\w1・\w1・\w8\s3\nわたしもここにいたいな\w1・\w1・\w1・\w1・\w1・\w4\n居ても、いいよね\w3・\w3・\w3・\w8\n\n\q0[#sakura exist cancel][いいよ] \q1[#sakura exist shutdown][ダメ]\z
+
+#sakura exist shutdown
+\h\s3そうだよね。やっぱりリソースの無駄遣いはいけないよね。\n\w5.\w5.\w5.\w8\nえんいー。\u\w5えんいー。\-\e
+
+#sakura exist cancel
+\h\s0そうだよね。居てもいいよね。\n\w8\s1%cありがとう。\e
+
+#nekodorif exist
+\h\s[7]げ、待ち伏せ･･･\e
+
+
+#install start
+\h\s0インストール開始っ。\e
+#install progress
+\h\s0インストール中～。\e
+#install complete
+\h\s0インストール完了っ。\e
+#install failure unlha32
+\h\s4‥‥\w8って、なんか unlha32.dll ないんだけど。\w8\uって不便じゃないのか？%usernameは\e
+#install failure unzip32
+\h\s4‥‥\w8って、なんか unzip32.dll ないんだけど。\w8\uまー日本はLHAのほうが普及してるからしょうがないんじゃ。\e
+#install failure
+\h\s4‥‥\w8って、ダメじゃんこのファイル。\w8\uいまさらインストール対応してないファイルなんてめずらしいな。\e
+#install failure currentghost
+\h\s7‥‥\w8って、わたしに上書きするな！\e
+#install unsupported
+\h\s4しらないよぅ。そんなアーカイブ\e
+
+
+#kinoko exists
+count4
+#kinoko exists0
+\hみてみて、いいでしょ。 \uいいのか？\e
+#kinoko exists1
+\hこれって結構おしゃれじゃない？\uそうかなぁ？\e
+#kinoko exists2
+\uうお、%selfnameなんか背が伸びたんじゃない？\hえへへ、いいでしょ。これシークレットきのこ。\n通販で買ったんだ。\u\nありがちだね。\h\n\nなんと今ならもう一つとか言われるとついつい...\e
+#kinoko exists3
+\hわーい、きのこきのこ。\uなんで、みんなそんなにきのこ好きなんだろう。\e
+
+#kinoko exists other
+count2
+#kinoko exists other0
+\hきのこいただきっ！\u積極的にほしがるもんかなぁ？\e
+#kinoko exists other1
+\hきのこいただきっ！\uしゃべるたびにきのこが移動するってのはどうなんだろう\e
+
+
+#schedulesensor start
+のスケジュールを読み込み中。\e
+#schedulesensor complete
+件のスケジュールを読み込みました。\e
+#schedulepost start
+にスケジュールを転送中。\e
+#schedulepost complete
+スケジュールを転送しました。\e
+#todays event header
+の予定だよ。\n
+#schedule 5 minutes header
+あと５分でだよ。\n
+#schedule 5 minutes footer
+忘れないでね。\e
+
+

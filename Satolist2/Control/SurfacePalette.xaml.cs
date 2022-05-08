@@ -1,4 +1,5 @@
-﻿using Satolist2.Utility;
+﻿using Satolist2.Core;
+using Satolist2.Utility;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -88,13 +89,13 @@ namespace Satolist2.Control
 
 		public void UpdateSurfacePreviewData()
 		{
-			if(Main.SurfacePreviewData != null)
+			if(Main.SurfacePreview.SurfacePreviewData != null)
 			{
 				items.Clear();
 				IsPreviewDataEnable = true;
-				cache = new ShellImageCache(DictionaryUtility.ConbinePath(Main.Ghost.FullDictionaryPath, MainViewModel.SurfacePreviewPath));
+				cache = new ShellImageCache(DictionaryUtility.ConbinePath(Main.SurfacePreview.SelectedShellPath, SurfacePreviewMetaData.SurfacePreviewPath));
 
-				foreach (var surface in Main.SurfacePreviewData.Items)
+				foreach (var surface in Main.SurfacePreview.SurfacePreviewData.Items)
 				{
 					if (!surface.IsEnableSurfacePalette)
 						continue;

@@ -161,10 +161,12 @@
       <DependentUpon>TextEditor.xaml</DependentUpon>
     </Compile>
     <Compile Include="Core\FtpClient.cs" />
+    <Compile Include="Core\LogMessage.cs" />
     <Compile Include="Core\NarNaLoaderClient.cs" />
     <Compile Include="Core\SatoriRecv.cs" />
     <Compile Include="Core\SSTPCallBackNativeWindow.cs" />
     <Compile Include="Core\SurfacePreviewImageGenerator.cs" />
+    <Compile Include="Core\TemporaryGhostRuntime.cs" />
     <Compile Include="Dialog\AddEventDialog.xaml.cs">
       <DependentUpon>AddEventDialog.xaml</DependentUpon>
     </Compile>

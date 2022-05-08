@@ -103,6 +103,14 @@ namespace Satolist2.Utility
 			return records.FirstOrDefault(o => o.Value.GhostPath == ghost.FullPath).Value;
 		}
 
+		public SakuraFMORecord Find(GhostModel ghost, string executablePath)
+		{
+			return records.FirstOrDefault(o =>
+				o.Value.GhostPath == ghost.FullPath &&
+				o.Value.ExecutablePath == executablePath
+				).Value;
+		}
+
 		//ヘルパ
 		public static SakuraFMORecord Read(GhostModel ghost)
 		{
@@ -111,9 +119,21 @@ namespace Satolist2.Utility
 			return reader.Find(ghost);
 		}
 
+		public static SakuraFMORecord Read(GhostModel ghost, string executablePath)
+		{
+			var reader = new SakuraFMOReader();
+			reader.Read();
+			return reader.Find(ghost, executablePath);
+		}
+
 		public static bool Exists(GhostModel ghost)
 		{
 			return Read(ghost) != null;
+		}
+
+		public static bool Exists(GhostModel ghost, string executablePath)
+		{
+			return Read(ghost, executablePath) != null;
 		}
 	}
 

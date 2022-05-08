@@ -3,11 +3,13 @@ using AvalonDock.Layout;
 using AvalonDock.Layout.Serialization;
 using Microsoft.Win32;
 using Satolist2.Control;
+using Satolist2.Core;
 using Satolist2.Dialog;
 using Satolist2.Model;
 using Satolist2.Utility;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -566,26 +568,15 @@ namespace Satolist2
 	//ワークスペースは切り離せるのが望ましそう。Dockのビューモデルとかもくっついてそうだし
 	internal class MainViewModel : NotificationObject
 	{
-		public const string SurfacePreviewPath = "profile/satolist/surfacepreview";
-		private const string SurfacePreviewMetadataPath = "surfaces.json";
-
 		public static EditorSettings EditorSettings { get; private set; }
-		private Core.SurfacePreviewMetaData surfacePreviewData;
+		
 
 		public MainWindow MainWindow { get; }
 		public GhostModel Ghost { get; private set; }
 		public bool IsGhostEnable { get; private set; }
-
-		//サーフェスプレビューデータ
-		public Core.SurfacePreviewMetaData SurfacePreviewData
-		{
-			get => surfacePreviewData;
-			set
-			{
-				surfacePreviewData = value;
-				NotifyChanged();
-			}
-		}
+		public LogMessage LogMessage => Core.LogMessage.Instance;
+		public SurfacePreviewViewModel SurfacePreview { get; }
+		
 
 		//それぞれのドッキングウィンドウ
 		public FileEventTreeViewModel FileEventTreeViewModel { get; }
@@ -629,6 +620,9 @@ namespace Satolist2
 		public ActionCommand MakeUpdateFileCommand { get; }
 		public ActionCommand UploadGhostCommand { get; }
 		public ActionCommand GenerateSurfacePreviewCommand { get; }
+		public ActionCommand SelectPreviewShellCommand { get; }
+		public ActionCommand ShowLogMessageCommand { get; }
+		public ActionCommand ClearLogMessageCommand { get; }
 
 		//設定情報
 		public InsertItemPaletteModel InsertPalette
@@ -679,6 +673,7 @@ namespace Satolist2
 			initializeData = initializeData ?? new MainViewModelInitializeData();
 			MainWindow = mainWindow;
 			Ghost = initializeData.Ghost;
+
 			IsGhostEnable = Ghost != null;
 			string shellPath = null;
 
@@ -729,7 +724,7 @@ namespace Satolist2
 				}
 
 				//サーフェスプレビューデータを読込
-				LoadSurfacePreviewData();
+				SurfacePreview = new SurfacePreviewViewModel(this);
 			}
 
 			EventEditors = new List<EventEditorViewModel>();
@@ -849,7 +844,6 @@ namespace Satolist2
 					catch { }
 				},
 				o => Ghost != null
-
 				);
 
 			OpenGhostDictionaryDirectoryCommand = new ActionCommand(
@@ -860,7 +854,8 @@ namespace Satolist2
 						Process.Start(Ghost.FullDictionaryPath);
 					}
 					catch { }
-				}
+				},
+				o => Ghost != null
 				);
 
 			OpenGhostShellDirectoryCommand = new ActionCommand(
@@ -871,7 +866,8 @@ namespace Satolist2
 						Process.Start(DictionaryUtility.ConbinePath(Ghost.FullPath, "shell"));
 					}
 					catch { }
-				}
+				},
+				o => Ghost != null
 				);
 
 			BootSSPCommand = new ActionCommand(
@@ -1127,18 +1123,20 @@ namespace Satolist2
 				o =>
 				{
 					//ゴーストの起動をチェック
+					/*
 					if(!SakuraFMOReader.Exists(Ghost))
 					{
 						MessageBox.Show("SSPで起動中のゴーストからサーフェスプレビューを作る機能です。\r\nゴーストを起動した状態でこの機能を使用して下さい。");
 						return;
 					}
+					*/
 
 					var gen = new Core.SurfacePreviewImageGenerator();
 					var dialog = new ProgressDialog(this);
 					dialog.DataContext.Title = "サーフェスプレビューの作成中";
 					dialog.DataContext.StableMessage = "SSPと通信しています。処理中はゴーストを操作しないでください。";
 
-					var task = gen.Generate(this, (success) =>
+					var task = gen.GenerateShellOnly(this, SurfacePreview.SelectedShellPath, (success) =>
 					{
 						dialog.DataContext.Progress = 100.0;
 						if (success)
@@ -1157,11 +1155,40 @@ namespace Satolist2
 					dialog.ShowDialog();
 
 					//再読み込み
-					LoadSurfacePreviewData();
+					SurfacePreview.ReloadPreviewData();
 					SurfacePaletteViewModel.UpdateSurfacePreviewData();
 					SurfaceViewerViewModel.UpdateSurfacePreviewData();
 				},
 				o => Ghost != null
+				);
+
+			SelectPreviewShellCommand = new ActionCommand(
+				o =>
+				{
+					//選択変更
+					SurfacePreview.SelectedShell = (SurfacePreviewViewModel.SurfacePreviewViewModelShellItem)o;
+
+					//再読み込み
+					SurfacePreview.ReloadPreviewData();
+					SurfacePaletteViewModel.UpdateSurfacePreviewData();
+					SurfaceViewerViewModel.UpdateSurfacePreviewData();
+				}
+				);
+
+			ShowLogMessageCommand = new ActionCommand(
+				o =>
+				{
+					if(mainWindow.LogList.Items.Count > 0)
+						mainWindow.LogList.ScrollIntoView(mainWindow.LogList.Items[mainWindow.LogList.Items.Count - 1]);
+					mainWindow.LogPopup.IsOpen = true;
+				}
+				);
+
+			ClearLogMessageCommand = new ActionCommand(
+				o =>
+				{
+					LogMessage.ClearLog();
+				}
 				);
 
 
@@ -1330,21 +1357,6 @@ namespace Satolist2
 			return false;
 		}
 
-
-		//シェルプレビューデータの読込
-		private void LoadSurfacePreviewData()
-		{
-			var metadataPath = DictionaryUtility.ConbinePath(Ghost.FullDictionaryPath, SurfacePreviewPath, SurfacePreviewMetadataPath);
-			try
-			{
-				SurfacePreviewData = JsonUtility.DeserializeFromFile<Core.SurfacePreviewMetaData>(metadataPath);
-			}
-			catch
-			{
-				SurfacePreviewData = null;
-			}
-		}
-
 		//アクティブなエディタに挿入
 		public void InsertToActiveEditor(string str, bool isActivate = true)
 		{
@@ -1361,4 +1373,148 @@ namespace Satolist2
 		
 
 	}
+
+	//サーフェスプレビュー共通ビューモデル
+	internal class SurfacePreviewViewModel : NotificationObject
+	{
+		//サーフェスシェルフォルダ列挙とか
+		public MainViewModel Main { get; }
+		private Core.SurfacePreviewMetaData surfacePreviewData;
+		private ObservableCollection<SurfacePreviewViewModelShellItem> shells;
+		private SurfacePreviewViewModelShellItem selectedShell;
+		public ReadOnlyObservableCollection<SurfacePreviewViewModelShellItem> Shells
+		{
+			get => new ReadOnlyObservableCollection<SurfacePreviewViewModelShellItem>(shells);
+		}
+
+		public SurfacePreviewViewModelShellItem SelectedShell
+		{
+			get => selectedShell;
+			set
+			{
+				if (selectedShell != value)
+				{
+					selectedShell = value;
+					NotifyChanged();
+					LoadSurfacePreviewData(selectedShell);
+
+					foreach(var s in shells)
+					{
+						s.IsSelected = s == selectedShell;
+					}
+
+					//選択を保存
+					MainViewModel.EditorSettings.GhostTemporarySettings.SurfacePreviewShellDirectory = selectedShell.DirectoryName;
+					MainViewModel.EditorSettings.SaveGhostTemporarySettings(Main.Ghost);
+				}
+			}
+		}
+
+		public string SelectedShellPath
+		{
+			get
+			{
+				if(SelectedShell !=null)
+				{
+					return SelectedShell.DirectoryFullPath;
+				}
+				return null;
+			}
+		}
+
+		//サーフェスプレビューデータ
+		public Core.SurfacePreviewMetaData SurfacePreviewData
+		{
+			get => surfacePreviewData;
+			set
+			{
+				surfacePreviewData = value;
+				NotifyChanged();
+			}
+		}
+
+		public SurfacePreviewViewModel(MainViewModel main)
+		{
+			Main = main;
+			shells = new ObservableCollection<SurfacePreviewViewModelShellItem>();
+
+			var shellDirectoryPath = DictionaryUtility.ConbinePath(Main.Ghost.FullPath, "shell");
+			var shellDirs = System.IO.Directory.GetDirectories(shellDirectoryPath);
+
+			foreach(var dir in shellDirs)
+			{
+				var nDir = DictionaryUtility.NormalizePath(dir);
+				var descriptPath = DictionaryUtility.ConbinePath(nDir, "descript.txt");
+				if(System.IO.File.Exists(descriptPath))
+				{
+					var parser = new CsvBuilder();
+					parser.Deserialize(System.IO.File.ReadAllText(descriptPath, Constants.EncodingShiftJis));
+
+					var type = parser.GetValue("type");
+					var name = parser.GetValue("name");
+
+					if(type == "shell" && !string.IsNullOrEmpty(name))
+					{
+						var s = new SurfacePreviewViewModelShellItem();
+						s.DirectoryName = System.IO.Path.GetFileName(dir);
+						s.DirectoryFullPath = DictionaryUtility.NormalizePath(dir);
+						s.ShellName = name;
+						shells.Add(s);
+					}
+				}
+			}
+
+			//アイテム選択
+			SelectedShell = Shells.FirstOrDefault(o => o.DirectoryName == MainViewModel.EditorSettings.GhostTemporarySettings.SurfacePreviewShellDirectory);
+			if (SelectedShell == null)
+				SelectedShell = Shells.FirstOrDefault( o => o.DirectoryName == "master" );
+			if (SelectedShell == null)
+				SelectedShell = Shells.FirstOrDefault();
+		}
+
+		public void ReloadPreviewData()
+		{
+			LoadSurfacePreviewData(SelectedShell);
+		}
+
+		private void LoadSurfacePreviewData(SurfacePreviewViewModelShellItem item)
+		{
+			if (item != null)
+			{
+				var metadataPath = DictionaryUtility.ConbinePath(Main.Ghost.FullPath, "shell", item.DirectoryName, SurfacePreviewMetaData.SurfacePreviewPath, SurfacePreviewMetaData.SurfacePreviewMetadataPath);
+				try
+				{
+					SurfacePreviewData = JsonUtility.DeserializeFromFile<Core.SurfacePreviewMetaData>(metadataPath);
+				}
+				catch
+				{
+					SurfacePreviewData = null;
+				}
+			}
+			else
+			{
+				SurfacePreviewData = null;
+			}
+		}
+
+		internal class SurfacePreviewViewModelShellItem : NotificationObject
+		{
+			private bool isSelected;
+
+			public string DirectoryName { get; set; }
+			public string DirectoryFullPath { get; set; }
+			public string ShellName { get; set; }
+			public bool IsSelected
+			{
+				get => isSelected;
+				set
+				{
+					isSelected = value;
+					NotifyChanged();
+				}
+			}
+		}
+	}
+
+	
 }
