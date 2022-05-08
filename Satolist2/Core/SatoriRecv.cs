@@ -111,6 +111,8 @@ namespace Satolist2.Core
 	public static class Win32Import
 	{
 		public const int WM_COPYDATA = 0x004a;
+		public const int TRUE = 1;
+		public const int FALSE = 0;
 
 		public static readonly UIntPtr SSTP_DWDATA = (UIntPtr)9801;
 
@@ -168,5 +170,7 @@ namespace Satolist2.Core
 		public static extern int DestroyWindow(IntPtr hWnd);
 		[DllImport("user32.dll")]
 		public static extern IntPtr SendMessageTimeoutA(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam, uint flags, uint timeout, IntPtr lpdwResult);
+		[DllImport("user32.dll")]
+		public static extern int IsWindow(IntPtr hwnd);
 	}
 }

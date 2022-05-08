@@ -102,7 +102,8 @@ namespace Satolist2.Utility
 			{
 				if (string.IsNullOrEmpty(item.Value.GhostPath) ||
 					string.IsNullOrEmpty(item.Value.GhostName) ||
-					string.IsNullOrEmpty(item.Value.ExecutablePath)
+					string.IsNullOrEmpty(item.Value.ExecutablePath) ||
+					Core.Win32Import.IsWindow(item.Value.HWnd) == Core.Win32Import.FALSE
 					)
 					records.Remove(item.Key);
 			}
@@ -125,10 +126,9 @@ namespace Satolist2.Utility
 		//サーフェスプレビュー作成に使用するSSPがあれば除去
 		public void RemoveSurfacePreviewGeneratorRuntime()
 		{
-			var generatorRuntime = DictionaryUtility.NormalizeFullPath("data/ssp/ssp.exe");
 			foreach(var r in Records.ToArray())
 			{
-				if (r.Value.ExecutablePath == generatorRuntime)
+				if (r.Value.GhostName == "サーフェスプレビューの準備中")//descript.txtで設定してある
 					records.Remove(r.Key);
 			}
 		}
