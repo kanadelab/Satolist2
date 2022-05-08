@@ -15,7 +15,7 @@
 	<Grid Visibility="{Binding Main.IsGhostEnable, Converter={StaticResource BoolToVisibilityConverter}}">
 		<Grid Visibility="{Binding IsPreviewDataEnable, Converter={StaticResource InvertBoolToVisibilityConverter}}">
 			<StackPanel>
-				<TextBlock Text="プレビューデータが作成されていません。&#xa;SSPでゴーストを起動した状態でボタンを押すと、プレビューを構築できます。" Margin="5" TextWrapping="Wrap" />
+				<TextBlock Text="プレビューデータが作成されていません。&#xa;ボタンを押すとシェルからプレビュー画像を作成します。" Margin="5" TextWrapping="Wrap" />
 				<Button Content="サーフェスプレビューの構築" Command="{Binding Main.GenerateSurfacePreviewCommand}" HorizontalAlignment="Left" Padding="3" Margin="5"/>
 			</StackPanel>
 		</Grid>

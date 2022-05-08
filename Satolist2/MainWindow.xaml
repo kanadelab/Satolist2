@@ -38,7 +38,7 @@
 			</MenuItem>
 			<MenuItem Header="編集">
 				<MenuItem Header="サーフェスプレビュー画像を再生成" Command="{Binding GenerateSurfacePreviewCommand}" />
-				<MenuItem Header="プレビューに使用するシェル" ItemsSource="{Binding SurfacePreview.Shells}" IsEnabled="{Binding IsGhostEnable}" x:Name="PreviewShellSelector">
+				<MenuItem Header="プレビューに使用するシェル" ItemsSource="{Binding SurfacePreview.Shells}" IsEnabled="{Binding SurfacePreview.IsExistsShell,FallbackValue=False}" x:Name="PreviewShellSelector">
 					<MenuItem.ItemContainerStyle>
 						<Style TargetType="MenuItem">
 							<Setter Property="Header" Value="{Binding ShellName}" />

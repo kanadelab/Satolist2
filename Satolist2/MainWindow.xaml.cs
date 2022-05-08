@@ -677,8 +677,11 @@ namespace Satolist2
 			IsGhostEnable = Ghost != null;
 			string shellPath = null;
 
+			//サーフェスプレビューデータを読込
+			SurfacePreview = new SurfacePreviewViewModel(this);
+
 			//エディタ設定のロード
-			if(EditorSettings == null)
+			if (EditorSettings == null)
 			{
 				EditorSettings = new EditorSettings();
 
@@ -718,13 +721,7 @@ namespace Satolist2
 					EditorSettings.SaveGhostTemporarySettings(Ghost);
 				}
 
-				if (!string.IsNullOrEmpty(initializeData.ShellDirectoryName))
-				{
-					shellPath = Ghost.FullPath + "/shell/" + initializeData.ShellDirectoryName;
-				}
-
-				//サーフェスプレビューデータを読込
-				SurfacePreview = new SurfacePreviewViewModel(this);
+				SurfacePreview.LoadShells();
 			}
 
 			EventEditors = new List<EventEditorViewModel>();
@@ -1159,7 +1156,7 @@ namespace Satolist2
 					SurfacePaletteViewModel.UpdateSurfacePreviewData();
 					SurfaceViewerViewModel.UpdateSurfacePreviewData();
 				},
-				o => Ghost != null
+				o => SurfacePreview.SelectedShell != null
 				);
 
 			SelectPreviewShellCommand = new ActionCommand(
@@ -1433,19 +1430,34 @@ namespace Satolist2
 			}
 		}
 
+		//シェルが存在してるか
+		public bool IsExistsShell
+		{
+			get => shells.Count > 0;
+		}
+
 		public SurfacePreviewViewModel(MainViewModel main)
 		{
 			Main = main;
 			shells = new ObservableCollection<SurfacePreviewViewModelShellItem>();
+		}
 
+		public void LoadShells()
+		{
 			var shellDirectoryPath = DictionaryUtility.ConbinePath(Main.Ghost.FullPath, "shell");
+			if (!System.IO.Directory.Exists(shellDirectoryPath))
+			{
+				//shellが存在していない
+				return;
+			}
+
 			var shellDirs = System.IO.Directory.GetDirectories(shellDirectoryPath);
 
-			foreach(var dir in shellDirs)
+			foreach (var dir in shellDirs)
 			{
 				var nDir = DictionaryUtility.NormalizePath(dir);
 				var descriptPath = DictionaryUtility.ConbinePath(nDir, "descript.txt");
-				if(System.IO.File.Exists(descriptPath))
+				if (System.IO.File.Exists(descriptPath))
 				{
 					var parser = new CsvBuilder();
 					parser.Deserialize(System.IO.File.ReadAllText(descriptPath, Constants.EncodingShiftJis));
@@ -1453,7 +1465,7 @@ namespace Satolist2
 					var type = parser.GetValue("type");
 					var name = parser.GetValue("name");
 
-					if(type == "shell" && !string.IsNullOrEmpty(name))
+					if (type == "shell" && !string.IsNullOrEmpty(name))
 					{
 						var s = new SurfacePreviewViewModelShellItem();
 						s.DirectoryName = System.IO.Path.GetFileName(dir);
@@ -1467,7 +1479,7 @@ namespace Satolist2
 			//アイテム選択
 			SelectedShell = Shells.FirstOrDefault(o => o.DirectoryName == MainViewModel.EditorSettings.GhostTemporarySettings.SurfacePreviewShellDirectory);
 			if (SelectedShell == null)
-				SelectedShell = Shells.FirstOrDefault( o => o.DirectoryName == "master" );
+				SelectedShell = Shells.FirstOrDefault(o => o.DirectoryName == "master");
 			if (SelectedShell == null)
 				SelectedShell = Shells.FirstOrDefault();
 		}
