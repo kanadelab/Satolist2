@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -26,6 +27,7 @@ namespace Satolist2.Model
 		public bool ShortCutKeyAlt { get; set; }
 		public bool ShortCutKeyShift { get; set; }
 		public NodeType Type { get; set; }
+
 
 		//全アイテムの取得
 		public IEnumerable<InsertItemPaletteModel> AllItems()

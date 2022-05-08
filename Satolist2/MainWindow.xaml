@@ -65,6 +65,7 @@
 				<MenuItem Header="文字置換リスト" x:Name="ReplaceListVisibleMenu" IsCheckable="True" IsChecked="{Binding IsVisible, Mode=TwoWay}" />
 				<MenuItem Header="変数リスト" x:Name="VariableListVisibleMenu" IsCheckable="True" IsChecked="{Binding IsVisible, Mode=TwoWay}" />
 				<MenuItem Header="れしばイベントログ" x:Name="RecvEventLogVisibleMenu" IsCheckable="True" IsChecked="{Binding IsVisible, Mode=TwoWay}" />
+				<MenuItem Header="挿入パレット" x:Name="InsertPaletteVisibleMenu" IsCheckable="True" IsChecked="{Binding IsVisible, Mode=TwoWay}" />
 			</MenuItem>
 			<MenuItem Header="デバッグ">
 				<MenuItem Header="SHIORI Reload" Command="{Binding ReloadShioriCommand}" InputGestureText="Ctrl+Alt+R" />
@@ -169,6 +170,12 @@
 							<util:DockingWindow x:Name="SurfacePalette">
 								<ctl:SurfacePalette />
 							</util:DockingWindow>
+							
+							<!--挿入パレット-->
+							<util:DockingWindow x:Name="InsertPalette">
+								<ctl:InsertPalette />
+							</util:DockingWindow>
+							
 						</avalonDock:LayoutAnchorablePane>
 
 					</avalonDock:LayoutPanel>

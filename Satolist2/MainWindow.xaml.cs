@@ -80,6 +80,7 @@ namespace Satolist2
 			VariableList.IsVisible = false;
 			SearchMenu.IsVisible = false;
 			RecvEventLog.IsVisible = false;
+			InsertPalette.IsVisible = false;
 
 			AllowDrop = true;
 			EventEditors = new List<DockingWindow>();
@@ -400,6 +401,7 @@ namespace Satolist2
 			ReplaceList.ViewModel = mainVm.ReplaceListViewModel;
 			VariableList.ViewModel = mainVm.VariableListViewModel;
 			RecvEventLog.ViewModel = mainVm.RecvEventLogViewModel;
+			InsertPalette.ViewModel = mainVm.InsertPaletteViewModel;
 		}
 
 		private void ReflectVisibleMenuDataContext()
@@ -421,7 +423,7 @@ namespace Satolist2
 			ReplaceListVisibleMenu.DataContext = ReplaceList;
 			VariableListVisibleMenu.DataContext = VariableList;
 			RecvEventLogVisibleMenu.DataContext = RecvEventLog;
-			
+			InsertPaletteVisibleMenu.DataContext = InsertPalette;
 			//
 			
 		}
@@ -510,6 +512,9 @@ namespace Satolist2
 				case RecvEventLogViewModel.ContentId:
 					RecvEventLog = (DockingWindow)e.Model;
 					break;
+				case InsertPaletteViewModel.ContentId:
+					InsertPalette = (DockingWindow)e.Model;
+					break;
 				default:
 					//イベントエディタ等一時的なモノはデシリアライズする必要はない
 					e.Cancel = true;
@@ -594,6 +599,7 @@ namespace Satolist2
 		public ReplaceListViewModel ReplaceListViewModel { get; }
 		public VariableListViewModel VariableListViewModel { get; }
 		public RecvEventLogViewModel RecvEventLogViewModel { get; }
+		public InsertPaletteViewModel InsertPaletteViewModel { get; }
 		
 
 		public List<EventEditorViewModel> EventEditors { get; }
@@ -744,6 +750,7 @@ namespace Satolist2
 			ReplaceListViewModel = new ReplaceListViewModel(this);
 			VariableListViewModel = new VariableListViewModel(this);
 			RecvEventLogViewModel = new RecvEventLogViewModel(this);
+			InsertPaletteViewModel = new InsertPaletteViewModel(this);
 
 			SaveFileCommand = new ActionCommand(
 				o => AskSave(),
@@ -940,6 +947,7 @@ namespace Satolist2
 						{
 							InsertPalette = vm.Items.First().ToModel();
 							EditorSettings.SaveInsertPalette();
+							InsertPaletteViewModel.NotifyModelUpdated();
 						}
 					}
 				}

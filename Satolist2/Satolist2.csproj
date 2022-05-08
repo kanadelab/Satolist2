@@ -105,6 +105,9 @@
     <Compile Include="Control\BindablePasswordBox.xaml.cs">
       <DependentUpon>BindablePasswordBox.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Control\InsertPalette.xaml.cs">
+      <DependentUpon>InsertPalette.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Control\RecvEventLog.xaml.cs">
       <DependentUpon>RecvEventLog.xaml</DependentUpon>
     </Compile>
@@ -249,6 +252,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Control\GhostDescriptEditor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Control\InsertPalette.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
