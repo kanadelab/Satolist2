@@ -96,19 +96,41 @@ namespace Satolist2.Utility
 					records.Add(fmoId, new SakuraFMORecord(fmoId));
 				records[fmoId].Parse(key, value);
 			}
+
+			//基準を満たしていない情報を削除
+			foreach(var item in records.ToArray())
+			{
+				if (string.IsNullOrEmpty(item.Value.GhostPath) ||
+					string.IsNullOrEmpty(item.Value.GhostName) ||
+					string.IsNullOrEmpty(item.Value.ExecutablePath)
+					)
+					records.Remove(item.Key);
+			}
 		}
 
 		public SakuraFMORecord Find(GhostModel ghost)
 		{
-			return records.FirstOrDefault(o => o.Value.GhostPath == ghost.FullPath).Value;
+			//末尾を最新として取り扱う
+			return records.LastOrDefault(o => o.Value.GhostPath == ghost.FullPath).Value;
 		}
 
 		public SakuraFMORecord Find(GhostModel ghost, string executablePath)
 		{
-			return records.FirstOrDefault(o =>
+			return records.LastOrDefault(o =>
 				o.Value.GhostPath == ghost.FullPath &&
 				o.Value.ExecutablePath == executablePath
 				).Value;
+		}
+
+		//サーフェスプレビュー作成に使用するSSPがあれば除去
+		public void RemoveSurfacePreviewGeneratorRuntime()
+		{
+			var generatorRuntime = DictionaryUtility.NormalizeFullPath("data/ssp/ssp.exe");
+			foreach(var r in Records.ToArray())
+			{
+				if (r.Value.ExecutablePath == generatorRuntime)
+					records.Remove(r.Key);
+			}
 		}
 
 		//ヘルパ

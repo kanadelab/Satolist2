@@ -58,7 +58,7 @@ namespace Satolist2.Core
 			Directory.CreateDirectory("data/ssp/ghost/temporaryghost/shell");
 
 			//テンプレートから里々を展開
-			File.Copy("data/template/satori.dll", "data/ssp/ghost/temporaryghost/ghost/master/satori.dll");
+			File.Copy("data/template/satori.dll", "data/ssp/ghost/temporaryghost/ghost/master/satori.dll", true);
 
 			//シェルを展開
 			FileSystem.CopyDirectory(shellPath, "data/ssp/ghost/temporaryghost/shell/master");

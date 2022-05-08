@@ -58,7 +58,7 @@ namespace Satolist2.Core
 			try
 			{
 				if(System.IO.File.Exists("version.txt"))
-					AddLogInternal(System.IO.File.ReadAllText("version.txt"));
+					AddLogInternal(System.IO.File.ReadAllLines("version.txt").First());
 				else
 					AddLogInternal("Satolist2 (LocalBuild)");
 			}

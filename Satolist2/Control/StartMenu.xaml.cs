@@ -94,6 +94,7 @@ namespace Satolist2.Control
 		{
 			var fmoReader = new SakuraFMOReader();
 			fmoReader.Read();
+			fmoReader.RemoveSurfacePreviewGeneratorRuntime();
 			items.Clear();
 
 			//起動中のゴーストを一番最初に表示
