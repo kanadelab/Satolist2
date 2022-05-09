@@ -162,12 +162,19 @@ namespace Satolist2.Control
 		public void RefleshSearch()
 		{
 			var pattern = new Regex(Regex.Escape(SearchString));
-			currentMatches = pattern.Matches(control.AttachEditor.Text);
+			if (!string.IsNullOrEmpty(pattern.ToString()))
+			{
+				currentMatches = pattern.Matches(control.AttachEditor.Text);
+			}
+			else
+			{
+				currentMatches = null;
+			}
 		}
 
 		public void MoveSearch(bool directionIsNext)
 		{
-			if (currentMatches.Count == 0)
+			if ((currentMatches?.Count ?? 0) == 0)
 				return;
 
 			//現在のカレットの位置から次の一致を取りに行く
