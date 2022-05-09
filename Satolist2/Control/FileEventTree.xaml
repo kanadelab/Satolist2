@@ -11,7 +11,7 @@
 		<util:InvertBoolToVisibilityConverter x:Key="InvertBoolToVisibilityConverter" />
 	</UserControl.Resources>
 	<Grid>
-		<TreeView ItemsSource="{Binding Dictionaries}" SelectedItemChanged="TreeView_SelectedItemChanged">
+		<TreeView ItemsSource="{Binding Directories}" SelectedItemChanged="TreeView_SelectedItemChanged">
 			<TreeView.ItemTemplate>
 				<HierarchicalDataTemplate ItemsSource="{Binding ChildItems}">
 					<TextBlock Text="{Binding Label}" />

@@ -954,21 +954,27 @@ namespace Satolist2.Utility
 	{
 		private string directoryPath;
 		private Dictionary<string, ShellImageSource> images;
+		private object lockObject;
+
 		public ShellImageCache(string shellDirectoryPath)
 		{
+			lockObject = new object();
 			images = new Dictionary<string, ShellImageSource>();
 			directoryPath = shellDirectoryPath;
 		}
 		public ShellImageSource LoadImage(string filePath)
 		{
-			ShellImageSource result;
-			images.TryGetValue(filePath, out result);
-			if(result == null)
+			lock (lockObject)
 			{
-				result = new ShellImageSource(directoryPath + "/" + filePath);
-				images.Add(filePath, result);
+				ShellImageSource result;
+				images.TryGetValue(filePath, out result);
+				if (result == null)
+				{
+					result = new ShellImageSource(directoryPath + "/" + filePath);
+					images.Add(filePath, result);
+				}
+				return result;
 			}
-			return result;
 		}
 	}
 

@@ -90,7 +90,8 @@ namespace Satolist2.Control
 	internal class FileEventTreeViewModel : NotificationObject, IDockingWindowContent, IDisposable
 	{
 		public const string ContentId = "FileEventTree";
-		private ObservableCollection<FileEventTreeItemDictionaryViewModel> dictionaries;
+		//private ObservableCollection<FileEventTreeItemDictionaryViewModel> dictionaries;
+		private ObservableCollection<FileEventTreeItemDirectoryViewModel> directories;
 
 		public MainViewModel Main { get; }
 		public GhostModel Ghost
@@ -98,9 +99,16 @@ namespace Satolist2.Control
 			get => Main.Ghost;
 		}
 
+		/*
 		public ReadOnlyObservableCollection<FileEventTreeItemDictionaryViewModel> Dictionaries
 		{
 			get => new ReadOnlyObservableCollection<FileEventTreeItemDictionaryViewModel>(dictionaries);
+		}
+		*/
+
+		public ReadOnlyObservableCollection<FileEventTreeItemDirectoryViewModel> Directories
+		{
+			get => new ReadOnlyObservableCollection<FileEventTreeItemDirectoryViewModel>(directories);
 		}
 
 		public string DockingTitle => "ファイルイベントツリー";
@@ -110,20 +118,71 @@ namespace Satolist2.Control
 		public FileEventTreeViewModel(MainViewModel main)
 		{
 			Main = main;
-			dictionaries = new ObservableCollection<FileEventTreeItemDictionaryViewModel>();
+			//dictionaries = new ObservableCollection<FileEventTreeItemDictionaryViewModel>();
+			directories = new ObservableCollection<FileEventTreeItemDirectoryViewModel>();
 
 			if (Ghost != null)
 			{
 				//辞書生成
 				foreach (var dic in Ghost.Dictionaries)
 				{
+					dic.PropertyChanged += Dic_PropertyChanged;
 					var dictViewModel = new FileEventTreeItemDictionaryViewModel(this, dic);
-					dictionaries.Add(dictViewModel);
+					//dictionaries.Add(dictViewModel);
+
+					var dicDir = DictionaryUtility.NormalizePath(System.IO.Path.GetDirectoryName(dic.RelativeName));
+					var dir = directories.FirstOrDefault(o => o.RelativeName == dicDir);
+					if(dir == null)
+					{
+						dir = new FileEventTreeItemDirectoryViewModel(dicDir);
+						directories.Add(dir);
+					}
+					dir.AddDictionary(dictViewModel);
 				}
 
 				//辞書のコレクション変更ハンドラ
 				INotifyCollectionChanged dictionaryCollection = Ghost.Dictionaries;
 				dictionaryCollection.CollectionChanged += DictionaryCollection_CollectionChanged;
+			}
+		}
+
+		private void Dic_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+		{
+			if (sender is DictionaryModel dic)
+			{
+				if (e.PropertyName == nameof(DictionaryModel.RelativeName))
+				{
+					var newDicDir = DictionaryUtility.NormalizePath(System.IO.Path.GetDirectoryName(dic.RelativeName));
+
+					//すでに存在してるレコードを一旦消す
+					FileEventTreeItemDictionaryViewModel viewmodel = null;
+					foreach(var dirVm in directories)
+					{
+						var item = dirVm.ChildItems.FirstOrDefault(o => o.Dictionary == dic);
+						if(dirVm.RelativeName == dic.RelativeName)
+						{
+							//前後で位置が変わらないので打ち切り
+							return;
+						}
+						else
+						{
+							dirVm.RemoveDictionary(item);
+							viewmodel = item;
+							break;
+						}
+					}
+
+					if (viewmodel != null)
+					{
+						var dir = directories.FirstOrDefault(o => o.RelativeName == newDicDir);
+						if (dir == null)
+						{
+							dir = new FileEventTreeItemDirectoryViewModel(newDicDir);
+							directories.Add(dir);
+						}
+						dir.AddDictionary(viewmodel);
+					}
+				}
 			}
 		}
 
@@ -142,20 +201,77 @@ namespace Satolist2.Control
 			*/
 			Debug.Assert((e.OldItems?.Count ?? 0) == 0);
 
-			foreach(Model.DictionaryModel item in e.NewItems)
+			foreach(Model.DictionaryModel dic in e.NewItems)
 			{
-				var itemViewModel = new FileEventTreeItemDictionaryViewModel(this, item);
-				dictionaries.Add(itemViewModel);
+				var dicViewModel = new FileEventTreeItemDictionaryViewModel(this, dic);
+				//dictionaries.Add(itemViewModel);
+
+				var dicDir = DictionaryUtility.NormalizePath(System.IO.Path.GetDirectoryName(dic.RelativeName));
+				var dir = directories.FirstOrDefault(o => o.RelativeName == dicDir);
+				if (dir == null)
+				{
+					dir = new FileEventTreeItemDirectoryViewModel(dicDir);
+					directories.Add(dir);
+				}
+				dir.AddDictionary(dicViewModel);
 			}
 		}
 
 		public void Dispose()
 		{
+			/*
+			foreach(var dic in dictionaries)
+			{
+				dic.Dictionary.PropertyChanged -= Dic_PropertyChanged;
+			}
+			*/
+
+			foreach(var dir in directories)
+			{
+				foreach(var dic in dir.ChildItems)
+				{
+					dic.Dictionary.PropertyChanged -= Dic_PropertyChanged;
+				}
+			}
+
 			if (Main.Ghost != null)
 			{
 				INotifyCollectionChanged dictionaryCollection = Ghost.Dictionaries;
 				dictionaryCollection.CollectionChanged -= DictionaryCollection_CollectionChanged;
 			}
+		}
+	}
+
+	//辞書ファイルディレクトリ階層
+	internal class FileEventTreeItemDirectoryViewModel : NotificationObject
+	{
+		private ObservableCollection<FileEventTreeItemDictionaryViewModel> items;
+
+		public ReadOnlyObservableCollection<FileEventTreeItemDictionaryViewModel> ChildItems
+		{
+			get => new ReadOnlyObservableCollection<FileEventTreeItemDictionaryViewModel>(items);
+		}
+
+		public string RelativeName { get; set; }
+
+		public string Label => string.IsNullOrEmpty(RelativeName) ? "<里々ルートフォルダ>" : RelativeName;
+
+		public FileEventTreeItemDirectoryViewModel(string relativePath)
+		{
+			items = new ObservableCollection<FileEventTreeItemDictionaryViewModel>();
+			RelativeName = relativePath;
+		}
+
+		public string NodeType = "Directory";
+
+		public void AddDictionary(FileEventTreeItemDictionaryViewModel dic)
+		{
+			items.Add(dic);
+		}
+
+		public void RemoveDictionary(FileEventTreeItemDictionaryViewModel dic)
+		{
+			items.Remove(dic);
 		}
 	}
 

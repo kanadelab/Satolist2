@@ -7,6 +7,7 @@ using System.Drawing;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -49,9 +50,11 @@ namespace Satolist2.Control
 	internal class SurfacePaletteViewModel : NotificationObject, IDockingWindowContent
 	{
 		public const string ContentId = "SurfacePalette";
-		private ShellImageCache cache;
 		private bool isPreviewDataEnable;
 		private ObservableCollection<SurfacePaletteItemViewModel> items;
+		private Task surfaceCreatingTask;
+		private CancellationTokenSource cancelObject;
+
 		public ReadOnlyObservableCollection<SurfacePaletteItemViewModel> Items
 		{
 			get => new ReadOnlyObservableCollection<SurfacePaletteItemViewModel>(items);
@@ -73,7 +76,6 @@ namespace Satolist2.Control
 			Main = main;
 			items = new ObservableCollection<SurfacePaletteItemViewModel>();
 
-
 			GenerateSurfacePreviewCommand = new ActionCommand(
 				o =>
 				{
@@ -89,24 +91,31 @@ namespace Satolist2.Control
 
 		public void UpdateSurfacePreviewData()
 		{
+			cancelObject?.Cancel();
+			cancelObject = null;
+			surfaceCreatingTask?.Wait();
+			surfaceCreatingTask = null;
+
 			if(Main.SurfacePreview.SurfacePreviewData != null)
 			{
 				items.Clear();
 				IsPreviewDataEnable = true;
-				cache = new ShellImageCache(DictionaryUtility.ConbinePath(Main.SurfacePreview.SelectedShellPath, SurfacePreviewMetaData.SurfacePreviewPath));
 
 				foreach (var surface in Main.SurfacePreview.SurfacePreviewData.Items)
 				{
 					if (!surface.IsEnableSurfacePalette)
 						continue;
 
-					var item = new SurfacePaletteItemViewModel(this, surface, cache)
+					var item = new SurfacePaletteItemViewModel(this, surface, Main.SurfacePreview.ImageCache)
 					{
 						OffsetX = surface.OffsetX,
 						OffsetY = surface.OffsetY
 					};
 					items.Add(item);
 				}
+
+				cancelObject = new CancellationTokenSource();
+				surfaceCreatingTask = Task.Run(() => { SurfaceLoadTask(cancelObject.Token); });
 			}
 			else
 			{
@@ -133,20 +142,50 @@ namespace Satolist2.Control
 			Satorite.SendSSTP(Main.Ghost, insertStr, false, false);
 		}
 
+		public void SurfaceLoadTask(CancellationToken cancelObject)
+		{
+			foreach(var vm in items)
+			{
+				var image = vm.ImageCache.LoadImage(vm.FileName);
+				if (image.Image != null)
+				{
+					double ex = vm.Expand <= 0.0 ? 1.0 : vm.Expand;
+					System.Drawing.Rectangle r = new System.Drawing.Rectangle(vm.OffsetX, vm.OffsetY, (int)(vm.SizeX / ex), (int)(vm.SizeY / ex));
+					var cloneBitmap = image.Image.Clone(r, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+
+					Main.MainWindow.Dispatcher.BeginInvoke(new Action(() =>
+				   {
+					   vm.Image = cloneBitmap;
+				   }), System.Windows.Threading.DispatcherPriority.ApplicationIdle);
+				}
+
+				if (cancelObject.IsCancellationRequested)
+					return;
+			}
+		}
+
 
 		public string DockingTitle => "サーフェス パレット";
 
 		public string DockingContentId => ContentId;
 	}
 
-	internal class SurfacePaletteItemViewModel
+	internal class SurfacePaletteItemViewModel : NotificationObject
 	{
-		public Bitmap Image
-		{
-			get => imageCache.LoadImage(FileName).Image;
-		}
 		private ShellImageCache imageCache;
 		private SurfacePaletteViewModel parent;
+		private Bitmap image;
+
+		public Bitmap Image
+		{
+			get => image;
+			set
+			{
+				image = value;
+				NotifyChanged();
+			}
+		}
+		
 		public string Label { get; set; }
 		public string FileName { get; set; }
 		public int OffsetX { get; set; }
@@ -156,6 +195,7 @@ namespace Satolist2.Control
 		public long Id { get; set; }
 		public int Scope { get; set; }
 		public double Expand { get; set; }
+		public ShellImageCache ImageCache => imageCache;
 
 		public ActionCommand InsertSurfaceCommand { get; }
 		public ActionCommand InsertSurfaceCommandSakuraScript { get; }

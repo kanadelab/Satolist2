@@ -8,7 +8,7 @@
 			 mc:Ignorable="d" 
 			 d:DesignHeight="450" d:DesignWidth="800">
 	<UserControl.Resources>
-		<local:SurfacePaletteViewModelToImageSourceConverter x:Key="BitmapConverter" />
+		<util:BitmapImageSourceConverter x:Key="BitmapConverter" />
 		<BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
 		<util:InvertBoolToVisibilityConverter x:Key="InvertBoolToVisibilityConverter" />
 	</UserControl.Resources>
@@ -47,7 +47,7 @@
 				<ListView.ItemTemplate>
 					<DataTemplate>
 						<StackPanel>
-							<Image Width="{Binding SizeX}" Height="{Binding SizeY}" Source="{Binding ., Converter={StaticResource BitmapConverter}}" />
+							<Image Width="{Binding SizeX}" Height="{Binding SizeY}" Source="{Binding Image, FallbackValue={x:Null}, Converter={StaticResource BitmapConverter}}" />
 							<TextBlock Text="{Binding Label}" MaxWidth="{Binding SizeX}" />
 						</StackPanel>
 					</DataTemplate>

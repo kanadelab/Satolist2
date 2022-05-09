@@ -1387,10 +1387,15 @@ namespace Satolist2
 		private Core.SurfacePreviewMetaData surfacePreviewData;
 		private ObservableCollection<SurfacePreviewViewModelShellItem> shells;
 		private SurfacePreviewViewModelShellItem selectedShell;
+		private ShellImageCache imageCache;
+
 		public ReadOnlyObservableCollection<SurfacePreviewViewModelShellItem> Shells
 		{
 			get => new ReadOnlyObservableCollection<SurfacePreviewViewModelShellItem>(shells);
 		}
+
+		//シェル読込用のキャッシュオブジェクト
+		public ShellImageCache ImageCache => imageCache;
 
 		public SurfacePreviewViewModelShellItem SelectedShell
 		{
@@ -1501,6 +1506,7 @@ namespace Satolist2
 		{
 			if (item != null)
 			{
+				imageCache = new ShellImageCache(DictionaryUtility.ConbinePath(item.DirectoryFullPath, SurfacePreviewMetaData.SurfacePreviewPath));
 				var metadataPath = DictionaryUtility.ConbinePath(Main.Ghost.FullPath, "shell", item.DirectoryName, SurfacePreviewMetaData.SurfacePreviewPath, SurfacePreviewMetaData.SurfacePreviewMetadataPath);
 				try
 				{
@@ -1513,6 +1519,7 @@ namespace Satolist2
 			}
 			else
 			{
+				imageCache = null;
 				SurfacePreviewData = null;
 			}
 		}

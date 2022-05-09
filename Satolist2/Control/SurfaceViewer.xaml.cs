@@ -154,7 +154,6 @@ namespace Satolist2.Control
 
 		public const string ContentId = "SurfaceViewer";
 		private SurfaceViewer control;
-		private ShellImageCache cache;
 		private bool isPreviewDataEnable;
 		private Core.SurfacePreviewMetaData previewData;
 		private ICollectionView surfaceList;
@@ -455,7 +454,7 @@ namespace Satolist2.Control
 				if (SelectedSurface != null)
 				{
 					var path = SelectedSurface.FileName;
-					var loadedImage = cache.LoadImage(path);
+					var loadedImage = Main.SurfacePreview.ImageCache.LoadImage(path);
 					return loadedImage.Image;
 				}
 				return null;
@@ -531,7 +530,6 @@ namespace Satolist2.Control
 		{
 			if (Main.SurfacePreview.SurfacePreviewData != null)
 			{
-				cache = new ShellImageCache(DictionaryUtility.ConbinePath(Main.SurfacePreview.SelectedShellPath, SurfacePreviewMetaData.SurfacePreviewPath));
 				IsPreviewDataEnable = true;
 				previewData = Main.SurfacePreview.SurfacePreviewData;
 				SurfaceList = CollectionViewSource.GetDefaultView(previewData.Items);
