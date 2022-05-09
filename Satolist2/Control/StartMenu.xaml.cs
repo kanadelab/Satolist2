@@ -174,6 +174,7 @@ namespace Satolist2.Control
 						SetHistoryModel(addedModel);
 					}
 					NotifyChanged();
+					MainViewModel.EditorSettings.SaveTemporarySettings();
 				}
 			}
 		}
