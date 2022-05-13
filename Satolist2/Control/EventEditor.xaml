@@ -10,9 +10,12 @@
 			 mc:Ignorable="d" 
 			 d:DesignHeight="450" d:DesignWidth="800">
 	<UserControl.Resources>
-		<model:InsertItemPaletteShortCutGestureConverter x:Key="ShortCutGestureConverter" />
-		<util:ReferenceToBoolConverter x:Key="ReferenceToBoolConverter" />
-		<BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+		<ResourceDictionary>
+			<model:InsertItemPaletteShortCutGestureConverter x:Key="ShortCutGestureConverter" />
+			<util:ReferenceToBoolConverter x:Key="ReferenceToBoolConverter" />
+			<BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+		</ResourceDictionary>
+		
 	</UserControl.Resources>
 	<Grid>
 		<Grid.RowDefinitions>
@@ -21,7 +24,7 @@
 			<RowDefinition Height="*" />
 		</Grid.RowDefinitions>
 
-		<Grid Grid.Row="0">
+		<Grid Grid.Row="0" IsEnabled="{Binding EnableHeaderEdit}">
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition Width="auto" />
 				<ColumnDefinition Width="*"/>
@@ -43,6 +46,7 @@
 				<TextBlock Text="条件"/>
 				<TextBox Text="{Binding Event.Condition, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 			</StackPanel>
+
 		</Grid>
 
 		<Grid Grid.Row="2" Margin="3">

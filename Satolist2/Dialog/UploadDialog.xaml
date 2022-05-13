@@ -1,4 +1,4 @@
-﻿<Window x:Class="Satolist2.Dialog.UploadDialog"
+﻿<local:DialogContentBase x:Class="Satolist2.Dialog.UploadDialog"
 		xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 		xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -8,7 +8,7 @@
 		xmlns:ctl="clr-namespace:Satolist2.Control"
 		mc:Ignorable="d"
 		Title="ファイルのアップロード" Height="450" Width="800" WindowStartupLocation="CenterOwner" >
-	<Window.Resources>
+	<local:DialogContentBase.Resources>
 		<ResourceDictionary>
 			<ResourceDictionary.MergedDictionaries>
 				<ResourceDictionary Source="/Control/StrechedListViewItemStyle.xaml" />
@@ -16,7 +16,7 @@
 			<util:InvertBoolConverter x:Key="InvertBoolConverter" />
 			<BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
 		</ResourceDictionary>
-	</Window.Resources>
+	</local:DialogContentBase.Resources>
 	<Grid>
 
 		<!--アップロード設定の選択-->
@@ -564,4 +564,4 @@
 		</Grid>
 
 	</Grid>
-</Window>
+</local:DialogContentBase>

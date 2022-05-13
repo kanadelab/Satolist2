@@ -27,7 +27,7 @@
 						<Button Margin="3" Command="{Binding AddModuleCommand}" Padding="3 0 3 0">
 							<Button.Content>
 								<StackPanel Orientation="Horizontal">
-									<Path Fill="Green" Margin="-3 -3 2 2" Data="{StaticResource AddIcon}" />
+									<Path Fill="{StaticResource ThemeGreen}" Margin="-3 -3 2 2" Data="{StaticResource AddIcon}" />
 									<TextBlock Text="追加" />
 								</StackPanel>
 							</Button.Content>
@@ -59,10 +59,10 @@
 														<TextBox Grid.Column="1" VerticalAlignment="Center" Margin="5 -3 5 0"  Text="{Binding ModulePath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 														<Button Grid.Column="2" Content="参照" Margin="0 0 5 5"  Command="{Binding SelectModuleCommand}" />
 														<Button Grid.Column="3" Margin="0 0 5 5"  Command="{Binding AddFunctionCommand}">
-															<Path Fill="Green" Margin="-3 -3 2 2" Data="{StaticResource AddIcon}" />
+															<Path Fill="{StaticResource ThemeGreen}" Margin="-3 -3 2 2" Data="{StaticResource AddIcon}" />
 														</Button>
 														<Button Grid.Column="4" Margin="0 0 5 5" Command="{Binding RemoveModuleCommand}">
-															<Path Fill="Red" Margin="-3 -3 2 2" Data="{StaticResource RemoveIcon}" />
+															<Path Fill="{StaticResource ThemeRed}" Margin="-3 -3 2 2" Data="{StaticResource RemoveIcon}" />
 														</Button>
 													</Grid>
 
@@ -92,7 +92,7 @@
 														<TextBlock Grid.Column="3" Margin="5 0 5 0" VerticalAlignment="Center" Text="コマンド:" />
 														<TextBox Grid.Column="4" VerticalAlignment="Center" Text="{Binding Command, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 														<Button Grid.Column="5" Margin="5 0 5 0" Command="{Binding RemoveFunctionCommand}">
-															<Path Fill="Red" Margin="-3 -3 2 2" Data="{StaticResource RemoveIcon}" />
+															<Path Fill="{StaticResource ThemeRed}" Margin="-3 -3 2 2" Data="{StaticResource RemoveIcon}" />
 														</Button>
 													</Grid>
 												</ControlTemplate>

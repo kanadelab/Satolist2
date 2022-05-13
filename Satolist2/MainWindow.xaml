@@ -1,4 +1,4 @@
-﻿<Window x:Class="Satolist2.MainWindow"
+﻿<UserControl x:Class="Satolist2.MainWindow"
 		xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 		xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -7,12 +7,18 @@
 		xmlns:util="clr-namespace:Satolist2.Utility"
 		xmlns:avalonDock="https://github.com/Dirkster99/AvalonDock"
 		mc:Ignorable="d"
-		Title="さとりすとv2" Height="800" Width="1200" DragEnter="MainWindow_DragEnter" Drop="MainWindow_Drop" Closing="Window_Closing">
-	<Window.InputBindings>
+		 DragEnter="MainWindow_DragEnter" Drop="MainWindow_Drop" >
+	<UserControl.InputBindings>
 		<KeyBinding Gesture="CTRL+S" Command="{Binding SaveFileCommand}" />
 		<KeyBinding Gesture="CTRL+ALT+R" Command="{Binding ReloadShioriCommand}" />
 		<KeyBinding Gesture="CTRL+SHIFT+F" Command="{Binding ShowSearchBoxCommand}" />
-	</Window.InputBindings>
+	</UserControl.InputBindings>
+	<UserControl.Resources>
+		<ResourceDictionary>
+			<ResourceDictionary.MergedDictionaries>
+			</ResourceDictionary.MergedDictionaries>
+		</ResourceDictionary>
+	</UserControl.Resources>
 	<Grid>
 		<Grid.RowDefinitions>
 			<RowDefinition Height="auto" />
@@ -87,10 +93,15 @@
 		</Menu>
 
 		<avalonDock:DockingManager Grid.Row="1" AllowMixedOrientation="True" x:Name="DockingManager">
+
+			<!--
 			<avalonDock:DockingManager.Theme>
-				<avalonDock:Vs2013LightTheme/>
+				<avalonDock:Vs2013DarkTheme/>
 			</avalonDock:DockingManager.Theme>
+			-->
+
 			<avalonDock:LayoutRoot>
+
 				<avalonDock:LayoutPanel Orientation="Vertical">
 					<avalonDock:LayoutPanel Orientation="Horizontal">
 
@@ -237,4 +248,4 @@
 			</Grid.Style>
 		</Grid>
 	</Grid>
-</Window>
+</UserControl>

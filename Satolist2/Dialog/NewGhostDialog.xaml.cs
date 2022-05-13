@@ -21,7 +21,7 @@ namespace Satolist2.Dialog
 	/// <summary>
 	/// NewGhostDialog.xaml の相互作用ロジック
 	/// </summary>
-	public partial class NewGhostDialog : Window
+	public partial class NewGhostDialog : DialogContentBase
 	{
 		internal new NewGhostDialogViewModel DataContext
 		{
@@ -32,7 +32,7 @@ namespace Satolist2.Dialog
 		internal NewGhostDialog(MainViewModel main)
 		{
 			InitializeComponent();
-			Owner = main.MainWindow;
+			Owner = main.MainWindow.RootWindow;
 			DataContext = new NewGhostDialogViewModel(this);
 		}
 	}

@@ -26,6 +26,7 @@ namespace Satolist2.Control
 		public TextEditor()
 		{
 			InitializeComponent();
+			
 			MainTextEditor.SyntaxHighlighting = new SatoriSyntaxHilighter();
 		}
 
@@ -138,7 +139,7 @@ namespace Satolist2.Control
 		{
 			var currentLine = control.MainTextEditor.TextArea.Caret.Line - 1;	//indexにするので-1
 			var beginLine = 0;
-			var endLine = 0;
+			var endLine = control.MainTextEditor.LineCount - 1;
 			EventType type = EventType.Header;
 
 			//開始行の検索(＠または＊を含まない範囲)
@@ -197,7 +198,7 @@ namespace Satolist2.Control
 			}
 
 			//開始行と終了行が逆になっているようであれば１行に満たない内容なので出力なし
-			if (beginLine >= endLine)
+			if (beginLine > endLine)
 				return;
 
 			//出力
@@ -209,6 +210,7 @@ namespace Satolist2.Control
 				builder.AppendLine(lineString);
 			}
 			Satorite.SendSatori(Main.Ghost, builder.ToString(), type);
+			Core.LogMessage.AddLog("ゴーストにトークを送信しました。");
 		}
 
 		public void Dispose()

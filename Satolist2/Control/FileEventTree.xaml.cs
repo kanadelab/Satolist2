@@ -30,6 +30,7 @@ namespace Satolist2.Control
 		public FileEventTree()
 		{
 			InitializeComponent();
+			
 		}
 
 		private void TreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)

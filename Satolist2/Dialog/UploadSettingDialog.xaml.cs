@@ -19,7 +19,7 @@ namespace Satolist2.Dialog
 	/// <summary>
 	/// UploadSettingDialog.xaml の相互作用ロジック
 	/// </summary>
-	public partial class UploadSettingDialog : Window
+	public partial class UploadSettingDialog : DialogContentBase
 	{
 		internal new UploadSettingDialogViewModel DataContext
 		{
@@ -33,7 +33,7 @@ namespace Satolist2.Dialog
 		internal UploadSettingDialog(Model.UploadServerSettingModelBase[] uploadSettings, MainViewModel main)
 		{
 			InitializeComponent();
-			Owner = main.MainWindow;
+			Owner = main.MainWindow.RootWindow;
 			Closing += UploadSettingDialog_Closing;
 			DataContext = new UploadSettingDialogViewModel(uploadSettings, this);
 		}
@@ -417,7 +417,7 @@ namespace Satolist2.Dialog
 							username = parent.UserName
 						};
 
-						RemoteFileSelectDialog dialog = new RemoteFileSelectDialog(parent.Parent.Dialog);
+						RemoteFileSelectDialog dialog = new RemoteFileSelectDialog(parent.Parent.Dialog.Host);
 						var vm = new RemoteFileSelectDialogViewModel(dialog, account);
 						vm.ShowFileNameInput = false;
 						dialog.DataContext = vm;
@@ -438,7 +438,7 @@ namespace Satolist2.Dialog
 							username = parent.UserName
 						};
 
-						RemoteFileSelectDialog dialog = new RemoteFileSelectDialog(parent.Parent.Dialog);
+						RemoteFileSelectDialog dialog = new RemoteFileSelectDialog(parent.Parent.Dialog.Host);
 						var vm = new RemoteFileSelectDialogViewModel(dialog, account);
 						vm.FileName = "ghost.nar";  //default
 					vm.ShowFileNameInput = true;

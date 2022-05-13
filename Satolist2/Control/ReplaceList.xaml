@@ -33,7 +33,7 @@
 						<Button Margin="3" Command="{Binding AddItemCommand}" Padding="3 0 3 0">
 							<Button.Content>
 								<StackPanel Orientation="Horizontal">
-									<Path Fill="Green" Margin="-3 -3 2 2" Data="{StaticResource AddIcon}" />
+									<Path Fill="{StaticResource ThemeGreen}" Margin="-3 -3 2 2" Data="{StaticResource AddIcon}" />
 									<TextBlock Text="追加" />
 								</StackPanel>
 							</Button.Content>
@@ -45,7 +45,7 @@
 							<KeyBinding Key="Delete" Command="{Binding RemoveItemCommand}" />
 						</ListView.InputBindings>
 						<ListView.ItemContainerStyle>
-							<Style TargetType="ListViewItem">
+							<Style TargetType="ListViewItem" BasedOn="{StaticResource {x:Type ListViewItem}}">
 								<Setter Property="HorizontalContentAlignment" Value="Stretch" />
 								<Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
 								<Setter Property="ContextMenu">
@@ -79,7 +79,7 @@
 									<GridViewColumn Header="トーク時置換">
 										<GridViewColumn.CellTemplate>
 											<DataTemplate>
-												<RadioButton IsChecked="{Binding IsReplaceAfter, Mode=TwoWay}" />
+												<RadioButton IsChecked="{Binding IsReplaceAfter, Mode=TwoWay}" Background="Transparent"/>
 											</DataTemplate>
 										</GridViewColumn.CellTemplate>
 									</GridViewColumn>
@@ -87,7 +87,7 @@
 									<GridViewColumn Header="ロード時置換">
 										<GridViewColumn.CellTemplate>
 											<DataTemplate>
-												<RadioButton IsChecked="{Binding IsReplace, Mode=TwoWay}" />
+												<RadioButton IsChecked="{Binding IsReplace, Mode=TwoWay}" Background="Transparent" />
 											</DataTemplate>
 										</GridViewColumn.CellTemplate>
 									</GridViewColumn>
@@ -97,7 +97,7 @@
 											<DataTemplate>
 												<Button Grid.Column="0" Margin="0 0 5 0" Command="{Binding RemoveSingleItemCommand}">
 													<Button.Content>
-														<Path Fill="Red" Margin="-3 -3 2 2" Data="{StaticResource RemoveIcon}" />
+														<Path Fill="{StaticResource ThemeRed}" Margin="-3 -3 2 2" Data="{StaticResource RemoveIcon}" />
 													</Button.Content>
 												</Button>
 											</DataTemplate>

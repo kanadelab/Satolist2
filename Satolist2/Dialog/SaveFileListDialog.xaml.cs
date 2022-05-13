@@ -18,14 +18,14 @@ namespace Satolist2.Dialog
 	/// <summary>
 	/// SaveFileListDialog.xaml の相互作用ロジック
 	/// </summary>
-	public partial class SaveFileListDialog : Window
+	public partial class SaveFileListDialog : DialogContentBase
 	{
 		public MessageBoxResult Result { get; private set; }
 
 		internal SaveFileListDialog(MainViewModel main)
 		{
 			InitializeComponent();
-			Owner = main.MainWindow;
+			Owner = main.MainWindow.RootWindow;
 		}
 
 		private void SaveButton_Click(object sender, RoutedEventArgs e)

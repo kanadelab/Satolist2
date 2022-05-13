@@ -99,7 +99,7 @@
 															<Condition Binding="{Binding IsDefault}" Value="True" />
 															<Condition Binding="{Binding Required}" Value="True" />
 														</MultiDataTrigger.Conditions>
-														<Setter Property="Foreground" Value="DarkRed" />
+														<Setter Property="Foreground" Value="{StaticResource ThemeDarkRed}" />
 													</MultiDataTrigger>
 												</Style.Triggers>
 											</Style>
@@ -108,14 +108,14 @@
 									<!--
 						<StackPanel Visibility="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=ListViewItem}, Converter={StaticResource BoolToVisibilityConverter}}">
 							<Separator />
-							<TextBlock Text="{Binding Help}" Foreground="Blue" />
+							<TextBlock Text="{Binding Help}" Foreground="{StaticResource ThemeBlue}" />
 						</StackPanel>
 						-->
 								</StackPanel>
 							</DataTemplate>
 						</ListView.ItemTemplate>
 						<ListView.ItemContainerStyle>
-							<Style TargetType="ListViewItem">
+							<Style TargetType="ListViewItem" BasedOn="{StaticResource {x:Type ListViewItem}}">
 								<Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
 								<EventSetter Event="GotFocus" Handler="ListViewItem_GotFocus" />
 								<EventSetter Event="Selected" Handler="ListViewItem_GotFocus" />

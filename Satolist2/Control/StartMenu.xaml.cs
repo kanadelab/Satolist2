@@ -26,6 +26,7 @@ namespace Satolist2.Control
 		public StartMenu()
 		{
 			InitializeComponent();
+			
 		}
 
 		private void ListViewItem_MouseDoubleClick(object sender, MouseButtonEventArgs e)
@@ -73,6 +74,7 @@ namespace Satolist2.Control
 			ReloadCommand = new ActionCommand(
 				o =>
 				{
+					MainViewModel.EditorSettings.SaveTemporarySettings();	//一旦保存
 					RefleshList();
 				}
 				);

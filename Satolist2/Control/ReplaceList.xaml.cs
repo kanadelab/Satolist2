@@ -26,6 +26,7 @@ namespace Satolist2.Control
 		public ReplaceList()
 		{
 			InitializeComponent();
+			
 		}
 	}
 

@@ -26,6 +26,7 @@ namespace Satolist2.Control
 		public GhostDescriptEditor()
 		{
 			InitializeComponent();
+			
 		}
 
 		//入力欄のフォーカスを取得した場合、そのListItemをSelectedにする

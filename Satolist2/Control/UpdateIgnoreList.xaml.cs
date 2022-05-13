@@ -1,5 +1,6 @@
 ﻿using ICSharpCode.AvalonEdit.Document;
 using Microsoft.Win32;
+using Microsoft.WindowsAPICodePack.Dialogs;
 using Satolist2.Model;
 using Satolist2.Utility;
 using System;
@@ -31,6 +32,7 @@ namespace Satolist2.Control
 		public UpdateIgnoreList()
 		{
 			InitializeComponent();
+			
 
 			MainList.DragOver += MainList_DragOver;
 			MainList.Drop += MainList_Drop;
@@ -79,10 +81,11 @@ namespace Satolist2.Control
 		private TextDocument developerOptionsText;
 		private TextDocument deleteText;
 		private MainViewModel main;
-		private UpdateIgnoreList control;
 		private int currentTabIndex;
 		private List<string> deleteCommonLine;  //コメントリスト行？
 		private List<string> developerOptionsCommonLine;
+
+		public UpdateIgnoreList Control { get; private set; }
 
 		public GhostModel Ghost => main.Ghost;
 
@@ -180,7 +183,7 @@ namespace Satolist2.Control
 
 					//末尾追加のはずなので、追加したアイテムのとこに移動する
 					items.Last().IsSelected = true;
-					control.RequestScroll(items.Last());
+					Control.RequestScroll(items.Last());
 				}
 				);
 
@@ -220,7 +223,7 @@ namespace Satolist2.Control
 			}
 
 			//末尾追加のはずなので、追加したアイテムのとこに移動する
-			control.RequestScroll(items.Last());
+			Control.RequestScroll(items.Last());
 		}
 
 		private void UnSelectAll()
@@ -496,7 +499,7 @@ namespace Satolist2.Control
 		//ViewModelが外されたときに破棄として呼ばれる
 		public void Dispose()
 		{
-			control.OnFileDrop -= Control_OnFileDrop;
+			Control.OnFileDrop -= Control_OnFileDrop;
 			if (DeveloperOptionsText != null)
 				DeveloperOptionsText.TextChanged -= DeveloperOptionsText_TextChanged;
 			if (DeleteText != null)
@@ -505,8 +508,8 @@ namespace Satolist2.Control
 
 		public void ControlBind(System.Windows.Controls.Control control)
 		{
-			this.control = (UpdateIgnoreList)control;
-			this.control.OnFileDrop += Control_OnFileDrop;
+			this.Control = (UpdateIgnoreList)control;
+			this.Control.OnFileDrop += Control_OnFileDrop;
 		}
 	}
 
@@ -518,9 +521,12 @@ namespace Satolist2.Control
 		private bool isNoUpdate;
 		private bool isDelete;
 		private bool isSelected;
+		private bool isContextMenuOpen;
 		public ActionCommand RemoveItemCommand { get; }
 		public ActionCommand RemoveSingleItemCommand { get; }
-		public ActionCommand FileOpenCommand { get; }
+		public ActionCommand SelectFileCommand { get; }
+		public ActionCommand SelectDirectoryCommand { get; }
+		public ActionCommand ShowContextMenuCommand { get; }
 
 		//指定パス
 		public string Path
@@ -608,6 +614,16 @@ namespace Satolist2.Control
 			get => !isDelete && !isNoUpdate && !isNoNar;
 		}
 
+		public bool IsContextMenuOpen
+		{
+			get => isContextMenuOpen;
+			set
+			{
+				isContextMenuOpen = value;
+				NotifyChanged();
+			}
+		}
+
 		public UpdateIgnoreListItemViewModel(UpdateIgnoreListViewModel parent)
 		{
 			this.parent = parent;
@@ -628,26 +644,60 @@ namespace Satolist2.Control
 				}
 				);
 
-			FileOpenCommand = new ActionCommand(
+			SelectFileCommand = new ActionCommand(
 				o =>
 				{
-					//NOTE: filenameに適当な名前を入れてChickFileExistsを無効にしてるとフォルダも選べるけど、もうちょっといい方法ないかな…
-					//フォルダ選択ダイアログのは正直使いにくいんだ…
-					var dialog = new OpenFileDialog();
-					dialog.InitialDirectory = parent.Ghost.FullPath;
-					dialog.CheckFileExists = false;
-					dialog.FileName = "ファイルを選択";
-					dialog.Multiselect = false;
-
-					if( dialog.ShowDialog() == true)
+					var fileDialog = new CommonOpenFileDialog();
+					var fullPath = DictionaryUtility.ConbinePath(parent.Ghost.FullPath, Path);
+					if (System.IO.File.Exists(fullPath))
 					{
-						if(!DictionaryUtility.IsChildPath(parent.Ghost.FullPath, dialog.FileName))
+						fileDialog.InitialDirectory = System.IO.Path.GetDirectoryName(fullPath);
+						fileDialog.DefaultFileName = System.IO.Path.GetFileName(fullPath);
+					}
+					else
+					{
+						fileDialog.InitialDirectory = parent.Ghost.FullPath;
+
+					}
+					if (fileDialog.ShowDialog() == CommonFileDialogResult.Ok)
+					{
+						if (!DictionaryUtility.IsChildPath(parent.Ghost.FullPath, fileDialog.FileName))
 						{
-							UpdateIgnoreListViewModel.ShowErrorRelativePathDialog(dialog.FileName);
+							UpdateIgnoreListViewModel.ShowErrorRelativePathDialog(fileDialog.FileName);
 							return;
 						}
-						Path = DictionaryUtility.MakeRelativePath(parent.Ghost.FullPath, dialog.FileName);
+						Path = DictionaryUtility.MakeRelativePath(parent.Ghost.FullPath, fileDialog.FileName);
 					}
+				}
+				);
+
+			SelectDirectoryCommand = new ActionCommand(
+				o =>
+				{
+					var fileDialog = new CommonOpenFileDialog();
+					var fullPath = DictionaryUtility.ConbinePath(parent.Ghost.FullPath, Path);
+					fileDialog.IsFolderPicker = true;
+					if (System.IO.Directory.Exists(fullPath))
+						fileDialog.DefaultDirectory = fullPath;
+					else
+						fileDialog.DefaultDirectory = parent.Ghost.FullPath;
+
+					if(fileDialog.ShowDialog() == CommonFileDialogResult.Ok)
+					{
+						if (!DictionaryUtility.IsChildPath(parent.Ghost.FullPath, fileDialog.FileName))
+						{
+							UpdateIgnoreListViewModel.ShowErrorRelativePathDialog(fileDialog.FileName);
+							return;
+						}
+						Path = DictionaryUtility.MakeRelativePath(parent.Ghost.FullPath, fileDialog.FileName) + "/";
+					}
+				}
+				);
+
+			ShowContextMenuCommand = new ActionCommand(
+				o =>
+				{
+					parent.Control.Dispatcher.BeginInvoke(new Action(() => IsContextMenuOpen = true), System.Windows.Threading.DispatcherPriority.Render);
 				}
 				);
 		}

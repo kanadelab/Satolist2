@@ -21,12 +21,12 @@ namespace Satolist2.Dialog
 	/// <summary>
 	/// TextEditorInsertPaletteSettingsDialog.xaml の相互作用ロジック
 	/// </summary>
-	public partial class TextEditorInsertPaletteSettingsDialog : Window
+	public partial class TextEditorInsertPaletteSettingsDialog : DialogContentBase
 	{
 		internal TextEditorInsertPaletteSettingsDialog(MainViewModel main)
 		{
 			InitializeComponent();
-			Owner = main.MainWindow;
+			Owner = main.MainWindow.RootWindow;
 		}
 
 		private void TreeViewItem_DragOver(object sender, DragEventArgs e)

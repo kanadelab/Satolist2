@@ -25,7 +25,7 @@
 							<Path Margin="-2 -3 5 0" Data="{StaticResource PowerIcon}">
 								<Path.Style>
 									<Style TargetType="Path">
-										<Setter Property="Fill" Value="Green" />
+										<Setter Property="Fill" Value="{StaticResource ThemeGreen}" />
 										<Style.Triggers>
 											<DataTrigger Binding="{Binding IsEnabled, RelativeSource={RelativeSource AncestorType=Button}}" Value="False">
 												<Setter Property="Fill" Value="Gray" />
@@ -45,7 +45,7 @@
 							<Path Margin="-2 -3 5 0" Data="{StaticResource PowerIcon}">
 								<Path.Style>
 									<Style TargetType="Path">
-										<Setter Property="Fill" Value="Red" />
+										<Setter Property="Fill" Value="{StaticResource ThemeRed}" />
 										<Style.Triggers>
 											<DataTrigger Binding="{Binding IsEnabled, RelativeSource={RelativeSource AncestorType=Button}}" Value="False">
 												<Setter Property="Fill" Value="Gray" />
@@ -86,7 +86,7 @@
 					<local:WartermarkedTextBox Text="{Binding SearchString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Row="0" Wartermark="イベント名でフィルタ" Margin="3" />
 					<ListView Grid.Row="1" x:Name="MainList" ItemsSource="{Binding FilteredItems}" Margin="3">
 						<ListView.ItemContainerStyle>
-							<Style TargetType="ListViewItem">
+							<Style TargetType="ListViewItem" BasedOn="{StaticResource {x:Type ListViewItem}}">
 								<EventSetter Event="MouseDoubleClick" Handler="ListViewItem_MouseDoubleClick" />
 							</Style>
 						</ListView.ItemContainerStyle>

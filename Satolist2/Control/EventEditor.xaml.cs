@@ -19,6 +19,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Satolist2.Dialog;
 using ICSharpCode.AvalonEdit.Highlighting;
+using System.Windows.Threading;
 
 namespace Satolist2.Control
 {
@@ -30,6 +31,7 @@ namespace Satolist2.Control
 		public EventEditor()
 		{
 			InitializeComponent();
+			
 			MainTextEditor.SyntaxHighlighting = new SatoriSyntaxHilighter();
 		}
 
@@ -162,6 +164,17 @@ namespace Satolist2.Control
 				MainTextEditor.FontSize = MainViewModel.EditorSettings.GeneralSettings.TextEditorFontSize;
 			}
 		}
+
+		//ハイライト設定を最新のものを使うようにする
+		public void UpdateHilightSettings()
+		{
+			MainTextEditor.SyntaxHighlighting = null;
+			MainTextEditor.Dispatcher.BeginInvoke(new Action(() =>
+			{
+				MainTextEditor.SyntaxHighlighting = new SatoriSyntaxHilighter();
+			}
+			), DispatcherPriority.Render);
+		}
 	}
 
 	internal class EventEditorViewModel : TextEditorViewModelBase, IDisposable, IControlBindedReceiver
@@ -194,6 +207,7 @@ namespace Satolist2.Control
 		public MainViewModel Main { get; }
 		public override ICSharpCode.AvalonEdit.TextEditor MainTextEditor => control.MainTextEditor;
 		public object HilightColors { get; private set; }
+		public bool EnableHeaderEdit => Event.Type != EventType.Header;
 
 		public HighlightingRule searchRule = new HighlightingRule();
 
@@ -213,7 +227,8 @@ namespace Satolist2.Control
 			SendToGhostCommand = new ActionCommand(
 				o =>
 				{
-					Satorite.SendSatori(main.Ghost, Document.Text, Event.Type);
+					//Satorite.SendSatori(main.Ghost, Document.Text, Event.Type);
+					SendToGhost();
 				}
 				);
 
@@ -264,7 +279,7 @@ namespace Satolist2.Control
 		{
 			var currentLine = control.MainTextEditor.TextArea.Caret.Line - 1;	//indexにするので-1
 			var beginLine = 0;
-			var endLine = 0;
+			var endLine = control.MainTextEditor.LineCount-1;
 			EventType type = EventType.Header;
 
 			//開始行の検索(＠または＊を含まない範囲)
@@ -324,7 +339,7 @@ namespace Satolist2.Control
 			}
 
 			//開始行と終了行が逆になっているようであれば１行に満たない内容なので出力なし
-			if (beginLine >= endLine)
+			if (beginLine > endLine)
 				return;
 
 			//出力
@@ -336,6 +351,7 @@ namespace Satolist2.Control
 				builder.AppendLine(lineString);
 			}
 			Satorite.SendSatori(Main.Ghost, builder.ToString(), type);
+			Core.LogMessage.AddLog("ゴーストにトークを送信しました。");
 		}
 
 		public void Dispose()

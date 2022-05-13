@@ -35,6 +35,7 @@ namespace Satolist2.Control
 		public SurfacePalette()
 		{
 			InitializeComponent();
+			
 		}
 
 		private void ListViewItem_MouseDoubleClick(object sender, MouseButtonEventArgs e)

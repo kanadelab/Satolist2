@@ -45,5 +45,10 @@ namespace Satolist2.Utility
 			}
 		}
 
+		public static bool SerializableObjectEquals(object a, object b)
+		{
+			return JObject.FromObject(a).ToString() == JObject.FromObject(b).ToString();
+		}
+
 	}
 }

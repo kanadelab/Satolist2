@@ -1,4 +1,4 @@
-﻿<Window x:Class="Satolist2.Dialog.NewGhostDialog"
+﻿<local:DialogContentBase x:Class="Satolist2.Dialog.NewGhostDialog"
 		xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 		xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -7,10 +7,10 @@
 		xmlns:util="clr-namespace:Satolist2.Utility"
 		mc:Ignorable="d"
 		Title="新規ゴーストの作成" Height="450" Width="800" WindowStartupLocation="CenterOwner">
-	<Window.Resources>
+	<local:DialogContentBase.Resources>
 		<util:EscapeUnderScoreConverter x:Key="EscapeUnderScoreConverter" />
 		<util:InvertBoolConverter x:Key="InvertBoolConverter" />
-	</Window.Resources>
+	</local:DialogContentBase.Resources>
 	<Grid>
 
 		<!--作成パス類の設定-->
@@ -132,4 +132,4 @@
 		</Grid>
 
 	</Grid>
-</Window>
+</local:DialogContentBase>

@@ -38,6 +38,7 @@ namespace Satolist2.Control
 		public SurfaceViewer()
 		{
 			InitializeComponent();
+			
 		}
 
 		//全体領域のドラッグ

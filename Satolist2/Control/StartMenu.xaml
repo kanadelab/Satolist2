@@ -24,7 +24,7 @@
 
 			<Button Grid.Column="1" VerticalAlignment="Center" Padding="3" Margin="3" Command="{Binding ReloadCommand}">
 				<StackPanel Orientation="Horizontal">
-					<Path Fill="Blue" Stretch="UniformToFill" Data="{StaticResource ReloadIcon}" />
+					<Path Fill="{StaticResource ThemeBlue}" Stretch="UniformToFill" Data="{StaticResource ReloadIcon}" />
 					<TextBlock Margin="5 0 5 0" Text="リロード" />
 				</StackPanel>
 			</Button>
@@ -67,11 +67,11 @@
 										<Style.Triggers>
 											<DataTrigger Binding="{Binding IsFavorite}" Value="True">
 												<Setter Property="Text" Value="お気に入りのゴースト"/>
-												<Setter Property="Foreground" Value="Blue"/>
+												<Setter Property="Foreground" Value="{StaticResource ThemeBlue}"/>
 											</DataTrigger>
 											<DataTrigger Binding="{Binding IsRunning}" Value="True">
 												<Setter Property="Text" Value="起動中のゴースト" />
-												<Setter Property="Foreground" Value="Green"/>
+												<Setter Property="Foreground" Value="{StaticResource ThemeGreen}"/>
 											</DataTrigger>
 										</Style.Triggers>
 									</Style>
@@ -84,10 +84,10 @@
 							<Style TargetType="TextBlock">
 								<Style.Triggers>
 									<DataTrigger Binding="{Binding IsRunning}" Value="True">
-										<Setter Property="Foreground" Value="Green"/>
+										<Setter Property="Foreground" Value="{StaticResource ThemeGreen}"/>
 									</DataTrigger>
 									<DataTrigger Binding="{Binding IsFavorite}" Value="True">
-										<Setter Property="Foreground" Value="Blue"/>
+										<Setter Property="Foreground" Value="{StaticResource ThemeBlue}"/>
 									</DataTrigger>
 								</Style.Triggers>
 							</Style>
@@ -98,7 +98,7 @@
 			</ListView.ItemTemplate>
 
 			<ListView.ItemContainerStyle>
-				<Style TargetType="ListViewItem">
+				<Style TargetType="ListViewItem" BasedOn="{StaticResource {x:Type ListViewItem}}">
 					<EventSetter Event="MouseDoubleClick" Handler="ListViewItem_MouseDoubleClick" />
 				</Style>
 			</ListView.ItemContainerStyle>

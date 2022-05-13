@@ -1,4 +1,4 @@
-﻿<Window x:Class="Satolist2.Dialog.UploadSettingDialog"
+﻿<local:DialogContentBase x:Class="Satolist2.Dialog.UploadSettingDialog"
 		xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 		xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -8,14 +8,14 @@
 		xmlns:local="clr-namespace:Satolist2.Dialog"
 		mc:Ignorable="d"
 		Title="アップロード設定" Height="450" Width="900" WindowStartupLocation="CenterOwner">
-	<Window.Resources>
+	<local:DialogContentBase.Resources>
 		<ResourceDictionary>
 			<ResourceDictionary.MergedDictionaries>
 				<ResourceDictionary Source="/Control/StrechedListViewItemStyle.xaml" />
 			</ResourceDictionary.MergedDictionaries>
 			<util:InvertBoolConverter x:Key="InvertBoolConverter" />
 		</ResourceDictionary>
-	</Window.Resources>
+	</local:DialogContentBase.Resources>
 	<Grid>
 		<Grid.RowDefinitions>
 			<RowDefinition Height="*" />
@@ -38,7 +38,7 @@
 					<Button Margin="3" Padding="3 0 3 0" Command="{Binding AddFtpAccountCommand}">
 						<Button.Content>
 							<StackPanel Orientation="Horizontal">
-								<Path Fill="Green" Margin="-3 -3 2 2" Data="{StaticResource AddIcon}" />
+								<Path Fill="{StaticResource ThemeGreen}" Margin="-3 -3 2 2" Data="{StaticResource AddIcon}" />
 								<TextBlock Text="FTPサーバを追加" />
 							</StackPanel>
 						</Button.Content>
@@ -47,7 +47,7 @@
 					<Button Margin="3" Padding="3 0 3 0" Command="{Binding AddNarnaloaderAccountCommand}">
 						<Button.Content>
 							<StackPanel Orientation="Horizontal">
-								<Path Fill="Green" Margin="-3 -3 2 2" Data="{StaticResource AddIcon}" />
+								<Path Fill="{StaticResource ThemeGreen}" Margin="-3 -3 2 2" Data="{StaticResource AddIcon}" />
 								<TextBlock Text="ななろだv2サーバを追加" />
 							</StackPanel>
 						</Button.Content>
@@ -73,14 +73,14 @@
 														<Button Margin="3" Padding="3 0 3 0" Command="{Binding AddItemCommand}">
 															<Button.Content>
 																<StackPanel Orientation="Horizontal">
-																	<Path Fill="Green" Margin="-3 -3 2 2" Data="{StaticResource AddIcon}" />
+																	<Path Fill="{StaticResource ThemeGreen}" Margin="-3 -3 2 2" Data="{StaticResource AddIcon}" />
 																	<TextBlock Text="アイテム追加" />
 																</StackPanel>
 															</Button.Content>
 														</Button>
 														<Button Margin="3" Command="{Binding RemoveServerCommand}">
 															<Button.Content>
-																<Path Fill="Red" Margin="-3 -3 2 2" Data="{StaticResource RemoveIcon}" />
+																<Path Fill="{StaticResource ThemeRed}" Margin="-3 -3 2 2" Data="{StaticResource RemoveIcon}" />
 															</Button.Content>
 														</Button>
 													</StackPanel>
@@ -107,7 +107,7 @@
 													<StackPanel Orientation="Horizontal" VerticalAlignment="Center" DockPanel.Dock="Right">
 														<Button Command="{Binding RemoveItemCommand}" Margin="3">
 															<Button.Content>
-																<Path Fill="Red" Margin="-3 -3 2 2" Data="{StaticResource RemoveIcon}" />
+																<Path Fill="{StaticResource ThemeRed}" Margin="-3 -3 2 2" Data="{StaticResource RemoveIcon}" />
 															</Button.Content>
 														</Button>
 													</StackPanel>
@@ -133,14 +133,14 @@
 															<Button Command="{Binding AddItemCommand}" Padding="3 0 3 0" Margin="3">
 																<Button.Content>
 																	<StackPanel Orientation="Horizontal">
-																		<Path Fill="Green" Margin="-3 -3 2 2" Data="{StaticResource AddIcon}" />
+																		<Path Fill="{StaticResource ThemeGreen}" Margin="-3 -3 2 2" Data="{StaticResource AddIcon}" />
 																		<TextBlock Text="アイテム追加" />
 																	</StackPanel>
 																</Button.Content>
 															</Button>
 															<Button Command="{Binding RemoveServerCommand}" Margin="3">
 																<Button.Content>
-																	<Path Fill="Red" Margin="-3 -3 2 2" Data="{StaticResource RemoveIcon}" />
+																	<Path Fill="{StaticResource ThemeRed}" Margin="-3 -3 2 2" Data="{StaticResource RemoveIcon}" />
 																</Button.Content>
 															</Button>
 														</StackPanel>
@@ -169,7 +169,7 @@
 														<StackPanel VerticalAlignment="Center" DockPanel.Dock="Right">
 															<Button Command="{Binding RemoveItemCommand}" Margin="3">
 																<Button.Content>
-																	<Path Fill="Red" Margin="-3 -3 2 2" Data="{StaticResource RemoveIcon}" />
+																	<Path Fill="{StaticResource ThemeRed}" Margin="-3 -3 2 2" Data="{StaticResource RemoveIcon}" />
 																</Button.Content>
 															</Button>
 														</StackPanel>
@@ -381,4 +381,4 @@
 		</StackPanel>
 
 	</Grid>
-</Window>
+</local:DialogContentBase>

@@ -27,6 +27,7 @@ namespace Satolist2.Control
 			wartermarkTextBlock.Margin = new Thickness(5, 0, 5, 0);
 			wartermarkTextBlock.Opacity = 0.3;
 			wartermarkTextBlock.IsHitTestVisible = false;
+			wartermarkTextBlock.Foreground = Themes.ApplicationTheme.GetWartermarkBrush();
 
 			visualChildren = new VisualCollection(this);
 			visualChildren.Add(wartermarkTextBlock);

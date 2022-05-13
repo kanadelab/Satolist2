@@ -1,0 +1,11 @@
+﻿<metro:MetroWindow x:Class="Satolist2.DarkRootWindow"
+		xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+		xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+		xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+		xmlns:local="clr-namespace:Satolist2"
+		mc:Ignorable="d"
+		Title="さとりすとv2" Height="800" Width="1200"
+		xmlns:metro="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro">
+	<local:MainWindow x:Name="Main" />
+</metro:MetroWindow>

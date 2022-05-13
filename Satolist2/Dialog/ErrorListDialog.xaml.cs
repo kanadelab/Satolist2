@@ -19,7 +19,7 @@ namespace Satolist2.Dialog
 	/// <summary>
 	/// ErrorListDialog.xaml の相互作用ロジック
 	/// </summary>
-	public partial class ErrorListDialog : Window
+	public partial class ErrorListDialog : DialogContentBase
 	{
 		internal new ErrorListDialogViewModel DataContext
 		{
@@ -30,7 +30,7 @@ namespace Satolist2.Dialog
 		internal ErrorListDialog(MainViewModel main, bool isYesNoButton)
 		{
 			InitializeComponent();
-			Owner = main?.MainWindow;
+			Owner = main?.MainWindow.RootWindow;
 			DataContext = new ErrorListDialogViewModel(this);
 
 			if(isYesNoButton)

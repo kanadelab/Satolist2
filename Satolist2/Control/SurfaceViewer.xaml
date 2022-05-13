@@ -8,9 +8,12 @@
 			 mc:Ignorable="d" 
 			 d:DesignHeight="450" d:DesignWidth="800" SizeChanged="UserControl_SizeChanged">
 	<UserControl.Resources>
-		<util:BitmapImageSourceConverter x:Key="BitmapConverter" />
-		<BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
-		<util:InvertBoolToVisibilityConverter x:Key="InvertBoolToVisibilityConverter" />
+		<ResourceDictionary>
+			<util:BitmapImageSourceConverter x:Key="BitmapConverter" />
+			<BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+			<util:InvertBoolToVisibilityConverter x:Key="InvertBoolToVisibilityConverter" />
+		</ResourceDictionary>
+		
 	</UserControl.Resources>
 	<Grid Visibility="{Binding Main.IsGhostEnable, Converter={StaticResource BoolToVisibilityConverter}}">
 		<Grid Visibility="{Binding IsPreviewDataEnable, Converter={StaticResource InvertBoolToVisibilityConverter}}">
@@ -44,12 +47,12 @@
 					   Height="{Binding ActualHeight,ElementName=SurfaceImage}"
 					   HorizontalAlignment="Center" VerticalAlignment="Top">
 
-					<Rectangle Fill="#77FFFFFF" Stroke="Red" Canvas.Top="{Binding RectTop, FallbackValue=0}" Canvas.Left="{Binding RectLeft,FallbackValue=0}"
+					<Rectangle Fill="#77FFFFFF" Stroke="{StaticResource ThemeRed}" Canvas.Top="{Binding RectTop, FallbackValue=0}" Canvas.Left="{Binding RectLeft,FallbackValue=0}"
 							   Width="{Binding RectWidth,FallbackValue=100}" Height="{Binding RectHeight, FallbackValue=100}"
 							   SnapsToDevicePixels="True" Visibility="{Binding IsCollisionModeRect, Converter={StaticResource BoolToVisibilityConverter}}" />
 
 
-					<Ellipse  Fill="#77FFFFFF" Stroke="Red" Canvas.Top="{Binding RectTop, FallbackValue=0}" Canvas.Left="{Binding RectLeft,FallbackValue=0}"
+					<Ellipse  Fill="#77FFFFFF" Stroke="{StaticResource ThemeRed}" Canvas.Top="{Binding RectTop, FallbackValue=0}" Canvas.Left="{Binding RectLeft,FallbackValue=0}"
 							   Width="{Binding RectWidth,FallbackValue=100}" Height="{Binding RectHeight, FallbackValue=100}"
 							   SnapsToDevicePixels="True" Visibility="{Binding IsCollisionModeEllipse, Converter={StaticResource BoolToVisibilityConverter}}"/>
 
@@ -58,7 +61,7 @@
 							   SnapsToDevicePixels="True" Visibility="{Binding IsCollisionModeEllipse, Converter={StaticResource BoolToVisibilityConverter}}"/>
 
 
-					<Polygon x:Name="CollisionPolygon" Fill="#77FFFFFF" Stroke="Red" Canvas.Left="0" Canvas.Top="0" SnapsToDevicePixels="True"
+					<Polygon x:Name="CollisionPolygon" Fill="#77FFFFFF" Stroke="{StaticResource ThemeRed}" Canvas.Left="0" Canvas.Top="0" SnapsToDevicePixels="True"
 							 Visibility="{Binding IsCollisionModePolygon, Converter={StaticResource BoolToVisibilityConverter}}"/>
 				</Canvas>
 
@@ -126,10 +129,10 @@
 											<Rectangle SnapsToDevicePixels="True">
 												<Rectangle.Style>
 													<Style TargetType="Rectangle">
-														<Setter Property="Fill" Value="DarkRed" />
+														<Setter Property="Fill" Value="{StaticResource ThemeDarkRed}" />
 														<Style.Triggers>
 															<DataTrigger Binding="{Binding IsLastVertex}" Value="True">
-																<Setter Property="Fill" Value="Red" />
+																<Setter Property="Fill" Value="{StaticResource ThemeRed}" />
 															</DataTrigger>
 															<Trigger Property="IsMouseOver" Value="True">
 																<Setter Property="Fill" Value="Orange" />
@@ -160,7 +163,8 @@
 				</Canvas>
 
 				<!--サーフェスリスト-->
-				<ListView Grid.Column="0" ItemsSource="{Binding SurfaceList}" SelectedItem="{Binding SelectedSurface}" DisplayMemberPath="Label" />
+				<ListView Grid.Column="0" ItemsSource="{Binding SurfaceList}" SelectedItem="{Binding SelectedSurface}" DisplayMemberPath="Label"
+						  ItemContainerStyle="{StaticResource {x:Type ListViewItem}}"/>
 			</Grid>
 
 			<!--生成判定情報-->
@@ -184,12 +188,12 @@
 				<TextBox Grid.Column="0" Margin="3" Text="{Binding SelectedRange, Mode=OneWay}" VerticalAlignment="Center" IsReadOnly="True" />
 				<Button Grid.Column="1" Margin="3" Padding="2" Command="{Binding CopyToClipBoardCommand}" ToolTip="クリップボードに判定をコピー" Width="24" Height="24">
 					<Button.Content>
-						<Path Fill="Green" Stretch="UniformToFill" Data="{StaticResource ClipboardIcon}" />
+						<Path Fill="{StaticResource ThemeGreen}" Stretch="UniformToFill" Data="{StaticResource ClipboardIcon}" />
 					</Button.Content>
 				</Button>
 				<Button Grid.Column="2" Margin="3" Padding="2" Command="{Binding CloseCollisionToolCommand}" ToolTip="判定の作成を終える" Width="24" Height="24">
 					<Button.Content>
-						<Path Fill="Red" Stretch="UniformToFill" Data="{StaticResource RemoveIcon}" />
+						<Path Fill="{StaticResource ThemeRed}" Stretch="UniformToFill" Data="{StaticResource RemoveIcon}" />
 					</Button.Content>
 				</Button>
 			</Grid>

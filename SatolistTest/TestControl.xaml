@@ -1,0 +1,58 @@
+﻿<UserControl x:Class="SatolistTest.TestControl"
+			 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+			 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+			 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+			 xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+			 xmlns:local="clr-namespace:SatolistTest"
+			 mc:Ignorable="d" 
+			 d:DesignHeight="450" d:DesignWidth="800">
+	<Grid>
+		<StackPanel Orientation="Horizontal">
+
+			<StackPanel Background="White">
+				<TextBlock Text="dddd" Foreground="#dcdfdc" />
+				<TextBlock Text="φEscape" Foreground="#888844" />
+				<TextBlock Text="\a[1]ScriptTag" Foreground="#800000" />
+				<TextBlock Text="（２０）ChangeSurface" Foreground="#0080ff" />
+				<TextBlock Text="＞Jump" Foreground="#008000"/>
+				<TextBlock Text="＿Choice" Foreground="#008000"/>
+				<TextBlock Text="Anchor" Foreground="#008000" />
+				<TextBlock Text="＠Word" Foreground="#0000ff" />
+				<TextBlock Text="＊Sentence" Foreground="#0000ff" />
+				<TextBlock Text="＄Variable" Foreground="#888844" />
+				<TextBlock Text="Getter" Foreground="#800000" />
+				<TextBlock Text="Random" Foreground="#008000" />
+				<TextBlock Text="Argument" Foreground="#008000" />
+				<TextBlock Text="Comment" Foreground="#108010" />
+				<TextBlock Text="Tab" Background="#AAAAFF" />
+				<TextBlock Text="Function" Foreground="#0080ff" />
+				<TextBlock Text="Saori" Foreground="#0080ff" />
+				<TextBlock Text="Replace" Foreground="#404070" />
+				<TextBlock Text="ReplaceAfter" Foreground="#404070"/>
+			</StackPanel>
+			
+			<StackPanel Background="#202020">
+				<TextBlock Text="dddd" Foreground="#dcdfdc" />
+				<TextBlock Text="φEscape" Foreground="#AAAA66" />
+				<TextBlock Text="\a[1]ScriptTag" Foreground="#AA6666" />
+				<TextBlock Text="（２０）ChangeSurface" Foreground="#44a0ff" />
+				<TextBlock Text="＞Jump" Foreground="#66AA66"/>
+				<TextBlock Text="＿Choice" Foreground="#66AA66"/>
+				<TextBlock Text="Anchor" Foreground="#66AA66" />
+				<TextBlock Text="＠Word" Foreground="#8888FF" />
+				<TextBlock Text="＊Sentence" Foreground="#8888FF" />
+				<TextBlock Text="＄Variable" Foreground="#AAAA66" />
+				<TextBlock Text="Getter" Foreground="#AA6666" />
+				<TextBlock Text="Random" Foreground="#66AA66" />
+				<TextBlock Text="Argument" Foreground="#66AA66" />
+				<TextBlock Text="Comment" Foreground="#66AA66" />
+				<TextBlock Text="Tab" Background="#202088" />
+				<TextBlock Text="Function" Foreground="#44AAff" />
+				<TextBlock Text="Saori" Foreground="#44AAff" />
+				<TextBlock Text="Replace" Foreground="#8080A0" />
+				<TextBlock Text="ReplaceAfter" Foreground="#8080A0"/>
+			</StackPanel>
+		</StackPanel>
+
+	</Grid>
+</UserControl>

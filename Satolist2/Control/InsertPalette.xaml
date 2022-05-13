@@ -39,7 +39,7 @@
 										<Path Stretch="Fill" Margin="0" x:Name="ListPath" VerticalAlignment="Center" HorizontalAlignment="Center">
 											<Path.Style>
 												<Style TargetType="Path">
-													<Setter Property="Fill" Value="Green"/>
+													<Setter Property="Fill" Value="{StaticResource ThemeGreen}"/>
 
 													<Style.Triggers>
 														<DataTrigger Binding="{Binding Type}" Value="Group">
@@ -54,7 +54,7 @@
 														</DataTrigger>
 
 														<DataTrigger Binding="{Binding IsMouseOver, ElementName=InsertButton}"  Value="True">
-															<Setter Property="Fill" Value="Red" />
+															<Setter Property="Fill" Value="{StaticResource ThemeRed}" />
 														</DataTrigger>
 
 													</Style.Triggers>
@@ -71,7 +71,7 @@
 								<Style TargetType="TextBlock" >
 									<Style.Triggers>
 										<DataTrigger Binding="{Binding IsMouseOver, ElementName=InsertButton}" Value="True">
-											<Setter Property="Foreground" Value="Red" />
+											<Setter Property="Foreground" Value="{StaticResource ThemeRed}" />
 										</DataTrigger>
 									</Style.Triggers>
 								</Style>

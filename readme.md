@@ -5,20 +5,32 @@
 やる気が続けばいいな。
 
 ## 「さとりすと」のユーザさんへ  
-こっちは作りかけ版なので、ほとんどうごきません。  
-試して頂くのは歓迎ですが、実際のゴースト開発をするにはまだまだ機能がたりなさそうです。  
+こっちは作りかけ版なので、あんまり動きません。
 ゴーストのデータを壊したりするかもしれないので必ずバックアップを取ってから試して下さい。
 
 * お試しはこちらから
-  * リストの一番上を開いてから、下部のArtifactsのところをクリックするとダウンロードできます。
+  * リストの一番上を開いてから、下部のArtifactsのところをクリックするとダウンロードできます。(要githubアカウント)
   * ！不安定なので消えても大丈夫なデータでためすこと！  
 [![おためしばん](https://github.com/kanadelab/Satolist2/actions/workflows/ci.yml/badge.svg?branch=master&event=push)](https://github.com/kanadelab/Satolist2/actions/workflows/ci.yml)
 
 ## 現在の状況  
-編集機能とサーフェス周りの基礎をざーっくりと作ってみた状況。  
-細かい機能にはあんまり対応してないです。  
+ひととおり作りました。うごくといいなあ。
 
-## 使用ライブラリ  
+## ライセンス
+### さとりすとで作ったゴーストについて
+これらのライセンスは、「さとりすと」そのものに影響するものですが、
+さとりすとで作ったゴーストについて影響するものではありません。
+
+### さとりすとのライセンス
+さとりすと本体については、CC BY-NC を適用します。
+https://creativecommons.org/licenses/by-nc/4.0/deed.ja
+
+ただし下記の素材をお借りしていますので、それらを含んだ扱いについてはそれぞれのライセンスに従ってご利用下さい。
+
+### 使用素材
+* SatolistResource/template/satori_license.txt によってライセンスされています。
+  * 里々 (SatolistResource/template/satori.dll)
+
 * Microsoft Public License (Ms-PL) ライセンスのパッケージを使用しています  
 https://opensource.org/licenses/MS-PL  
   * Dirkster.AvalonDock
@@ -29,7 +41,10 @@ https://opensource.org/licenses/mit-license.php
   * Newtonsoft.Json
   * FluentFTP
   * WindowsAPICodePack
+  * ControlzEx
+  * MahApps.Metro
 
 * Apache2.0 ライセンスの素材を使用しています。  
   https://www.apache.org/licenses/LICENSE-2.0
   * https://materialdesignicons.com/
+  * Satolist2/Icons.xaml に集約しています。

@@ -58,7 +58,8 @@ namespace Satolist2.Utility
 
 			new SyntaxDefinition("^[＞].+", ScriptSyntax.Jump),
 
-			new SyntaxDefinition("\\\\_a\\[.+?\\].+?\\\\_a", ScriptSyntax.Anchor),
+			//new SyntaxDefinition("\\\\_a\\[.+?\\].+?\\\\_a", ScriptSyntax.Anchor),	//アンカー分ける意味無いか
+			new SyntaxDefinition("\\\\_a\\[.+?\\].+?\\\\_a", ScriptSyntax.Choice),
 
 			new SyntaxDefinition("^＊[^\t]*", ScriptSyntax.Sentence),
 
@@ -84,28 +85,6 @@ namespace Satolist2.Utility
 			new SyntaxDefinition("\t", ScriptSyntax.Tab)
 		};
 
-		//色情報
-		private Dictionary<ScriptSyntax, int> HilightColors = new Dictionary<ScriptSyntax, int>()
-		{
-			{ ScriptSyntax.Escape, 0x888844 },
-			{ ScriptSyntax.ScriptTag, 0x800000 },
-			{ ScriptSyntax.ChangeSurface, 0x0080ff },
-			{ ScriptSyntax.Jump, 0x008000 },
-			{ ScriptSyntax.Choice, 0x008000 },
-			{ ScriptSyntax.Anchor, 0x008000 },
-			{ ScriptSyntax.Word, 0x0000ff },
-			{ ScriptSyntax.Sentence, 0x0000ff },
-			{ ScriptSyntax.Variable, 0x888844 },
-			{ ScriptSyntax.Getter, 0x800000 },
-			{ ScriptSyntax.Random, 0x008000 },
-			{ ScriptSyntax.Argument, 0x008000 },
-			{ ScriptSyntax.Comment, 0x108010 },
-			{ ScriptSyntax.Tab, 0x000000 },
-			{ ScriptSyntax.Function, 0x0080ff },
-			{ ScriptSyntax.Saori, 0x0080ff },
-			{ ScriptSyntax.Replace, 0x404070 },
-			{ ScriptSyntax.ReplaceAfter, 0x404070 }
-		};
 
 		public HighlightingRule SearchHilightRule { get; }
 
@@ -121,11 +100,14 @@ namespace Satolist2.Utility
 			foreach (var def in Definitions)
 			{
 				var rule = new HighlightingRule();
-				var col = System.Drawing.Color.FromArgb(HilightColors[def.syntaxType]);
-				var brush = new SimpleHighlightingBrush(System.Windows.Media.Color.FromArgb(255, col.R, col.G, col.B));
+				var col = GetHilightColor(def.syntaxType);
+				var brush = new SimpleHighlightingBrush(col);
 
 				rule.Color = new HighlightingColor();
-				rule.Color.Foreground = brush;
+				if (def.syntaxType != ScriptSyntax.Tab)
+					rule.Color.Foreground = brush;
+				else
+					rule.Color.Background = brush;
 				rule.Regex = new System.Text.RegularExpressions.Regex(def.pattern);
 				Rules.Add(rule);
 			}
@@ -148,6 +130,19 @@ namespace Satolist2.Utility
 					Rules.Remove(SearchHilightRule);
 				}
 			}
+		}
+
+		private System.Windows.Media.Color GetHilightColor(ScriptSyntax def)
+		{
+			//設定を問い合わせる
+			if(MainViewModel.EditorSettings.GeneralSettings.TextEditorColors.ContainsKey(Enum.GetName(typeof(ScriptSyntax), def)))
+			{
+				var col = Themes.ApplicationTheme.UintToColorRGB(
+					MainViewModel.EditorSettings.GeneralSettings.TextEditorColors[Enum.GetName(typeof(ScriptSyntax), def)]
+					);
+				return col;
+			}
+			return Themes.ApplicationTheme.UintToColorRGB(Themes.ApplicationTheme.GetEditorHilight(def));
 		}
 	}
 

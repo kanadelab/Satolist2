@@ -31,6 +31,7 @@ namespace Satolist2.Control
 		public InsertPalette()
 		{
 			InitializeComponent();
+			
 		}
 
 		private void InsertButton_MouseDoubleClick(object sender, MouseButtonEventArgs e)

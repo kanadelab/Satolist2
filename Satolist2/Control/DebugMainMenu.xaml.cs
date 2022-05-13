@@ -24,8 +24,8 @@ namespace Satolist2.Control
 		public DebugMainMenu()
 		{
 			InitializeComponent();
+			
 		}
-
 	}
 
 	internal class DebugMainMenuViewModel : NotificationObject, IDockingWindowContent

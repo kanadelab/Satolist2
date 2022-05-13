@@ -27,6 +27,7 @@ namespace Satolist2.Control
 		public SaoriList()
 		{
 			InitializeComponent();
+			
 		}
 	}
 

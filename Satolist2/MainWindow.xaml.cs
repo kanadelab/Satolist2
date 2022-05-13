@@ -1,6 +1,7 @@
 ﻿using AvalonDock.Controls;
 using AvalonDock.Layout;
 using AvalonDock.Layout.Serialization;
+using MahApps.Metro.Controls;
 using Microsoft.Win32;
 using Satolist2.Control;
 using Satolist2.Core;
@@ -21,9 +22,11 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
+using System.Windows.Markup;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
+using System.Windows.Resources;
 using System.Windows.Shapes;
 
 namespace Satolist2
@@ -31,13 +34,14 @@ namespace Satolist2
 	/// <summary>
 	/// Interaction logic for MainWindow.xaml
 	/// </summary>
-	public partial class MainWindow : Window
+	public partial class MainWindow : UserControl
 	{
 		private List<DockingWindow> EventEditors { get; }
 		private List<DockingWindow> TextEditors { get; }
 		private MainViewModel mainViewModel;
 		private LayoutDocumentPane DocumentPane { get; set; }
 		private DockingWindow ActiveEditor { get; set; }
+		public Window RootWindow { get; set; }
 
 		public ICSharpCode.AvalonEdit.TextEditor ActiveTextEditor
 		{
@@ -70,6 +74,7 @@ namespace Satolist2
 		public MainWindow()
 		{
 			InitializeComponent();
+			DockingManager.Theme = Themes.ApplicationTheme.GetDockingSystemTheme();
 
 			//デフォルト状態で閉じておくもの
 			GhostDescriptEditor.IsVisible = false;
@@ -102,20 +107,25 @@ namespace Satolist2
 			//スタートメニューは自動で閉じるので復活する
 			StartMenu.Show();
 
-			//さとりすとのSSTP受信用ウインドウを起動
-			Closed += MainWindow_Closed;
-			Dispatcher.BeginInvoke(new Action(() =>
-			{
-				Core.SSTPCallBackNativeWindow.Create((new System.Windows.Interop.WindowInteropHelper(this)).Handle);
-			}), System.Windows.Threading.DispatcherPriority.Render);
-			
-
 #if DEPLOY
 			//公開時はデバッグメニューを封じておく。今のところ根本に消すわけではないけど
 			DebugMainMenuVisibleMenu.Visibility = Visibility.Collapsed;
 			DebugMainMenuVisibleMenu.IsEnabled = false;
 			DebugMainMenu.Hide();
 #endif
+		}
+
+		public void SetRoot(Window rootWindow)
+		{
+			RootWindow = rootWindow;
+
+			//さとりすとのSSTP受信用ウインドウを起動
+			RootWindow.Closed += MainWindow_Closed;
+			RootWindow.Closing += Window_Closing;
+			Dispatcher.BeginInvoke(new Action(() =>
+			{
+				Core.SSTPCallBackNativeWindow.Create((new System.Windows.Interop.WindowInteropHelper(RootWindow)).Handle);
+			}), System.Windows.Threading.DispatcherPriority.Render);
 		}
 
 		private void MainWindow_Closed(object sender, EventArgs e)
@@ -354,11 +364,30 @@ namespace Satolist2
 			//NOTE: テンポラリエディタはすぐ閉じるだろうし一旦は考えてない
 		}
 
+		internal void UpdateTextEditorHilights()
+		{
+			foreach (var item in EventEditors)
+			{
+				if (item.ViewModel is TextEditorViewModelBase vm)
+				{
+					vm.UpdateHilightSettings();
+				}
+			}
+
+			foreach (var item in TextEditors)
+			{
+				if (item.ViewModel is TextEditorViewModelBase vm)
+				{
+					vm.UpdateHilightSettings();
+				}
+			}
+		}
+
 		internal void OpenGhost(string ghostPath, string shellDirectoryName = "master", string executablePath = null)
 		{
 			//ゴーストのロード
 			var ghost = new GhostModel(ghostPath);
-			Title = string.Format("{0} - さとりすとv2", ghost.GhostDescriptName);
+			RootWindow.Title = string.Format("{0} - さとりすとv2", ghost.GhostDescriptName);
 
 			//メインの起動
 			var init = new MainViewModelInitializeData();
@@ -381,7 +410,7 @@ namespace Satolist2
 				e.Close();
 
 			//開けたらスタートメニューを閉じる
-			StartMenu.Hide();
+			StartMenuVisibleMenu.IsChecked = false;
 		}
 
 		//各コントロールのViewModelの再バインド
@@ -933,6 +962,9 @@ namespace Satolist2
 					{
 						EditorSettings.GeneralSettings = dialog.DataContext.Model;
 						EditorSettings.SaveGeneralSettings();
+
+						//エディタの更新
+						MainWindow.UpdateTextEditorHilights();
 					}
 				}
 				);
@@ -1543,6 +1575,7 @@ namespace Satolist2
 			}
 		}
 	}
+
 
 	
 }

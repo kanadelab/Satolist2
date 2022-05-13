@@ -19,7 +19,7 @@ namespace Satolist2.Dialog
 	/// <summary>
 	/// ProgressDialog.xaml の相互作用ロジック
 	/// </summary>
-	public partial class ProgressDialog : Window
+	public partial class ProgressDialog : DialogContentBase
 	{
 		//ダイアログのキャンセル機能
 		public CancellationTokenSource Cancellation { get; }
@@ -39,7 +39,7 @@ namespace Satolist2.Dialog
 		{
 			InitializeComponent();
 			Cancellation = new CancellationTokenSource();
-			Owner = main.MainWindow;
+			Owner = main.MainWindow.RootWindow;
 			DataContext = new ProgressDialogViewModel(this);
 			
 		}

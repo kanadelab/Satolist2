@@ -17,7 +17,7 @@ namespace Satolist2.Dialog
 	/// <summary>
 	/// TextInputDialog.xaml の相互作用ロジック
 	/// </summary>
-	public partial class TextInputDialog : Window
+	public partial class TextInputDialog : DialogContentBase
 	{
 		public TextInputDialog(Window ownerWindow)
 		{

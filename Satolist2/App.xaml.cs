@@ -17,6 +17,13 @@ namespace Satolist2
 		protected override void OnStartup(StartupEventArgs e)
 		{
 			base.OnStartup(e);
+
+			//テーマ設定
+			var isDarkMode = Model.EditorSettings.TemporaryLoadGeneralSettings()?.IsEnableDarkMode ?? false;
+
+			Themes.ApplicationTheme.CurrentTheme = isDarkMode ? Themes.ApplicationTheme.Themes.Dark : Themes.ApplicationTheme.Themes.Default;
+			Themes.ApplicationTheme.Setup(Resources);
+			StartupUri = Themes.ApplicationTheme.GetBootWindowPath();
 		}
 
 		protected override void OnExit(ExitEventArgs e)

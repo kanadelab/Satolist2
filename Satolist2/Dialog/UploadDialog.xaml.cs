@@ -21,7 +21,7 @@ namespace Satolist2.Dialog
 	/// <summary>
 	/// UploadDialog.xaml の相互作用ロジック
 	/// </summary>
-	public partial class UploadDialog : Window
+	public partial class UploadDialog : DialogContentBase
 	{
 		private bool isUploading = false;
 		public Model.GhostModel Ghost { get; }
@@ -34,24 +34,14 @@ namespace Satolist2.Dialog
 			set => base.DataContext = value;
 		}
 
-		protected override void OnClosing(CancelEventArgs e)
-		{
-			//アップロード中は閉じられない
-			if(isUploading)
-			{
-				e.Cancel = true;
-			}
-
-			base.OnClosing(e);
-		}
-
 		internal UploadDialog(Model.UploadServerSettingModelBase[] servers, MainViewModel main, Model.GhostLocalSettings ghostSettings)
 		{
 			Ghost = main.Ghost;
 			Cancellation = new CancellationTokenSource();
 			InitializeComponent();
-			Owner = main.MainWindow;
+			Owner = main.MainWindow.RootWindow;
 			DataContext = new DialogViewModel();
+			Closing += UploadDialog_Closing;
 
 			//viewmodel作成
 			DataContext.Items = servers.Select<Model.UploadServerSettingModelBase, object>(
@@ -96,6 +86,15 @@ namespace Satolist2.Dialog
 			}
 			ServerList.Focus();
 			SelectUploadTargetPage.Visibility = Visibility.Visible;
+		}
+
+		private void UploadDialog_Closing(object sender, CancelEventArgs e)
+		{
+			//アップロード中は閉じられない
+			if (isUploading)
+			{
+				e.Cancel = true;
+			}
 		}
 
 		public class DialogViewModel : Utility.NotificationObject

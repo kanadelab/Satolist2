@@ -1,0 +1,30 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+					xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+					xmlns:metro="clr-namespace:MetroRadiance.Themes;assembly=MetroRadiance"
+					xmlns:avalonEdit="http://icsharpcode.net/sharpdevelop/avalonedit">
+	<ResourceDictionary.MergedDictionaries>
+
+		<!-- MahApps.Metro resource dictionaries. Make sure that all file names are Case Sensitive! -->
+		<ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
+		<!--<ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />-->
+		<!-- Theme setting -->
+
+
+		<ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Themes/Dark.Cyan.xaml" />
+		<!--
+		<ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.FlatButton.xaml" />
+		-->
+	</ResourceDictionary.MergedDictionaries>
+
+	<SolidColorBrush x:Key="ThemeRed">IndianRed</SolidColorBrush>
+	<SolidColorBrush x:Key="ThemeGreen">Lime</SolidColorBrush>
+	<SolidColorBrush x:Key="ThemeBlue">DodgerBlue</SolidColorBrush>
+	<SolidColorBrush x:Key="ThemeDarkRed">Red</SolidColorBrush>
+	<SolidColorBrush x:Key="ThemePeachPuff">PeachPuff</SolidColorBrush>
+
+	<Style TargetType="avalonEdit:TextEditor" BasedOn="{StaticResource {x:Type avalonEdit:TextEditor}}">
+		<Setter Property="Background" Value="#1e1e1e" />
+		<Setter Property="Foreground" Value="#DCDCDC" />
+	</Style>
+
+</ResourceDictionary>

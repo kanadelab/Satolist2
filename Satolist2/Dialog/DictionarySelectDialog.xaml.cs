@@ -16,7 +16,7 @@ using System.Windows.Shapes;
 namespace Satolist2.Dialog
 {
 	//辞書フォルダをえらぶ
-	public partial class DictionarySelectDialog : Window
+	public partial class DictionarySelectDialog : DialogContentBase
 	{
 		private MainViewModel main;
 
@@ -42,7 +42,7 @@ namespace Satolist2.Dialog
 		{
 			InitializeComponent();
 			this.main = main;
-			Owner = main.MainWindow;
+			Owner = main.MainWindow.RootWindow;
 
 			OkCommand = new ActionCommand(
 				o =>

@@ -1,4 +1,4 @@
-﻿<Window x:Class="Satolist2.Dialog.TextInputDialog"
+﻿<local:DialogContentBase x:Class="Satolist2.Dialog.TextInputDialog"
 		xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 		xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -20,7 +20,7 @@
 		</Grid.RowDefinitions>
 		
 		<TextBlock Grid.Row="0" Text="{Binding Description, FallbackValue=名前を入力します。}" Margin="3" />
-		<TextBlock Grid.Row="1" Text="{Binding ErrorMessage}" Foreground="Red" Margin="3">
+		<TextBlock Grid.Row="1" Text="{Binding ErrorMessage}" Foreground="{StaticResource ThemeRed}" Margin="3">
 			<TextBlock.Style>
 				<Style TargetType="TextBlock">
 					<Style.Triggers>
@@ -38,4 +38,4 @@
 		</StackPanel>
 		
 	</Grid>
-</Window>
+</local:DialogContentBase>

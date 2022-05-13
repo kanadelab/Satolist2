@@ -8,7 +8,10 @@
 			 mc:Ignorable="d" 
 			 d:DesignHeight="450" d:DesignWidth="800">
 	<UserControl.Resources>
-		<util:InvertBoolToVisibilityConverter x:Key="InvertBoolToVisibilityConverter" />
+		<ResourceDictionary>
+			<util:InvertBoolToVisibilityConverter x:Key="InvertBoolToVisibilityConverter" />
+		</ResourceDictionary>
+		
 	</UserControl.Resources>
 	<Grid>
 		<TreeView ItemsSource="{Binding Directories}" SelectedItemChanged="TreeView_SelectedItemChanged">
@@ -18,7 +21,7 @@
 				</HierarchicalDataTemplate>
 			</TreeView.ItemTemplate>
 			<TreeView.ItemContainerStyle>
-				<Style TargetType="TreeViewItem">
+				<Style TargetType="TreeViewItem" >
 					<EventSetter Event="MouseDoubleClick" Handler="TreeViewItem_MouseDoubleClick" />
 					<Style.Triggers>
 						<DataTrigger Binding="{Binding NodeType}" Value="Dictionary">
@@ -68,7 +71,7 @@
 								<Condition Binding="{Binding Dictionary.IsSerialized}" Value="True" />
 							</MultiDataTrigger.Conditions>
 							<MultiDataTrigger.Setters>
-								<Setter Property="Background" Value="PeachPuff" />
+								<Setter Property="Background" Value="{StaticResource ThemePeachPuff}" />
 							</MultiDataTrigger.Setters>
 						</MultiDataTrigger>
 					</Style.Triggers>

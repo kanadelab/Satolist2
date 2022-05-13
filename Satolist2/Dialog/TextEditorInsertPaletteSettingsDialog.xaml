@@ -1,4 +1,4 @@
-﻿<Window x:Class="Satolist2.Dialog.TextEditorInsertPaletteSettingsDialog"
+﻿<local:DialogContentBase x:Class="Satolist2.Dialog.TextEditorInsertPaletteSettingsDialog"
 			 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 			 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 			 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -6,7 +6,7 @@
 			 xmlns:local="clr-namespace:Satolist2.Dialog"
 			 mc:Ignorable="d" 
 			 Height="500" Width="800" WindowStartupLocation="CenterOwner" Title="挿入メニューのカスタマイズ">
-	<Window.Resources>
+	<local:DialogContentBase.Resources>
 		<ResourceDictionary>
 			<ResourceDictionary.MergedDictionaries>
 				<ResourceDictionary Source="/Control/StrechedListViewItemStyle.xaml" />
@@ -14,7 +14,7 @@
 			<Geometry x:Key="GroupIcon">M20,18H4V8H20M20,6H12L10,4H4C2.89,4 2,4.89 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V8C22,6.89 21.1,6 20,6Z</Geometry>
 			<Geometry x:Key="ItemIcon">M4,2H20A2,2 0 0,1 22,4V16A2,2 0 0,1 20,18H16L12,22L8,18H4A2,2 0 0,1 2,16V4A2,2 0 0,1 4,2M4,4V16H8.83L12,19.17L15.17,16H20V4H4M6,7H18V9H6V7M6,11H16V13H6V11Z</Geometry>
 		</ResourceDictionary>
-	</Window.Resources>
+	</local:DialogContentBase.Resources>
 	<Grid x:Name="RootGrid">
 		<Grid.ColumnDefinitions>
 			<ColumnDefinition Width="1.5*" />
@@ -29,14 +29,14 @@
 		<StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal">
 			<Button Margin="3" Command="{Binding AddItemCommand}" Padding="5 2 5 2">
 				<StackPanel Orientation="Horizontal">
-					<Path Fill="Green" VerticalAlignment="Center" Stretch="UniformToFill" Data="{StaticResource InsertMenuItemIcon}">
+					<Path Fill="{StaticResource ThemeGreen}" VerticalAlignment="Center" Stretch="UniformToFill" Data="{StaticResource InsertMenuItemIcon}">
 					</Path>
 					<TextBlock VerticalAlignment="Center" Text="アイテム追加" />
 				</StackPanel>
 			</Button>
 			<Button Margin="3" Command="{Binding AddGroupCommand}" Padding="5 2 5 2">
 				<StackPanel Orientation="Horizontal">
-					<Path Fill="Green" VerticalAlignment="Center" Stretch="UniformToFill" Data="{StaticResource InsertMenuGroupIcon}">
+					<Path Fill="{StaticResource ThemeGreen}" VerticalAlignment="Center" Stretch="UniformToFill" Data="{StaticResource InsertMenuGroupIcon}">
 					</Path>
 					<TextBlock VerticalAlignment="Center" Text="グループ追加" />
 				</StackPanel>
@@ -73,7 +73,7 @@
 										<Path x:Name="ListPath" VerticalAlignment="Center" HorizontalAlignment="Center">
 											<Path.Style>
 												<Style TargetType="Path">
-													<Setter Property="Fill" Value="Green"/>
+													<Setter Property="Fill" Value="{StaticResource ThemeGreen}"/>
 													
 													<Style.Triggers>
 														<DataTrigger Binding="{Binding Type}" Value="Group">
@@ -102,17 +102,17 @@
 						<StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right">
 							<Button Margin="3" Command="{Binding UpItemCommand}">
 								<Button.Content>
-									<Path Fill="Green" Margin="-3 -3 2 2" Data="{StaticResource UpIcon}" />
+									<Path Fill="{StaticResource ThemeGreen}" Margin="-3 -3 2 2" Data="{StaticResource UpIcon}" />
 								</Button.Content>
 							</Button>
 							<Button Margin="3" Command="{Binding DownItemCommand}">
 								<Button.Content>
-									<Path Fill="Green" Margin="-3 -3 2 2" Data="{StaticResource DownIcon}" />
+									<Path Fill="{StaticResource ThemeGreen}" Margin="-3 -3 2 2" Data="{StaticResource DownIcon}" />
 								</Button.Content>
 							</Button>
 							<Button Margin="3" Command="{Binding RemoveItemCommand}">
 								<Button.Content>
-									<Path Fill="Red" Margin="-3 -3 2 2" Data="{StaticResource RemoveIcon}" />
+									<Path Fill="{StaticResource ThemeRed}" Margin="-3 -3 2 2" Data="{StaticResource RemoveIcon}" />
 								</Button.Content>
 							</Button>
 							<StackPanel.Style>
@@ -193,4 +193,4 @@
 			<Button Content="キャンセル" Width="100" Command="{Binding CancelCommand}" Margin="3"/>
 		</StackPanel>
 	</Grid>
-</Window>
+</local:DialogContentBase>

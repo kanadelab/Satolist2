@@ -26,6 +26,7 @@ namespace Satolist2.Control
 		public SearchResult()
 		{
 			InitializeComponent();
+			
 		}
 
 		private void ListViewItem_MouseDoubleClick(object sender, MouseButtonEventArgs e)

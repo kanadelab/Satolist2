@@ -24,6 +24,7 @@ namespace Satolist2.Control
 		public SearchMenu()
 		{
 			InitializeComponent();
+			
 		}
 	}
 

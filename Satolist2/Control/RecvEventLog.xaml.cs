@@ -27,6 +27,7 @@ namespace Satolist2.Control
 		public RecvEventLog()
 		{
 			InitializeComponent();
+			
 		}
 
 		private void UserControl_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -161,7 +162,7 @@ namespace Satolist2.Control
 					if (!Core.SatoriRecvNativeWindow.IsCreated)
 					{
 						//れしばを起動
-						Core.SatoriRecvNativeWindow.Create((new System.Windows.Interop.WindowInteropHelper(Main.MainWindow)).Handle, OnReceive);
+						Core.SatoriRecvNativeWindow.Create((new System.Windows.Interop.WindowInteropHelper(Main.MainWindow.RootWindow)).Handle, OnReceive);
 
 						//SHIORIを読み直し(里々の再起動によってれしばに接続)
 						if(Main.Ghost != null)

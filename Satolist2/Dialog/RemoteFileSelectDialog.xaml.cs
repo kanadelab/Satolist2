@@ -21,7 +21,7 @@ namespace Satolist2.Dialog
 	/// <summary>
 	/// RemoteFileSelectDialog.xaml の相互作用ロジック
 	/// </summary>
-	public partial class RemoteFileSelectDialog : Window
+	public partial class RemoteFileSelectDialog : DialogContentBase
 	{
 		public event MouseButtonEventHandler ItemDoubleClick;
 
@@ -152,7 +152,7 @@ namespace Satolist2.Dialog
 				{
 					//現在のディレクトリをリストアップ
 					var currentItems = items.Select(s => s.Name);
-					var inputDialog = new TextInputDialog(dialog);
+					var inputDialog = new TextInputDialog(dialog.Host);
 					var vm = new CreateDirectoryDialogViewModel(inputDialog, currentItems);
 					inputDialog.DataContext = vm;
 					if (inputDialog.ShowDialog() == true)

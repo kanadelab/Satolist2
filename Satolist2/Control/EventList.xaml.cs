@@ -28,6 +28,7 @@ namespace Satolist2.Control
 		public EventList()
 		{
 			InitializeComponent();
+			
 		}
 
 		private void ListViewItem_MouseDoubleClick(object sender, MouseButtonEventArgs e)

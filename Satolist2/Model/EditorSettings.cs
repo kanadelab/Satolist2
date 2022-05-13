@@ -220,6 +220,23 @@ namespace Satolist2.Model
 				GeneralSettings = new GeneralSettings();
 		}
 
+		//基本設定を読み込む
+		//本ロードに入る前に必要なものをここでとりあえず読む想定。設計見直すかもだけど一旦簡単に使いたかったので
+		public static GeneralSettings TemporaryLoadGeneralSettings()
+		{
+			try
+			{
+				if (System.IO.File.Exists(GeneralSettingPath))
+				{
+					return JsonUtility.DeserializeFromFile<GeneralSettings>(GeneralSettingPath);
+				}
+			}
+			catch
+			{
+			}
+			return null;
+		}
+
 		//基本設定の保存
 		public void SaveGeneralSettings()
 		{
@@ -246,6 +263,10 @@ namespace Satolist2.Model
 		public double TextEditorFontSize { get; set; }
 		[JsonProperty]
 		public string TextEditorFontName { get; set; }
+		[JsonProperty]
+		public bool IsEnableDarkMode { get; set; }
+		[JsonProperty]
+		public Dictionary<string, uint> TextEditorColors { get; set; }
 
 		public GeneralSettings()
 		{
@@ -253,6 +274,7 @@ namespace Satolist2.Model
 			UseOwnedSSTP = false;
 			IsTextModeDefault = false;
 			ListedDictionaryInsertEmptyLineCount = 1;
+			TextEditorColors = new Dictionary<string, uint>();
 		}
 
 		public GeneralSettings Clone()
@@ -261,19 +283,17 @@ namespace Satolist2.Model
 			{
 				UseOwnedSSTP = UseOwnedSSTP,
 				IsTextModeDefault = IsTextModeDefault,
-				ListedDictionaryInsertEmptyLineCount = ListedDictionaryInsertEmptyLineCount
+				ListedDictionaryInsertEmptyLineCount = ListedDictionaryInsertEmptyLineCount,
+				TextEditorFontName = TextEditorFontName,
+				TextEditorFontSize = TextEditorFontSize,
+				IsEnableDarkMode = IsEnableDarkMode,
+				TextEditorColors = TextEditorColors.ToDictionary(k => k.Key, k => k.Value)
 			};
 		}
 
 		public bool IsEqlals(GeneralSettings obj)
 		{
-			if (UseOwnedSSTP != obj.UseOwnedSSTP)
-				return false;
-			if (ListedDictionaryInsertEmptyLineCount != obj.ListedDictionaryInsertEmptyLineCount)
-				return false;
-			if (IsTextModeDefault != obj.IsTextModeDefault)
-				return false;
-			return true;
+			return JsonUtility.SerializableObjectEquals(this, obj);
 
 		}
 	}

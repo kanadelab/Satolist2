@@ -25,6 +25,7 @@ namespace Satolist2.Control
 		public TemporaryTextEditor()
 		{
 			InitializeComponent();
+			
 			MainTextEditor.SyntaxHighlighting = new SatoriSyntaxHilighter();
 		}
 

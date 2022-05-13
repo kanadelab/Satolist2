@@ -19,7 +19,7 @@ namespace Satolist2.Dialog
 	/// <summary>
 	/// AddEventDialog.xaml の相互作用ロジック
 	/// </summary>
-	public partial class AddEventDialog : Window
+	public partial class AddEventDialog : DialogContentBase
 	{
 		internal new AddEventDialogViewModel DataContext
 		{
@@ -33,7 +33,7 @@ namespace Satolist2.Dialog
 		internal AddEventDialog(MainViewModel main)
 		{
 			InitializeComponent();
-			Owner = main.MainWindow;
+			Owner = main.MainWindow.RootWindow;
 			DataContext = new AddEventDialogViewModel(main);
 			DataContext.AddTarget = DataContext.Main.Ghost.Dictionaries.FirstOrDefault();
 		}
