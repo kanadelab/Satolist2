@@ -131,6 +131,9 @@
     <Compile Include="Control\SaoriList.xaml.cs">
       <DependentUpon>SaoriList.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Control\SatoriteWindow.xaml.cs">
+      <DependentUpon>SatoriteWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Control\SearchMenu.xaml.cs">
       <DependentUpon>SearchMenu.xaml</DependentUpon>
     </Compile>
@@ -296,6 +299,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Control\SaoriList.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Control\SatoriteWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

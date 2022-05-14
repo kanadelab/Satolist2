@@ -86,6 +86,8 @@ namespace Satolist2
 			SearchMenu.IsVisible = false;
 			RecvEventLog.IsVisible = false;
 			InsertPalette.IsVisible = false;
+			Satorite.IsVisible = false;
+			DebugMainMenu.IsVisible = false;
 
 			AllowDrop = true;
 			EventEditors = new List<DockingWindow>();
@@ -106,6 +108,10 @@ namespace Satolist2
 
 			//スタートメニューは自動で閉じるので復活する
 			StartMenu.Show();
+
+			//さとりてウインドウのシンタックスハイライトを設定
+			((SatoriteWindow)Satorite.Content).UpdateHilighting();
+			((SatoriteWindow)Satorite.Content).UpdateFontSettings();
 
 #if DEPLOY
 			//公開時はデバッグメニューを封じておく。今のところ根本に消すわけではないけど
@@ -361,6 +367,7 @@ namespace Satolist2
 				}
 			}
 
+			((SatoriteWindow)Satorite.Content).UpdateFontSettings();
 			//NOTE: テンポラリエディタはすぐ閉じるだろうし一旦は考えてない
 		}
 
@@ -381,6 +388,8 @@ namespace Satolist2
 					vm.UpdateHilightSettings();
 				}
 			}
+
+			((SatoriteWindow)Satorite.Content).UpdateHilighting();
 		}
 
 		internal void OpenGhost(string ghostPath, string shellDirectoryName = "master", string executablePath = null)
@@ -432,6 +441,7 @@ namespace Satolist2
 			VariableList.ViewModel = mainVm.VariableListViewModel;
 			RecvEventLog.ViewModel = mainVm.RecvEventLogViewModel;
 			InsertPalette.ViewModel = mainVm.InsertPaletteViewModel;
+			Satorite.ViewModel = mainVm.SatoriteViewModel;
 		}
 
 		private void ReflectVisibleMenuDataContext()
@@ -454,6 +464,7 @@ namespace Satolist2
 			VariableListVisibleMenu.DataContext = VariableList;
 			RecvEventLogVisibleMenu.DataContext = RecvEventLog;
 			InsertPaletteVisibleMenu.DataContext = InsertPalette;
+			SatoriteVisibleMenu.DataContext = Satorite;
 			//
 			
 		}
@@ -545,6 +556,9 @@ namespace Satolist2
 				case InsertPaletteViewModel.ContentId:
 					InsertPalette = (DockingWindow)e.Model;
 					break;
+				case SatoriteViewModel.ContentId:
+					Satorite = (DockingWindow)e.Model;
+					break;
 				default:
 					//イベントエディタ等一時的なモノはデシリアライズする必要はない
 					e.Cancel = true;
@@ -630,6 +644,7 @@ namespace Satolist2
 		public VariableListViewModel VariableListViewModel { get; }
 		public RecvEventLogViewModel RecvEventLogViewModel { get; }
 		public InsertPaletteViewModel InsertPaletteViewModel { get; }
+		public SatoriteViewModel SatoriteViewModel { get; }
 		
 
 		public List<EventEditorViewModel> EventEditors { get; }
@@ -781,6 +796,7 @@ namespace Satolist2
 			VariableListViewModel = new VariableListViewModel(this);
 			RecvEventLogViewModel = new RecvEventLogViewModel(this);
 			InsertPaletteViewModel = new InsertPaletteViewModel(this);
+			SatoriteViewModel = new SatoriteViewModel(this);
 
 			SaveFileCommand = new ActionCommand(
 				o => AskSave(),

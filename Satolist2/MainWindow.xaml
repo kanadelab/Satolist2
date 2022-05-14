@@ -72,6 +72,7 @@
 				<MenuItem Header="変数リスト" x:Name="VariableListVisibleMenu" IsCheckable="True" IsChecked="{Binding IsVisible, Mode=TwoWay}" />
 				<MenuItem Header="れしばイベントログ" x:Name="RecvEventLogVisibleMenu" IsCheckable="True" IsChecked="{Binding IsVisible, Mode=TwoWay}" />
 				<MenuItem Header="挿入パレット" x:Name="InsertPaletteVisibleMenu" IsCheckable="True" IsChecked="{Binding IsVisible, Mode=TwoWay}" />
+				<MenuItem Header="さとりて" x:Name="SatoriteVisibleMenu" IsCheckable="True" IsChecked="{Binding IsVisible, Mode=TwoWay}" />
 			</MenuItem>
 			<MenuItem Header="デバッグ">
 				<MenuItem Header="SHIORI Reload" Command="{Binding ReloadShioriCommand}" InputGestureText="Ctrl+Alt+R" />
@@ -202,6 +203,11 @@
 						<!--検索結果-->
 						<util:DockingWindow x:Name="SearchResult">
 							<ctl:SearchResult />
+						</util:DockingWindow>
+						
+						<!--さとりて-->
+						<util:DockingWindow x:Name="Satorite">
+							<ctl:SatoriteWindow />
 						</util:DockingWindow>
 
 					</avalonDock:LayoutAnchorablePane>
