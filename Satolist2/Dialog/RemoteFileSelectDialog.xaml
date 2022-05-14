@@ -152,8 +152,8 @@
 		</Grid>
 
 		<StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right">
-			<Button Content="キャンセル" Width="100" Margin="3" Command="{Binding CancelCommand}" IsCancel="True"/>
 			<Button Content="OK" Width="100" Margin="3" Command="{Binding OkCommand}" IsDefault="True" />
+			<Button Content="キャンセル" Width="100" Margin="3" Command="{Binding CancelCommand}" IsCancel="True"/>
 		</StackPanel>
 
 	</Grid>

@@ -66,6 +66,15 @@ namespace Satolist2.Dialog
 			{
 				selectedItem = value;
 				NotifyChanged();
+
+				//ファイル名を変更
+				if (selectedItem != null)
+				{
+					if (selectedItem.Type == FileListItemType.File && showFileNameInput)
+					{
+						FileName = selectedItem.Name;
+					}
+				}
 				OkCommand.NotifyCanExecuteChanged();
 			}
 		}
@@ -212,7 +221,7 @@ namespace Satolist2.Dialog
 					else
 					{
 						if (selectedItem != null)
-							ResultPath = DictionaryUtility.ConbinePath(selectedItem.FullName, fileName);
+							ResultPath = selectedItem.FullName;
 						else
 							ResultPath = DictionaryUtility.ConbinePath(currentPath, fileName);
 					}
@@ -222,12 +231,19 @@ namespace Satolist2.Dialog
 				},
 				o =>
 				{
-					//ディレクトリを選択している場合のみ決定可能
-					//nullはカレントを選択している扱いで許容
-					if (selectedItem == null || selectedItem.Type == FileListItemType.NewDirectory || selectedItem.Type == FileListItemType.Directory)
-						return true;
+					if (showFileNameInput)
+					{
+						return !string.IsNullOrEmpty(FileName) && DictionaryUtility.IsValidFileName(FileName);
+					}
 					else
-						return false;
+					{
+						//ディレクトリを選択している場合のみ決定可能
+						//nullはカレントを選択している扱いで許容
+						if (selectedItem == null || selectedItem.Type == FileListItemType.NewDirectory || selectedItem.Type == FileListItemType.Directory)
+							return true;
+						else
+							return false;
+					}
 				}
 				);
 
