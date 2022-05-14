@@ -86,7 +86,7 @@
 		</TabControl>
 		<StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right">
 			<Button Content="OK" Margin="3" Width="100" Command="{Binding OkCommand}"/>
-			<Button Content="キャンセル" Margin="3" Width="100" Command="{Binding CancelCommand}"/>
+			<Button Content="キャンセル" Margin="3" Width="100" Command="{Binding CancelCommand}" IsCancel="True" />
 		</StackPanel>
 	</Grid>
 </local:DialogContentBase>
