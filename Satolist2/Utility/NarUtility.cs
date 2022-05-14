@@ -273,7 +273,8 @@ namespace Satolist2.Utility
 				//差分チェック
 				if(diffFiles.ContainsKey(item.Item1))
 				{
-					if(hash == item.Item2 && size == item.Item3)
+					var diff = diffFiles[item.Item1];
+					if(hash == diff.Item1 && size == diff.Item2)
 					{
 						//差分一致につきスキップ
 						var skipMessage = string.Format("{1}/{2} skip: {0}", item.Item1, i, uploadFiles.Count);
