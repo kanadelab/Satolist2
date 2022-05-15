@@ -51,6 +51,7 @@ namespace Satolist2.Dialog
 	internal class SaveFileListViewModel
 	{
 		public SaveFileListItemViewModel[] Items { get; }
+		public bool IsEnableDiscard { get; set; }
 
 		public SaveFileListViewModel(IEnumerable<ISaveFileObject> saveFiles)
 		{

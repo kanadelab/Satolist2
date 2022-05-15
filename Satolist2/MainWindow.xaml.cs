@@ -195,7 +195,7 @@ namespace Satolist2
 
 				viewModel.UpdateFontSettings();
 				EventEditors.Add(newWindow);
-				DocumentPane.Children.Add(newWindow);
+				DocumentPane.Children.Insert(0, newWindow);
 				currentWindow = newWindow;
 			}
 
@@ -420,6 +420,10 @@ namespace Satolist2
 
 			//開けたらスタートメニューを閉じる
 			StartMenuVisibleMenu.IsChecked = false;
+
+			//ログ表示
+			var logStr = string.Format("ゴースト「{0}」を開きました。 ({1})", ghost.GhostDescriptName, ghost.FullPath);
+			LogMessage.AddLog(logStr);
 		}
 
 		//各コントロールのViewModelの再バインド
@@ -571,7 +575,7 @@ namespace Satolist2
 			//保存するかを尋ねる
 			if(DataContext is MainViewModel vm)
 			{
-				if(!vm.AskSave())
+				if(!vm.AskSave(true))
 				{
 					e.Cancel = true;
 					return;
@@ -799,7 +803,7 @@ namespace Satolist2
 			SatoriteViewModel = new SatoriteViewModel(this);
 
 			SaveFileCommand = new ActionCommand(
-				o => AskSave(),
+				o => AskSave(false),
 				o => Ghost != null
 				);
 
@@ -1063,7 +1067,7 @@ namespace Satolist2
 				o =>
 				{
 					//保存ダイアログを出す
-					if(AskSave())
+					if(AskSave(true))
 					{
 						//ファイル保存先の選択
 						//TODO: developer_options.txt を実装してのテストはできてないので要確認
@@ -1112,7 +1116,7 @@ namespace Satolist2
 			MakeUpdateFileCommand = new ActionCommand(
 				o =>
 				{
-					if(AskSave())
+					if(AskSave(true))
 					{
 						var progressDialog = new ProgressDialog(this);
 						progressDialog.DataContext.Title = "更新ファイルの作成";
@@ -1151,7 +1155,7 @@ namespace Satolist2
 						return;
 					}
 
-					if (AskSave())
+					if (AskSave(true))
 					{
 						//ゴーストアップロード
 						var dialog = new UploadDialog(EditorSettings.UploadSettings, this, EditorSettings.GhostTemporarySettings);
@@ -1338,15 +1342,18 @@ namespace Satolist2
 		}
 
 		//保存ダイアログを呼ぶ
-		public bool AskSave()
+		public bool AskSave(bool isAutomaticSaveDialog)
 		{
 			//ゴーストを開いてない
 			if (Ghost == null)
 				return true;
 
-			//保存が不要
-			if (!IsChanged)
-				return true;
+			if (isAutomaticSaveDialog)
+			{
+				//保存が不要
+				if (!IsChanged)
+					return true;
+			}
 
 			List<ISaveFileObject> objects = new List<ISaveFileObject>();
 			objects.AddRange(SaveLoadPanes);
@@ -1355,6 +1362,7 @@ namespace Satolist2
 
 			var dialog = new SaveFileListDialog(this);
 			var dialogViewModel = new SaveFileListViewModel(objects);
+			dialogViewModel.IsEnableDiscard = isAutomaticSaveDialog;
 			dialog.DataContext = dialogViewModel;
 			dialog.ShowDialog();
 

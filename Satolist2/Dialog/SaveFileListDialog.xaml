@@ -26,7 +26,7 @@
 		</ListView>
 		<StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
 			<Button Content="保存" Padding="0 5 0 5" Margin="5" Width="100" IsDefault="True" Click="SaveButton_Click" />
-			<Button Content="破棄" Padding="0 5 0 5" Margin="5" Width="100" Click="DisposeButton_Click" />
+			<Button Content="破棄" Padding="0 5 0 5" Margin="5" Width="100" Click="DisposeButton_Click" IsEnabled="{Binding IsEnableDiscard}" />
 			<Button Content="キャンセル" Padding="0 5 0 5" Margin="5" Width="100" IsCancel="True" Click="CancelButton_Click" />
 		</StackPanel>
 

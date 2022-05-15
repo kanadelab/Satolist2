@@ -12,6 +12,7 @@
 		<KeyBinding Gesture="CTRL+S" Command="{Binding SaveFileCommand}" />
 		<KeyBinding Gesture="CTRL+ALT+R" Command="{Binding ReloadShioriCommand}" />
 		<KeyBinding Gesture="CTRL+SHIFT+F" Command="{Binding ShowSearchBoxCommand}" />
+		<KeyBinding Gesture="CTRL+ALT+G" Command="{Binding BootSSPCommand}" />
 	</UserControl.InputBindings>
 	<UserControl.Resources>
 		<ResourceDictionary>
@@ -38,7 +39,7 @@
 				<MenuItem Header="ゴーストの辞書フォルダを開く" Command="{Binding OpenGhostDictionaryDirectoryCommand}" />
 				<MenuItem Header="ゴーストのシェルフォルダを開く" Command="{Binding OpenGhostShellDirectoryCommand}" />
 				<Separator/>
-				<MenuItem Header="ゴーストをSSPで起動" Command="{Binding BootSSPCommand}" />
+				<MenuItem Header="ゴーストをSSPで起動" Command="{Binding BootSSPCommand}" InputGestureText="Ctrl+Alt+G" />
 				<Separator />
 				<MenuItem Header="ゴーストを新規作成" Command="{Binding NewGhostCommand}" />
 			</MenuItem>
@@ -93,7 +94,7 @@
 			</MenuItem>
 		</Menu>
 
-		<avalonDock:DockingManager Grid.Row="1" AllowMixedOrientation="True" x:Name="DockingManager">
+		<avalonDock:DockingManager Grid.Row="1" AllowMixedOrientation="True" x:Name="DockingManager" >
 
 			<!--
 			<avalonDock:DockingManager.Theme>
@@ -117,7 +118,7 @@
 						</avalonDock:LayoutAnchorablePane>
 
 						<!--ドキュメントペイン-->
-						<avalonDock:LayoutDocumentPane>
+						<avalonDock:LayoutDocumentPane CanRepositionItems="True" >
 
 							<!--スタートメニュー-->
 							<util:DockingWindow x:Name="StartMenu">
@@ -231,16 +232,16 @@
 				</Button.Template>
 			</Button>
 			<Popup x:Name="LogPopup" StaysOpen="False" Placement="Top">
-				<!--<Border BorderBrush="#5544FF" BorderThickness="2">-->
-					<StackPanel Background="White">
-					<Button Content="ログをクリア" Margin="3" Command="{Binding ClearLogMessageCommand}" />
-					<!--<TextBlock Text="さとりすと ログ情報" />-->
-						<ListView ItemsSource="{Binding LogMessage.LogItems}" DisplayMemberPath="Message"
+				<StackPanel >
+					<Menu>
+						<MenuItem Header="ログをクリア" Command="{Binding ClearLogMessageCommand}" />
+					</Menu>
+					<Separator/>
+					<ListView ItemsSource="{Binding LogMessage.LogItems}" DisplayMemberPath="Message"
 									ScrollViewer.VerticalScrollBarVisibility="Visible"
 									Width="600" Height="200" x:Name="LogList">
-						</ListView>
-					</StackPanel>
-				<!--</Border>-->
+					</ListView>
+				</StackPanel>
 			</Popup>
 			<Grid.Style>
 				<Style TargetType="Grid">
