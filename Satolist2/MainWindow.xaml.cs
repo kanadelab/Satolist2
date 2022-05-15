@@ -3,6 +3,7 @@ using AvalonDock.Layout;
 using AvalonDock.Layout.Serialization;
 using MahApps.Metro.Controls;
 using Microsoft.Win32;
+using Microsoft.WindowsAPICodePack.Dialogs;
 using Satolist2.Control;
 using Satolist2.Core;
 using Satolist2.Dialog;
@@ -676,6 +677,7 @@ namespace Satolist2
 		public ActionCommand UploadGhostCommand { get; }
 		public ActionCommand GenerateSurfacePreviewCommand { get; }
 		public ActionCommand SelectPreviewShellCommand { get; }
+		public ActionCommand SelectPreviewShellDirectoryCommand { get; }
 		public ActionCommand ShowLogMessageCommand { get; }
 		public ActionCommand ClearLogMessageCommand { get; }
 
@@ -1227,9 +1229,24 @@ namespace Satolist2
 					SurfacePreview.SelectedShell = (SurfacePreviewViewModel.SurfacePreviewViewModelShellItem)o;
 
 					//再読み込み
-					SurfacePreview.ReloadPreviewData();
 					SurfacePaletteViewModel.UpdateSurfacePreviewData();
 					SurfaceViewerViewModel.UpdateSurfacePreviewData();
+					GenerateSurfacePreviewCommand.NotifyCanExecuteChanged();
+				}
+				);
+
+			SelectPreviewShellDirectoryCommand = new ActionCommand(
+				o =>
+				{
+					//選択
+					var result = SurfacePreview.SelectShellFromPath();
+					if (!result)
+						MessageBox.Show("シェルを開けませんでした。", "さとりすと");
+
+					//再読み込み
+					SurfacePaletteViewModel.UpdateSurfacePreviewData();
+					SurfaceViewerViewModel.UpdateSurfacePreviewData();
+					GenerateSurfacePreviewCommand.NotifyCanExecuteChanged();
 				}
 				);
 
@@ -1463,6 +1480,7 @@ namespace Satolist2
 				{
 					selectedShell = value;
 					NotifyChanged();
+					NotifyChanged(nameof(IsShellEnable));
 					LoadSurfacePreviewData(selectedShell);
 
 					foreach(var s in shells)
@@ -1470,9 +1488,12 @@ namespace Satolist2
 						s.IsSelected = s == selectedShell;
 					}
 
-					//選択を保存
-					MainViewModel.EditorSettings.GhostTemporarySettings.SurfacePreviewShellDirectory = selectedShell.DirectoryName;
-					MainViewModel.EditorSettings.SaveGhostTemporarySettings(Main.Ghost);
+					if (!SelectedShell.IsTemporary)
+					{
+						//選択を保存
+						MainViewModel.EditorSettings.GhostTemporarySettings.SurfacePreviewShellDirectory = selectedShell.DirectoryName;
+						MainViewModel.EditorSettings.SaveGhostTemporarySettings(Main.Ghost);
+					}
 				}
 			}
 		}
@@ -1506,6 +1527,12 @@ namespace Satolist2
 			get => shells.Count > 0;
 		}
 
+		//シェルが選択されているか
+		public bool IsShellEnable
+		{
+			get => selectedShell != null;
+		}
+
 		public SurfacePreviewViewModel(MainViewModel main)
 		{
 			Main = main;
@@ -1525,9 +1552,26 @@ namespace Satolist2
 
 			foreach (var dir in shellDirs)
 			{
-				var nDir = DictionaryUtility.NormalizePath(dir);
-				var descriptPath = DictionaryUtility.ConbinePath(nDir, "descript.txt");
-				if (System.IO.File.Exists(descriptPath))
+				var s = AnalyzeShellDirectory(dir);
+				if (s != null)
+					shells.Add(s);
+			}
+
+			//アイテム選択
+			SelectedShell = Shells.FirstOrDefault(o => o.DirectoryName == MainViewModel.EditorSettings.GhostTemporarySettings.SurfacePreviewShellDirectory);
+			if (SelectedShell == null)
+				SelectedShell = Shells.FirstOrDefault(o => o.DirectoryName == "master");
+			if (SelectedShell == null)
+				SelectedShell = Shells.FirstOrDefault();
+		}
+
+		public SurfacePreviewViewModelShellItem AnalyzeShellDirectory(string path)
+		{
+			var nDir = DictionaryUtility.NormalizePath(path);
+			var descriptPath = DictionaryUtility.ConbinePath(nDir, "descript.txt");
+			if (System.IO.File.Exists(descriptPath))
+			{
+				try
 				{
 					var parser = new CsvBuilder();
 					parser.Deserialize(System.IO.File.ReadAllText(descriptPath, Constants.EncodingShiftJis));
@@ -1538,20 +1582,33 @@ namespace Satolist2
 					if (type == "shell" && !string.IsNullOrEmpty(name))
 					{
 						var s = new SurfacePreviewViewModelShellItem();
-						s.DirectoryName = System.IO.Path.GetFileName(dir);
-						s.DirectoryFullPath = DictionaryUtility.NormalizePath(dir);
+						s.DirectoryName = System.IO.Path.GetFileName(path);
+						s.DirectoryFullPath = nDir;
 						s.ShellName = name;
-						shells.Add(s);
+						return s;
 					}
 				}
+				catch { }
 			}
+			return null;
+		}
 
-			//アイテム選択
-			SelectedShell = Shells.FirstOrDefault(o => o.DirectoryName == MainViewModel.EditorSettings.GhostTemporarySettings.SurfacePreviewShellDirectory);
-			if (SelectedShell == null)
-				SelectedShell = Shells.FirstOrDefault(o => o.DirectoryName == "master");
-			if (SelectedShell == null)
-				SelectedShell = Shells.FirstOrDefault();
+		//ダイアログを表示してシェルを選択
+		public bool SelectShellFromPath()
+		{
+			var dialog = new CommonOpenFileDialog();
+			dialog.IsFolderPicker = true;
+
+			if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
+			{
+				var shell = AnalyzeShellDirectory(dialog.FileName);
+				if (shell == null)
+					return false;
+
+				shell.IsTemporary = true;	//一時的な選択としてゴーストローカルデータには反映しない
+				SelectedShell = shell;
+			}
+			return true;
 		}
 
 		public void ReloadPreviewData()
@@ -1564,7 +1621,7 @@ namespace Satolist2
 			if (item != null)
 			{
 				imageCache = new ShellImageCache(DictionaryUtility.ConbinePath(item.DirectoryFullPath, SurfacePreviewMetaData.SurfacePreviewPath));
-				var metadataPath = DictionaryUtility.ConbinePath(Main.Ghost.FullPath, "shell", item.DirectoryName, SurfacePreviewMetaData.SurfacePreviewPath, SurfacePreviewMetaData.SurfacePreviewMetadataPath);
+				var metadataPath = DictionaryUtility.ConbinePath(item.DirectoryFullPath, SurfacePreviewMetaData.SurfacePreviewPath, SurfacePreviewMetaData.SurfacePreviewMetadataPath);
 				try
 				{
 					SurfacePreviewData = JsonUtility.DeserializeFromFile<Core.SurfacePreviewMetaData>(metadataPath);
@@ -1588,6 +1645,8 @@ namespace Satolist2
 			public string DirectoryName { get; set; }
 			public string DirectoryFullPath { get; set; }
 			public string ShellName { get; set; }
+			public bool IsTemporary { get; set; }
+
 			public bool IsSelected
 			{
 				get => isSelected;

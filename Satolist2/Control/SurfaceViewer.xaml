@@ -15,7 +15,7 @@
 		</ResourceDictionary>
 		
 	</UserControl.Resources>
-	<Grid Visibility="{Binding Main.IsGhostEnable, Converter={StaticResource BoolToVisibilityConverter}}">
+	<Grid Visibility="{Binding Main.SurfacePreview.IsShellEnable, Converter={StaticResource BoolToVisibilityConverter}}">
 		<Grid Visibility="{Binding IsPreviewDataEnable, Converter={StaticResource InvertBoolToVisibilityConverter}}">
 			<StackPanel>
 				<TextBlock Text="プレビューデータが作成されていません。&#xa;ボタンを押すとシェルからプレビュー画像を作成します。" Margin="5" TextWrapping="Wrap"/>
