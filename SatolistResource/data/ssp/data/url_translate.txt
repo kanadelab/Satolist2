@@ -112,3 +112,5 @@
 2020/10/01 05:00:00	http://snownight.sakura.ne.jp/	http://snowfragment.sakura.ne.jp/
 2021/01/15 17:48:17	https://stheskeleton.usite.pro/	https://zichqec.github.io/s-the-skeleton/updates/ghosts/
 2021/01/29 22:16:20	http://sosiremi.appspot.com/ghost/whitesword/	http://nanachi.sakura.ne.jp/narnaloader/data/WhiteSword/
+2022/05/12 09:07:00	http://sakura.nanika.jp/	http://sakura.shillest.net/
+2022/05/12 09:07:00	http://emily.nanika.jp/	http://fa-x.shillest.net/
