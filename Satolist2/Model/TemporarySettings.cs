@@ -36,8 +36,6 @@ namespace Satolist2.Model
 				GhostHistory.Remove(item);
 			}
 			GhostHistory.Insert(0, history);
-
-			//TODO: 多くなりすぎたら捨てる
 		}
 
 		public OpenGhostHistory AddHistory(string path, string name, bool isFavorite)
@@ -49,6 +47,13 @@ namespace Satolist2.Model
 			history.IsFavorite = isFavorite;
 			GhostHistory.Insert(0, history);
 			return history;
+		}
+
+		public void RemoveHistory(string path)
+		{
+			var item = GhostHistory.FirstOrDefault(o => o.Path == path);
+			if (item != null)
+				GhostHistory.Remove(item);
 		}
 
 		//ヒストリーを整理
