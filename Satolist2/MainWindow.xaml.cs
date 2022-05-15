@@ -1191,6 +1191,16 @@ namespace Satolist2
 					}
 					*/
 
+					//編集中のゴーストが起動していたら、シェルをリロードする。きせかえの状態を吐かせるため
+					if (Ghost != null)
+					{
+						if (SakuraFMOReader.Exists(Ghost))
+						{
+							Satorite.SendSSTP(Ghost, @"\![reload,shell]\m[{0},{1},{2}]", true, true);
+							LogMessage.AddLog("起動中のゴーストの状態をプレビューに反映するため、動作中のシェルをリロードしました。");
+						}
+					}
+
 					var gen = new Core.SurfacePreviewImageGenerator();
 					var dialog = new ProgressDialog(this);
 					dialog.DataContext.Title = "サーフェスプレビューの作成中";
