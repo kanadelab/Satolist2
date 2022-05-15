@@ -100,6 +100,18 @@
 			<ListView.ItemContainerStyle>
 				<Style TargetType="ListViewItem" BasedOn="{StaticResource {x:Type ListViewItem}}">
 					<EventSetter Event="MouseDoubleClick" Handler="ListViewItem_MouseDoubleClick" />
+					<Setter Property="ContextMenu">
+						<Setter.Value>
+							<ContextMenu>
+								<MenuItem Header="開く" FontWeight="Bold" Command="{Binding OpenCommand}" />
+								<Separator />
+								<MenuItem Header="エクスプローラで開く" Command="{Binding OpenExplorerCommand}" />
+								<MenuItem Header="お気に入り" Command="{Binding ToggleFavoriteCommand}" IsChecked="{Binding IsFavorite}" />
+								<Separator />
+								<MenuItem Header="一覧から削除" Command="{Binding RemoveCommand}" />
+							</ContextMenu>
+						</Setter.Value>
+					</Setter>
 				</Style>
 			</ListView.ItemContainerStyle>
 

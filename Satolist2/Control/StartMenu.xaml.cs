@@ -83,12 +83,26 @@ namespace Satolist2.Control
 			RefleshList();
 		}
 
+		//選択中のゴーストを開く
 		public void OpenSelectedGhost()
 		{
-			if(selectedItem != null)
+			OpenGhost(selectedItem);
+		}
+
+		//ゴーストを開く
+		public void OpenGhost(GhostItemViewModel item)
+		{
+			if (selectedItem != null)
 			{
-				mainVm.MainWindow.OpenGhost(selectedItem.Path, executablePath: selectedItem.RunningExecutablePath);
+				mainVm.MainWindow.OpenGhost(item.Path, executablePath: item.RunningExecutablePath);
 			}
+		}
+
+		//RemoteHistory
+		public void RemoveHistory(GhostItemViewModel item)
+		{
+			items.Remove(item);
+			MainViewModel.EditorSettings.TemporarySettings.RemoveHistory(item.Path);
 		}
 
 		//リスト表示の再構築
@@ -102,7 +116,7 @@ namespace Satolist2.Control
 			//起動中のゴーストを一番最初に表示
 			foreach (var item in fmoReader.Records)
 			{
-				items.Add(new GhostItemViewModel()
+				items.Add(new GhostItemViewModel(this)
 				{
 					Name = item.Value.GhostName,
 					Path = item.Value.GhostPath,
@@ -111,14 +125,14 @@ namespace Satolist2.Control
 				});
 			}
 
-			//ヒストリーから表示
-			foreach (var item in MainViewModel.EditorSettings.TemporarySettings.GhostHistory)
+			//ヒストリーから表示(お気に入りを優先)
+			foreach (var item in MainViewModel.EditorSettings.TemporarySettings.GhostHistory.OrderBy(o => !o.IsFavorite))
 			{
 				//既に起動中ならスキップ
 				var foundItem = items.FirstOrDefault(o => o.Path == item.Path);
 				if (foundItem == null)
 				{
-					var addItem = new GhostItemViewModel()
+					var addItem = new GhostItemViewModel(this)
 					{
 						Name = item.Name,
 						Path = item.Path
@@ -155,7 +169,9 @@ namespace Satolist2.Control
 		public string RunningExecutablePath { get; set; }
 
 		public ActionCommand ToggleFavoriteCommand { get;}
-	
+		public ActionCommand OpenCommand { get; }
+		public ActionCommand OpenExplorerCommand { get; }
+		public ActionCommand RemoveCommand { get; }
 
 		public bool IsFavorite
 		{
@@ -181,7 +197,7 @@ namespace Satolist2.Control
 			}
 		}
 
-		public GhostItemViewModel()
+		public GhostItemViewModel(StartMenuViewModel parent)
 		{
 			//お気に入り設定をトグル
 			ToggleFavoriteCommand = new ActionCommand(
@@ -189,6 +205,35 @@ namespace Satolist2.Control
 				{
 					IsFavorite = !IsFavorite;
 				}
+				);
+
+			//開く
+			OpenCommand = new ActionCommand(
+				o =>
+				{
+					parent.OpenGhost(this);
+				}
+				);
+
+			//エクスプローラで開く
+			OpenExplorerCommand = new ActionCommand(
+				o =>
+				{
+					try
+					{
+						System.Diagnostics.Process.Start(Path);
+					}
+					catch { }
+				}
+				);
+
+			//削除
+			RemoveCommand = new ActionCommand(
+				o =>
+				{
+					parent.RemoveHistory(this);
+				},
+				o => !IsRunning	//起動中だと無条件に表示するので削除なし
 				);
 		}
 
