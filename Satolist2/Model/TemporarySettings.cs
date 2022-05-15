@@ -31,7 +31,10 @@ namespace Satolist2.Model
 			var history = new OpenGhostHistory(ghost.GhostDescriptName, ghost.FullPath);
 			var item = GhostHistory.FirstOrDefault(o => o.IsEquals(history));
 			if (item != null)
+			{
+				history.IsFavorite = item.IsFavorite;	//ただ移動するだけでも良かった？　とりあえず削除と絡めてみる
 				GhostHistory.Remove(item);
+			}
 			GhostHistory.Insert(0, history);
 
 			//TODO: 多くなりすぎたら捨てる
