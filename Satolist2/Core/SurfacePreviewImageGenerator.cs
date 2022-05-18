@@ -279,7 +279,7 @@ namespace Satolist2.Core
 		public void OnCopyData(int msg, IntPtr wparam, IntPtr lparam)
 		{
 			//Executeの戻り、今回のケースだとシェルのパスが来るはず
-			var executeResult = Win32Import.CopyDataStructToString(lparam);
+			var executeResult = Win32Import.CopyDataStructToString(lparam, Win32Import.SSTP_DWDATA);
 			var response = new ProtocolBuilder();
 			response.Deserialize(executeResult);
 

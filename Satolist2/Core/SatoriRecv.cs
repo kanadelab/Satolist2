@@ -92,8 +92,9 @@ namespace Satolist2.Core
 		{
 			if(msg == Win32Import.WM_COPYDATA)	//WM_COPYDATA
 			{
-				var body = Win32Import.CopyDataStructToString(lParam);
-				Data(body);
+				var body = Win32Import.CopyDataStructToString(lParam, Win32Import.RECV_DWDATA);
+				if(body != null)
+					Data(body);
 			}
 			return Win32Import.DefWindowProc(hWnd, msg, wParam, lParam);
 		}
@@ -115,6 +116,7 @@ namespace Satolist2.Core
 		public const int FALSE = 0;
 
 		public static readonly UIntPtr SSTP_DWDATA = (UIntPtr)9801;
+		public static readonly UIntPtr RECV_DWDATA = (UIntPtr)0;
 
 		public delegate IntPtr WndProcDelegate(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam);
 		public struct NativeWindowClassEx
@@ -143,12 +145,13 @@ namespace Satolist2.Core
 			public IntPtr lpData;
 		}
 
-		public static string CopyDataStructToString(IntPtr lParam)
+		public static string CopyDataStructToString(IntPtr lParam, UIntPtr targetDwData )
 		{
 			CopyDataStruct cds = (CopyDataStruct)Marshal.PtrToStructure<CopyDataStruct>(lParam);
-			if (cds.dwData != SSTP_DWDATA)
-				return null;	//想定外
 
+			if (cds.dwData != targetDwData)
+				return null;	//想定外
+			
 			byte[] data = new byte[cds.cbData];
 			Marshal.Copy(cds.lpData, data, 0, data.Length);
 			var body = Constants.EncodingShiftJis.GetString(data);
