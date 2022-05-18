@@ -24,7 +24,7 @@
 					</TextBlock.Style>
 				</TextBlock>
 
-				<local:WartermarkedTextBox Text="{Binding SearchString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Wartermark="検索" Width="200" x:Name="MainTextBox">
+				<local:WartermarkedTextBox Text="{Binding SearchString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" Wartermark="検索" Width="200" x:Name="MainTextBox">
 					<local:WartermarkedTextBox.InputBindings>
 						<KeyBinding Gesture="Esc" Command="{Binding CloseSearchBoxCommand}" />
 						<KeyBinding Gesture="Enter" Command="{Binding SearchNextCommand}" />
@@ -33,18 +33,18 @@
 				</local:WartermarkedTextBox>
 				
 				<!--次検索-->
-				<Button Command="{Binding SearchNextCommand}" Focusable="False">
-					<Path Fill="Black" Margin="-5 -5 0 0" Data="{StaticResource SearchNextIcon}" />
+				<Button Command="{Binding SearchNextCommand}" Focusable="False" Padding="2">
+					<Path Fill="Gray" Stretch="UniformToFill" Data="{StaticResource SearchNextIcon}" />
 				</Button>
 
 				<!--前検索-->
-				<Button Command="{Binding SearchPrevCommand}" Focusable="False">
-					<Path Fill="Black" Margin="-5 -5 0 0" Data="{StaticResource SearchPrevIcon}" />
+				<Button Command="{Binding SearchPrevCommand}" Focusable="False" Padding="2">
+					<Path Fill="Gray" Stretch="UniformToFill" Data="{StaticResource SearchPrevIcon}" />
 				</Button>
 
 				<!--閉じる-->
-				<Button Command="{Binding CloseSearchBoxCommand}" Focusable="False">
-					<Path Fill="Black" Margin="-5 -5 0 0" Data="{StaticResource RemoveIcon}" />
+				<Button Command="{Binding CloseSearchBoxCommand}" Focusable="False" Padding="2">
+					<Path Fill="Gray" Stretch="UniformToFill" Data="{StaticResource RemoveIcon}" />
 				</Button>
 			</StackPanel>
 		</Border>
