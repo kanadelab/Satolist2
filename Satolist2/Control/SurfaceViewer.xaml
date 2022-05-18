@@ -35,8 +35,6 @@
 					<ColumnDefinition Width="*" />
 				</Grid.ColumnDefinitions>
 
-				
-
 				<!--サーフェス画像本体-->
 				<Image Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Top" x:Name="SurfaceImage"
 					   IsHitTestVisible="False" Source="{Binding SelectedSurfaceBitmap, Converter={StaticResource BitmapConverter}}" Width="{Binding SelectedSurfaceBitmap.Width}" />
@@ -163,8 +161,23 @@
 				</Canvas>
 
 				<!--サーフェスリスト-->
-				<ListView Grid.Column="0" ItemsSource="{Binding SurfaceList}" SelectedItem="{Binding SelectedSurface}" DisplayMemberPath="Label"
-						  ItemContainerStyle="{StaticResource {x:Type ListViewItem}}"/>
+				<ListView Grid.Column="0" ItemsSource="{Binding SurfaceList}" SelectedItem="{Binding SelectedSurface}" DisplayMemberPath="Label">
+					<ListView.ItemContainerStyle>
+						<Style TargetType="ListViewItem" BasedOn="{StaticResource {x:Type ListViewItem}}">
+							<EventSetter Event="MouseDoubleClick" Handler="ListViewItem_MouseDoubleClick" />
+							<Setter Property="ContextMenu">
+								<Setter.Value>
+									<ContextMenu>
+										<MenuItem Header="サーフェス切り替えをトークに挿入" Command="{Binding InsertSurfaceCommand}" />
+										<MenuItem Header="サーフェス切り替えをトークに挿入(さくらスクリプト形式)" Command="{Binding InsertSurfaceCommandSakuraScript}" />
+										<Separator />
+										<MenuItem Header="サーフェス切り替えを起動中のゴーストに送信" Command="{Binding RuntimeChangeSurfaceCommand}" />
+									</ContextMenu>
+								</Setter.Value>
+							</Setter>
+						</Style>
+					</ListView.ItemContainerStyle>
+				</ListView>
 			</Grid>
 
 			<!--生成判定情報-->

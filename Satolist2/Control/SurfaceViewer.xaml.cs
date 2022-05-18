@@ -139,7 +139,15 @@ namespace Satolist2.Control
 			DataContext.CloseCollisionToolCommand?.Execute(null);
 		}
 
-		
+		private void ListViewItem_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+		{
+			//ダブルクリックでスクリプト挿入
+			if (sender is ListViewItem listViewItem)
+			{
+				DataContext.InsertSurfaceToActiveEditor((SurfaceViewerItemViewModel)listViewItem.DataContext);
+			}
+			e.Handled = true;
+		}
 	}
 
 	internal class SurfaceViewerViewModel : NotificationObject, IDockingWindowContent, IControlBindedReceiver
@@ -158,9 +166,10 @@ namespace Satolist2.Control
 		private bool isPreviewDataEnable;
 		private Core.SurfacePreviewMetaData previewData;
 		private ICollectionView surfaceList;
-		private Core.SurfacePreviewMetaDataRecord selectedSurface;
+		private SurfaceViewerItemViewModel selectedSurface;
 		private CollisionType collisionType = CollisionType.Rect;
 		private bool isCollisionMaking;
+		private SurfaceViewerItemViewModel[] items;
 
 		//ドラッグ位置
 		private double dragBeginX;
@@ -433,7 +442,7 @@ namespace Satolist2.Control
 
 		public MainViewModel Main { get; }
 
-		public Core.SurfacePreviewMetaDataRecord SelectedSurface
+		public SurfaceViewerItemViewModel SelectedSurface
 		{
 			get => selectedSurface;
 			set
@@ -454,7 +463,7 @@ namespace Satolist2.Control
 			{
 				if (SelectedSurface != null)
 				{
-					var path = SelectedSurface.FileName;
+					var path = SelectedSurface.Model.FileName;
 					var loadedImage = Main.SurfacePreview.ImageCache.LoadImage(path);
 					return loadedImage.Image;
 				}
@@ -533,10 +542,12 @@ namespace Satolist2.Control
 			{
 				IsPreviewDataEnable = true;
 				previewData = Main.SurfacePreview.SurfacePreviewData;
-				SurfaceList = CollectionViewSource.GetDefaultView(previewData.Items);
+				items = previewData.Items.Select(o => new SurfaceViewerItemViewModel(this, o)).ToArray();
+
+				SurfaceList = CollectionViewSource.GetDefaultView(items);
 				SurfaceList.Filter = (o) =>
 				{
-					var item = (Core.SurfacePreviewMetaDataRecord)o;
+					var item = ((SurfaceViewerItemViewModel)o).Model;
 					return item.IsEnableSurfaceViewer;
 				};
 				SurfaceList.SortDescriptions.Add(new SortDescription("Id", ListSortDirection.Ascending));
@@ -603,9 +614,65 @@ namespace Satolist2.Control
 			this.control = (SurfaceViewer)control;
 		}
 
+		public void InsertSurfaceToActiveEditor(SurfaceViewerItemViewModel item)
+		{
+			var insertStr = string.Format("（{0}）", DictionaryUtility.NumberZen2Han(item.Id.ToString()));
+			Main.InsertToActiveEditor(insertStr); ;
+		}
+
+		public void InsertSurfaceToActiveEditorSakuraScript(SurfaceViewerItemViewModel item)
+		{
+			var insertStr = string.Format(@"\s[{0}]", item.Id.ToString());
+			Main.InsertToActiveEditor(insertStr);
+		}
+
+		public void SendRuntimeChangeSurface(SurfaceViewerItemViewModel item)
+		{
+			var insertStr = string.Format(@"\p[{0}]\s[{1}]", item.Scope, item.Id.ToString());
+			Satorite.SendSSTP(Main.Ghost, insertStr, false, false);
+		}
+
 		public string DockingTitle => "サーフェスビューワ";
 
 		public string DockingContentId => ContentId;
+	}
+
+	internal class SurfaceViewerItemViewModel : NotificationObject
+	{
+		public Core.SurfacePreviewMetaDataRecord Model { get; }
+		public ActionCommand InsertSurfaceCommand { get; }
+		public ActionCommand InsertSurfaceCommandSakuraScript { get; }
+		public ActionCommand RuntimeChangeSurfaceCommand { get; }
+
+		public long Id => Model.Id;
+		public int Scope => Model.Scope;
+		public string Label => Model.Label;
+
+		public SurfaceViewerItemViewModel(SurfaceViewerViewModel parent, Core.SurfacePreviewMetaDataRecord surface)
+		{
+			Model = surface;
+
+			InsertSurfaceCommand = new ActionCommand(
+				o =>
+				{
+					parent.InsertSurfaceToActiveEditor(this);
+				}
+				);
+
+			InsertSurfaceCommandSakuraScript = new ActionCommand(
+				o =>
+				{
+					parent.InsertSurfaceToActiveEditorSakuraScript(this);
+				}
+				);
+
+			RuntimeChangeSurfaceCommand = new ActionCommand(
+				o =>
+				{
+					parent.SendRuntimeChangeSurface(this);
+				}
+				);
+		}
 	}
 	
 	internal class SurfaceViewerPolygonPointViewModel : NotificationObject
