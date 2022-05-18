@@ -12,7 +12,7 @@
 		<Border BorderBrush="DarkGray" BorderThickness="2" Margin="0 0 30 0">
 			<StackPanel Orientation="Horizontal">
 
-				<TextBlock Text="{Binding SearchInformation}" Margin="3 0 3 0">
+				<TextBlock Text="{Binding SearchInformation}" Margin="3 0 3 0" VerticalAlignment="Center">
 					<TextBlock.Style>
 						<Style TargetType="TextBlock">
 							<Style.Triggers>
