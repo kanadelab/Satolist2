@@ -241,7 +241,7 @@ namespace Satolist2.Control
 		{
 			IsHistory = true;
 			historyModel = history;
-			IsFavorite = historyModel.IsFavorite;
+			isFavorite = historyModel.IsFavorite;
 		}
 	}
 }
