@@ -25,7 +25,7 @@ namespace Satolist2.Utility
 		public object ViewModel
 		{
 			//get => GetValue(ViewModelProperty);
-			get => ((System.Windows.Controls.Control)Content).DataContext;
+			get => ((System.Windows.Controls.Control)Content)?.DataContext;
 			set
 			{
 				//古い方のvmはdisposeする
