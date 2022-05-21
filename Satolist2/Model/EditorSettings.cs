@@ -258,6 +258,10 @@ namespace Satolist2.Model
 		[JsonProperty]
 		public bool IsTextModeDefault { get; set; }
 		[JsonProperty]
+		public bool IsEnableUpdateCheck { get; set; }
+		[JsonProperty]
+		public bool IsEnablePreReleaseUpdate { get; set; }
+		[JsonProperty]
 		public int ListedDictionaryInsertEmptyLineCount { get; set; }
 		[JsonProperty]
 		public double TextEditorFontSize { get; set; }
@@ -275,6 +279,9 @@ namespace Satolist2.Model
 			IsTextModeDefault = false;
 			ListedDictionaryInsertEmptyLineCount = 1;
 			TextEditorColors = new Dictionary<string, uint>();
+
+			IsEnableUpdateCheck = true;
+			IsEnablePreReleaseUpdate = true;	//開発版のみ
 		}
 
 		public GeneralSettings Clone()
@@ -287,7 +294,9 @@ namespace Satolist2.Model
 				TextEditorFontName = TextEditorFontName,
 				TextEditorFontSize = TextEditorFontSize,
 				IsEnableDarkMode = IsEnableDarkMode,
-				TextEditorColors = TextEditorColors.ToDictionary(k => k.Key, k => k.Value)
+				TextEditorColors = TextEditorColors.ToDictionary(k => k.Key, k => k.Value),
+				IsEnablePreReleaseUpdate = IsEnablePreReleaseUpdate,
+				IsEnableUpdateCheck = IsEnableUpdateCheck
 			};
 		}
 

@@ -16,6 +16,9 @@ namespace Satolist2
     {
 		protected override void OnStartup(StartupEventArgs e)
 		{
+			//アセンブリ位置をカレントに設定
+			Environment.CurrentDirectory = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+
 			base.OnStartup(e);
 
 			//テーマ設定

@@ -1,4 +1,4 @@
-name: 開発版ビルド
+name: 開発版
 on: [push]
 jobs:
   build:
@@ -17,16 +17,16 @@ jobs:
         shell: cmd
         run: |
           nuget restore Satolist2.sln
-      
-      - name: run msbuild
-        shell: cmd
-        run: |
-          MSBuild.exe Satolist2.sln -property:Configuration=Deploy;Platform="Any CPU" -t:rebuild
 
       - name: set version
         shell: cmd
         run: |
-          echo Satolist Development Version: #%GITHUB_RUN_NUMBER% >> Satolist2\bin\Deploy\version.txt
+          echo namespace Satolist2 { public static class Version { public static string VersionString = "Satoist2 Development Version: #%GITHUB_RUN_NUMBER%"; public static long VersionIndex = %GITHUB_RUN_NUMBER%; } } > Satolist2\Version.cs
+
+      - name: run msbuild
+        shell: cmd
+        run: |
+          MSBuild.exe Satolist2.sln -property:Configuration=Deploy;Platform="Any CPU" -t:rebuild
 
       - name: make filelist
         shell: cmd

@@ -622,9 +622,11 @@ namespace Satolist2
 	//ワークスペースは切り離せるのが望ましそう。Dockのビューモデルとかもくっついてそうだし
 	internal class MainViewModel : NotificationObject
 	{
-		public static EditorSettings EditorSettings { get; private set; }
-		
+		private bool isUpdateAvailable;
+		private string updateVersionLabel;
+		private UpdateReleaseInfo updateInfo;
 
+		public static EditorSettings EditorSettings { get; private set; }
 		public MainWindow MainWindow { get; }
 		public GhostModel Ghost { get; private set; }
 		public bool IsGhostEnable { get; private set; }
@@ -680,6 +682,7 @@ namespace Satolist2
 		public ActionCommand SelectPreviewShellDirectoryCommand { get; }
 		public ActionCommand ShowLogMessageCommand { get; }
 		public ActionCommand ClearLogMessageCommand { get; }
+		public ActionCommand NetworkUpdateCommand { get; }
 
 		//設定情報
 		public InsertItemPaletteModel InsertPalette
@@ -725,8 +728,30 @@ namespace Satolist2
 			}
 		}
 
+		public bool IsUpdateAvailable
+		{
+			get => isUpdateAvailable;
+			set
+			{
+				isUpdateAvailable = value;
+				NotifyChanged();
+			}
+		}
+
+		public string UpdateVersionLabel
+		{
+			get => updateVersionLabel;
+			set
+			{
+				updateVersionLabel = value;
+				NotifyChanged();
+			}
+		}
+
 		public MainViewModel(MainWindow mainWindow, MainViewModelInitializeData initializeData = null)
 		{
+			updateVersionLabel = string.Empty;
+
 			initializeData = initializeData ?? new MainViewModelInitializeData();
 			MainWindow = mainWindow;
 			Ghost = initializeData.Ghost;
@@ -764,6 +789,9 @@ namespace Satolist2
 					MessageBox.Show("さとりすとの起動に必要な設定ファイルのロードに失敗したため起動できません。\r\nさとりすとを上書き再インストールすると解決するかもしれません。\r\n\r\n" + ex, "エラー");
 					Environment.Exit(1);
 				}
+
+				//ネットワークアップデート
+				CheckNetworkUpdate(EditorSettings.GeneralSettings.IsEnablePreReleaseUpdate);
 			}
 
 			//ゴーストのローカル情報のロード
@@ -1276,6 +1304,12 @@ namespace Satolist2
 				}
 				);
 
+			NetworkUpdateCommand = new ActionCommand(
+				o =>
+				{
+					BootNetworkUpdator();
+				}
+				);
 
 			//読込エラーが発生している場合に通知
 			List<ErrorListDialogItemViewModel> errorItems = new List<ErrorListDialogItemViewModel>();
@@ -1459,7 +1493,79 @@ namespace Satolist2
 				}
 			}
 		}
-		
+
+		private void CheckNetworkUpdate(bool acceptReleaseBuild)
+		{
+#if DEPLOY || true
+			Task.Run(() =>
+			{
+				var release = UpdateChecker.GetRelease(acceptReleaseBuild);
+				if(release != null)
+				{
+					updateInfo = release;
+
+					//githubにあるほうが自分よりあたらしければアップデートを通知する
+					if (release.VersionIndex > Version.VersionIndex)
+					{
+						MainWindow.Dispatcher.BeginInvoke(new Action(() =>
+					  {
+						  IsUpdateAvailable = true;
+						  UpdateVersionLabel = release.Label;
+					  }
+						));
+					}
+				}
+			}
+			);
+#endif
+
+#if false
+			IsUpdateAvailable = true;
+			UpdateVersionLabel = "test";
+			updateInfo = new UpdateReleaseInfo()
+			{
+				Description = "てすと",
+				Label = "test",
+				TagName = "test",
+				VersionIndex = 1,
+				ZipURL = "https://github.com/kanadelab/Satolist2/releases/download/dev70/dev70.zip"
+			};
+#endif
+		}
+
+		//ネットワーク更新を行う
+		private void BootNetworkUpdator()
+		{
+			try
+			{
+				//さとりすとのアップデータをテンポラリに切り離して隔離
+				string temporaryUpdatorPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "Satolist2Updator");
+				System.IO.Directory.CreateDirectory(temporaryUpdatorPath);
+
+				//更新に必要なファイル
+				string[] updatorFiles =
+				{
+					"SatolistUpdator.exe"
+				};
+
+				foreach (var f in updatorFiles)
+				{
+					System.IO.File.Copy(f, System.IO.Path.Combine(temporaryUpdatorPath, f), true);
+				}
+
+				//現在の実行ファイル名を確認
+				var executablePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+
+				//アップデータを起動
+				IsUpdateAvailable = false;  //多重実行できないように
+				ProcessStartInfo info = new ProcessStartInfo();
+				info.FileName = System.IO.Path.Combine(temporaryUpdatorPath, "SatolistUpdator.exe");
+				info.Arguments = string.Format(@"""{0}"" ""{1}""", executablePath, updateInfo.ZipURL);
+				info.WorkingDirectory = Environment.CurrentDirectory;
+				Process.Start(info);
+			}
+			catch { }
+		}
 
 	}
 
@@ -1647,6 +1753,8 @@ namespace Satolist2
 				SurfacePreviewData = null;
 			}
 		}
+
+		
 
 		internal class SurfacePreviewViewModelShellItem : NotificationObject
 		{

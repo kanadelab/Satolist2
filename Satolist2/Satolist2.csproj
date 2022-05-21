@@ -262,6 +262,8 @@
     <Compile Include="Utility\SyntaxHighlight.cs" />
     <Compile Include="Utility\TemporaryDirectory.cs" />
     <Compile Include="Model\TemporarySettings.cs" />
+    <Compile Include="Utility\UpdateChecker.cs" />
+    <Compile Include="Version.cs" />
     <Page Include="Control\BindablePasswordBox.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -465,6 +467,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SatolistUpdator\SatolistUpdator.csproj">
+      <Project>{789c550a-4b6a-40bb-9355-10d7c27eee40}</Project>
+      <Name>SatolistUpdator</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="..\SatolistResource\SatolistResource.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

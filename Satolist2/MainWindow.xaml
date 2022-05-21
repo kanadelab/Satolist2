@@ -16,8 +16,7 @@
 	</UserControl.InputBindings>
 	<UserControl.Resources>
 		<ResourceDictionary>
-			<ResourceDictionary.MergedDictionaries>
-			</ResourceDictionary.MergedDictionaries>
+			<BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
 		</ResourceDictionary>
 	</UserControl.Resources>
 	<Grid>
@@ -219,19 +218,42 @@
 		</avalonDock:DockingManager>
 
 		<Grid Grid.Row="2">
-			<Button Command="{Binding ShowLogMessageCommand}" VerticalAlignment="Center" Margin="3" MaxHeight="20">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="*" />
+				<ColumnDefinition Width="auto" />
+			</Grid.ColumnDefinitions>
+			
+			<Button Grid.Column="0" Command="{Binding ShowLogMessageCommand}" VerticalAlignment="Center" Margin="3" MaxHeight="20">
 				<Button.Template>
 					<ControlTemplate>
 						<Grid>
 							<Rectangle Fill="Transparent" />
 							<StackPanel Orientation="Horizontal" Margin="5 3 0 3">
-								<Path Fill="White" Stretch="Uniform" Data="{StaticResource LogMessageIcon}" VerticalAlignment="Center" />
+								<Path Fill="White" Stretch="Uniform" Data="{StaticResource LogMessageIcon}" VerticalAlignment="Center" MaxHeight="18" />
 								<TextBlock Margin="6 0 0 0" Text="{Binding LogMessage.NewestLogMessage.Message}" Foreground="White" VerticalAlignment="Center"/>
 							</StackPanel>
 						</Grid>
 					</ControlTemplate>
 				</Button.Template>
 			</Button>
+
+			<Button Grid.Column="1" VerticalAlignment="Center" Margin="3" MaxHeight="20" Foreground="White" Command="{Binding NetworkUpdateCommand}"
+					Visibility="{Binding IsUpdateAvailable, Converter={StaticResource BoolToVisibilityConverter}}">
+				<Button.Template>
+					<ControlTemplate>
+						<Grid>
+							<Rectangle Fill="Transparent" />
+							<StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+								<TextBlock Text="アップデートがあります(" />
+								<TextBlock Text="{Binding UpdateVersionLabel}" />
+								<TextBlock Text=")" Margin="0 0 5 0" />
+								<Path Fill="White" Data="{StaticResource SatolistUpdateIcon}" Stretch="Uniform" MaxHeight="18" Margin="0 0 5 0" />
+							</StackPanel>
+						</Grid>
+					</ControlTemplate>
+				</Button.Template>
+			</Button>
+			
 			<Popup x:Name="LogPopup" StaysOpen="False" Placement="Top">
 				<StackPanel >
 					<Menu>

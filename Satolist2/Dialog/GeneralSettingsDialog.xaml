@@ -40,6 +40,10 @@
 							<ComboBoxItem>5</ComboBoxItem>
 						</ComboBox>
 					</StackPanel>
+
+					<CheckBox Content="アップデートの自動確認" IsChecked="{Binding Model.IsEnableUpdateCheck, Mode=TwoWay}" Margin="3"/>
+					<CheckBox Content="プレリリースビルドを利用する(より不安定な可能性があります)" IsChecked="{Binding Model.IsEnablePreReleaseUpdate, Mode=TwoWay}" Margin="15 3 3 3" />
+
 				</StackPanel>
 			</TabItem>
 
