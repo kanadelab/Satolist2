@@ -26,7 +26,14 @@ jobs:
       - name: set version
         shell: cmd
         run: |
-          echo Satolist Development Version: #%GITHUB_RUN_NUMBER% >> Satolist2/bin/Deploy/version.txt
+          echo Satolist Development Version: #%GITHUB_RUN_NUMBER% >> Satolist2\bin\Deploy\version.txt
+
+      - name: make filelist
+        shell: cmd
+        run: |
+          pushd Satolist2\bin\Deploy\data
+          ..\..\..\..\UpdateFileListGenerator\bin\Deploy\UpdateFileListGenerator.exe files
+          popd
 
       - name: upload artifacts
         uses: actions/upload-artifact@v3
