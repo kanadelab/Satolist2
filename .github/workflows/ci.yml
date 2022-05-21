@@ -31,8 +31,8 @@ jobs:
       - name: make filelist
         shell: cmd
         run: |
-          pushd Satolist2\bin\Deploy\data
-          ..\..\..\..\UpdateFileListGenerator\bin\Deploy\UpdateFileListGenerator.exe files
+          pushd Satolist2\bin\Deploy
+          ..\..\..\UpdateFileListGenerator\bin\Deploy\UpdateFileListGenerator.exe data\files
           popd
 
       - name: upload artifacts
