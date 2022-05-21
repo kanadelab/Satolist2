@@ -241,7 +241,7 @@ namespace SatolistUpdator
 		{
 			if(IsRunningDuplecatedEditorProcess())
 			{
-				MessageBox.Show("アップデートするには起動中のさとりすとをすべて終了してください。", "さとりすと ネットワークアップデータ", MessageBoxButton.OK, MessageBoxImage.Information);
+				MessageBox.Show("アップデートするには起動中のさとりすとをすべて終了してください。", "さとりすと ネットワーク更新", MessageBoxButton.OK, MessageBoxImage.Information);
 				return;
 			}
 
@@ -280,7 +280,7 @@ namespace SatolistUpdator
 				{
 					MainWindow.Dispatcher.Invoke(() =>
 					{
-						Message = "アップデートに失敗しました。";
+						Message = "アップデートに失敗しました。PCの再起動や手動の上書き更新を試すと良いかもしれません。";
 						NotifyFailed();
 					}
 					);
@@ -382,6 +382,9 @@ namespace SatolistUpdator
 				Directory.CreateDirectory(Path.GetDirectoryName(targetFilePath));
 				File.Copy(extractFilePath, targetFilePath, true);
 			}
+
+			//てすと
+			throw new Exception();
 		}
 
 		//失敗時にバックアップから復元

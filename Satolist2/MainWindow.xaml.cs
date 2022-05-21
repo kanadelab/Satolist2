@@ -1519,18 +1519,6 @@ namespace Satolist2
 			);
 #endif
 
-#if false
-			IsUpdateAvailable = true;
-			UpdateVersionLabel = "test";
-			updateInfo = new UpdateReleaseInfo()
-			{
-				Description = "てすと",
-				Label = "test",
-				TagName = "test",
-				VersionIndex = 1,
-				ZipURL = "https://github.com/kanadelab/Satolist2/releases/download/dev70/dev70.zip"
-			};
-#endif
 		}
 
 		//ネットワーク更新を行う

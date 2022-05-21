@@ -5,14 +5,14 @@
 		xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 		xmlns:local="clr-namespace:SatolistUpdator"
 		mc:Ignorable="d"
-		Title="さとりすと ネットワーク更新" Height="150" Width="400">
+		Title="さとりすと ネットワーク更新" Height="130" Width="500">
 	<Window.Resources>
 		<ResourceDictionary>
 			<BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
 		</ResourceDictionary>
 	</Window.Resources>
 	<StackPanel>
-		<TextBlock Text="{Binding Message, FallbackValue=さとりすとのネットワークアップデート}" Margin="3" />
+		<TextBlock Text="{Binding Message, FallbackValue=アップデート}" Margin="3" TextWrapping="WrapWithOverflow"/>
 		<ProgressBar IsIndeterminate="True" MinHeight="20" Margin="3">
 			<ProgressBar.Style>
 				<Style TargetType="ProgressBar">
@@ -25,9 +25,9 @@
 			</ProgressBar.Style>
 		</ProgressBar>
 		<StackPanel HorizontalAlignment="Right" Orientation="Horizontal" Margin="3">
-			<Button Content="アップデート開始" Margin="3" MinWidth="50" Command="{Binding UpdateButtonCommand}" Visibility="{Binding ShowUpdateButton, Converter={StaticResource BooleanToVisibilityConverter}}" />
-			<Button Content="閉じる(さとりすとを起動)" MinWidth="50" Margin="3" Command="{Binding BootSatolistButtonCommand}" Visibility="{Binding ShowBootSatolistButton, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-			<Button Content="閉じる" MinWidth="50" Margin="3" Command="{Binding CloseButtonCommand}" Visibility="{Binding ShowCloseButton, Converter={StaticResource BooleanToVisibilityConverter}}" />
+			<Button Content="アップデート開始" Margin="3" MinWidth="100" MinHeight="25" Command="{Binding UpdateButtonCommand}" Visibility="{Binding ShowUpdateButton, Converter={StaticResource BooleanToVisibilityConverter}}" />
+			<Button Content="閉じる(さとりすとを起動)" MinWidth="100" MinHeight="25" Margin="3" Command="{Binding BootSatolistButtonCommand}" Visibility="{Binding ShowBootSatolistButton, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+			<Button Content="閉じる" MinWidth="100" MinHeight="25" Margin="3" Command="{Binding CloseButtonCommand}" Visibility="{Binding ShowCloseButton, Converter={StaticResource BooleanToVisibilityConverter}}" />
 		</StackPanel>
 	</StackPanel>
 </Window>
