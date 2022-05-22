@@ -30,11 +30,11 @@ https://creativecommons.org/licenses/by-nc/4.0/deed.ja
 ### 使用素材
 * 二次配布の許可を頂いています  
 https://colorbox.saloon.jp/ghost/archive/ghost_free/index.htm
- * ゴーストキット改良版Plus
+  * ゴーストキット改良版Plus
 
 * 二次配布可能なアプリケーションを同梱しています  
 http://ssp.shillest.net/ 
- * SSP (SatolistResource/data/ssp)
+  * SSP (SatolistResource/data/ssp)
 
 * SatolistResource/data/template/satori_license.txt によってライセンスされています。  
 https://github.com/ponapalt/satoriya-shiori
