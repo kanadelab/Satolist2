@@ -28,8 +28,21 @@ https://creativecommons.org/licenses/by-nc/4.0/deed.ja
 ただし下記の素材をお借りしていますので、それらを含んだ扱いについてはそれぞれのライセンスに従ってご利用下さい。
 
 ### 使用素材
-* SatolistResource/template/satori_license.txt によってライセンスされています。
-  * 里々 (SatolistResource/template/satori.dll)
+* 二次配布の許可を頂いています
+https://colorbox.saloon.jp/ghost/archive/ghost_free/index.htm
+ * ゴーストキット改良版Plus
+
+* 二次配布可能なアプリケーションを同梱しています
+http://ssp.shillest.net/ 
+ * SSP (SatolistResource/data/ssp)
+
+* SatolistResource/data/template/satori_license.txt によってライセンスされています。
+https://github.com/ponapalt/satoriya-shiori
+  * 里々 (SatolistResource/data/template/satori.dll)
+
+* 二次配布可能な素材を使用しています
+http://nore.bake-neko.net/shell.html
+  * 狐風味 (SatolistResource/data/template/shell/master)
 
 * Microsoft Public License (Ms-PL) ライセンスのパッケージを使用しています  
 https://opensource.org/licenses/MS-PL  
