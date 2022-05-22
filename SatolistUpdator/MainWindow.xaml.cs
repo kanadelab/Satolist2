@@ -382,9 +382,6 @@ namespace SatolistUpdator
 				Directory.CreateDirectory(Path.GetDirectoryName(targetFilePath));
 				File.Copy(extractFilePath, targetFilePath, true);
 			}
-
-			//てすと
-			throw new Exception();
 		}
 
 		//失敗時にバックアップから復元
