@@ -259,6 +259,9 @@ namespace Satolist2.Utility
 			cancellationToken?.ThrowIfCancellationRequested();
 			progressHandler?.Invoke(new Progress() { UseProgress = true, Message="ファイルアップロードを開始します。" });
 
+			//スキップ数を表示するのでもっておく
+			int skipCount = 0;
+
 			//更新ファイルベースで更新を行う
 			for(int i = 0; i < uploadFiles.Count; i++)
 			{
@@ -277,8 +280,10 @@ namespace Satolist2.Utility
 					if(hash == diff.Item1 && size == diff.Item2)
 					{
 						//差分一致につきスキップ
-						var skipMessage = string.Format("{1}/{2} skip: {0}", item.Item1, i, uploadFiles.Count);
-						progressHandler?.Invoke(new Progress() { UseProgress = true, Value = progressValue, Message = skipMessage });
+						//出力すると重いので出力しないでおく
+						//var skipMessage = string.Format("{1}/{2} skip: {0}", item.Item1, i, uploadFiles.Count);
+						//progressHandler?.Invoke(new Progress() { UseProgress = true, Value = progressValue, Message = skipMessage });
+						skipCount++;
 						continue;
 					}
 				}
@@ -288,6 +293,9 @@ namespace Satolist2.Utility
 				progressHandler?.Invoke(new Progress() { UseProgress = true, Value = progressValue, Message = uploadMessage });
 				ftpClient.UploadFile(fileName, remoteFileName);
 			}
+
+			var skipMessage = string.Format("差分の無い{0}個のファイルをスキップしました。", skipCount);
+			progressHandler?.Invoke(new Progress() { UseProgress = false, Message = skipMessage });
 		}
 
 		//ftpでnarをアップロードする
