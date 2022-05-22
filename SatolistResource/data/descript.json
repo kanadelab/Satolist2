@@ -13,7 +13,7 @@
 		"Type": "String"
 	},
 	{
-		"Property": "craftmaiw",
+		"Property": "craftmanw",
 		"Description": "作者名",
 		"Help": "例:湯空さとり",
 		"Type": "String"
