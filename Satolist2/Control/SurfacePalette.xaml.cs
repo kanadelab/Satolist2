@@ -145,11 +145,13 @@ namespace Satolist2.Control
 
 		public void SurfaceLoadTask(CancellationToken cancelObject)
 		{
+			bool isFirstImage = true;
 			foreach(var vm in items)
 			{
 				var image = vm.ImageCache.LoadImage(vm.FileName);
 				if (image.Image != null)
 				{
+					bool isGenerate = isFirstImage;
 					double ex = vm.Expand <= 0.0 ? 1.0 : vm.Expand;
 					System.Drawing.Rectangle r = new System.Drawing.Rectangle(vm.OffsetX, vm.OffsetY, (int)(vm.SizeX / ex), (int)(vm.SizeY / ex));
 					var cloneBitmap = image.Image.Clone(r, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
@@ -157,7 +159,23 @@ namespace Satolist2.Control
 					Main.MainWindow.Dispatcher.BeginInvoke(new Action(() =>
 				   {
 					   vm.Image = cloneBitmap;
+
+					   if (isGenerate)
+					   {
+						   try
+						   {
+							   //データがあったら、サムネイルを生成してprofileに保存しておく
+							   //スタートメニューでつかう
+							   var ghostPreviewPath = DictionaryUtility.ConbinePath(Main.Ghost.FullDictionaryPath, "profile/satolist");
+							   System.IO.Directory.CreateDirectory(ghostPreviewPath);
+							   vm.Image.Save(DictionaryUtility.ConbinePath(ghostPreviewPath, "preview.png"), System.Drawing.Imaging.ImageFormat.Png);
+						   }
+						   catch { }
+					   }
 				   }), System.Windows.Threading.DispatcherPriority.ApplicationIdle);
+
+					//1枚だけサムネ出力
+					isFirstImage = false;
 				}
 
 				if (cancelObject.IsCancellationRequested)
@@ -236,30 +254,5 @@ namespace Satolist2.Control
 				);
 		}
 	}
-
-	//SurfacePaletteViewModelの示す情報で画像をクリップ
-	internal class SurfacePaletteViewModelToImageSourceConverter : IValueConverter
-	{
-		private static BitmapImageSourceConverter innerConverter = new BitmapImageSourceConverter();
-		public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-		{
-			if (value is SurfacePaletteItemViewModel vm)
-			{
-				if (vm.Image != null)
-				{
-					double ex = vm.Expand <= 0.0 ? 1.0 : vm.Expand;
-					System.Drawing.Rectangle r = new System.Drawing.Rectangle(vm.OffsetX, vm.OffsetY, (int)(vm.SizeX / ex), (int)(vm.SizeY / ex));
-					var cloneBitmap = vm.Image.Clone(r, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-					return innerConverter.Convert(cloneBitmap, targetType, parameter, culture);
-				}
-				return null;
-			}
-			throw new NotImplementedException();
-		}
-
-		public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-		{
-			throw new NotImplementedException();
-		}
-	}
+	
 }

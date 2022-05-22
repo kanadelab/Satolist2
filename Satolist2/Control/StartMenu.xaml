@@ -4,8 +4,12 @@
 			 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
 			 xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
 			 xmlns:local="clr-namespace:Satolist2.Control"
+			 xmlns:util="clr-namespace:Satolist2.Utility"
 			 mc:Ignorable="d" 
 			 d:DesignHeight="450" d:DesignWidth="800">
+	<UserControl.Resources>
+		<util:BitmapImageSourceConverter x:Key="BitmapConverter" />
+	</UserControl.Resources>
 	<Grid>
 		<Grid.RowDefinitions>
 			<RowDefinition Height="auto" />
@@ -36,70 +40,82 @@
 
 			<ListView.ItemTemplate>
 				<DataTemplate>
-					<StackPanel>
-						<TextBlock FontSize="17" Text="{Binding Name}" />
-						<StackPanel Orientation="Horizontal">
-							<Button Command="{Binding ToggleFavoriteCommand}" Margin="0 -5 0 0">
-								<Button.Template>
-									<ControlTemplate>
-										<Grid>
-											<Path Fill="DarkGoldenrod"><!--いい色があれば… 背景白で浮いてしまってる-->
-												<Path.Style>
-													<Style TargetType="Path">
-														<Setter Property="Data" Value="M12,15.39L8.24,17.66L9.23,13.38L5.91,10.5L10.29,10.13L12,6.09L13.71,10.13L18.09,10.5L14.77,13.38L15.76,17.66M22,9.24L14.81,8.63L12,2L9.19,8.63L2,9.24L7.45,13.97L5.82,21L12,17.27L18.18,21L16.54,13.97L22,9.24Z" />
-														<Style.Triggers>
-															<DataTrigger Binding="{Binding IsFavorite}" Value="True">
-																<Setter Property="Data" Value="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z"/>
-															</DataTrigger>
-														</Style.Triggers>
-													</Style>
-												</Path.Style>
-											</Path>
-											<Rectangle Fill="Transparent" />
-										</Grid>
-									</ControlTemplate>
-								</Button.Template>
-							</Button>
-							<TextBlock FontSize="12" Margin="0 0 10 0" VerticalAlignment="Center">
-								<TextBlock.Style>
-									<Style TargetType="TextBlock">
-										<Setter Property="Text" Value="最近のゴースト" />
-										<Style.Triggers>
-											<DataTrigger Binding="{Binding IsFavorite}" Value="True">
-												<Setter Property="Text" Value="お気に入りのゴースト"/>
-												<Setter Property="Foreground" Value="{StaticResource ThemeBlue}"/>
-											</DataTrigger>
-											<DataTrigger Binding="{Binding IsRunning}" Value="True">
-												<Setter Property="Text" Value="起動中のゴースト" />
-												<Setter Property="Foreground" Value="{StaticResource ThemeGreen}"/>
-											</DataTrigger>
-										</Style.Triggers>
-									</Style>
-								</TextBlock.Style>
-							</TextBlock>
-							<TextBlock FontSize="12" Text="{Binding Path}" />
+					<Grid>
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="*" />
+							<ColumnDefinition Width="auto" />
+						</Grid.ColumnDefinitions>
+
+						<Grid Grid.Column="1"  Height="{Binding ActualHeight, ElementName=ListStackPanel}">
+							<Image Stretch="UniformToFill" VerticalAlignment="Center" Height="100" Source="{Binding Image, Converter={StaticResource BitmapConverter}}" />
+						</Grid>
+
+						<StackPanel x:Name="ListStackPanel" Grid.Column="0" VerticalAlignment="Center">
+							<TextBlock FontSize="17" Text="{Binding Name}" />
+							<StackPanel Orientation="Horizontal">
+								<Button Command="{Binding ToggleFavoriteCommand}" Margin="0 -5 0 0">
+									<Button.Template>
+										<ControlTemplate>
+											<Grid>
+												<Path Fill="DarkGoldenrod"><!--いい色があれば… 背景白で浮いてしまってる-->
+													<Path.Style>
+														<Style TargetType="Path">
+															<Setter Property="Data" Value="M12,15.39L8.24,17.66L9.23,13.38L5.91,10.5L10.29,10.13L12,6.09L13.71,10.13L18.09,10.5L14.77,13.38L15.76,17.66M22,9.24L14.81,8.63L12,2L9.19,8.63L2,9.24L7.45,13.97L5.82,21L12,17.27L18.18,21L16.54,13.97L22,9.24Z" />
+															<Style.Triggers>
+																<DataTrigger Binding="{Binding IsFavorite}" Value="True">
+																	<Setter Property="Data" Value="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z"/>
+																</DataTrigger>
+															</Style.Triggers>
+														</Style>
+													</Path.Style>
+												</Path>
+												<Rectangle Fill="Transparent" />
+											</Grid>
+										</ControlTemplate>
+									</Button.Template>
+								</Button>
+								<TextBlock FontSize="12" Margin="0 0 10 0" VerticalAlignment="Center">
+									<TextBlock.Style>
+										<Style TargetType="TextBlock">
+											<Setter Property="Text" Value="最近のゴースト" />
+											<Style.Triggers>
+												<DataTrigger Binding="{Binding IsFavorite}" Value="True">
+													<Setter Property="Text" Value="お気に入りのゴースト"/>
+													<Setter Property="Foreground" Value="{StaticResource ThemeBlue}"/>
+												</DataTrigger>
+												<DataTrigger Binding="{Binding IsRunning}" Value="True">
+													<Setter Property="Text" Value="起動中のゴースト" />
+													<Setter Property="Foreground" Value="{StaticResource ThemeGreen}"/>
+												</DataTrigger>
+											</Style.Triggers>
+										</Style>
+									</TextBlock.Style>
+								</TextBlock>
+								<TextBlock FontSize="12" Text="{Binding Path}" />
+							</StackPanel>
+						
+							<StackPanel.Resources>
+								<Style TargetType="TextBlock">
+									<Style.Triggers>
+										<DataTrigger Binding="{Binding IsRunning}" Value="True">
+											<Setter Property="Foreground" Value="{StaticResource ThemeGreen}"/>
+										</DataTrigger>
+										<DataTrigger Binding="{Binding IsFavorite}" Value="True">
+											<Setter Property="Foreground" Value="{StaticResource ThemeBlue}"/>
+										</DataTrigger>
+									</Style.Triggers>
+								</Style>
+							</StackPanel.Resources>
+						
 						</StackPanel>
-						
-						<StackPanel.Resources>
-							<Style TargetType="TextBlock">
-								<Style.Triggers>
-									<DataTrigger Binding="{Binding IsRunning}" Value="True">
-										<Setter Property="Foreground" Value="{StaticResource ThemeGreen}"/>
-									</DataTrigger>
-									<DataTrigger Binding="{Binding IsFavorite}" Value="True">
-										<Setter Property="Foreground" Value="{StaticResource ThemeBlue}"/>
-									</DataTrigger>
-								</Style.Triggers>
-							</Style>
-						</StackPanel.Resources>
-						
-					</StackPanel>
+					</Grid>
 				</DataTemplate>
 			</ListView.ItemTemplate>
 
 			<ListView.ItemContainerStyle>
 				<Style TargetType="ListViewItem" BasedOn="{StaticResource {x:Type ListViewItem}}">
 					<EventSetter Event="MouseDoubleClick" Handler="ListViewItem_MouseDoubleClick" />
+					<Setter Property="HorizontalContentAlignment" Value="Stretch" />
 					<Setter Property="ContextMenu">
 						<Setter.Value>
 							<ContextMenu>

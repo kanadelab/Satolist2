@@ -3,6 +3,7 @@ using Satolist2.Utility;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,6 +16,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Image = System.Drawing.Image;
 
 namespace Satolist2.Control
 {
@@ -159,6 +161,25 @@ namespace Satolist2.Control
 		{
 			get => path;
 			set => path = DictionaryUtility.RemoveLastSlash(DictionaryUtility.NormalizeFullPath(value));
+		}
+
+		//プレビューイメージ
+		//サーフェスパレットの機能が出力してくるのでつかう
+		public Image Image
+		{
+			get 
+			{
+				try
+				{
+					var bitmapPath = DictionaryUtility.ConbinePath(Path, "ghost/master/profile/satolist/preview.png");
+					if (System.IO.File.Exists(bitmapPath))
+					{
+						return Bitmap.FromFile(bitmapPath);
+					}
+				}
+				catch { }
+				return null;
+			}
 		}
 
 		//ヒストリーに存在するレコード
