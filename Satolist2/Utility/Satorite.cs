@@ -129,6 +129,43 @@ namespace Satolist2.Utility
 			RaiseSSTP(sstpBuilder, fmoRecord);
 		}
 
+		//NOTIFY SSTPの送信
+		public static void NotifySSTP(GhostModel ghost, string eventName, params string[] references)
+		{
+			//未実装
+			throw new NotImplementedException();
+
+			/*
+			var fmoRecord = SakuraFMOReader.Read(ghost);
+			if (fmoRecord == null)
+			{
+				Core.LogMessage.AddLog("編集中のゴーストにアクセスできません。SSPでゴーストを起動していますか？", Core.LogMessageType.Error);
+				return; //送信できてない
+			}
+
+			var sstpBuilder = new ProtocolBuilder();
+			sstpBuilder.Command = "NOTIFY SSTP/1.0";
+			sstpBuilder.Parameters["Event"] = eventName;
+			*/
+			
+		}
+
+		//NOTIFY SSTPブロードキャスト
+		public static void NotifySSTPBroadcast(string eventName, params string[] references)
+		{
+			var sstpBuilder = new ProtocolBuilder();
+			sstpBuilder.Command = "NOTIFY SSTP/1.0";
+			sstpBuilder.Parameters["Event"] = eventName;
+			sstpBuilder.Parameters["Sender"] = "さとりすと";
+			sstpBuilder.Parameters["Charset"] = "Shift_JIS";
+			
+			for(int i = 0; i < references.Length; i++)
+			{
+				sstpBuilder.Parameters.Add(string.Format("Reference{0}", i), references[i]);
+			}
+			RaiseSSTPBroadcast(sstpBuilder);
+		}
+
 		//里々を起動
 		//さとりすと側のプロセスに依存せず別プロセスで里々を起動するのでさとりすとが64bitでも起動できるしくみ
 		public static string ExecuteSatori(string satoriDirectory, string eventName)
@@ -179,6 +216,19 @@ namespace Satolist2.Utility
 			Core.Win32Import.SendMessageTimeoutA(target.HWnd, Core.Win32Import.WM_COPYDATA, IntPtr.Zero, h.AddrOfPinnedObject(), 2, 5000, IntPtr.Zero);
 
 			Marshal.FreeHGlobal(dataPtr);
+		}
+
+		//SSTPブロードキャスト
+		public static void RaiseSSTPBroadcast(ProtocolBuilder data)
+		{
+			var fmoReader = new SakuraFMOReader();
+			fmoReader.Read();
+			fmoReader.RemoveSurfacePreviewGeneratorRuntime();
+
+			foreach(var item in fmoReader.Records)
+			{
+				RaiseSSTP(data, item.Value);
+			}
 		}
 
 	}

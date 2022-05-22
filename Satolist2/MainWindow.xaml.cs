@@ -131,7 +131,12 @@ namespace Satolist2
 			RootWindow.Closing += Window_Closing;
 			Dispatcher.BeginInvoke(new Action(() =>
 			{
-				Core.SSTPCallBackNativeWindow.Create((new System.Windows.Interop.WindowInteropHelper(RootWindow)).Handle);
+				var hwnd = (new System.Windows.Interop.WindowInteropHelper(RootWindow)).Handle;
+				Core.SSTPCallBackNativeWindow.Create(hwnd);
+
+				//ここでhwndが確定するのでさとりすとの起動イベントを発生する
+				Utility.Satorite.NotifySSTPBroadcast("OnSatolistBoot", hwnd.ToString(), string.Empty, System.Reflection.Assembly.GetExecutingAssembly().Location);
+
 			}), System.Windows.Threading.DispatcherPriority.Render);
 		}
 
@@ -139,6 +144,9 @@ namespace Satolist2
 		{
 			//SSTPのウインドウ登録も消す
 			Core.SSTPCallBackNativeWindow.Destory();
+
+			//閉じるときのイベントを送信
+			Utility.Satorite.NotifySSTPBroadcast("OnSatolistClosed");
 		}
 
 		private LayoutDocumentPane FindDocumentPane(ILayoutContainer panel)
@@ -425,6 +433,9 @@ namespace Satolist2
 			//ログ表示
 			var logStr = string.Format("ゴースト「{0}」を開きました。 ({1})", ghost.GhostDescriptName, ghost.FullPath);
 			LogMessage.AddLog(logStr);
+
+			//ゴーストを開いたときのイベントを送信
+			Utility.Satorite.NotifySSTPBroadcast("OnSatolistGhostOpened", ghost.GhostDescriptSakuraName, ghost.GhostDescriptName);
 		}
 
 		//各コントロールのViewModelの再バインド
@@ -1433,6 +1444,7 @@ namespace Satolist2
 				var errorList = new List<ErrorListDialogItemViewModel>();
 
 				//保存
+				bool isSaved = false;
 				foreach( var saveItem in dialogViewModel.Items.Where(o => o.IsSave))
 				{
 					bool success = saveItem.SaveItem.Save();
@@ -1443,7 +1455,14 @@ namespace Satolist2
 						error.Title = saveItem.SaveFilePath;
 						errorList.Add(error);
 					}
+					else
+					{
+						isSaved = true;
+					}
 				}
+
+				if(isSaved && !isAutomaticSaveDialog)
+					Satorite.NotifySSTPBroadcast("OnSatolistSaved");
 
 				if(errorList.Count > 0)
 				{

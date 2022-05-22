@@ -40,6 +40,9 @@ namespace Satolist2.Dialog
 
 		private void OkButtonClick(object sender, RoutedEventArgs e)
 		{
+			//追加確定時、通知を送る "EVENT", "WORD" は過去仕様から
+			Satorite.NotifySSTPBroadcast("OnSatolistEventAdded", DataContext.Name, DataContext.AddTarget.Name, DataContext.Type == EventType.Sentence ? "EVENT" : "WORD", DataContext.Condition);
+
 			DialogResult = true;
 			Close();
 		}
@@ -64,7 +67,7 @@ namespace Satolist2.Dialog
 		//項目名
 		public string Name
 		{
-			get => name;
+			get => name ?? string.Empty;
 			set
 			{
 				name = value;
@@ -75,7 +78,7 @@ namespace Satolist2.Dialog
 		//条件 ウインドウには出さないけど追加項目の内容として保持
 		public string Condition
 		{
-			get => condition;
+			get => condition ?? string.Empty;
 			set
 			{
 				condition = value;
