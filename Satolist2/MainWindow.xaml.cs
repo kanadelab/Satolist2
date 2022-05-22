@@ -1515,7 +1515,7 @@ namespace Satolist2
 
 		private void CheckNetworkUpdate(bool acceptReleaseBuild)
 		{
-#if DEPLOY || true
+#if DEPLOY
 			Task.Run(() =>
 			{
 				var release = UpdateChecker.GetRelease(acceptReleaseBuild);
