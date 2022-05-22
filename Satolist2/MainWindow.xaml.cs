@@ -404,7 +404,17 @@ namespace Satolist2
 		internal void OpenGhost(string ghostPath, string shellDirectoryName = "master", string executablePath = null)
 		{
 			//ゴーストのロード
-			var ghost = new GhostModel(ghostPath);
+			GhostModel ghost = null;
+			try
+			{
+				ghost = new GhostModel(ghostPath);
+			}
+			catch
+			{
+				//エラー
+				MessageBox.Show("ゴーストを開けませんでした。", "さとりすと", MessageBoxButton.OK, MessageBoxImage.Warning);
+				return;
+			}
 			RootWindow.Title = string.Format("{0} - さとりすとv2", ghost.GhostDescriptName);
 
 			//メインの起動
