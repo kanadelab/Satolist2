@@ -386,9 +386,6 @@
     <None Include="$(MSBuildThisFileDirectory)data\ssp\data\profile\app.dat">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="$(MSBuildThisFileDirectory)data\template\template\ghostkit_plus\saori\ssu.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="$(MSBuildThisFileDirectory)data\ssp\data\language\english\" />

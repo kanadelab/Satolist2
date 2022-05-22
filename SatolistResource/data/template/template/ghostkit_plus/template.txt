@@ -1,5 +1,17 @@
 satolist_template
+version,2
 name,ゴーストキット改良版Plus
 craftman,神夜 みゅん
 check_default,1
-ignore_saori/ssu.dll,1
+
+file,descript.txt
+file,dic_advanced.txt
+file,dic_base.txt
+file,dic_extraevent.txt
+file,dic_menu.txt
+file,dic_network.txt
+file,dic_resource.txt
+file,dic_talk.txt
+file,replace_after.txt
+file,replace.txt
+file,satori_conf.txt

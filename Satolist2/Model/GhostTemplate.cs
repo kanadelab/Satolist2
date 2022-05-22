@@ -15,7 +15,7 @@ namespace Satolist2.Model
 			public string RelativePath { get; }
 			public string FullPath { get; }
 			public bool IsDefaultChecked { get; }
-			public bool IsSatoriDictionary { get; }
+			public bool IsCheckable { get; }
 			public string Description { get; }
 
 			public GhostTemplateFileModel(string relativePath, string fullPath, bool isDefaultChecked)
@@ -28,7 +28,7 @@ namespace Satolist2.Model
 				//里々辞書かどうかは命名規則により
 				if(Constants.SatoriDictionaryPattern.IsMatch(System.IO.Path.GetFileName(relativePath)))
 				{
-					IsSatoriDictionary = true;
+					IsCheckable = true;	//チェックのon/offが可能かどうか(里々辞書は可能)
 
 					//里々辞書の場合はファイルを開いて説明を取得する
 					try
@@ -61,9 +61,10 @@ namespace Satolist2.Model
 		public const string TemplateNameKey = "name";
 		public const string TemplateCheckDefaultKey = "check_default";
 
+		public const string TemplateFileKey = "file";
+		public const string TemplateCheckedKey = "checked";
+
 		private List<GhostTemplateFileModel> files;
-		private Dictionary<string, bool> checkedFiles;
-		private HashSet<string> ignoreFiles;
 		
 		public bool IsCheckDefault { get; private set; }
 		public string Craftman { get; private set; }
@@ -98,6 +99,7 @@ namespace Satolist2.Model
 					ParseVersion1Template(reader, templateDirectory);
 					break;
 				case 2:
+					ParseVersion2Template(reader, templateDirectory);
 					break;
 				default:
 					throw new NotImplementedException();
@@ -108,20 +110,105 @@ namespace Satolist2.Model
 		public GhostTemplateModel()
 		{
 			files = new List<GhostTemplateFileModel>();
-			checkedFiles = new Dictionary<string, bool>();
-			ignoreFiles = new HashSet<string>();
-
-			ignoreFiles.Add(TemplateDescriptFileName);
-			ignoreFiles.Add(TemplateReadmeFileName);
 
 			Craftman = string.Empty;
 			Name = "(テンプレートを使用しない)";
 			ReadMe = "ゴーストテンプレートを使用せずにからっぽのゴーストを作成します。";
 		}
 
+		//さとりすとv2スタンダード
+		//上書き更新できるように、すべてのファイルをdescriptに列挙するルールをとる
+		private void ParseVersion2Template(CsvBuilder descript, string templateDirectory)
+		{
+			HashSet<string> listupedPath = new HashSet<string>();	//ファイル
+			var checkPath = new Dictionary<string, bool>();	//チェックステータス
+
+			foreach(var record in descript.Records)
+			{
+				if (string.IsNullOrEmpty(record.Key) || string.IsNullOrEmpty(record.Value))
+					continue;
+
+				switch(record.Key)
+				{
+					case TemplateCraftmanKey:
+						Craftman = record.Value;
+						break;
+					case TemplateNameKey:
+						Name = record.Value;
+						break;
+					case TemplateCheckDefaultKey:
+						{
+							int v;
+							if (int.TryParse(record.Value, out v))
+								IsCheckDefault = (v != 0);
+						}
+						break;
+					case TemplateFileKey:
+						listupedPath.Add(DictionaryUtility.NormalizePath(record.Value));
+						break;
+					case TemplateCheckedKey:
+						{
+							var sp = record.Value.Split(Constants.CommaSeparator, StringSplitOptions.None);
+							if (sp.Length == 2)
+							{
+								int v;
+								if(int.TryParse(sp[1], out v))
+								{
+									checkPath[sp[0]] = v != 0;
+								}
+							}
+						}
+						break;
+				}
+			}
+
+			//readmeの取得
+			var readmePath = DictionaryUtility.ConbinePath(templateDirectory, TemplateReadmeFileName);
+			try
+			{
+				ReadMe = System.IO.File.ReadAllText(readmePath, Constants.EncodingShiftJis);
+			}
+			catch
+			{
+				ReadMe = "[template_readme.txt を取得できませんでした。]";
+			}
+
+			//メタ情報をreadmeに足す
+			string[] readmeLines =
+			{
+				string.Format("作者: {0}", Craftman),
+				string.Empty,
+				ReadMe
+			};
+			ReadMe = string.Join(Constants.NewLine, readmeLines);
+
+			//テンプレートのファイルを列挙
+			var templateDirectoryFiles = System.IO.Directory.GetFiles(templateDirectory, "*.*", System.IO.SearchOption.AllDirectories);
+			foreach (var item in templateDirectoryFiles)
+			{
+				var relativePath = DictionaryUtility.MakeRelativePath(templateDirectory, DictionaryUtility.NormalizePath(item));
+
+				//リストアップされていないなら無視
+				if (!listupedPath.Contains(relativePath))
+					continue;
+
+				bool defaultChecked = IsCheckDefault;
+				if (checkPath.ContainsKey(relativePath))
+					defaultChecked = checkPath[relativePath];
+
+				files.Add(new GhostTemplateFileModel(relativePath, item, defaultChecked));
+			}
+		}
+
 		//過去互換。今思い返すと正直記法がかなり微妙なので互換だけ残しておくような感じ
 		private void ParseVersion1Template(CsvBuilder descript, string templateDirectory)
 		{
+			Dictionary<string, bool> checkedFiles = new Dictionary<string, bool>();
+			HashSet<string> ignoreFiles = new HashSet<string>();
+
+			ignoreFiles.Add(TemplateDescriptFileName);
+			ignoreFiles.Add(TemplateReadmeFileName);
+
 			string ignoreRecordHead = "ignore_";
 			string checkedRecordHead = "check_";
 
@@ -200,7 +287,7 @@ namespace Satolist2.Model
 
 				if (ignoreFiles.Contains(relativePath))
 					continue;
-				bool defaultChecked = true;
+				bool defaultChecked = IsCheckDefault;
 				if (checkedFiles.ContainsKey(relativePath))
 					defaultChecked = checkedFiles[relativePath];
 

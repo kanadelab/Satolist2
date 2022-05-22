@@ -473,7 +473,7 @@ namespace Satolist2.Dialog
 			{
 				foreach(var item in Model.Files)
 				{
-					if (item.IsSatoriDictionary)
+					if (item.IsCheckable)
 					{
 						//里々の辞書ファイルの場合は使用有無のチェックボックスがあるので確認
 						var viewModel = Dictionaries.First(o => ReferenceEquals(o.Model, item));
@@ -503,7 +503,7 @@ namespace Satolist2.Dialog
 
 			foreach(var item in Model.Files)
 			{
-				if(item.IsSatoriDictionary)
+				if(item.IsCheckable)
 				{
 					dictionaries.Add(new NewGhostDialogDictionaryViewModel(item));
 				}
