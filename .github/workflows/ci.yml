@@ -1,4 +1,4 @@
-name: 開発版
+name: 開発版　
 on: [push]
 jobs:
   build:
