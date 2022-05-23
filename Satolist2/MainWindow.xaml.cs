@@ -1558,17 +1558,12 @@ namespace Satolist2
 				//さとりすとのアップデータをテンポラリに切り離して隔離
 				string temporaryUpdatorPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "Satolist2Updator");
 				System.IO.Directory.CreateDirectory(temporaryUpdatorPath);
-
-				//更新に必要なファイル
-				string[] updatorFiles =
-				{
-					"SatolistUpdator.exe"
-				};
-
-				foreach (var f in updatorFiles)
-				{
-					System.IO.File.Copy(f, System.IO.Path.Combine(temporaryUpdatorPath, f), true);
-				}
+				System.IO.File.Copy(
+					SatolistUpdator.UpdatorInfo.GetLocation(),
+					System.IO.Path.Combine(temporaryUpdatorPath, System.IO.Path.GetFileName(SatolistUpdator.UpdatorInfo.GetLocation())),
+					true
+					);
+				
 
 				//現在の実行ファイル名を確認
 				var executablePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
