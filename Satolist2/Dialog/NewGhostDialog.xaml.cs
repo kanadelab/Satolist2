@@ -225,14 +225,13 @@ namespace Satolist2.Dialog
 			ImportMasterShellPath = defaultImportMasterShellPath;
 
 			
-			var templateDirs = System.IO.Directory.GetDirectories("data/template/template");
-
 			//インポートなしテンプレート
 			var emptyTemplate = NewGhostDialogGhostTemplateViewModel.EmptyTempalte;
 			SelectedTemplate = emptyTemplate;
 			templates.Add(emptyTemplate);
 
-			//テンプレートをロードする
+			//組み込みテンプレートをロードする
+			var templateDirs = System.IO.Directory.GetDirectories("data/template/template");
 			foreach (var item in templateDirs)
 			{
 				try
@@ -242,6 +241,22 @@ namespace Satolist2.Dialog
 				}
 				catch { }
 			}
+
+			//ユーザーテンプレートをロードする
+			try
+			{
+				var userTemplateDirs = System.IO.Directory.GetDirectories("template");
+				foreach (var item in userTemplateDirs)
+				{
+					try
+					{
+						var t = new NewGhostDialogGhostTemplateViewModel(DictionaryUtility.NormalizeFullPath(item));
+						templates.Add(t);
+					}
+					catch { }
+				}
+			}
+			catch { }
 
 			//コマンド準備
 			OpenTargetSelectDialogCommand = new ActionCommand(
