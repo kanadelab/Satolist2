@@ -35,8 +35,14 @@ jobs:
           ..\..\..\UpdateFileListGenerator\bin\Deploy\UpdateFileListGenerator.exe data\files
           popd
 
+      - name: copy files
+        shell: cmd
+        run: |
+          mkdir deploy
+          SatolistDeploy\bin\Deploy\SatolistDeploy.exe Satolist2\bin\Deploy deploy
+
       - name: upload artifacts
         uses: actions/upload-artifact@v3
         with:
           name: Satolist2-Dev
-          path: Satolist2/bin/Deploy
+          path: deploy
