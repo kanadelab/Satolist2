@@ -42,8 +42,8 @@ namespace Satolist2.Control
 		{
 			if (!string.IsNullOrEmpty(MainViewModel.EditorSettings.GeneralSettings.TextEditorFontName) && MainViewModel.EditorSettings.GeneralSettings.TextEditorFontSize > 0)
 			{
-				MainTextEditor.FontFamily = new FontFamily(MainViewModel.EditorSettings.GeneralSettings.TextEditorFontName);
-				MainTextEditor.FontSize = MainViewModel.EditorSettings.GeneralSettings.TextEditorFontSize;
+				MainTextEditor.TextArea.FontFamily = new FontFamily(MainViewModel.EditorSettings.GeneralSettings.TextEditorFontName);
+				MainTextEditor.TextArea.FontSize = MainViewModel.EditorSettings.GeneralSettings.TextEditorFontSize;
 			}
 		}
 	}
