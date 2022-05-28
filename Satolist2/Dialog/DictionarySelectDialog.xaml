@@ -5,7 +5,7 @@
 		xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 		xmlns:local="clr-namespace:Satolist2.Dialog"
 		mc:Ignorable="d"
-		Title="DictionarySelectDialog" Height="450" Width="800" WindowStartupLocation="CenterOwner">
+		Title="辞書ファイルを選択" Height="450" Width="800" WindowStartupLocation="CenterOwner">
 	<Grid>
 		<Grid.RowDefinitions>
 			<RowDefinition Height="*" />
