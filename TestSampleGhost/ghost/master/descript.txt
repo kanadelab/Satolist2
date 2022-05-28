@@ -23,3 +23,4 @@ don't need bind,0
 don't need seriko talk,0
 balloon.dontmove,False
 shiori,satori.dll
+testbooltype,13

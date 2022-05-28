@@ -10,6 +10,9 @@
 	<UserControl.Resources>
 		<ResourceDictionary>
 			<util:InvertBoolToVisibilityConverter x:Key="InvertBoolToVisibilityConverter" />
+			<ResourceDictionary.MergedDictionaries>
+				<ResourceDictionary Source="/Control/StrechedListViewItemStyle.xaml" />
+			</ResourceDictionary.MergedDictionaries>
 		</ResourceDictionary>
 		
 	</UserControl.Resources>
@@ -17,15 +20,41 @@
 		<TreeView ItemsSource="{Binding Directories}" SelectedItemChanged="TreeView_SelectedItemChanged">
 			<TreeView.ItemTemplate>
 				<HierarchicalDataTemplate ItemsSource="{Binding ChildItems}">
-					<TextBlock Text="{Binding Label}" />
+					<StackPanel Orientation="Horizontal">
+						<Path Fill="DarkGray" Stretch="Uniform" Height="13" Margin="1 1 3 1">
+							<Path.Style>
+								<Style TargetType="Path">
+									<Style.Triggers>
+										<DataTrigger Binding="{Binding NodeType}" Value="Directory">
+											<Setter Property="Data" Value="{StaticResource DirectoryIcon}" />
+										</DataTrigger>
+
+										<DataTrigger Binding="{Binding NodeType}" Value="Dictionary">
+											<Setter Property="Data" Value="{StaticResource ListDictionaryIcon}" />
+										</DataTrigger>
+
+										<DataTrigger Binding="{Binding Dictionary.IsSerialized}" Value="True">
+											<Setter Property="Data" Value="{StaticResource SerializedDictionaryIcon}" />
+										</DataTrigger>
+
+										<DataTrigger Binding="{Binding Dictionary.IsSatoriDictionary}" Value="False">
+											<Setter Property="Data" Value="{StaticResource TextFileIcon}" />
+										</DataTrigger>
+										
+									</Style.Triggers>
+								</Style>
+							</Path.Style>
+						</Path>
+						<TextBlock Text="{Binding Label}" />
+					</StackPanel>
 				</HierarchicalDataTemplate>
 			</TreeView.ItemTemplate>
 			<TreeView.ItemContainerStyle>
-				<Style TargetType="TreeViewItem" >
+				<Style TargetType="TreeViewItem" BasedOn="{StaticResource StrechedListViewItemStyle}" >
 					<EventSetter Event="MouseDoubleClick" Handler="TreeViewItem_MouseDoubleClick" />
 					<Style.Triggers>
+
 						<DataTrigger Binding="{Binding NodeType}" Value="Dictionary">
-							<Setter Property="Visibility" Value="{Binding Dictionary.IsDeleted, Converter={StaticResource InvertBoolToVisibilityConverter}}" />
 							<Setter Property="ContextMenu">
 								<Setter.Value>
 									<ContextMenu>
@@ -66,7 +95,9 @@
 							<!--なにもない-->
 						</DataTrigger>
 						
+						
 						<!--リスト化解除モードの辞書表示切替-->
+						<!--
 						<MultiDataTrigger>
 							<MultiDataTrigger.Conditions>
 								<Condition Binding="{Binding NodeType}" Value="Dictionary" />
@@ -76,8 +107,10 @@
 								<Setter Property="Background" Value="{StaticResource ThemePeachPuff}" />
 							</MultiDataTrigger.Setters>
 						</MultiDataTrigger>
+						-->
 						
 						<!--非里々辞書-->
+						<!--
 						<MultiDataTrigger>
 							<MultiDataTrigger.Conditions>
 								<Condition Binding="{Binding NodeType}" Value="Dictionary" />
@@ -87,7 +120,7 @@
 								<Setter Property="Background" Value="Blue" />	
 							</MultiDataTrigger.Setters>
 						</MultiDataTrigger>
-						
+						-->
 					</Style.Triggers>
 				</Style>
 			</TreeView.ItemContainerStyle>

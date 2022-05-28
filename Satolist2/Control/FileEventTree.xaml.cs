@@ -273,7 +273,7 @@ namespace Satolist2.Control
 			RelativeName = relativePath;
 		}
 
-		public string NodeType = "Directory";
+		public string NodeType => "Directory";
 
 		public void AddDictionary(FileEventTreeItemDictionaryViewModel dic)
 		{
