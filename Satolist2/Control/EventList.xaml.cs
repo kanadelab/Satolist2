@@ -59,6 +59,8 @@ namespace Satolist2.Control
 		private INotifyCollectionChanged itemsSource;
 		private string eventTitleLabel;
 		private string dockingTitle;
+		private DictionaryModel currentDictionary;
+		private string currentEventName;
 
 		public MainViewModel Main { get; }
 
@@ -162,8 +164,31 @@ namespace Satolist2.Control
 				items.Add(newItem);
 			}
 
-			eventTitleLabel = string.Format("{0}/{1}", dictionary.Name, eventLabel);
-			DockingTitle = string.Format("{0} ({1})", eventTitleLabel, items.Count);
+			if(currentDictionary != null)
+			{
+				currentDictionary.PropertyChanged -= CurrentDictionary_PropertyChanged;
+				currentDictionary.OnDelete -= CurrentDictionary_OnDelete;
+			}
+			currentDictionary = dictionary;
+			currentEventName = eventLabel;
+			currentDictionary.PropertyChanged += CurrentDictionary_PropertyChanged;
+			currentDictionary.OnDelete += CurrentDictionary_OnDelete;
+			UpdateDockingLabel();
+		}
+
+		private void CurrentDictionary_OnDelete(TextFileModel obj)
+		{
+			obj.PropertyChanged -= CurrentDictionary_PropertyChanged;
+			obj.OnDelete -= CurrentDictionary_OnDelete;
+			DockingTitle = "単語群・文リスト";
+		}
+
+		private void CurrentDictionary_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+		{
+			if(e.PropertyName == nameof(TextFileModel.RelativeName))
+			{
+				UpdateDockingLabel();
+			}
 		}
 
 		public void SetItems(ReadOnlyObservableCollection<InlineEventModel> events, string eventLabel, DictionaryModel dictionary)
@@ -185,8 +210,16 @@ namespace Satolist2.Control
 				items.Add(newItem);
 			}
 
-			eventTitleLabel = string.Format("{0}/{1}", dictionary.Name, eventLabel);
-			DockingTitle = string.Format("{0} ({1})", eventTitleLabel, items.Count);
+			if (currentDictionary != null)
+			{
+				currentDictionary.PropertyChanged -= CurrentDictionary_PropertyChanged;
+				currentDictionary.OnDelete -= CurrentDictionary_OnDelete;
+			}
+			currentDictionary = dictionary;
+			currentEventName = eventLabel;
+			currentDictionary.PropertyChanged += CurrentDictionary_PropertyChanged;
+			currentDictionary.OnDelete += CurrentDictionary_OnDelete;
+			UpdateDockingLabel();
 		}
 
 		private void SourceCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -217,9 +250,14 @@ namespace Satolist2.Control
 			{
 				items.Clear();
 			}
-			DockingTitle = string.Format("{0} ({1})", eventTitleLabel, items.Count);
+			UpdateDockingLabel();
 		}
 
+		private void UpdateDockingLabel()
+		{
+			eventTitleLabel = string.Format("{0}/{1}", currentDictionary.Name, currentEventName);
+			DockingTitle = string.Format("{0} ({1})", eventTitleLabel, items.Count);
+		}
 	}
 
 	internal class EventListItemViewModel : NotificationObject

@@ -33,6 +33,7 @@
 										<Separator />
 										<MenuItem Header="リスト化を解除" IsCheckable="False" IsChecked="{Binding Dictionary.IsSerialized, Mode=OneWay}" Command="{Binding ChangeSerializeStatusCommand}" />
 										<Separator />
+										<MenuItem Header="ファイルを移動・名前変更" Command="{Binding MoveFileCommand}" />
 										<MenuItem Header="ファイルを削除" Command="{Binding DeleteFileCommand}" />
 									</ContextMenu>
 								</Setter.Value>
@@ -45,8 +46,9 @@
 										<MenuItem Header="同名の項目を追加" Command="{Binding AddItemCommand}" />
 										<Separator />
 										<MenuItem Header="項目を別のファイルに一括移動" Command="{Binding MoveItemCommand}" />
+										<MenuItem Header="項目の名前を一括変更" Command="{Binding RenameItemCommand}" />
 										<Separator />
-										<MenuItem Header="項目を削除" Command="{Binding DeleteItemCommand}" />
+										<MenuItem Header="項目を一括削除" Command="{Binding DeleteItemCommand}" />
 									</ContextMenu>
 								</Setter.Value>
 							</Setter>
@@ -74,6 +76,18 @@
 								<Setter Property="Background" Value="{StaticResource ThemePeachPuff}" />
 							</MultiDataTrigger.Setters>
 						</MultiDataTrigger>
+						
+						<!--非里々辞書-->
+						<MultiDataTrigger>
+							<MultiDataTrigger.Conditions>
+								<Condition Binding="{Binding NodeType}" Value="Dictionary" />
+								<Condition Binding="{Binding Dictionary.IsSatoriDictionary}" Value="False" />
+							</MultiDataTrigger.Conditions>
+							<MultiDataTrigger.Setters>
+								<Setter Property="Background" Value="Blue" />	
+							</MultiDataTrigger.Setters>
+						</MultiDataTrigger>
+						
 					</Style.Triggers>
 				</Style>
 			</TreeView.ItemContainerStyle>

@@ -5,16 +5,16 @@
 		xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 		xmlns:local="clr-namespace:Satolist2.Dialog"
 		mc:Ignorable="d"
-		Title="新しい項目を追加する" Height="200" Width="500" FocusManager.FocusedElement="{Binding ElementName=NameInputBox}"
+		Title="新しい項目を追加する" Height="210" Width="500"
 		WindowStartupLocation="CenterOwner">
 	<Grid>
 		<StackPanel Margin="5">
 			
 			<TextBlock Text="項目の名前" Margin="3" />
-			<TextBox Text="{Binding Name}" x:Name="NameInputBox" Margin="3"/>
+			<TextBox Text="{Binding Name}" x:Name="NameInputBox" Margin="3"/> 
 			
 			<TextBlock Text="追加先"/>
-			<ComboBox SelectedItem="{Binding AddTarget}" ItemsSource="{Binding Main.Ghost.Dictionaries}" DisplayMemberPath="RelativeName" />
+			<ComboBox SelectedItem="{Binding AddTarget}" ItemsSource="{Binding Main.Ghost.Dictionaries}" DisplayMemberPath="RelativeName" IsEnabled="{Binding IsFileSelectEnabled}" />
 			<StackPanel Orientation="Horizontal">
 				<RadioButton Content="文" IsChecked="{Binding IsSentenceSelected}" Margin="5"/>
 				<RadioButton Content="単語群" IsChecked="{Binding IsWordSelected}" Margin="5"/>

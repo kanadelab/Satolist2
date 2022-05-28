@@ -1,4 +1,5 @@
-﻿using Satolist2.Dialog;
+﻿using Microsoft.Win32;
+using Satolist2.Dialog;
 using Satolist2.Model;
 using Satolist2.Utility;
 using System;
@@ -160,16 +161,19 @@ namespace Satolist2.Control
 					foreach(var dirVm in directories)
 					{
 						var item = dirVm.ChildItems.FirstOrDefault(o => o.Dictionary == dic);
-						if(dirVm.RelativeName == dic.RelativeName)
+						if (item != null)
 						{
-							//前後で位置が変わらないので打ち切り
-							return;
-						}
-						else
-						{
-							dirVm.RemoveDictionary(item);
-							viewmodel = item;
-							break;
+							if (dirVm.RelativeName == dic.RelativeName)
+							{
+								//前後で位置が変わらないので打ち切り
+								return;
+							}
+							else
+							{
+								dirVm.RemoveDictionary(item);
+								viewmodel = item;
+								break;
+							}
 						}
 					}
 
@@ -190,31 +194,37 @@ namespace Satolist2.Control
 		//辞書の追加削除への対応 今のところ削除は保存操作で消えないといけないので、Collapsedにしているだけ
 		private void DictionaryCollection_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
 		{
-			/*
-			foreach (Model.DictionaryModel item in e.OldItems)
+
+			if (e.OldItems != null)
 			{
-				var itemViewModel = dictionaries.FirstOrDefault(o => ReferenceEquals(o.Dictionary, item));
-				if(itemViewModel != null)
+				foreach (Model.DictionaryModel item in e.OldItems)
 				{
-					dictionaries.Remove(itemViewModel);
+					foreach (var dir in directories)
+					{
+						var vm = dir.ChildItems.FirstOrDefault(o => o.Dictionary == item);
+						if (vm != null)
+						{
+							dir.RemoveDictionary(vm);
+							break;
+						}
+					}
 				}
 			}
-			*/
-			Debug.Assert((e.OldItems?.Count ?? 0) == 0);
 
-			foreach(Model.DictionaryModel dic in e.NewItems)
+			if (e.NewItems != null)
 			{
-				var dicViewModel = new FileEventTreeItemDictionaryViewModel(this, dic);
-				//dictionaries.Add(itemViewModel);
-
-				var dicDir = DictionaryUtility.NormalizePath(System.IO.Path.GetDirectoryName(dic.RelativeName));
-				var dir = directories.FirstOrDefault(o => o.RelativeName == dicDir);
-				if (dir == null)
+				foreach (Model.DictionaryModel dic in e.NewItems)
 				{
-					dir = new FileEventTreeItemDirectoryViewModel(dicDir);
-					directories.Add(dir);
+					var dicViewModel = new FileEventTreeItemDictionaryViewModel(this, dic);
+					var dicDir = DictionaryUtility.NormalizePath(System.IO.Path.GetDirectoryName(dic.RelativeName));
+					var dir = directories.FirstOrDefault(o => o.RelativeName == dicDir);
+					if (dir == null)
+					{
+						dir = new FileEventTreeItemDirectoryViewModel(dicDir);
+						directories.Add(dir);
+					}
+					dir.AddDictionary(dicViewModel);
 				}
-				dir.AddDictionary(dicViewModel);
 			}
 		}
 
@@ -299,6 +309,7 @@ namespace Satolist2.Control
 		public ActionCommand AddItemCommand { get; }
 		public ActionCommand ChangeSerializeStatusCommand { get; }
 		public ActionCommand DeleteFileCommand { get; }
+		public ActionCommand MoveFileCommand { get; }
 
 		public FileEventTreeItemDictionaryViewModel(FileEventTreeViewModel parent, DictionaryModel dictionary)
 		{
@@ -314,24 +325,103 @@ namespace Satolist2.Control
 				o => FileEventTree.Main.OpenAddEventDialog(addTarget: Dictionary)
 				);
 
+			//リスト化
 			ChangeSerializeStatusCommand = new ActionCommand(
 				o =>
 				{
-					FileEventTree.Main.MainWindow.CloseDictionaryEditors(Dictionary);
 					Dictionary.IsSerialized = !Dictionary.IsSerialized;
+				},
+				o =>
+				{
+					//里々辞書のみリストモード変更可能
+					return Dictionary.IsSatoriDictionary;
 				}
 				);
 
+			//削除
 			DeleteFileCommand = new ActionCommand(
 				o =>
 				{
-					var result = MessageBox.Show(string.Format("ファイル「{0}」を削除します。よろしいですか？", Label), "ファイルの削除", MessageBoxButton.YesNo, MessageBoxImage.Question);
+					var result = MessageBox.Show(string.Format("ファイル「{0}」を削除します。よろしいですか？\r\n※削除したファイルはゴミ箱へ送られます。", Label), "ファイルの削除", MessageBoxButton.YesNo, MessageBoxImage.Question);
 					if(result == MessageBoxResult.Yes)
 					{
-						Dictionary.IsDeleted = true;
+						Dictionary.Ghost.DeleteDictionary(Dictionary);
 					}
 				}
 				);
+
+			//移動
+			MoveFileCommand = new ActionCommand(
+				o =>
+				{
+					var filePath = DictionaryUtility.NormalizeWindowsPath(dictionary.FullPath);
+					var dialog = new SaveFileDialog();
+					dialog.Filter = "里々辞書ファイル(dic*.txt)|dic*.txt|すべてのファイル(*.*)|*.*";
+					dialog.InitialDirectory = System.IO.Path.GetDirectoryName(filePath);
+					dialog.FileName = System.IO.Path.GetFileName(filePath);
+					dialog.OverwritePrompt = false;
+					dialog.Title = "移動先を指定";
+					dialog.FileOk += (s, e) =>
+					{
+						if(!parent.Main.ValidateNewDictionaryPath(dialog.FileName, false))
+						{
+							e.Cancel = true;
+							return;
+						}
+
+						bool result = true;
+						bool showDialog = false;
+						if(DictionaryUtility.IsSatoriDictionaryName(dictionary.Name))
+						{
+							if (!DictionaryUtility.IsSatoriDictionaryName(System.IO.Path.GetFileName(dialog.FileName)))
+							{
+								showDialog = true;
+								//里々の形式からそれ以外の形式
+								if (
+									MessageBoxResult.No == MessageBox.Show("ファイルをここに移動します。よろしいですか？\r\n\r\n※ファイル名を里々の辞書(dic*.txt)からそうではない名前に変更しようとしています。里々の辞書とは認識されなくなりますがよろしいですか？", "ファイルを移動・名前変更", MessageBoxButton.YesNo, MessageBoxImage.Warning)
+								)
+								{
+									result = false;
+								}
+							}
+						}
+						else
+						{
+							if (DictionaryUtility.IsSatoriDictionaryName(System.IO.Path.GetFileName(dialog.FileName)))
+							{
+								showDialog = true;
+								//それ以外から里々の辞書形式
+								if(
+									MessageBoxResult.No == MessageBox.Show("ファイルをここに移動します。よろしいですか？\r\n\r\n※ファイル名を里々の辞書(dic*.txt)に変更しようとしています。新たに里々の辞書として認識されるようになりますがよろしいですか？", "ファイルを移動・名前変更", MessageBoxButton.YesNo, MessageBoxImage.Warning)
+								)
+								{
+									result = false;
+								}
+							}
+						}
+
+						if(!showDialog)
+						{
+							 if(
+								MessageBoxResult.No == MessageBox.Show("ファイルをここに移動します。よろしいですか？", "ファイルを移動・名前変更", MessageBoxButton.YesNo, MessageBoxImage.Question)
+								)
+							{
+								result = false;
+							}
+						}
+
+						e.Cancel = !result;
+					};
+
+					//リネームの実行
+					if (dialog.ShowDialog() == true)
+					{
+						//辞書リネーム
+						dictionary.Rename(dialog.FileName);
+					}
+				}
+				);
+
 
 			//イベントハンドラの用意
 			Dictionary.PropertyChanged += OnDictionaryPropertyChanged;
@@ -396,6 +486,10 @@ namespace Satolist2.Control
 			FileEventTreeItemEventViewModel eventViewModel = reverseDictionary[ev];
 			string newLabel = ev.Identifier;
 			string oldLabel = eventViewModel.Label;
+
+			//名前が変更されてなければなにもしない
+			if (newLabel == oldLabel)
+				return;
 
 			//移動先があるかを探す
 			FileEventTreeItemEventViewModel moveTarget = null;
@@ -523,6 +617,7 @@ namespace Satolist2.Control
 		public FileEventTreeItemDictionaryViewModel Dictionary { get; }
 		public ActionCommand AddItemCommand { get; }
 		public ActionCommand MoveItemCommand { get; }
+		public ActionCommand RenameItemCommand { get; }
 		public ActionCommand DeleteItemCommand { get; }
 
 		public string Label
@@ -578,6 +673,29 @@ namespace Satolist2.Control
 						foreach(var item in events.ToArray())
 						{
 							item.MoveTo(dialog.SelectedItem);
+						}
+					}
+				}
+				);
+
+			//項目のリネーム
+			RenameItemCommand = new ActionCommand(
+				o =>
+				{
+					var item = Items.First();
+					var dialog = new AddEventDialog(Dictionary.FileEventTree.Main);
+					dialog.DataContext.Name = item.Name;
+					dialog.DataContext.Type = item.Type;
+					dialog.DataContext.AddTarget = Dictionary.Dictionary;
+					dialog.DataContext.IsFileSelectEnabled = false;
+
+					//決定されたら名前をいじる
+					if(dialog.ShowDialog() == true && ( item.Name != dialog.DataContext.Name || item.Type != dialog.DataContext.Type ))
+					{
+						foreach(var i in Items.ToArray())
+						{
+							i.Name = dialog.DataContext.Name;
+							i.Type = dialog.DataContext.Type;
 						}
 					}
 				}

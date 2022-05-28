@@ -242,6 +242,11 @@ namespace Satolist2.Utility
 			return result;
 		}
 
+		public static bool IsSatoriDictionaryName(string path)
+		{
+			return Regex.IsMatch(System.IO.Path.GetFileName(path), "^dic.+\\.txt$");
+		}
+
 	}
 
 	internal static class Constants

@@ -32,7 +32,7 @@
 				<MenuItem Header="開き直す" Command="{Binding ReopenGhostCommand}" />
 				<Separator />
 				<MenuItem Header="里々の辞書ファイルを追加" Command="{Binding AddSatoriDictionaryFileCommand}" />
-				<!--<MenuItem Header="テキストファイルを追加" Command="{Binding AddTextFileCommand}" />-->
+				<MenuItem Header="テキストファイルを追加" Command="{Binding AddTextFileCommand}" />
 				<Separator />
 				<MenuItem Header="ゴーストのフォルダを開く" Command="{Binding OpenGhostDirectoryCommand}" />
 				<MenuItem Header="ゴーストの辞書フォルダを開く" Command="{Binding OpenGhostDictionaryDirectoryCommand}" />

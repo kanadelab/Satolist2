@@ -34,6 +34,11 @@ namespace Satolist2
 			content.Width = double.NaN;
 			content.Height = double.NaN;
 			content.Setup(this);
+
+			Dispatcher.BeginInvoke(new Action(() => {
+				content.InitialFocus?.Focus();
+			}
+			), System.Windows.Threading.DispatcherPriority.Render);
 		}
 	}
 }

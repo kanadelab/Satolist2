@@ -57,11 +57,29 @@ namespace Satolist2.Model
 			fullPath = DictionaryUtility.NormalizeFullPath(Path.GetFullPath(path));
 			dictionaries = new ObservableCollection<DictionaryModel>();
 
+			//読み込まない設定ファイル
+			var ignoreDictionaryFiles = new HashSet<string>();
+			ignoreDictionaryFiles.Add("descript.txt");
+			ignoreDictionaryFiles.Add("var.txt");
+			ignoreDictionaryFiles.Add("replace.txt");
+			ignoreDictionaryFiles.Add("replace_after.txt");
+			ignoreDictionaryFiles.Add("satori_license.txt");
+			ignoreDictionaryFiles.Add("updates.txt");
+			ignoreDictionaryFiles.Add("satori_conf.txt");
+			ignoreDictionaryFiles.Add("satori_savedata.txt");
+			ignoreDictionaryFiles.Add("satori_savebackup.txt");
+
 			//ファイル巡回
 			var files = Directory.GetFiles(FullDictionaryPath, "*.*", SearchOption.AllDirectories);
 			foreach(var f in files)
 			{
 				if(Regex.IsMatch(Path.GetFileName(f), "^dic.*\\.txt$"))
+				{
+					var dict = new DictionaryModel(this, Path.GetFullPath(f));
+					dict.LoadDictionary();
+					dictionaries.Add(dict);
+				}
+				else if(Regex.IsMatch(Path.GetFileName(f), "\\.txt$") && !ignoreDictionaryFiles.Contains(Path.GetFileName(f)))
 				{
 					var dict = new DictionaryModel(this, Path.GetFullPath(f));
 					dict.LoadDictionary();
@@ -85,16 +103,25 @@ namespace Satolist2.Model
 			dictionaries.Add(newDictionary);
 			return newDictionary;
 		}
+
+		public void DeleteDictionary(DictionaryModel dic)
+		{
+			dictionaries.Remove(dic);
+			dic.Deleted();
+
+			//ファイル実体もこの場で削除する
+			DictionaryUtility.RecycleFile(dic.FullPath);
+		}
 	}
 
 	//テキストファイルデータ
+	//里々の辞書ファイルとそれ以外と別ファイルにしようと思ったけど… 同じ方が都合が良さそうだったので意味がなかった…
 	public class TextFileModel : NotificationObject, ISaveFileObject
 	{
+		private string fullPath;
 		private string body;
 		private bool bodyAvailable; //false ならbodyは無効。里々辞書形式でデシリアライズされているなど直接テキストファイルとして編集できない
 		private bool isChanged;     //変更検出
-		private bool isDeleted;		//削除扱いにされているか(保存操作時に消す予定か）
-
 
 		public GhostModel Ghost { get; }
 
@@ -104,7 +131,15 @@ namespace Satolist2.Model
 		//フルパス
 		public string FullPath
 		{
-			get; set;
+			get => fullPath;
+			set
+			{
+				fullPath = value;
+				NotifyChanged();
+				NotifyChanged(nameof(Name));
+				NotifyChanged(nameof(RelativeName));
+				NotifyChanged(nameof(IsSatoriDictionary));
+			}
 		}
 
 		//純粋なファイル名
@@ -117,6 +152,12 @@ namespace Satolist2.Model
 		public string RelativeName
 		{
 			get => DictionaryUtility.MakeRelativePath(Ghost.FullDictionaryPath, FullPath);
+		}
+
+		//ファイル名が里々の辞書ファイルかどうか
+		public bool IsSatoriDictionary
+		{
+			get => DictionaryUtility.IsSatoriDictionaryName(FullPath);
 		}
 
 		//ファイルの中身
@@ -152,28 +193,6 @@ namespace Satolist2.Model
 			{
 				isChanged = value;
 				NotifyChanged();
-			}
-		}
-
-		public bool IsDeleted
-		{
-			get => isDeleted;
-			set
-			{
-				if (isDeleted != value)
-				{
-					if (!value)
-						throw new InvalidOperationException();	//復活は対応してない
-					isDeleted = value;
-					Changed();
-					NotifyChanged();
-
-					if(isDeleted)
-					{
-						//削除になった場合削除イベントを発生する
-						OnDelete?.Invoke(this);
-					}
-				}
 			}
 		}
 
@@ -215,6 +234,26 @@ namespace Satolist2.Model
 		{
 			IsChanged = true;
 		}
+
+		internal void Deleted()
+		{
+			OnDelete?.Invoke(this);
+		}
+
+		public virtual void Rename(string fullName)
+		{
+			var oldName = FullPath;
+			try
+			{
+				//ファイルを移動
+				//新規作成モードなど実体がない場合はエラーになるので許容する
+				File.Copy(FullPath, fullName, true);
+			}
+			catch { }
+
+			FullPath = fullName;
+			DictionaryUtility.RecycleFile(oldName);
+		}
 	}
 
 	//里々の辞書ファイル
@@ -236,7 +275,11 @@ namespace Satolist2.Model
 			get => isSerialized;
 			set
 			{
-				if(isSerialized != value)
+				//里々辞書以外はデシリアライズ不可
+				if (!IsSatoriDictionary && !value)
+					return;
+
+				if (isSerialized != value)
 				{
 					bool changed = IsChanged;
 					isSerialized = value;
@@ -288,7 +331,7 @@ namespace Satolist2.Model
 		{
 			//TODO: 辞書単体の設定を考慮する必要
 			var text = File.ReadAllText(FullPath, Constants.EncodingShiftJis);
-			if (!MainViewModel.EditorSettings.GeneralSettings.IsTextModeDefault)
+			if (!MainViewModel.EditorSettings.GeneralSettings.IsTextModeDefault && IsSatoriDictionary)
 			{
 				//リストモード
 				Deserialize(text);
@@ -515,32 +558,35 @@ namespace Satolist2.Model
 		{
 			try
 			{
-				if (!IsDeleted)
+				string saveText;
+				if (IsSerialized)
 				{
-					string saveText;
-					if (IsSerialized)
-					{
-						//保存
-						saveText = Body;
-					}
-					else
-					{
-						//シリアライズして保存
-						saveText = Serialize();
-					}
-					File.WriteAllText(FullPath, saveText, Constants.EncodingShiftJis);
+					//保存
+					saveText = Body;
 				}
 				else
 				{
-					//削除済みなので、ゴミ箱いき
-					DictionaryUtility.RecycleFile(FullPath);
+					//シリアライズして保存
+					saveText = Serialize();
 				}
+				File.WriteAllText(FullPath, saveText, Constants.EncodingShiftJis);
+
 				IsChanged = false;
 				return true;
 			}
 			catch
 			{
 				return false;
+			}
+		}
+
+		public override void Rename(string fullName)
+		{
+			base.Rename(fullName);
+			//里々じゃなければリスト解除を強制する
+			if (!DictionaryUtility.IsSatoriDictionaryName(Name))
+			{
+				IsSerialized = true;
 			}
 		}
 

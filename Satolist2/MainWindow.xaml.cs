@@ -201,6 +201,7 @@ namespace Satolist2
 				newWindow.Closing += EventEditorClosing;
 				newWindow.IsActiveChanged += NewWindow_IsActiveChanged;
 				ev.OnRemove += OpendEventRemoved;
+				ev.PropertyChanged += Text_PropertyChanged;
 
 				viewModel.UpdateFontSettings();
 				EventEditors.Add(newWindow);
@@ -237,7 +238,7 @@ namespace Satolist2
 
 		//一致するテキストファイルの編集画面を閉じる
 		//辞書のシリアライズステータスの切り替え
-		public void CloseDictionaryEditors(DictionaryModel dict)
+		private void CloseDictionaryEditors(DictionaryModel dict)
 		{
 			{
 				var editors = EventEditors.Where(
@@ -280,7 +281,10 @@ namespace Satolist2
 				window.Closing -= EventEditorClosing;
 				window.IsActiveChanged -= NewWindow_IsActiveChanged;
 				if (window.ViewModel is EventEditorViewModel viewModel)
+				{
 					viewModel.Event.OnRemove -= OpendEventRemoved;
+					viewModel.Event.PropertyChanged -= Text_PropertyChanged;
+				}
 			}
 		}
 
@@ -299,6 +303,7 @@ namespace Satolist2
 				newWindow.Closing += TextEditorClosing;
 				newWindow.IsActiveChanged += NewWindow_IsActiveChanged;
 				text.OnDelete += TextFileDeleted;
+				text.PropertyChanged += Text_PropertyChanged;
 				viewModel.UpdateFontSettings();
 
 				TextEditors.Add(newWindow);
@@ -332,6 +337,19 @@ namespace Satolist2
 				if (window.ViewModel is TextEditorViewModel vm)
 				{
 					vm.TextFile.OnDelete -= TextFileDeleted;
+					vm.TextFile.PropertyChanged -= Text_PropertyChanged;
+				}
+			}
+		}
+
+		//TextFileの状態変更
+		private void Text_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+		{
+			if(sender is DictionaryModel dic)
+			{
+				if(e.PropertyName == nameof(DictionaryModel.IsSerialized))
+				{
+					CloseDictionaryEditors(dic);
 				}
 			}
 		}
@@ -880,35 +898,20 @@ namespace Satolist2
 					saveDialog.FileName = "dic_ghost.txt";
 					saveDialog.FileOk += (sender, e) =>
 					{
-						
-						if (!DictionaryUtility.IsChildPath(Ghost.FullDictionaryPath, saveDialog.FileName))
+						if(!ValidateNewDictionaryPath(saveDialog.FileName, false))
 						{
-							//ghost/master以下、辞書としてのみ追加が可能
-							MessageBox.Show("ゴーストの辞書フォルダにのみファイルを追加できます。");
 							e.Cancel = true;
 							return;
 						}
 
-						if (System.IO.File.Exists(saveDialog.FileName))
+						if (!DictionaryUtility.IsSatoriDictionaryName(saveDialog.FileName))
 						{
-							MessageBox.Show("すでに存在するファイルは新規作成できません。");
-							e.Cancel = true;
-							return;
-						}
-
-						//既存のファイル名を拒否する。ファイルシステムかさとりすと上に存在するファイルは拒否
-						if (Ghost.Dictionaries.Any(f => f.FullPath == saveDialog.FileName))
-						{
-							MessageBox.Show("さとりすとに読み込まれているファイルは新規作成できません。");
-							e.Cancel = true;
-							return;
-						}
-
-						//里々の辞書形式成約
-						if(!Regex.IsMatch(System.IO.Path.GetFileName(saveDialog.FileName), "^dic.+\\.txt$"))
-						{
-							MessageBox.Show("里々の辞書は「dic*.txt」のファイル名の形式で保存する必要があります。");
-							e.Cancel = true;
+							var result = MessageBox.Show("ファイル名が「dic*.txt」形式ではないため、里々の辞書として認識されませんが、テキストファイルを追加してよろしいですか？", "ファイルの追加", MessageBoxButton.YesNo, MessageBoxImage.Question);
+							if (result != MessageBoxResult.Yes)
+							{
+								e.Cancel = true;
+								return;
+							}
 						}
 					};
 
@@ -924,17 +927,35 @@ namespace Satolist2
 			AddTextFileCommand = new ActionCommand(
 				o =>
 				{
-					throw new NotImplementedException();
-
 					var saveDialog = new SaveFileDialog();
-					saveDialog.Filter = "テキストファイル(*.txt)|*.txt";
+					saveDialog.Filter = "テキストファイル(*.txt)|*.txt|里々辞書ファイル(dic*.txt)|dic*.txt";
 					saveDialog.AddExtension = true;
 					saveDialog.OverwritePrompt = false;
-					saveDialog.FileName = "text.txt";
+					saveDialog.FileName = "file.txt";
+					saveDialog.Title = "作成先を選択";
 					saveDialog.FileOk += (sender, e) =>
 					{
-						//既存のファイル名を拒否する。ファイルシステムかさとりすと上に存在するファイルは拒否
+						if (!ValidateNewDictionaryPath(saveDialog.FileName, false))
+						{
+							e.Cancel = true;
+						}
+
+						if(DictionaryUtility.IsSatoriDictionaryName(saveDialog.FileName))
+						{
+							var result = MessageBox.Show("ファイル名が「dic*.txt」形式になっているため、里々の辞書として扱われますが追加してもよろしいですか？", "ファイルの追加", MessageBoxButton.YesNo, MessageBoxImage.Question);
+							if (result != MessageBoxResult.Yes)
+							{
+								e.Cancel = true;
+								return;
+							}
+						}
 					};
+
+					if (saveDialog.ShowDialog() == true)
+					{
+						//ファイルを追加する
+						Ghost.AddNewDictionary(saveDialog.FileName);
+					}
 				},
 				o => Ghost != null
 				);
@@ -1521,6 +1542,42 @@ namespace Satolist2
 					MainWindow.ActivateActiveEditor();
 				}
 			}
+		}
+
+		public bool ValidateNewDictionaryPath(string fullName, bool requireSatoriFileName)
+		{
+			fullName = DictionaryUtility.NormalizePath(fullName);
+
+			if (!DictionaryUtility.IsChildPath(Ghost.FullDictionaryPath, fullName))
+			{
+				//ghost/master以下、辞書としてのみ追加が可能
+				MessageBox.Show("ゴーストの辞書フォルダにのみファイルを追加できます。");
+				return false;
+			}
+
+			if (System.IO.File.Exists(fullName))
+			{
+				MessageBox.Show("すでに存在するファイルは新規作成できません。");
+				return false;
+			}
+
+			//既存のファイル名を拒否する。ファイルシステムかさとりすと上に存在するファイルは拒否
+			if (Ghost.Dictionaries.Any(f => f.FullPath == fullName))
+			{
+				MessageBox.Show("さとりすとに読み込まれているファイルは新規作成できません。");
+				return false;
+			}
+
+			if (requireSatoriFileName)
+			{
+				//里々の辞書形式制約
+				if (!DictionaryUtility.IsSatoriDictionaryName(fullName))
+				{
+					MessageBox.Show("里々の辞書は「dic*.txt」のファイル名の形式で保存する必要があります。");
+					return false;
+				}
+			}
+			return true;
 		}
 
 		private void CheckNetworkUpdate(bool acceptReleaseBuild)

@@ -23,6 +23,7 @@ namespace Satolist2.Dialog
 		{
 			InitializeComponent();
 			Owner = ownerWindow;
+			InitialFocus = MainInputBox;
 		}
 
 		private void CancelButtonClick(object sender, RoutedEventArgs e)

@@ -7,7 +7,6 @@
 		xmlns:ctl="clr-namespace:Satolist2.Control"
 		mc:Ignorable="d"
 		Title="{Binding Title, FallbackValue=名前の入力}" Height="150" Width="400"
-		FocusManager.FocusedElement="{Binding ElementName=MainInputBox}"
 		WindowStartupLocation="CenterOwner"
 		>
 	<Grid>

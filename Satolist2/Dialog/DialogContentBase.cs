@@ -12,6 +12,7 @@ namespace Satolist2.Dialog
 	//じつはウインドウのなかにあるコントロールだけど、ダイアログのホストがテーマによって違うウインドウ実態でも同じように扱えるようにする機構
 	public class DialogContentBase : UserControl
 	{
+		public static readonly DependencyProperty InitialFocusProperty = DependencyProperty.Register(nameof(InitialFocus), typeof(System.Windows.Controls.Control), typeof(DialogContentBase));
 		public static readonly DependencyProperty TitleProperty = DependencyProperty.Register(nameof(Title), typeof(string), typeof(DialogContentBase));
 		public static readonly DependencyProperty WindowStartupLocationProperty = DependencyProperty.Register(nameof(WindowStartupLocation), typeof(WindowStartupLocation), typeof(DialogContentBase));
 
@@ -29,6 +30,12 @@ namespace Satolist2.Dialog
 		{
 			get => (WindowStartupLocation)GetValue(WindowStartupLocationProperty);
 			set => SetValue(WindowStartupLocationProperty, value);
+		}
+
+		public System.Windows.Controls.Control InitialFocus
+		{
+			get => (System.Windows.Controls.Control)GetValue(InitialFocusProperty);
+			set => SetValue(InitialFocusProperty, value);
 		}
 
 		public Window Host { get; private set; }

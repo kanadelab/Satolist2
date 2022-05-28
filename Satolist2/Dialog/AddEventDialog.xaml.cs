@@ -36,6 +36,7 @@ namespace Satolist2.Dialog
 			Owner = main.MainWindow.RootWindow;
 			DataContext = new AddEventDialogViewModel(main);
 			DataContext.AddTarget = DataContext.Main.Ghost.Dictionaries.FirstOrDefault();
+			InitialFocus = NameInputBox;
 		}
 
 		private void OkButtonClick(object sender, RoutedEventArgs e)
@@ -61,6 +62,7 @@ namespace Satolist2.Dialog
 		private string condition;
 		private EventType type;
 		private DictionaryModel addTarget;
+		private bool isFileSelectEnabled;
 
 		public MainViewModel Main { get; }
 
@@ -139,9 +141,20 @@ namespace Satolist2.Dialog
 			}
 		}
 
+		public bool IsFileSelectEnabled
+		{
+			get => isFileSelectEnabled;
+			set
+			{
+				isFileSelectEnabled = value;
+				NotifyChanged(); 
+			}
+		}
+
 		public AddEventDialogViewModel(MainViewModel main)
 		{
 			Main = main;
+			isFileSelectEnabled = true;
 		}
 	}
 }
