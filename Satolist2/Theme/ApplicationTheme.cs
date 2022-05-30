@@ -116,7 +116,7 @@ namespace Satolist2.Themes
 			{ ScriptSyntax.Random, 0x008000 },
 			{ ScriptSyntax.Argument, 0x008000 },
 			{ ScriptSyntax.Comment, 0x108010 },
-			{ ScriptSyntax.Tab, 0xAAAAFF },
+			{ ScriptSyntax.Tab, 0xDDDDFF },
 			{ ScriptSyntax.Function, 0x0080ff },
 			{ ScriptSyntax.Saori, 0x0080ff },
 			{ ScriptSyntax.Replace, 0x404070 },
