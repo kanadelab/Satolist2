@@ -42,9 +42,9 @@ namespace Satolist2
 				path = string.Format(@"data\assembly\{1}\{0}", name.Name, name.CultureName);
 
 			if (System.IO.File.Exists(path + ".dll"))
-				return Assembly.LoadFrom(path + ".dll");
+				return Assembly.Load(System.IO.File.ReadAllBytes(path + ".dll"));
 			else if(System.IO.File.Exists(path + ".exe"))
-				return Assembly.LoadFrom(path + ".exe");
+				return Assembly.Load(System.IO.File.ReadAllBytes(path + ".exe"));
 			else
 				return null;
 		}
