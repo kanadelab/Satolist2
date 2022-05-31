@@ -1582,7 +1582,7 @@ namespace Satolist2
 
 		private void CheckNetworkUpdate(bool acceptReleaseBuild)
 		{
-#if DEPLOY
+#if DEPLOY || true
 			Task.Run(() =>
 			{
 				var release = UpdateChecker.GetRelease(acceptReleaseBuild);
@@ -1612,12 +1612,14 @@ namespace Satolist2
 		{
 			try
 			{
+				string updatorPath = App.UpdatorPath ?? SatolistUpdator.UpdatorInfo.GetLocation();
+
 				//さとりすとのアップデータをテンポラリに切り離して隔離
 				string temporaryUpdatorPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "Satolist2Updator");
 				System.IO.Directory.CreateDirectory(temporaryUpdatorPath);
 				System.IO.File.Copy(
-					SatolistUpdator.UpdatorInfo.GetLocation(),
-					System.IO.Path.Combine(temporaryUpdatorPath, System.IO.Path.GetFileName(SatolistUpdator.UpdatorInfo.GetLocation())),
+					updatorPath,
+					System.IO.Path.Combine(temporaryUpdatorPath, System.IO.Path.GetFileName(updatorPath)),
 					true
 					);
 				

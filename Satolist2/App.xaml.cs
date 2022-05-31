@@ -15,6 +15,8 @@ namespace Satolist2
     /// </summary>
     public partial class App : Application
     {
+		public static string UpdatorPath { get; private set; }
+
 		protected override void OnStartup(StartupEventArgs e)
 		{
 			//アセンブリ位置をカレントに設定
@@ -43,8 +45,13 @@ namespace Satolist2
 
 			if (System.IO.File.Exists(path + ".dll"))
 				return Assembly.Load(System.IO.File.ReadAllBytes(path + ".dll"));
-			else if(System.IO.File.Exists(path + ".exe"))
+			else if (System.IO.File.Exists(path + ".exe"))
+			{
+				//アップデータの名前を記憶
+				if (name.Name == "SatolistUpdator")
+					UpdatorPath = path + ".exe";
 				return Assembly.Load(System.IO.File.ReadAllBytes(path + ".exe"));
+			}
 			else
 				return null;
 		}
