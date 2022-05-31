@@ -1631,6 +1631,7 @@ namespace Satolist2
 				info.FileName = System.IO.Path.Combine(temporaryUpdatorPath, "SatolistUpdator.exe");
 				info.Arguments = string.Format(@"""{0}"" ""{1}""", executablePath, updateInfo.ZipURL);
 				info.WorkingDirectory = Environment.CurrentDirectory;
+				info.UseShellExecute = false;
 				Process.Start(info);
 			}
 			catch { }
