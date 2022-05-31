@@ -176,7 +176,7 @@ namespace Satolist2.Control
 			UpdateDockingLabel();
 		}
 
-		private void CurrentDictionary_OnDelete(TextFileModel obj)
+		private void CurrentDictionary_OnDelete(DictionaryModel obj)
 		{
 			obj.PropertyChanged -= CurrentDictionary_PropertyChanged;
 			obj.OnDelete -= CurrentDictionary_OnDelete;
@@ -185,7 +185,7 @@ namespace Satolist2.Control
 
 		private void CurrentDictionary_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
 		{
-			if(e.PropertyName == nameof(TextFileModel.RelativeName))
+			if(e.PropertyName == nameof(DictionaryModel.RelativeName))
 			{
 				UpdateDockingLabel();
 			}

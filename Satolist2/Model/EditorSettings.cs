@@ -271,6 +271,16 @@ namespace Satolist2.Model
 		public bool IsEnableDarkMode { get; set; }
 		[JsonProperty]
 		public Dictionary<string, uint> TextEditorColors { get; set; }
+		
+		//試験的
+		[JsonProperty]
+		public string TextEditorBackgroundImagePath { get; set; }
+		[JsonProperty]
+		public bool IsSurfacePaletteInserTypeSakuraScript { get; set; }
+		[JsonProperty]
+		public double TextEditorOffsetX { get; set; }
+		[JsonProperty]
+		public double TextEditorOffsetY { get; set; }
 
 		public GeneralSettings()
 		{
@@ -286,18 +296,7 @@ namespace Satolist2.Model
 
 		public GeneralSettings Clone()
 		{
-			return new GeneralSettings()
-			{
-				UseOwnedSSTP = UseOwnedSSTP,
-				IsTextModeDefault = IsTextModeDefault,
-				ListedDictionaryInsertEmptyLineCount = ListedDictionaryInsertEmptyLineCount,
-				TextEditorFontName = TextEditorFontName,
-				TextEditorFontSize = TextEditorFontSize,
-				IsEnableDarkMode = IsEnableDarkMode,
-				TextEditorColors = TextEditorColors.ToDictionary(k => k.Key, k => k.Value),
-				IsEnablePreReleaseUpdate = IsEnablePreReleaseUpdate,
-				IsEnableUpdateCheck = IsEnableUpdateCheck
-			};
+			return JsonUtility.CloneObject(this);
 		}
 
 		public bool IsEqlals(GeneralSettings obj)

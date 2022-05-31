@@ -288,9 +288,9 @@ namespace Satolist2
 			}
 		}
 
-		internal TextEditor OpenTextEditor(TextFileModel text)
+		internal TextEditor OpenTextEditor(DictionaryModel text)
 		{
-			if (!text.BodyAvailable)
+			if (!text.IsSerialized)
 				throw new Exception();  //多分リストモードのファイルを開こうとしてる
 
 			var currentWindow = TextEditors.FirstOrDefault(o => ((TextEditorViewModel)o.ViewModel).TextFile == text);
@@ -318,7 +318,7 @@ namespace Satolist2
 			return editor;
 		}
 
-		private void TextFileDeleted(TextFileModel obj)
+		private void TextFileDeleted(DictionaryModel obj)
 		{
 			var deletedEditor = TextEditors.FirstOrDefault(
 				o => ((TextEditorViewModel)o.ViewModel).TextFile == obj
@@ -1399,13 +1399,13 @@ namespace Satolist2
 		}
 
 		//テキストエディタのオープン
-		public void OpenTextEditor(TextFileModel textFile)
+		public void OpenTextEditor(DictionaryModel textFile)
 		{
 			MainWindow.OpenTextEditor(textFile);
 		}
 
 		//テキストエディタのオープン、必要な位置へカレットを移動
-		public void OpenTextEditor(TextFileModel textFile, int moveCaretLine)
+		public void OpenTextEditor(DictionaryModel textFile, int moveCaretLine)
 		{
 			var textEditor = MainWindow.OpenTextEditor(textFile);
 			if(textEditor.DataContext is TextEditorViewModel vm)

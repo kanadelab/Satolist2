@@ -103,6 +103,7 @@ namespace Satolist2.Themes
 
 		private static Dictionary<ScriptSyntax, uint> DefaultThemeEditorHilight = new Dictionary<ScriptSyntax, uint>()
 		{
+			{ ScriptSyntax.Default, 0x000000 },
 			{ ScriptSyntax.Escape, 0x888844 },
 			{ ScriptSyntax.ScriptTag, 0x800000 },
 			{ ScriptSyntax.ChangeSurface, 0x0080ff },
@@ -125,6 +126,7 @@ namespace Satolist2.Themes
 
 		private static Dictionary<ScriptSyntax, uint> DarkThemeEditorHilight = new Dictionary<ScriptSyntax, uint>()
 		{
+			{ ScriptSyntax.Default, 0xDCDCDC },
 			{ ScriptSyntax.Escape, 0xAAAA66 },
 			{ ScriptSyntax.ScriptTag, 0xAA6666 },
 			{ ScriptSyntax.ChangeSurface, 0x44a0ff },

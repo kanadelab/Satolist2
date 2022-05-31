@@ -33,7 +33,9 @@ namespace Satolist2.Control
 			MainTextEditor.SyntaxHighlighting = null;
 			MainTextEditor.Dispatcher.BeginInvoke(new Action(() =>
 			{
-				MainTextEditor.SyntaxHighlighting = new SatoriSyntaxHilighter();
+				var hilighter = new SatoriSyntaxHilighter();
+				MainTextEditor.SyntaxHighlighting = hilighter;
+				MainTextEditor.Foreground = hilighter.MainForegroundColor;
 			}
 			), DispatcherPriority.Render);
 		}

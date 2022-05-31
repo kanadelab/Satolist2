@@ -22,7 +22,7 @@
 
 		<TabControl Grid.Row="0" Margin="3">
 			<TabItem Header="基本設定">
-				<StackPanel Grid.Row="0" Margin="3">
+				<StackPanel Margin="3">
 					<TextBlock Text="さとりすと本体の設定を変更できます。" Margin="3"/>
 					<Separator />
 
@@ -47,7 +47,40 @@
 				</StackPanel>
 			</TabItem>
 
-			
+			<TabItem Header="試験的機能">
+				<StackPanel Margin="3">
+					<TextBlock Text="おためしに付けてみた機能の設定。" Margin="3"/>
+					<Separator Margin="3" />
+					<GroupBox Header="テキストエディタ拡張(新たに開くテキストエディタから有効)" Margin="3">
+						<StackPanel>
+							<StackPanel Margin="3">
+								<TextBlock Text="背景画像を設定" />
+								<Grid>
+									<Grid.ColumnDefinitions>
+										<ColumnDefinition Width="*" />
+										<ColumnDefinition Width="auto" />
+									</Grid.ColumnDefinitions>
+									<TextBox Grid.Column="0" x:Name="TextEditorBackgroundImagePathTextBox" Text="{Binding Model.TextEditorBackgroundImagePath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" />
+									<Button Grid.Column="1" Content="参照" MinWidth="50" CommandParameter="{Binding ., ElementName=TextEditorBackgroundImagePathTextBox}" Command="{Binding SelectTextEditorBackgroundImagePathCommand}" />
+								</Grid>
+							</StackPanel>
+
+							<StackPanel Margin="3">
+								<TextBlock Text="基準位置をずらす" />
+								<StackPanel Orientation="Horizontal">
+									<TextBlock Text="X: " VerticalAlignment="Center" />
+									<TextBox Text="{Binding TextEditorOffsetX, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" MinWidth="100" />
+									<TextBlock Text="Y: " VerticalAlignment="Center" Margin="10 0 0 0"/>
+									<TextBox Text="{Binding TextEditorOffsetY, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" MinWidth="100" />
+								</StackPanel>
+							</StackPanel>
+						</StackPanel>
+					</GroupBox>
+					<CheckBox Content="サーフェスビューワ・パレットダブルクリック時に挿入するサーフェス変更をさくらスクリプト形式に変更" IsChecked="{Binding Model.IsSurfacePaletteInserTypeSakuraScript, Mode=TwoWay}" Margin="3" />
+				</StackPanel>
+			</TabItem>
+
+
 			<TabItem Header="テキストエディタ">
 				<Grid>
 					<ListView ItemsSource="{Binding Colors}">

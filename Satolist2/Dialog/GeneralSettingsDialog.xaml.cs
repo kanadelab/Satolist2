@@ -40,15 +40,45 @@ namespace Satolist2.Dialog
 
 	internal class GeneralSettingsDialogViewModel : NotificationObject
 	{
+		private string textEditorOffsetX;
+		private string textEditorOffsetY;
+
 		public GeneralSettings Model { get; }
 		public GeneralSettingsDialog Dialog { get; }
 		public ActionCommand OkCommand { get; }
 		public ActionCommand CancelCommand { get; }
+		public ActionCommand SelectTextEditorBackgroundImagePathCommand { get; }
 		public List<GeneralSettingsColorSettingViewModel> Colors { get; }
 
 		public bool IsChanged
 		{
 			get => !Model.IsEqlals(MainViewModel.EditorSettings.GeneralSettings);
+		}
+
+		public string TextEditorOffsetX
+		{
+			get => textEditorOffsetX;
+			set
+			{
+				textEditorOffsetX = value;
+				double data;
+				if (double.TryParse(TextEditorOffsetX, out data))
+					Model.TextEditorOffsetX = data;
+				NotifyChanged();
+			}
+		}
+
+		public string TextEditorOffsetY
+		{
+			get => textEditorOffsetY;
+			set
+			{
+				textEditorOffsetY = value;
+				double data;
+				if (double.TryParse(TextEditorOffsetY, out data))
+					Model.TextEditorOffsetY = data;
+				NotifyChanged();
+			}
 		}
 
 		public GeneralSettingsDialogViewModel(MainViewModel main, GeneralSettingsDialog dialog)
@@ -72,12 +102,38 @@ namespace Satolist2.Dialog
 			CancelCommand = new ActionCommand(
 				o =>
 				{
-					
 					dialog.Close();
 				}
 				);
 
+			SelectTextEditorBackgroundImagePathCommand = new ActionCommand(
+				o =>
+				{
+					if (o is System.Windows.Controls.TextBox t)
+					{
+						var d = new OpenFileDialog();
+						d.Filter = "png画像ファイル(*.png)|*.png";
+						if (d.ShowDialog() == DialogResult.OK)
+						{
+							t.Text = d.FileName;
+						}
+					}
+				}
+
+				);
+
+			//数値
+			textEditorOffsetX = Model.TextEditorOffsetX.ToString();
+			textEditorOffsetY = Model.TextEditorOffsetY.ToString();
+
 			//カラーデータ
+			Colors.Add(new GeneralSettingsColorSettingViewModel(this)
+			{
+				Label = "通常文字",
+				DefaultColor = Themes.ApplicationTheme.GetEditorHilight(ScriptSyntax.Default),
+				Syntax = ScriptSyntax.Default
+			});
+
 			Colors.Add(new GeneralSettingsColorSettingViewModel(this)
 			{
 				Label = "エスケープされた文字",

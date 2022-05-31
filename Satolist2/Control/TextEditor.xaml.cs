@@ -26,8 +26,6 @@ namespace Satolist2.Control
 		public TextEditor()
 		{
 			InitializeComponent();
-			
-			MainTextEditor.SyntaxHighlighting = new SatoriSyntaxHilighter();
 		}
 
 		internal void UpdateInsertPaletteKeyBindings(InsertItemPaletteModel palette, ICommand command)
@@ -74,7 +72,7 @@ namespace Satolist2.Control
 		public override string DockingContentId => randomizedContetnId;
 
 		
-		public TextFileModel TextFile { get; }
+		public DictionaryModel TextFile { get; }
 		public TextDocument Document { get; }
 		public MainViewModel Main { get; }
 		public ActionCommand SendToGhostCommand { get; }
@@ -82,7 +80,7 @@ namespace Satolist2.Control
 
 		public override ICSharpCode.AvalonEdit.TextEditor MainTextEditor => control.MainTextEditor;
 
-		public TextEditorViewModel(MainViewModel main, TextFileModel textFile)
+		public TextEditorViewModel(MainViewModel main, DictionaryModel textFile)
 		{
 			randomizedContetnId = Guid.NewGuid().ToString();    //複数出現するのでユニークなIDを振る
 			TextFile = textFile;
@@ -225,6 +223,7 @@ namespace Satolist2.Control
 			{
 				control = textEditor;
 				control.UpdateInsertPaletteKeyBindings(Main.InsertPalette, InsertCommand);
+				UpdateHilightSettings();
 			}
 		}
 	}

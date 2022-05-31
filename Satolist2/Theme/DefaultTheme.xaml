@@ -5,6 +5,7 @@
 	<SolidColorBrush x:Key="ThemeBlue">Blue</SolidColorBrush>
 	<SolidColorBrush x:Key="ThemeDarkRed">DarkRed</SolidColorBrush>
 	<SolidColorBrush x:Key="ThemePeachPuff">#444400</SolidColorBrush>
+	<SolidColorBrush x:Key="TextEditorBackgroundColor">#FFFFFF</SolidColorBrush>
 
 	<Style TargetType="ListViewItem" />
 </ResourceDictionary>

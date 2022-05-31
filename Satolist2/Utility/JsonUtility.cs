@@ -50,5 +50,7 @@ namespace Satolist2.Utility
 			return JObject.FromObject(a).ToString() == JObject.FromObject(b).ToString();
 		}
 
+		public static T CloneObject<T>(T obj) { return JObject.FromObject(obj).ToObject<T>(); }
+
 	}
 }

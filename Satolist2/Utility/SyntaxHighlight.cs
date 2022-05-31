@@ -12,6 +12,7 @@ namespace Satolist2.Utility
 {
 	enum ScriptSyntax
 	{
+		Default,
 		Escape,
 		ScriptTag,
 		ChangeSurface,
@@ -35,6 +36,10 @@ namespace Satolist2.Utility
 
 	class SatoriSyntaxRuleSet : HighlightingRuleSet
 	{
+		private static bool customHilighterLoaded = false;
+		private static CustomSyntaxHilightRecord[] customHilighter = null;
+		private const string CustomHilighterPath = "settings/hilighter.json";
+
 		private readonly List<SyntaxDefinition> Definitions = new List<SyntaxDefinition>()
 		{
 			new SyntaxDefinition("\\\\s\\[.+?\\]", ScriptSyntax.ChangeSurface),
@@ -111,6 +116,51 @@ namespace Satolist2.Utility
 				rule.Regex = new System.Text.RegularExpressions.Regex(def.pattern);
 				Rules.Add(rule);
 			}
+
+#if false	//こういうのもいいのかなあ
+			//カスタムハイライトルールのロード
+			if (System.IO.File.Exists(CustomHilighterPath))
+			{
+				try
+				{
+					customHilighter = JsonUtility.DeserializeFromFile<CustomSyntaxHilightRecord[]>(CustomHilighterPath);
+					foreach(var h in customHilighter)
+					{
+						var rule = new HighlightingRule();
+
+						if (string.IsNullOrEmpty(h.foreground) && string.IsNullOrEmpty(h.background))
+							continue;   //色指定が１つもないものは不適当
+						if (string.IsNullOrEmpty(h.pattern) && (h.patterns?.Length ?? 0) == 0)
+							continue;	//パターン指定がない
+
+						if (!string.IsNullOrEmpty(h.foreground))
+						{
+							var foreground = ColorTranslator.FromHtml(h.foreground);
+							rule.Color.Foreground = new SimpleHighlightingBrush(System.Windows.Media.Color.FromArgb(foreground.A, foreground.R, foreground.G, foreground.B));
+						}
+						if(!string.IsNullOrEmpty(h.background))
+						{
+							var background = ColorTranslator.FromHtml(h.background);
+							rule.Color.Background = new SimpleHighlightingBrush(System.Windows.Media.Color.FromArgb(background.A, background.R, background.G, background.B));
+						}
+
+						var patterns = new List<string>();
+						if (!string.IsNullOrEmpty(h.pattern))
+							patterns.Add(h.pattern);
+						if(h.patterns != null)
+						{
+							foreach(var item in h.patterns)
+							{
+								if (!string.IsNullOrEmpty(item))
+									patterns.Add(item);
+							}
+						}
+					}
+				}
+				catch { }
+			}
+			customHilighterLoaded = true;
+#endif
 		}
 
 		public void UpdateSearchHilighter()
@@ -132,7 +182,7 @@ namespace Satolist2.Utility
 			}
 		}
 
-		private System.Windows.Media.Color GetHilightColor(ScriptSyntax def)
+		public static System.Windows.Media.Color GetHilightColor(ScriptSyntax def)
 		{
 			//設定を問い合わせる
 			if(MainViewModel.EditorSettings.GeneralSettings.TextEditorColors.ContainsKey(Enum.GetName(typeof(ScriptSyntax), def)))
@@ -157,6 +207,8 @@ namespace Satolist2.Utility
 		public IEnumerable<HighlightingColor> NamedHighlightingColors => throw new NotImplementedException();
 
 		public IDictionary<string, string> Properties => throw new NotImplementedException();
+
+		public SolidColorBrush MainForegroundColor => new SolidColorBrush(SatoriSyntaxRuleSet.GetHilightColor(ScriptSyntax.Default));
 
 		public HighlightingColor GetNamedColor(string name)
 		{
@@ -189,6 +241,16 @@ namespace Satolist2.Utility
 			this.pattern = pattern;
 			this.syntaxType = type;
 		}
+	}
+
+
+	//カスタムシンタックスハイライタ(もうすきにして)
+	class CustomSyntaxHilightRecord
+	{
+		public string[] patterns;
+		public string pattern;
+		public string background;
+		public string foreground;
 	}
 
 }

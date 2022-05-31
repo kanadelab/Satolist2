@@ -79,7 +79,10 @@ namespace Satolist2.Model
 					dict.LoadDictionary();
 					dictionaries.Add(dict);
 				}
-				else if(Regex.IsMatch(Path.GetFileName(f), "\\.txt$") && !ignoreDictionaryFiles.Contains(Path.GetFileName(f)))
+				else if((
+					Regex.IsMatch(Path.GetFileName(f), "\\.txt$") ||
+					Regex.IsMatch(Path.GetFileName(f), "\\.dic$") 
+					) && !ignoreDictionaryFiles.Contains(Path.GetFileName(f)))
 				{
 					var dict = new DictionaryModel(this, Path.GetFullPath(f));
 					dict.LoadDictionary();
@@ -116,23 +119,28 @@ namespace Satolist2.Model
 
 	//テキストファイルデータ
 	//里々の辞書ファイルとそれ以外と別ファイルにしようと思ったけど… 同じ方が都合が良さそうだったので意味がなかった…
-	public class TextFileModel : NotificationObject, ISaveFileObject
+	public class DictionaryModel : NotificationObject, ISaveFileObject
 	{
 		private string fullPath;
 		private string body;
-		private bool bodyAvailable; //false ならbodyは無効。里々辞書形式でデシリアライズされているなど直接テキストファイルとして編集できない
 		private bool isChanged;     //変更検出
+		private ObservableCollection<EventModel> events;
+		private bool isSerialized;                          //リスト化解除されたか
 
 		public GhostModel Ghost { get; }
+		public bool IsInlineEventAnalyze { get; set; }
+		public string SaveFilePath => RelativeName;
+
+		public EditorLoadState LoadState { get; set; }
 
 		//削除通知
-		public event Action<TextFileModel> OnDelete;
+		public event Action<DictionaryModel> OnDelete;
 
 		//フルパス
 		public string FullPath
 		{
 			get => fullPath;
-			set
+			private set
 			{
 				fullPath = value;
 				NotifyChanged();
@@ -160,32 +168,22 @@ namespace Satolist2.Model
 			get => DictionaryUtility.IsSatoriDictionaryName(FullPath);
 		}
 
-		//ファイルの中身
+		//ファイルがプレーンテキストとして扱われているか
 		public string Body
 		{
-			get => bodyAvailable ? body : null;
+			get => isSerialized ? body : null;
 			set
 			{
-				bodyAvailable = true;
+				isSerialized = true;
 				body = value;
+				ClearEvent();
 				Changed();
 				NotifyChanged();
-				NotifyChanged(nameof(BodyAvailable));
+				NotifyChanged(nameof(IsSerialized));
 			}
 		}
 
-		//ファイルの中身が有効か
-		public bool BodyAvailable
-		{
-			get => bodyAvailable;
-			set
-			{
-				bodyAvailable = value;
-				NotifyChanged();
-				NotifyChanged(nameof(Body));
-			}
-		}
-
+		//変更があるか
 		public bool IsChanged
 		{
 			get => isChanged;
@@ -196,50 +194,43 @@ namespace Satolist2.Model
 			}
 		}
 
-		public string SaveFilePath => RelativeName;
-
-		public EditorLoadState LoadState { get; set; }
-
-		public TextFileModel(GhostModel ghost, string fullPath)
+		public DictionaryModel(GhostModel ghost, string fullPath)
 		{
 			LoadState = EditorLoadState.Initialized;
 			Ghost = ghost;
 			FullPath = fullPath;
-			bodyAvailable = true;
+			isSerialized = true;
 			body = string.Empty;
-			if(!string.IsNullOrEmpty(fullPath))
-				LoadFile();
+			events = new ObservableCollection<EventModel>();
+			OnDelete += DictionaryModel_OnDelete;
 		}
 
-		protected virtual void LoadFile()
+
+		public DictionaryModel()
 		{
-			try
-			{
-				body = File.ReadAllText(FullPath, Constants.EncodingShiftJis);
-				bodyAvailable = true;
-				LoadState = EditorLoadState.Loaded;
-			}
-			catch
-			{
-				LoadState = EditorLoadState.LoadFailed;
-			}
+			LoadState = EditorLoadState.Initialized;
+			Ghost = null;
+			FullPath = null;
+			isSerialized = true;
+			body = string.Empty;
+
+			events = new ObservableCollection<EventModel>();
+			OnDelete += DictionaryModel_OnDelete;
 		}
 
-		public virtual bool Save()
-		{
-			throw new NotImplementedException();
-		}
-
+		//変更としてマーク
 		public void Changed()
 		{
 			IsChanged = true;
 		}
 
+		//削除イベント
 		internal void Deleted()
 		{
 			OnDelete?.Invoke(this);
 		}
 
+		//リネーム
 		public virtual void Rename(string fullName)
 		{
 			var oldName = FullPath;
@@ -253,17 +244,14 @@ namespace Satolist2.Model
 
 			FullPath = fullName;
 			DictionaryUtility.RecycleFile(oldName);
+
+			//里々じゃなければリスト解除を強制する
+			if (!DictionaryUtility.IsSatoriDictionaryName(Name))
+			{
+				IsSerialized = true;
+			}
 		}
-	}
-
-	//里々の辞書ファイル
-	public class DictionaryModel : TextFileModel
-	{
-		private ObservableCollection<EventModel> events;
-		private bool isSerialized;                          //リスト化解除されたか
-
-		public bool IsInlineEventAnalyze { get; set; }
-
+	
 		public ReadOnlyObservableCollection<EventModel> Events
 		{
 			get => new ReadOnlyObservableCollection<EventModel>(events);
@@ -286,7 +274,6 @@ namespace Satolist2.Model
 					if(value)
 					{
 						Body = Serialize();
-						BodyAvailable = true;
 
 						//イベントを消す
 						ClearEvent();
@@ -294,7 +281,6 @@ namespace Satolist2.Model
 					else
 					{
 						Deserialize(Body);
-						BodyAvailable = false;
 					}
 					IsChanged = changed;    //この操作だけでは編集ステータスは変わらない
 				}
@@ -302,20 +288,7 @@ namespace Satolist2.Model
 			}
 		}
 
-		//ゴーストの辞書をロードする用
-		public DictionaryModel(GhostModel ghost, string fullPath): base(ghost, fullPath)
-		{
-			events = new ObservableCollection<EventModel>();
-			OnDelete += DictionaryModel_OnDelete;
-		}
-
-		public DictionaryModel() : base(null, null)
-		{
-			events = new ObservableCollection<EventModel>();
-			OnDelete += DictionaryModel_OnDelete;
-		}
-
-		private void DictionaryModel_OnDelete(TextFileModel obj)
+		private void DictionaryModel_OnDelete(DictionaryModel obj)
 		{
 			//ファイルが削除扱いにされた。
 			//リストモードであればイベントの除去をまとめて行い、リスト系から表示を消す。
@@ -323,10 +296,6 @@ namespace Satolist2.Model
 				ClearEvent();
 		}
 
-		protected override void LoadFile()
-		{
-			//nop
-		}
 		public void LoadDictionary()
 		{
 			//TODO: 辞書単体の設定を考慮する必要
@@ -336,14 +305,12 @@ namespace Satolist2.Model
 				//リストモード
 				Deserialize(text);
 				isSerialized = false;
-				BodyAvailable = false;
 			}
 			else
 			{
 				//テキストモード
 				Body = text;
 				IsChanged = false;
-				BodyAvailable = true;
 				isSerialized = true;
 			}
 		}
@@ -404,7 +371,6 @@ namespace Satolist2.Model
 			Changed();
 		}
 
-
 		//辞書のシリアライズ
 		public string Serialize()
 		{
@@ -428,7 +394,6 @@ namespace Satolist2.Model
 			//isChangedの状態を復元
 			IsChanged = isChanged;
 
-			//TODO: 1行あけたい（古いさとりすとのほうはデフォルト０で指定可能だった）
 			return string.Join(Constants.NewLine, serializedEvents);
 		}
 
@@ -554,7 +519,7 @@ namespace Satolist2.Model
 			IsChanged = true;
 		}
 
-		public override bool Save()
+		public bool Save()
 		{
 			try
 			{
@@ -579,17 +544,6 @@ namespace Satolist2.Model
 				return false;
 			}
 		}
-
-		public override void Rename(string fullName)
-		{
-			base.Rename(fullName);
-			//里々じゃなければリスト解除を強制する
-			if (!DictionaryUtility.IsSatoriDictionaryName(Name))
-			{
-				IsSerialized = true;
-			}
-		}
-
 	}
 
 	//里々の項目１つ分

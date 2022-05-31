@@ -127,6 +127,18 @@ namespace Satolist2.Control
 
 		public void InsertSurfaceToActiveEditor(SurfacePaletteItemViewModel item)
 		{
+			if (MainViewModel.EditorSettings.GeneralSettings.IsSurfacePaletteInserTypeSakuraScript)
+			{
+				InsertSurfaceToActiveEditorSakuraScript(item);
+			}
+			else
+			{
+				InsertSurfaceToActiveEditorSatori(item);
+			}
+		}
+
+		public void InsertSurfaceToActiveEditorSatori(SurfacePaletteItemViewModel item)
+		{
 			var insertStr = string.Format("（{0}）", DictionaryUtility.NumberZen2Han(item.Id.ToString()));
 			Main.InsertToActiveEditor(insertStr); ;
 		}
@@ -235,7 +247,7 @@ namespace Satolist2.Control
 			InsertSurfaceCommand = new ActionCommand(
 				o =>
 				{
-					parent.InsertSurfaceToActiveEditor(this);
+					parent.InsertSurfaceToActiveEditorSatori(this);
 				}
 				);
 

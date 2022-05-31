@@ -5,6 +5,7 @@ using Satolist2.Utility;
 using System;
 using System.IO;
 using System.Linq;
+using System.Net;
 
 namespace SatolistTest
 {
@@ -138,6 +139,13 @@ namespace SatolistTest
 
 			client.ExecuteCommand(request);
 			Console.WriteLine("a");
+		}
+
+		[TestMethod]
+		public void ZipDownload()
+		{
+			WebClient mywebClient = new WebClient();
+			mywebClient.DownloadFile("https://github.com/kanadelab/Satolist2/releases/download/dev70/dev70.zip", @"downloaded.zip");
 		}
 
 	}

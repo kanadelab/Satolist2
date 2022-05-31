@@ -31,8 +31,6 @@ namespace Satolist2.Control
 		public EventEditor()
 		{
 			InitializeComponent();
-			
-			MainTextEditor.SyntaxHighlighting = new SatoriSyntaxHilighter();
 		}
 
 		internal void UpdateInsertPaletteKeyBindings(InsertItemPaletteModel palette, ICommand command)
@@ -126,6 +124,33 @@ namespace Satolist2.Control
 
 		public abstract ICSharpCode.AvalonEdit.TextEditor MainTextEditor { get; }
 
+		//背景画像パス
+		public string BackgroundImagePath
+		{
+			get
+			{
+				return MainViewModel.EditorSettings.GeneralSettings.TextEditorBackgroundImagePath;
+			}
+		}
+
+		//背景画像
+		public bool IsEnableBackgroundImage
+		{
+			get
+			{
+				return !string.IsNullOrEmpty(MainViewModel.EditorSettings.GeneralSettings.TextEditorBackgroundImagePath);
+			}
+		}
+
+		//マージン
+		public Thickness TextEditorMargin
+		{
+			get
+			{
+				return new Thickness(MainViewModel.EditorSettings.GeneralSettings.TextEditorOffsetX, MainViewModel.EditorSettings.GeneralSettings.TextEditorOffsetY, 0.0, 0.0);
+			}
+		}
+
 		public string DockingTitle
 		{
 			get
@@ -171,7 +196,9 @@ namespace Satolist2.Control
 			MainTextEditor.SyntaxHighlighting = null;
 			MainTextEditor.Dispatcher.BeginInvoke(new Action(() =>
 			{
-				MainTextEditor.SyntaxHighlighting = new SatoriSyntaxHilighter();
+				var hilighter = new SatoriSyntaxHilighter();
+				MainTextEditor.SyntaxHighlighting = hilighter;
+				MainTextEditor.Foreground = hilighter.MainForegroundColor;
 			}
 			), DispatcherPriority.Render);
 		}
@@ -367,6 +394,7 @@ namespace Satolist2.Control
 			{
 				control = eventEditor;
 				control.UpdateInsertPaletteKeyBindings(Main.InsertPalette, InsertCommand);
+				UpdateHilightSettings();
 			}
 		}
 	}

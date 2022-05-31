@@ -166,7 +166,7 @@ namespace Satolist2.Control
 	public class SearchResultItemViewModel : NotificationObject, IDisposable
 	{
 		private EventModel ev;
-		private TextFileModel textFile;
+		private DictionaryModel textFile;
 		private int textFileLineNumber;
 		private string textFileLinePreview;
 		private bool isSelected;
@@ -193,7 +193,7 @@ namespace Satolist2.Control
 			}
 		}
 
-		public TextFileModel TextFile
+		public DictionaryModel TextFile
 		{
 			get => textFile;
 			set
@@ -307,7 +307,7 @@ namespace Satolist2.Control
 			Event.OnRemove += Event_OnRemove;
 		}
 
-		internal SearchResultItemViewModel(SearchResultViewModel parent, int lineNumber, string linePreviewString, TextFileModel textFile)
+		internal SearchResultItemViewModel(SearchResultViewModel parent, int lineNumber, string linePreviewString, DictionaryModel textFile)
 		{
 			Parent = parent;
 			TextFile = textFile;
@@ -316,7 +316,7 @@ namespace Satolist2.Control
 			TextFile.OnDelete += Text_OnDelete;
 		}
 
-		private void Text_OnDelete(TextFileModel obj)
+		private void Text_OnDelete(DictionaryModel obj)
 		{
 			//削除
 			Parent.OnRemoveItem(this);
