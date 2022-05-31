@@ -49,56 +49,53 @@
 
 		</Grid>
 
-		<Grid Grid.Row="2" Margin="3">
-			<Grid Background="{StaticResource TextEditorBackgroundColor}">
-				<Image Source="{Binding BackgroundImagePath}" Visibility="{Binding IsEnableBackgroundImage, Converter={StaticResource BoolToVisibilityConverter}}" Stretch="None" HorizontalAlignment="Left" VerticalAlignment="Top" />
-				<avalonEdit:TextEditor x:Name="MainTextEditor" Document="{Binding Document}" SnapsToDevicePixels="True" Margin="{Binding TextEditorMargin}">
+		<Grid Grid.Row="2" Margin="3" Background="{StaticResource TextEditorBackgroundColor}">
+			<Image Source="{Binding BackgroundImagePath}" Visibility="{Binding IsEnableBackgroundImage, Converter={StaticResource BoolToVisibilityConverter}}" Stretch="None" HorizontalAlignment="Left" VerticalAlignment="Top" />
+			<avalonEdit:TextEditor x:Name="MainTextEditor" Document="{Binding Document}"
+								   SnapsToDevicePixels="True" Margin="{Binding TextEditorMargin}">
 
-					<avalonEdit:TextEditor.Style>
-						<Style TargetType="avalonEdit:TextEditor" BasedOn="{StaticResource {x:Type avalonEdit:TextEditor}}">
-							<Style.Triggers>
-								<DataTrigger Binding="{Binding IsEnableBackgroundImage}" Value="True">
-									<Setter Property="Background" Value="Transparent" />
-								</DataTrigger>
-							</Style.Triggers>
-						</Style>
-					</avalonEdit:TextEditor.Style>
-					
-					<avalonEdit:TextEditor.Options>
-						<avalonEdit:TextEditorOptions />
-					</avalonEdit:TextEditor.Options>
+				<avalonEdit:TextEditor.Style>
+					<Style TargetType="avalonEdit:TextEditor" BasedOn="{StaticResource {x:Type avalonEdit:TextEditor}}">
+						<Style.Triggers>
+							<DataTrigger Binding="{Binding IsEnableBackgroundImage}" Value="True">
+								<Setter Property="Background" Value="Transparent" />
+							</DataTrigger>
+						</Style.Triggers>
+					</Style>
+				</avalonEdit:TextEditor.Style>
 
-					<avalonEdit:TextEditor.InputBindings>
-						<KeyBinding Gesture="ALT+Q" Command="{Binding SendToGhostCommand}" />
-						<KeyBinding Gesture="CTRL+F" Command="{Binding ShowSearchBoxCommand}" />
-					</avalonEdit:TextEditor.InputBindings>
-			
-					<avalonEdit:TextEditor.ContextMenu>
-						<ContextMenu x:Name="ContextMenuRoot">
-							<MenuItem Header="コピー" Command="ApplicationCommands.Copy" InputGestureText="Ctrl+C" />
-							<MenuItem Header="切り取り" Command="ApplicationCommands.Cut" InputGestureText="Ctrl+X" />
-							<MenuItem Header="貼り付け" Command="ApplicationCommands.Paste" InputGestureText="Ctrl+V" />
-							<MenuItem Header="検索" Command="{Binding ShowSearchBoxCommand}" InputGestureText="Ctrl+F" />
-							<Separator />
-							<MenuItem Header="ゴーストに送信" Command="{Binding SendToGhostCommand}" InputGestureText="Alt+Q" />
-							<Separator />
-							<MenuItem Header="挿入" ItemsSource="{Binding Main.InsertPalette.Items, FallbackValue={x:Null}}" IsEnabled="{Binding Main.InsertPalette, Converter={StaticResource ReferenceToBoolConverter}}">
-								<MenuItem.ItemContainerStyle>
-									<Style TargetType="MenuItem">
-										<Setter Property="Header" Value="{Binding Label}"/>
-										<Setter Property="ItemsSource" Value="{Binding Items}" />
-										<Setter Property="InputGestureText" Value="{Binding .,Converter={StaticResource ShortCutGestureConverter}}" />
-										<Setter Property="Command" Value="{Binding DataContext.InsertCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
-										<Setter Property="CommandParameter" Value="{Binding .}" />
-									</Style>
-								</MenuItem.ItemContainerStyle>
-							</MenuItem>
-						</ContextMenu>
-					</avalonEdit:TextEditor.ContextMenu>
-				</avalonEdit:TextEditor>
+				<avalonEdit:TextEditor.Options>
+					<avalonEdit:TextEditorOptions />
+				</avalonEdit:TextEditor.Options>
 
-			</Grid>
+				<avalonEdit:TextEditor.InputBindings>
+					<KeyBinding Gesture="ALT+Q" Command="{Binding SendToGhostCommand}" />
+					<KeyBinding Gesture="CTRL+F" Command="{Binding ShowSearchBoxCommand}" />
+				</avalonEdit:TextEditor.InputBindings>
 
+				<avalonEdit:TextEditor.ContextMenu>
+					<ContextMenu x:Name="ContextMenuRoot">
+						<MenuItem Header="コピー" Command="ApplicationCommands.Copy" InputGestureText="Ctrl+C" />
+						<MenuItem Header="切り取り" Command="ApplicationCommands.Cut" InputGestureText="Ctrl+X" />
+						<MenuItem Header="貼り付け" Command="ApplicationCommands.Paste" InputGestureText="Ctrl+V" />
+						<MenuItem Header="検索" Command="{Binding ShowSearchBoxCommand}" InputGestureText="Ctrl+F" />
+						<Separator />
+						<MenuItem Header="ゴーストに送信" Command="{Binding SendToGhostCommand}" InputGestureText="Alt+Q" />
+						<Separator />
+						<MenuItem Header="挿入" ItemsSource="{Binding Main.InsertPalette.Items, FallbackValue={x:Null}}" IsEnabled="{Binding Main.InsertPalette, Converter={StaticResource ReferenceToBoolConverter}}">
+							<MenuItem.ItemContainerStyle>
+								<Style TargetType="MenuItem">
+									<Setter Property="Header" Value="{Binding Label}"/>
+									<Setter Property="ItemsSource" Value="{Binding Items}" />
+									<Setter Property="InputGestureText" Value="{Binding .,Converter={StaticResource ShortCutGestureConverter}}" />
+									<Setter Property="Command" Value="{Binding DataContext.InsertCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+									<Setter Property="CommandParameter" Value="{Binding .}" />
+								</Style>
+							</MenuItem.ItemContainerStyle>
+						</MenuItem>
+					</ContextMenu>
+				</avalonEdit:TextEditor.ContextMenu>
+			</avalonEdit:TextEditor>
 		</Grid>
 		<local:TextEditorSearchBox x:Name="SearchBox" Grid.Row="1"
 				AttachEditor="{Binding .,ElementName=MainTextEditor}" 

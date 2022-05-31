@@ -174,12 +174,16 @@ namespace Satolist2.Model
 			get => isSerialized ? body : null;
 			set
 			{
-				isSerialized = true;
 				body = value;
 				ClearEvent();
 				Changed();
 				NotifyChanged();
-				NotifyChanged(nameof(IsSerialized));
+
+				if (!isSerialized)
+				{
+					isSerialized = true;
+					NotifyChanged(nameof(IsSerialized));
+				}
 			}
 		}
 
