@@ -18,7 +18,7 @@ namespace Satolist2.Utility
 			if (line.IndexOf(Constants.SentenceHead) == 0)
 			{
 				eventType = EventType.Sentence;
-				var sp = line.Substring(1).Split(Constants.TabSeparator, 2, StringSplitOptions.RemoveEmptyEntries);
+				var sp = line.Substring(1).Split(Constants.TabSeparator, 2);
 
 				if (sp.Length == 0)
 				{
@@ -40,7 +40,7 @@ namespace Satolist2.Utility
 			else if (line.IndexOf(Constants.WordHead) == 0)
 			{
 				eventType = EventType.Word;
-				var sp = line.Substring(1).Split(Constants.TabSeparator, 2, StringSplitOptions.RemoveEmptyEntries);
+				var sp = line.Substring(1).Split(Constants.TabSeparator, 2);
 
 				if (sp.Length == 0)
 				{
@@ -431,6 +431,11 @@ namespace Satolist2.Utility
 			foreach(var line in lines)
 			{
 				var sp = line.Split(new char[] { ',' }, 2, StringSplitOptions.None);
+
+				//残った邪魔な改行コードを破棄
+				for (int i = 0; i < sp.Length; i++)
+					sp[i] = sp[i].Replace("\r", "").Replace("\n", "");
+
 				if(sp.Length == 1)
 				{
 					Records.Add(new KeyValuePair<string, string>(null, sp[0]));	//カンマ区切りされてにない行を示す
