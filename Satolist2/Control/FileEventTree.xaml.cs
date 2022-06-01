@@ -660,7 +660,7 @@ namespace Satolist2.Control
 
 			//項目の追加
 			AddItemCommand = new ActionCommand(
-				o => Dictionary.FileEventTree.Main.OpenAddEventDialog(addTarget: Dictionary.Dictionary)
+				o => Dictionary.FileEventTree.Main.OpenAddEventDialog(addTarget: Dictionary.Dictionary, name: events.First().Name)
 				);
 
 			//項目の移動
