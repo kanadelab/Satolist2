@@ -1,1 +1,1 @@
-﻿namespace Satolist2 { public static class Version { public static string VersionString = "Satoist2 (LocalBuild)"; public static long VersionIndex = 0; } }
+﻿namespace Satolist2 { public static class Version { public static string VersionString = "さとりすとv2 ローカルビルド {0}"; public static long VersionIndex = 0;} }

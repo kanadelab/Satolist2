@@ -291,7 +291,7 @@ namespace Satolist2.Model
 			TextEditorColors = new Dictionary<string, uint>();
 
 			IsEnableUpdateCheck = true;
-			IsEnablePreReleaseUpdate = true;	//開発版のみ
+			IsEnablePreReleaseUpdate = false;
 		}
 
 		public GeneralSettings Clone()

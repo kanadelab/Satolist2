@@ -25,7 +25,9 @@ namespace SatolistDeploy
 			string[] copyItems =
 			{
 				"data",
-				"Satolist2.exe"
+				"Satolist2.exe",
+				"readme.txt",
+				"licence.txt"
 			};
 
 			//必要なアセンブリ。雑多にあるので data/assembly に移動。

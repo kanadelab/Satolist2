@@ -1,0 +1,42 @@
+﻿さとりすとのライセンス
+
+さとりすとv2で作ったゴーストについては、一切の制限を加えることはありません。
+あなたが作ったゴーストは、あなたのものです。
+
+さとりすと本体については、CC BY-NC を適用します。
+https://creativecommons.org/licenses/by-nc/4.0/deed.ja
+
+ただし下記の素材をお借りしていますので、それらを含んだ扱いについてはそれぞれのライセンスに従ってご利用下さい。
+使用素材
+    二次配布の許可を頂いています
+    https://colorbox.saloon.jp/ghost/archive/ghost_free/index.htm
+        ゴーストキット改良版Plus
+
+    二次配布可能なアプリケーションを同梱しています
+    http://ssp.shillest.net/
+        SSP (data/ssp)
+
+    SatolistResource/data/template/satori_license.txt によってライセンスされています。
+    https://github.com/ponapalt/satoriya-shiori
+        里々 (data/template/satori.dll)
+
+    二次配布可能な素材を使用しています
+    http://nore.bake-neko.net/shell.html
+        狐風味 (data/template/shell/master)
+
+    Microsoft Public License (Ms-PL) ライセンスのパッケージを使用しています
+    https://opensource.org/licenses/MS-PL
+        Dirkster.AvalonDock
+
+    MITライセンスのパッケージを使用しています
+    https://opensource.org/licenses/mit-license.php
+        AvalonEdit
+        Newtonsoft.Json
+        FluentFTP
+        WindowsAPICodePack
+        ControlzEx
+        MahApps.Metro
+
+    Apache2.0 ライセンスの素材を使用しています。
+    https://www.apache.org/licenses/LICENSE-2.0
+        https://materialdesignicons.com/

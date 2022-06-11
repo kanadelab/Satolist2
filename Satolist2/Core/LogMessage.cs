@@ -55,7 +55,9 @@ namespace Satolist2.Core
 
 		private void SetVersionInfo()
 		{
-			AddLogInternal(Version.VersionString);
+			var asmVer = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
+			var asmVerStr = string.Format("{0}.{1}.{2}", asmVer.Major, asmVer.Minor, asmVer.Build);
+			AddLogInternal(string.Format(Version.VersionString, asmVerStr));
 		}
 	}
 
