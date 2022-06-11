@@ -355,8 +355,14 @@ namespace SatolistUpdator
 
 				//バックアップ先にコピー
 				var backupFilePath = Path.Combine(BackupDirectory, file);
-				Directory.CreateDirectory(Path.GetDirectoryName(backupFilePath));
-				File.Copy(filePath, backupFilePath, true);
+
+				//できる限り
+				try
+				{
+					Directory.CreateDirectory(Path.GetDirectoryName(backupFilePath));
+					File.Copy(filePath, backupFilePath, true);
+				}
+				catch { }
 			}
 		}
 
@@ -395,10 +401,9 @@ namespace SatolistUpdator
 
 				//バックアップ先にコピー
 				var backupFilePath = Path.Combine(BackupDirectory, file);
-				Directory.CreateDirectory(Path.GetDirectoryName(backupFilePath));
-
 				try
 				{
+					Directory.CreateDirectory(Path.GetDirectoryName(backupFilePath));
 					File.Copy(backupFilePath, filePath, true);
 				}
 				catch { }	//できるだけ復元する
