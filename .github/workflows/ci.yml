@@ -38,7 +38,7 @@ jobs:
         shell: cmd
         run: |
           pushd deploy
-          ..\..\..\UpdateFileListGenerator\bin\Deploy\UpdateFileListGenerator.exe data\files
+          ..\UpdateFileListGenerator\bin\Deploy\UpdateFileListGenerator.exe data\files
           popd
 
       - name: upload artifacts
