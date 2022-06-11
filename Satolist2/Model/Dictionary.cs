@@ -284,7 +284,7 @@ namespace Satolist2.Model
 					}
 					else
 					{
-						Deserialize(Body);
+						Deserialize(body);
 					}
 					IsChanged = changed;    //この操作だけでは編集ステータスは変わらない
 				}
