@@ -1,4 +1,4 @@
-name: 開発版　
+name: 自動ビルド　
 on: [push]
 jobs:
   build:
@@ -28,21 +28,21 @@ jobs:
         run: |
           MSBuild.exe Satolist2.sln -property:Configuration=Deploy;Platform="Any CPU" -t:rebuild
 
-      - name: make filelist
-        shell: cmd
-        run: |
-          pushd Satolist2\bin\Deploy
-          ..\..\..\UpdateFileListGenerator\bin\Deploy\UpdateFileListGenerator.exe data\files
-          popd
-
       - name: copy files
         shell: cmd
         run: |
           mkdir deploy
           SatolistDeploy\bin\Deploy\SatolistDeploy.exe Satolist2\bin\Deploy deploy
 
+      - name: make filelist
+        shell: cmd
+        run: |
+          pushd deploy
+          ..\..\..\UpdateFileListGenerator\bin\Deploy\UpdateFileListGenerator.exe data\files
+          popd
+
       - name: upload artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: Satolist2-Dev
+          name: Satolist2-Build
           path: deploy
