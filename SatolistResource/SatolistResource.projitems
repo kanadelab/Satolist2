@@ -336,7 +336,12 @@
     <Content Include="$(MSBuildThisFileDirectory)data\temporaryghost\ghost\master\dic_temporary.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="$(MSBuildThisFileDirectory)readme.txt" />
+    <Content Include="$(MSBuildThisFileDirectory)licence.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="$(MSBuildThisFileDirectory)readme.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Content Include="$(MSBuildThisFileDirectory)data\ssp\ssp.dbg">
