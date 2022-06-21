@@ -404,7 +404,7 @@ namespace Satolist2
 			{
 				if (item.ViewModel is TextEditorViewModelBase vm)
 				{
-					vm.UpdateHilightSettings();
+					vm.UpdateGeneralSettings();
 				}
 			}
 
@@ -412,7 +412,7 @@ namespace Satolist2
 			{
 				if (item.ViewModel is TextEditorViewModelBase vm)
 				{
-					vm.UpdateHilightSettings();
+					vm.UpdateGeneralSettings();
 				}
 			}
 

@@ -223,7 +223,7 @@ namespace Satolist2.Control
 			{
 				control = textEditor;
 				control.UpdateInsertPaletteKeyBindings(Main.InsertPalette, InsertCommand);
-				UpdateHilightSettings();
+				UpdateGeneralSettings();
 			}
 		}
 	}

@@ -253,6 +253,7 @@ namespace Satolist2.Model
 	//基本設定情報
 	public class GeneralSettings
 	{
+		//基本
 		[JsonProperty]
 		public bool UseOwnedSSTP { get; set; }
 		[JsonProperty]
@@ -269,6 +270,18 @@ namespace Satolist2.Model
 		public string TextEditorFontName { get; set; }
 		[JsonProperty]
 		public bool IsEnableDarkMode { get; set; }
+
+		//テキストエディタ
+		[JsonProperty]
+		public bool IsShowLineNumber { get; set; }
+		[JsonProperty]
+		public bool IsShowEndOfLine { get; set; }
+		[JsonProperty]
+		public bool IsWardWrap { get; set; }
+		[JsonProperty]
+		public bool IsIndent { get; set; }
+
+		//カラー
 		[JsonProperty]
 		public Dictionary<string, uint> TextEditorColors { get; set; }
 		

@@ -190,9 +190,20 @@ namespace Satolist2.Control
 			}
 		}
 
-		//ハイライト設定を最新のものを使うようにする
-		public void UpdateHilightSettings()
+		//基本設定を最新のものに更新
+		public void UpdateGeneralSettings()
 		{
+			//設定
+			MainTextEditor.ShowLineNumbers = MainViewModel.EditorSettings.GeneralSettings.IsShowLineNumber;
+			MainTextEditor.WordWrap = MainViewModel.EditorSettings.GeneralSettings.IsWardWrap;
+			MainTextEditor.Options.ShowEndOfLine = MainViewModel.EditorSettings.GeneralSettings.IsShowEndOfLine;
+
+			if (MainViewModel.EditorSettings.GeneralSettings.IsIndent)
+				MainTextEditor.TextArea.IndentationStrategy = new ICSharpCode.AvalonEdit.Indentation.DefaultIndentationStrategy();
+			else
+				MainTextEditor.TextArea.IndentationStrategy = null;
+
+			//ハイライト
 			MainTextEditor.SyntaxHighlighting = null;
 			MainTextEditor.Dispatcher.BeginInvoke(new Action(() =>
 			{
@@ -394,7 +405,7 @@ namespace Satolist2.Control
 			{
 				control = eventEditor;
 				control.UpdateInsertPaletteKeyBindings(Main.InsertPalette, InsertCommand);
-				UpdateHilightSettings();
+				UpdateGeneralSettings();
 			}
 		}
 	}

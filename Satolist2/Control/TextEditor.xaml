@@ -36,6 +36,10 @@
 					</Style>
 				</avalonEdit:TextEditor.Style>
 
+				<avalonEdit:TextEditor.Options>
+					<avalonEdit:TextEditorOptions ShowSpaces="True" ShowTabs="False"/>
+				</avalonEdit:TextEditor.Options>
+
 				<avalonEdit:TextEditor.InputBindings>
 					<KeyBinding Gesture="ALT+Q" Command="{Binding SendToGhostCommand}" />
 					<KeyBinding Gesture="CTRL+F" Command="{Binding ShowSearchBoxCommand}" />
