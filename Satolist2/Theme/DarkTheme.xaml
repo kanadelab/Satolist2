@@ -3,17 +3,8 @@
 					xmlns:metro="clr-namespace:MetroRadiance.Themes;assembly=MetroRadiance"
 					xmlns:avalonEdit="http://icsharpcode.net/sharpdevelop/avalonedit">
 	<ResourceDictionary.MergedDictionaries>
-
-		<!-- MahApps.Metro resource dictionaries. Make sure that all file names are Case Sensitive! -->
 		<ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
-		<!--<ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />-->
-		<!-- Theme setting -->
-
-
 		<ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Themes/Dark.Cyan.xaml" />
-		<!--
-		<ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.FlatButton.xaml" />
-		-->
 	</ResourceDictionary.MergedDictionaries>
 
 	<SolidColorBrush x:Key="ThemeRed">IndianRed</SolidColorBrush>

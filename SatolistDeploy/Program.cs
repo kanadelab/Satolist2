@@ -27,7 +27,8 @@ namespace SatolistDeploy
 				"data",
 				"Satolist2.exe",
 				"readme.txt",
-				"licence.txt"
+				"licence.txt",
+				"MahApps.Metro.dll",
 			};
 
 			//必要なアセンブリ。雑多にあるので data/assembly に移動。
@@ -55,7 +56,6 @@ namespace SatolistDeploy
 				"ControlzEx.dll",
 				"FluentFTP.dll",
 				"ICSharpCode.AvalonEdit.dll",
-				"MahApps.Metro.dll",
 				"Microsoft.WindowsAPICodePack.dll",
 				"Microsoft.WindowsAPICodePack.ExtendedLinguisticServices.dll",
 				"Microsoft.WindowsAPICodePack.Sensors.dll",
