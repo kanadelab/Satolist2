@@ -1535,7 +1535,7 @@ namespace Satolist2
 		{
 			if(MainWindow.ActiveTextEditor != null)
 			{
-				MainWindow.ActiveTextEditor.Document.Insert(MainWindow.ActiveTextEditor.CaretOffset, str);
+				MainWindow.ActiveTextEditor.TextArea.PerformTextInput(str);
 
 				if(isActivate)
 				{
