@@ -371,23 +371,32 @@ namespace Satolist2.Control
 			{
 				if ((control?.SurfaceImage?.ActualWidth ?? 0.0) == 0.0)
 					return string.Empty;
+				if (SelectedSurfaceBitmap == null)
+					return string.Empty;
 
 				//自動拡大縮小によって変更されたシェルのスケールを適用する
 				var shellScale = control.SurfaceImage.Width / control.SurfaceImage.ActualWidth;
+				double baseSizeOffsetX = 0;
+				double baseSizeOffsetY = 0;
+
+				if(selectedSurface.Model.BaseSizeWidth > 0)
+					baseSizeOffsetX = selectedSurface.Model.BaseSizeWidth - SelectedSurfaceBitmap.Width;
+				if (SelectedSurface.Model.BaseSizeHeight > 0)
+					baseSizeOffsetY = selectedSurface.Model.BaseSizeHeight - SelectedSurfaceBitmap.Height;
 
 				switch(CurrentCollisionType)
 				{
 					case CollisionType.Rect:
 					case CollisionType.Ellipse:
 						return string.Format("{0},{1},{2},{3}", 
-							(int)(RectLeft*shellScale),
-							(int)(RectTop*shellScale),
-							(int)((RectLeft + RectWidth)*shellScale),
-							(int)((RectTop + RectHeight)*shellScale));
+							(int)((RectLeft+baseSizeOffsetX)*shellScale),
+							(int)((RectTop+baseSizeOffsetY)*shellScale),
+							(int)((RectLeft + RectWidth + baseSizeOffsetX )*shellScale),
+							(int)((RectTop + RectHeight + baseSizeOffsetY )*shellScale));
 					case CollisionType.Polygon:
 						return string.Join(",", PolygonPointsViewModel.Select(o => string.Format("{0},{1}",
-							(int)(o.Point.X * shellScale),
-							(int)(o.Point.Y * shellScale)
+							(int)((o.Point.X + baseSizeOffsetX) * shellScale),
+							(int)((o.Point.Y + baseSizeOffsetY) * shellScale)
 							)));
 				}
 				return string.Empty;

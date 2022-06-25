@@ -107,11 +107,7 @@ namespace Satolist2.Control
 					if (!surface.IsEnableSurfacePalette)
 						continue;
 
-					var item = new SurfacePaletteItemViewModel(this, surface, Main.SurfacePreview.ImageCache)
-					{
-						OffsetX = surface.OffsetX,
-						OffsetY = surface.OffsetY
-					};
+					var item = new SurfacePaletteItemViewModel(this, surface, Main.SurfacePreview.ImageCache);
 					items.Add(item);
 				}
 
@@ -165,7 +161,16 @@ namespace Satolist2.Control
 				{
 					bool isGenerate = isFirstImage;
 					double ex = vm.Expand <= 0.0 ? 1.0 : vm.Expand;
-					System.Drawing.Rectangle r = new System.Drawing.Rectangle(vm.OffsetX, vm.OffsetY, (int)(vm.SizeX / ex), (int)(vm.SizeY / ex));
+
+					//ベースサイズとオフセット計算
+					var offsetX = vm.OffsetX;
+					var offsetY = vm.OffsetY;
+					if(vm.BaseSizeX > 0)
+						offsetX += (image.Image.Size.Width - vm.BaseSizeX);
+					if (vm.BaseSizeY > 0)
+						offsetY += (image.Image.Size.Height - vm.BaseSizeY);
+
+					System.Drawing.Rectangle r = new System.Drawing.Rectangle(offsetX, offsetY, (int)(vm.SizeX / ex), (int)(vm.SizeY / ex));
 					var cloneBitmap = image.Image.Clone(r, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
 
 					Main.MainWindow.Dispatcher.BeginInvoke(new Action(() =>
@@ -223,6 +228,8 @@ namespace Satolist2.Control
 		public int OffsetY { get; set; }
 		public int SizeX { get; set; }
 		public int SizeY { get; set; }
+		public int BaseSizeX { get; set; }
+		public int BaseSizeY { get; set; }
 		public long Id { get; set; }
 		public int Scope { get; set; }
 		public double Expand { get; set; }
@@ -243,6 +250,10 @@ namespace Satolist2.Control
 			SizeY = 100;
 			Scope = surface.Scope;
 			Expand = surface.Expand;
+			OffsetX = surface.OffsetX;
+			OffsetY = surface.OffsetY;
+			BaseSizeX = surface.BaseSizeWidth;
+			BaseSizeY = surface.BaseSizeHeight;
 
 			InsertSurfaceCommand = new ActionCommand(
 				o =>

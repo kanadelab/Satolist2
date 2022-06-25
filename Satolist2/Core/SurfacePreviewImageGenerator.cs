@@ -2,6 +2,7 @@
 using Satolist2.Utility;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -165,7 +166,7 @@ namespace Satolist2.Core
 							mutex.ReleaseMutex();
 							main.MainWindow.Dispatcher.Invoke(() => mutex.WaitOne());
 
-							//次のスクリプトを実行
+							//画像出力
 							var generateScript = string.Format(@"\![execute,dumpsurface,{0},{1},{2}]\m[{3},{4},{5}]",
 								temporaryDumpDirectory,
 								scope,
@@ -175,9 +176,29 @@ namespace Satolist2.Core
 								surfaceId);
 							RetryableAction(() => Satorite.SendSSTP(ghost, generateScript, true, true, SSTPCallBackNativeWindow.Instance.HWnd));
 
+							//DispacherにMutexを取らせる
+							mutex.ReleaseMutex();
+							main.MainWindow.Dispatcher.Invoke(() => mutex.WaitOne());
+
 							//出力した画像をコピー
 							var previewFileName = string.Format("surface{0}.png", surfaceId);
 							System.IO.File.Copy(DictionaryUtility.ConbinePath(temporaryDumpDirectory, previewFileName), DictionaryUtility.ConbinePath(outputPath, previewFileName), true);
+
+							//0位置切り出し画像を作成
+							generateScript = string.Format(@"\![execute,dumpsurface,{0},{1},{2},surfacezero,,1]\m[{3},{4},{5}]",
+								temporaryDumpDirectory,
+								scope,
+								surfaceId,
+								SSTPCallBackNativeWindow.OperationProgressMessage,
+								sessionId,
+								surfaceId);
+							RetryableAction(() => Satorite.SendSSTP(ghost, generateScript, true, true, SSTPCallBackNativeWindow.Instance.HWnd));
+
+							//画像サイズをロード
+							var zeroFileName = string.Format("surfacezero{0}.png", surfaceId);
+							var zeroBitmap = Bitmap.FromFile(DictionaryUtility.ConbinePath(temporaryDumpDirectory, zeroFileName));
+							item.BaseSizeWidth = zeroBitmap.Width;
+							item.BaseSizeHeight = zeroBitmap.Height;
 
 							//進捗の通知
 							var progressMessage = string.Format("({1}/{2}) surface{0}.png", surfaceId, i+1, generateSurfaces.Count);
@@ -324,6 +345,12 @@ namespace Satolist2.Core
 		public string SurfaceTableLabel { get; set; }
 		[JsonProperty]
 		public double Expand { get; set; }
+		//当たり判定マイナス座標を抜いたサイズ
+		[JsonProperty]
+		public int BaseSizeWidth { get; set; }
+		[JsonProperty]
+		public int BaseSizeHeight { get; set; }
+
 
 		[JsonIgnore]
 		public string FileName
