@@ -14,9 +14,6 @@ namespace Satolist2.Utility
 		{
 			FullPath = DictionaryUtility.ConbinePath(System.IO.Path.GetTempPath(), "satolist2", Guid.NewGuid().ToString());
 			System.IO.Directory.CreateDirectory(FullPath);
-
-			//デバッグで出力
-			Console.WriteLine("tempPath: " + FullPath);
 		}
 
 		public void Dispose()

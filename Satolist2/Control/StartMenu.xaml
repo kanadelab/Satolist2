@@ -22,8 +22,7 @@
 				<ColumnDefinition Width="auto" />
 			</Grid.ColumnDefinitions>
 			<StackPanel Grid.Column="0">
-				<TextBlock Text="さとりすとへようこそ！　テスト版です！" />
-				<TextBlock Text="ダブルクリックでゴーストを開く" Margin="0 10 0 0" />
+				<TextBlock Text="ゴーストのフォルダをドロップするかリストをダブルクリックしてゴーストを開きます。" Margin="0 10 0 0" />
 			</StackPanel>
 
 			<Button Grid.Column="1" VerticalAlignment="Center" Padding="3" Margin="3" Command="{Binding ReloadCommand}">
