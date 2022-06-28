@@ -1,0 +1,119 @@
+﻿<local:DialogContentBase x:Class="Satolist2.Dialog.SatoriUpdateDialog"
+			 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+			 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+			 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+			 xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+			 xmlns:local="clr-namespace:Satolist2.Dialog"
+			 mc:Ignorable="d" 
+			 d:DesignHeight="450" d:DesignWidth="800" Width="600" Height="500" Title="里々のアップデート">
+	<local:DialogContentBase.Resources>
+		<BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+	</local:DialogContentBase.Resources>
+	<Grid>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="auto" />
+			<RowDefinition Height="*" />
+			<RowDefinition Height="auto" />
+		</Grid.RowDefinitions>
+		<StackPanel Grid.Row="0">
+			<TextBlock Text="使用する里々のバージョンを選択します。特にこだわりがなければ一番上の最新版を使うと良いでしょう。" Margin="3" />
+			<StackPanel Orientation="Horizontal" Margin="3">
+				<TextBlock Text="ゴーストの現在の里々: " />
+				<TextBlock Text="{Binding CurrentSatoriVersion}" />
+			</StackPanel>
+			<Button Click="Button_Click" Cursor="Hand">
+				<Button.Template>
+					<ControlTemplate>
+						<TextBlock Text="データ取得元の里々のリリースページはこちらです。" TextDecorations="Underline" Foreground="{StaticResource ThemeBlue}" Margin="3" />
+					</ControlTemplate>
+				</Button.Template>
+			</Button>
+		</StackPanel>
+
+		<Grid Grid.Row="1">
+
+			<!--ロード中-->
+			<StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+				<TextBlock Text="里々のリリース情報をロード中..." HorizontalAlignment="Center"/>
+				<ProgressBar Height="15" Width="200" IsIndeterminate="True" />
+				<StackPanel.Style>
+					<Style TargetType="StackPanel">
+						<Setter Property="Visibility" Value="Collapsed" />
+						<Style.Triggers>
+							<DataTrigger Binding="{Binding Status}" Value="Loading">
+								<Setter Property="Visibility" Value="Visible" />
+							</DataTrigger>
+						</Style.Triggers>
+					</Style>
+				</StackPanel.Style>
+			</StackPanel>
+			
+			<!--ロード失敗-->
+			<StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+				<TextBlock Text="里々のリリーズ情報のロードに失敗しました。" />
+				<StackPanel.Style>
+					<Style TargetType="StackPanel">
+						<Setter Property="Visibility" Value="Collapsed" />
+						<Style.Triggers>
+							<DataTrigger Binding="{Binding Status}" Value="LoadFailed">
+								<Setter Property="Visibility" Value="Visible" />
+							</DataTrigger>
+						</Style.Triggers>
+					</Style>
+				</StackPanel.Style>
+			</StackPanel>
+			
+			<!--リストビュー-->
+			<ListView ItemsSource="{Binding Items}" SelectedItem="{Binding SelectedItem, Mode=TwoWay}" ScrollViewer.CanContentScroll="False"
+				  ScrollViewer.HorizontalScrollBarVisibility="Disabled" Margin="3">
+				<ListView.ItemTemplate>
+					<DataTemplate>
+						<StackPanel>
+							<Grid>
+								<Grid.ColumnDefinitions>
+									<ColumnDefinition Width="auto" />
+									<ColumnDefinition Width="*" />
+								</Grid.ColumnDefinitions>
+								<TextBlock Grid.Column="0" Text="{Binding Title}" FontSize="15" FontWeight="Bold" />
+								<TextBlock Grid.Column="1" Text="★現在のバージョン" Foreground="{StaticResource ThemeGreen}" HorizontalAlignment="Right" Visibility="{Binding IsCurrentVersion, Converter={StaticResource BoolToVisibilityConverter}}" />
+							</Grid>
+							<TextBlock Text="{Binding Description}" TextWrapping="Wrap"/>
+							<Separator />
+						</StackPanel>
+					</DataTemplate>
+				</ListView.ItemTemplate>
+				<ListView.ItemContainerStyle>
+					<Style TargetType="ListViewItem">
+						<Setter Property="HorizontalContentAlignment" Value="Stretch" />
+					</Style>
+				</ListView.ItemContainerStyle>
+				<ListView.Style>
+					<Style TargetType="ListView" BasedOn="{StaticResource {x:Type ListView}}">
+						<Setter Property="Visibility" Value="Collapsed" />
+						<Style.Triggers>
+							<DataTrigger Binding="{Binding Status}" Value="Ready">
+								<Setter Property="Visibility" Value="Visible" />
+							</DataTrigger>
+						</Style.Triggers>
+					</Style>
+				</ListView.Style>
+			</ListView>
+		</Grid>
+		
+		
+		<StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="3">
+			<Button Content="更新" Command="{Binding OkCommand}" MinWidth="100" IsDefault="True" Margin="3">
+				<Button.Style>
+					<Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+						<Style.Triggers>
+							<DataTrigger Binding="{Binding SelectedItem}" Value="{x:Null}">
+								<Setter Property="IsEnabled" Value="False" />
+							</DataTrigger>
+						</Style.Triggers>
+					</Style>
+				</Button.Style>
+			</Button>
+			<Button Content="キャンセル" Command="{Binding CancelCommand}" MinWidth="100" IsCancel="True" Margin="3" />
+		</StackPanel>
+	</Grid>
+</local:DialogContentBase>

@@ -21,6 +21,16 @@ namespace Satolist2.Utility
 		//里々のスクリプトをゴーストに送信
 		public static void SendSatori(GhostModel ghost, string script, EventType type)
 		{
+			var sakuraScript = ExecuteSatori(ghost, script, type);
+			if (!string.IsNullOrEmpty(sakuraScript))
+			{
+				SendSSTP(ghost, sakuraScript, true, false);
+			}
+		}
+
+		//里々のスクリプトを実行してさくらスクリプト出力を返す
+		public static string ExecuteSatori(GhostModel ghost, string script, EventType type)
+		{
 			try
 			{
 				var saveData = new SaveDataBuilder(ghost);
@@ -55,7 +65,7 @@ namespace Satolist2.Utility
 				writer.Close();
 
 				//里々にリクエストを投げてイベントを実行
-				var result = ExecuteSatori(ghost.FullDictionaryPath, SatoriteEventName);
+				var result = ExecuteSatoriDLL(ghost.FullDictionaryPath, SatoriteEventName);
 
 				//実行を終えたので一時的な辞書を終了
 				File.Delete(filePath);
@@ -67,10 +77,11 @@ namespace Satolist2.Utility
 				if (parsedResult.Parameters.ContainsKey("Value"))
 				{
 					string resultScript = parsedResult.Parameters["Value"];
-					SendSSTP(ghost, resultScript, true, false);
+					return resultScript;
 				}
 			}
 			catch { }
+			return null;
 		}
 		
 		//SEND SSTPの送信
@@ -168,7 +179,7 @@ namespace Satolist2.Utility
 
 		//里々を起動
 		//さとりすと側のプロセスに依存せず別プロセスで里々を起動するのでさとりすとが64bitでも起動できるしくみ
-		public static string ExecuteSatori(string satoriDirectory, string eventName)
+		private static string ExecuteSatoriDLL(string satoriDirectory, string eventName)
 		{
 			try
 			{
@@ -229,6 +240,12 @@ namespace Satolist2.Utility
 			{
 				RaiseSSTP(data, item.Value);
 			}
+		}
+
+		//里々のバージョン取得
+		public static string GetSatoriVersion(GhostModel ghost)
+		{
+			return ExecuteSatori(ghost, "（里々のバージョン）", EventType.Word);
 		}
 
 	}

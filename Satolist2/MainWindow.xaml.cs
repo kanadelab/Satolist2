@@ -719,6 +719,7 @@ namespace Satolist2
 		public ActionCommand GenerateSurfacePreviewCommand { get; }
 		public ActionCommand SelectPreviewShellCommand { get; }
 		public ActionCommand SelectPreviewShellDirectoryCommand { get; }
+		public ActionCommand UpdateSatoriCommand { get; }
 		public ActionCommand ShowLogMessageCommand { get; }
 		public ActionCommand ClearLogMessageCommand { get; }
 		public ActionCommand NetworkUpdateCommand { get; }
@@ -1328,6 +1329,35 @@ namespace Satolist2
 					SurfaceViewerViewModel.UpdateSurfacePreviewData();
 					GenerateSurfacePreviewCommand.NotifyCanExecuteChanged();
 				}
+				);
+
+			UpdateSatoriCommand = new ActionCommand(
+				o =>
+				{
+					var satoriVersion = Satorite.GetSatoriVersion(Ghost);
+					if(string.IsNullOrEmpty(satoriVersion))
+					{
+						//バージョン取得失敗
+						var r = MessageBox.Show(
+							"ゴーストの里々のバージョンが正しく取得できませんでした。\r\n"+
+							"編集中のゴーストが里々のゴーストでないか、satori.dllがghost/masterに配置されていない可能性があります。\r\n\r\n"+
+							"このままアップデートを続けてもいいですか？", "里々のアップデート", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+						if (r == MessageBoxResult.No)
+							return;
+					}
+
+					var dialog = new SatoriUpdateDialog(Ghost, satoriVersion ?? "不明");
+					dialog.Owner = MainWindow.RootWindow;
+					if (dialog.ShowDialog() == true)
+					{
+						var updateProgress = new ProgressDialog(this);
+						updateProgress.DataContext.IsIndeterminate = true;
+						updateProgress.Title = "里々のアップデート";
+						updateProgress.SetTask(SatoriUpdator.UpdateSatori(updateProgress.DataContext, dialog.DataContext.SelectedItem.Release, Ghost));
+						updateProgress.ShowDialog();
+					}
+				},
+				Ghost != null
 				);
 
 			ShowLogMessageCommand = new ActionCommand(

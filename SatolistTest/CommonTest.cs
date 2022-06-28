@@ -64,23 +64,6 @@ namespace SatolistTest
 		}
 
 		[TestMethod]
-		public void ExecuteSatoriTest()
-		{
-			Environment.CurrentDirectory = GetSatolistWorkingDirectory();
-
-			//里々を起動してOnBootのさくらスクリプトを取得
-			GhostModel ghost = new GhostModel(GetTestSampleGhostDirectory());
-			var result = Satorite.ExecuteSatori(ghost.FullDictionaryPath, "OnBoot");
-
-			//返答を解析
-			ProtocolBuilder parser = new ProtocolBuilder();
-			parser.Deserialize(result);
-
-			//結果のスクリプト
-			Console.WriteLine(parser.Parameters["Value"]);
-		}
-
-		[TestMethod]
 		public void SatoriProxyTest()
 		{
 			SatoriProxy.Program.Main(new string[]{ "SendSatori", "OnBoot", GetTestSampleGhostDirectory() + "/ghost/master" });

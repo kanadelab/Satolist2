@@ -55,6 +55,8 @@
 					</MenuItem.ItemContainerStyle>
 				</MenuItem>
 				<MenuItem Header="プレビューするシェルを直接選択" Command="{Binding SelectPreviewShellDirectoryCommand}" />
+				<Separator />
+				<MenuItem Header="ゴーストの里々をアップデート" Command="{Binding UpdateSatoriCommand}" />
 			</MenuItem>
 			<MenuItem Header="表示">
 				<MenuItem Header="ファイルイベントツリー" x:Name="FileEventTreeVisibleMenu" IsCheckable="True" IsChecked="{Binding IsVisible, Mode=TwoWay}" />

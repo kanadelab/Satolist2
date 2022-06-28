@@ -182,5 +182,17 @@ namespace Satolist2.Dialog
 			IsIndeterminate = !progress.UseProgress;
 			Progress = progress.Value;
 		}
+
+		public void SetCompletedProgress()
+		{
+			Progress = 100.0;
+			IsIndeterminate = false;
+		}
+
+		public void SetFailedProgress()
+		{
+			Progress = 0.0;
+			IsIndeterminate = false;
+		}
 	}
 }

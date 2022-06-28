@@ -221,6 +221,9 @@
     <Compile Include="Dialog\RemoteFileSelectDialog.xaml.cs">
       <DependentUpon>RemoteFileSelectDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dialog\SatoriUpdateDialog.xaml.cs">
+      <DependentUpon>SatoriUpdateDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dialog\SaveFileListDialog.xaml.cs">
       <DependentUpon>SaveFileListDialog.xaml</DependentUpon>
     </Compile>
@@ -257,6 +260,7 @@
     <Compile Include="Utility\Progress.cs" />
     <Compile Include="Utility\SakuraFMOReader.cs" />
     <Compile Include="Utility\Satorite.cs" />
+    <Compile Include="Utility\SatoriUpdator.cs" />
     <Compile Include="Utility\SSPBootUtility.cs" />
     <Compile Include="Utility\Surfaces.cs" />
     <Compile Include="Utility\SyntaxHighlight.cs" />
@@ -393,6 +397,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Dialog\RemoteFileSelectDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialog\SatoriUpdateDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
