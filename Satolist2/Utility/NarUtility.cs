@@ -289,7 +289,7 @@ namespace Satolist2.Utility
 				}
 
 				//アップロード
-				var uploadMessage = string.Format("{1}/{2} upload: {0}", item.Item1, i, uploadFiles.Count);
+				var uploadMessage = string.Format("{1}/{2} upload: {0}", item.Item1, i+1, uploadFiles.Count);
 				progressHandler?.Invoke(new Progress() { UseProgress = true, Value = progressValue, Message = uploadMessage });
 				ftpClient.UploadFile(fileName, remoteFileName);
 			}
