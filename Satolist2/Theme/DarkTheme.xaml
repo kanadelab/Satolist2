@@ -16,6 +16,7 @@
 
 	<Style TargetType="avalonEdit:TextEditor" BasedOn="{StaticResource {x:Type avalonEdit:TextEditor}}">
 		<Setter Property="Background" Value="#1e1e1e" />
+		<Setter Property="Foreground" Value="#DCDCDC" />
 	</Style>
 
 </ResourceDictionary>
