@@ -3,6 +3,7 @@ using Satolist2.Utility;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -51,6 +52,7 @@ namespace Satolist2.Dialog
 		private bool showFileNameInput;
 		private RemoteFileSelectDialog dialog;
 		private ObservableCollection<FileListItem> items;
+		private ICollectionView itemsView;
 		private FileListItem selectedItem;
 		private FtpClient ftpClient;
 		private string currentPath;
@@ -58,7 +60,7 @@ namespace Satolist2.Dialog
 		private RemoteFileSelectDialog.DialogState state;
 		private List<CreateDirectoryRecord> createDirectory;
 
-		public ReadOnlyObservableCollection<FileListItem> Items => new ReadOnlyObservableCollection<FileListItem>(items);
+		public ICollectionView Items => itemsView;
 		public FileListItem SelectedItem
 		{
 			get => selectedItem;
@@ -146,6 +148,8 @@ namespace Satolist2.Dialog
 			Domain = account.url;
 			createDirectory = new List<CreateDirectoryRecord>();
 			items = new ObservableCollection<FileListItem>();
+			itemsView = CollectionViewSource.GetDefaultView(items);
+			itemsView.SortDescriptions.Add(new SortDescription(nameof(FileListItem.Name), ListSortDirection.Ascending));
 			ftpClient = new FtpClient(account);
 			currentPath = directory;
 			state = RemoteFileSelectDialog.DialogState.Connecting;
