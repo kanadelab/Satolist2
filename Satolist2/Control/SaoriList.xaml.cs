@@ -83,11 +83,6 @@ namespace Satolist2.Control
 			items = new ObservableCollection<SaoriListModuleViewModel>();
 			commonLines = new List<string>();
 
-			/*
-			items.Add(new SaoriListModuleViewModel(this) { ModulePath = "saori/ssu.dll" });
-			items.Add(new SaoriListModuleViewModel(this) { ModulePath = "saori/ssu.dll" });
-			*/
-
 			AddModuleCommand = new ActionCommand(
 				o =>
 				{
@@ -95,7 +90,8 @@ namespace Satolist2.Control
 					var path = SaoriListModuleViewModel.SelectModule(Main.Ghost.FullDictionaryPath);
 					if(!string.IsNullOrEmpty(path))
 					{
-						items.Add(new SaoriListModuleViewModel(this) { ModulePath = path });
+						items.Add(new SaoriListModuleViewModel(this, path));
+						Main.SatoriConfViewModel.Changed();
 					}
 
 				});
@@ -137,8 +133,7 @@ namespace Satolist2.Control
 					var moduleViewModel = items.FirstOrDefault(o => o.ModulePath == module);
 					if(moduleViewModel == null)
 					{
-						moduleViewModel = new SaoriListModuleViewModel(this);
-						moduleViewModel.ModulePath = module;
+						moduleViewModel = new SaoriListModuleViewModel(this, module);
 						items.Add(moduleViewModel);
 					}
 					moduleViewModel.AddFunction(call, command);
@@ -214,6 +209,7 @@ namespace Satolist2.Control
 		private string modulePath;
 		private SaoriListViewModel parent;
 
+		public SaoriListViewModel Parent => parent;
 		public ReadOnlyObservableCollection<SaoriListFunctionViewModel> Items => new ReadOnlyObservableCollection<SaoriListFunctionViewModel>(items);
 		public string Type => "SaoriModule";
 		public ActionCommand SelectModuleCommand { get; }
@@ -227,40 +223,29 @@ namespace Satolist2.Control
 			{
 				modulePath = value;
 				NotifyChanged();
+				parent.Main.SatoriConfViewModel.Changed();
 			}
 		}
 
 		public void AddFunction(string name, string command = "")
 		{
-			items.Add(new SaoriListFunctionViewModel(this) { Name = name, Command = command });
+			items.Add(new SaoriListFunctionViewModel(this, name, command));
 		}
 			
 
-		public SaoriListModuleViewModel(SaoriListViewModel parent)
+		public SaoriListModuleViewModel(SaoriListViewModel parent, string path)
 		{
+			this.parent = parent;
 			items = new ObservableCollection<SaoriListFunctionViewModel>();
-
-			/*
-			items.Add(new SaoriListFunctionViewModel(this)
-			{
-				Command = "calc",
-				Name = "calc"
-			});
-
-			items.Add(new SaoriListFunctionViewModel(this)
-			{
-				Command = "calc",
-				Name = "calc"
-			});
-			*/
+			modulePath = path;
 
 			SelectModuleCommand = new ActionCommand(
 				o =>
 				{
-					var path = SelectModule(parent.Main.Ghost.FullDictionaryPath);
-					if(!string.IsNullOrEmpty(path))
+					var module = SelectModule(parent.Main.Ghost.FullDictionaryPath);
+					if(!string.IsNullOrEmpty(module))
 					{
-						ModulePath = path;
+						ModulePath = module;
 					}
 				}
 				);
@@ -269,7 +254,10 @@ namespace Satolist2.Control
 				o =>
 				{
 					if (MessageBox.Show("SAORIモジュール設定を削除します。よろしいですか？", "SAORIリスト", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+					{
 						parent.RemoveModule(this);
+						parent.Main.SatoriConfViewModel.Changed();
+					}
 				}
 				);
 
@@ -278,6 +266,7 @@ namespace Satolist2.Control
 				{
 					//関数の追加
 					AddFunction(string.Empty, string.Empty);
+					parent.Main.SatoriConfViewModel.Changed();
 				}
 				);
 		}
@@ -325,6 +314,7 @@ namespace Satolist2.Control
 			set
 			{
 				name = value;
+				parent.Parent.Main.SatoriConfViewModel.Changed();
 				NotifyChanged();
 			}
 		}
@@ -334,19 +324,25 @@ namespace Satolist2.Control
 			set
 			{
 				command = value;
+				parent.Parent.Main.SatoriConfViewModel.Changed();
 				NotifyChanged();
 			}
 		}
 
-		public SaoriListFunctionViewModel(SaoriListModuleViewModel parent)
+		public SaoriListFunctionViewModel(SaoriListModuleViewModel parent, string name, string command)
 		{
 			this.parent = parent;
+			this.name = name;
+			this.command = command;
 
 			RemoveFunctionCommand = new ActionCommand(
 				o =>
 				{
 					if (MessageBox.Show("SAORI呼び出しを削除します。よろしいですか？", "SAORIリスト", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+					{
 						parent.RemoveFunction(this);
+						parent.Parent.Main.SatoriConfViewModel.Changed();
+					}
 				}
 				);
 		}

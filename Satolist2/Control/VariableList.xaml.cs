@@ -35,7 +35,7 @@ namespace Satolist2.Control
 		public const string ContentId = "VariableList";
 		private const int TabIndexList = 0;
 
-		private MainViewModel main;
+		public MainViewModel Main { get; }
 		private VariableList control;
 		private ObservableCollection<VariableListItemViewModel> items;
 		private TextDocument document;
@@ -81,7 +81,7 @@ namespace Satolist2.Control
 
 		public VariableListViewModel(MainViewModel main)
 		{
-			this.main = main;
+			Main = main;
 			items = new ObservableCollection<VariableListItemViewModel>();
 			commonLines = new List<string>();
 			document = new TextDocument();
@@ -95,6 +95,7 @@ namespace Satolist2.Control
 						var removes = items.Where(i => i.IsSelected).ToArray();
 						foreach (var item in removes)
 							items.Remove(item);
+						Main.SatoriConfViewModel.Changed();
 					}
 				},
 				o =>
@@ -109,9 +110,10 @@ namespace Satolist2.Control
 					UnSelectAll();
 
 					//アイテムを追加
-					items.Add(new VariableListItemViewModel(this));
+					items.Add(new VariableListItemViewModel(this, string.Empty, string.Empty));
 					items.Last().IsSelected = true;
 					RequestScroll(items.Last());
+					Main.SatoriConfViewModel.Changed();
 				}
 				);
 
@@ -143,10 +145,10 @@ namespace Satolist2.Control
 		//読み込み周辺
 		public void Load()
 		{
-			if(main.SatoriConfViewModel.LoadState == EditorLoadState.Loaded)
+			if(Main.SatoriConfViewModel.LoadState == EditorLoadState.Loaded)
 			{
-				main.SatoriConfViewModel.VariableInitializeListFileSaveBody = GetSaveBody;
-				Deserialize(main.SatoriConfViewModel.VariableInitializeListBody);
+				Main.SatoriConfViewModel.VariableInitializeListFileSaveBody = GetSaveBody;
+				Deserialize(Main.SatoriConfViewModel.VariableInitializeListBody);
 			}
 		}
 
@@ -166,11 +168,7 @@ namespace Satolist2.Control
 				}	
 
 				var sp = item.Split(Constants.TabSeparator, 2, StringSplitOptions.None);
-				items.Add(new VariableListItemViewModel(this)
-				{
-					Name = sp[0].Substring(1),
-					Data = sp.Length > 1 ? sp[1] : string.Empty
-				});
+				items.Add(new VariableListItemViewModel(this, sp[0].Substring(1), sp.Length > 1 ? sp[1] : string.Empty));
 			}
 		}
 
@@ -203,7 +201,7 @@ namespace Satolist2.Control
 
 		private void Document_TextChanged(object sender, EventArgs e)
 		{
-			main.SatoriConfViewModel.Changed();
+			Main.SatoriConfViewModel.Changed();
 		}
 
 		//保存内容を出力
@@ -245,6 +243,7 @@ namespace Satolist2.Control
 			set
 			{
 				name = value;
+				parent.Main.SatoriConfViewModel.Changed();
 				NotifyChanged();
 			}
 		}
@@ -255,6 +254,7 @@ namespace Satolist2.Control
 			set
 			{
 				data = value;
+				parent.Main.SatoriConfViewModel.Changed();
 				NotifyChanged();
 			}
 		}
@@ -269,9 +269,11 @@ namespace Satolist2.Control
 			}
 		}
 
-		public VariableListItemViewModel(VariableListViewModel parent)
+		public VariableListItemViewModel(VariableListViewModel parent, string name, string data)
 		{
 			this.parent = parent;
+			this.name = name;
+			this.data = data;
 			RemoveItemCommand = parent.RemoveItemCommand;
 			RemoveSingleItemCommand = new ActionCommand(
 				o =>
@@ -279,6 +281,7 @@ namespace Satolist2.Control
 					if(MessageBox.Show("項目を削除します。よろしいですか？", "変数リスト", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
 					{
 						this.parent.RemoveItem(this);
+						parent.Main.SatoriConfViewModel.Changed();
 					}
 				}
 				);
