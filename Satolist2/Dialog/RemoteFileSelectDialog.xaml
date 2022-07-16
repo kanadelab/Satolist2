@@ -50,7 +50,7 @@
 			</Button>
 		</StackPanel>
 
-		<ListView Grid.Row="2" ItemsSource="{Binding Items}" SelectedItem="{Binding SelectedItem, Mode=TwoWay}">
+		<ListView Grid.Row="2" Background="Transparent" x:Name="MainList" ItemsSource="{Binding Items}" SelectedItem="{Binding SelectedItem, Mode=TwoWay}">
 			<ListView.ItemContainerStyle>
 				<Style TargetType="ListViewItem" BasedOn="{StaticResource {x:Type ListViewItem}}">
 					<EventSetter Event="MouseDoubleClick" Handler="ListViewItem_MouseDoubleClick" />

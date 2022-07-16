@@ -175,13 +175,15 @@ namespace Satolist2.Dialog
 							parent = currentPath,
 							name = vm.Text
 						});
-						items.Insert(0, new FileListItem()
+						var newItem = new FileListItem()
 						{
 							FullName = string.Concat(currentPath, "/", vm.Text),
 							Name = vm.Text,
 							Type = FileListItemType.NewDirectory,
 							IsSelected = true
-						});
+						};
+						items.Insert(0, newItem);
+						dialog.MainList.ScrollIntoView(newItem);
 					}
 				}
 				);
