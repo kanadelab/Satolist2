@@ -171,6 +171,40 @@ namespace Satolist2.Control
 						offsetY += (image.Image.Size.Height - vm.BaseSizeY);
 
 					System.Drawing.Rectangle r = new System.Drawing.Rectangle(offsetX, offsetY, (int)(vm.SizeX / ex), (int)(vm.SizeY / ex));
+
+					//0サイズになった場合はデフォルトの100に変換
+					if (r.Width <= 0)
+						r.Width = 100;
+					if (r.Height <= 0)
+						r.Height = 100;
+
+					//境界チェック
+					if(image.Image.Width < r.X + r.Width)
+					{
+						if(image.Image.Width < r.Width)
+						{
+							r.X = 0;
+							r.Width = image.Image.Width;
+						}
+						else
+						{
+							r.X = image.Image.Width - r.Width;
+						}
+					}
+
+					if (image.Image.Height < r.Y + r.Height)
+					{
+						if (image.Image.Height < r.Height)
+						{
+							r.Y = 0;
+							r.Height = image.Image.Height;
+						}
+						else
+						{
+							r.Y = image.Image.Height - r.Height;
+						}
+					}
+
 					var cloneBitmap = image.Image.Clone(r, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
 
 					Main.MainWindow.Dispatcher.BeginInvoke(new Action(() =>
@@ -246,8 +280,8 @@ namespace Satolist2.Control
 			imageCache = cache;
 			Label = surface.Label;
 			FileName = surface.FileName;
-			SizeX = 100;
-			SizeY = 100;
+			SizeX = surface.FrameX;
+			SizeY = surface.FrameY;
 			Scope = surface.Scope;
 			Expand = surface.Expand;
 			OffsetX = surface.OffsetX;

@@ -117,7 +117,6 @@ namespace Satolist2.Core
 					cancel.ThrowIfCancellationRequested();
 
 					//さとりすとが選択するサーフェス情報を持ってくる
-					//TODO: scope対応
 					var generateSurfaces = new List<SurfacePreviewMetaDataRecord>();
 					foreach (var id in shell.SurfaceIDList)
 					{
@@ -133,6 +132,8 @@ namespace Satolist2.Core
 							IsEnableSurfaceViewer = record.SatolistViewerVisible,
 							OffsetX = record.SatolistPaletteOffsetX,
 							OffsetY = record.SatolistPaletteOffsetY,
+							FrameX = record.SatolistPaletteFrameX,
+							FrameY = record.SatolistPaletteFrameY,
 							SurfaceTableLabel = record.SurfaceTableLabel,
 							Scope = record.SatolistScope,
 							Expand = record.SatolistPaletteExpand
@@ -342,6 +343,10 @@ namespace Satolist2.Core
 		[JsonProperty]
 		public int OffsetY { get; set; }
 		[JsonProperty]
+		public int FrameX { get; set; }
+		[JsonProperty]
+		public int FrameY { get; set; }
+		[JsonProperty]
 		public string SurfaceTableLabel { get; set; }
 		[JsonProperty]
 		public double Expand { get; set; }
@@ -378,6 +383,8 @@ namespace Satolist2.Core
 			OffsetX = 0;
 			OffsetY = 0;
 			Expand = 1.0;
+			FrameX = 100;
+			FrameY = 100;
 		}
 	}
 }

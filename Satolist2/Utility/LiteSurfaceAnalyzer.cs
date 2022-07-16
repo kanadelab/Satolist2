@@ -15,6 +15,7 @@ namespace Satolist2.Utility
 	{
 		private static readonly Regex SurfaceRecordRegexPattern = new Regex("^surface(\\.append)?([0-9,-]+)");
 		private static readonly Regex SatolistPaletteOffsetRegiexPattern = new Regex("^//satolist.palette.offset,([0-9]+),([0-9]+)");
+		private static readonly Regex SatolistPaletteFrameRegiexPattern = new Regex("^//satolist.palette.frame,([0-9]+),([0-9]+)");
 		private static readonly Regex SatolistPaletteExpandRegiexPattern = new Regex("^//satolist.palette.expand,([0-9\\.]+)");
 		private static readonly Regex SatolistPaletteVisibleRegexPattern = new Regex("^//satolist.palette.visible,([0-9]+)");
 		private static readonly Regex SatolistViewerVisibleRegiexPattern = new Regex("^//satolist.viewer.visible,([0-9]+)");
@@ -26,6 +27,8 @@ namespace Satolist2.Utility
 		public string ShellDirectoryPath { get; private set; }
 		public int GlobalPaletteOffsetX { get; private set; }
 		public int GlobalPaletteOffsetY { get; private set; }
+		public int GlobalPaletteFrameX { get; private set; }
+		public int GlobalPaletteFrameY { get; private set; }
 		public double GlobalPaletteExpand { get; private set; }
 		public bool GlobalPaletteVisible { get; private set; }
 		public bool GlobalViewerVisible { get; private set; }
@@ -45,7 +48,11 @@ namespace Satolist2.Utility
 		public LiteSurfaceAnalyzer()
 		{
 			records = new Dictionary<long, LiteSurfaceRecord>();
+
+			//デフォルト値
 			GlobalPaletteExpand = 1.0;
+			GlobalPaletteFrameX = 100;
+			GlobalPaletteFrameY = 100;
 		}
 
 		public void Load(string shellDirectory)
@@ -99,6 +106,10 @@ namespace Satolist2.Utility
 				{
 					record.Value.SatolistPaletteExpand = GlobalPaletteExpand;
 				}
+
+				//フレーム設定は個々には設定しない。ただデータはサーフェスの配列なのでそれぞれに情報を書き込むのみしておく
+				record.Value.SatolistPaletteFrameX = GlobalPaletteFrameX;
+				record.Value.SatolistPaletteFrameY = GlobalPaletteFrameY;
 			}
 
 			//surfacetable.txtをロード
@@ -165,6 +176,23 @@ namespace Satolist2.Utility
 						}
 					}
 					continue;
+				}
+
+				var paletteFrameMatch = SatolistPaletteFrameRegiexPattern.Match(line);
+				if(paletteFrameMatch.Success)
+				{
+					int x, y;
+					if(
+						int.TryParse(paletteFrameMatch.Groups[1].Value, out x) &&
+						int.TryParse(paletteFrameMatch.Groups[2].Value, out y)
+						)
+					{
+						if(currentRecord == null)
+						{
+							GlobalPaletteFrameX = x;
+							GlobalPaletteFrameY = y;
+						}
+					}
 				}
 
 				//拡大
@@ -317,6 +345,8 @@ namespace Satolist2.Utility
 		public bool UseSatolistPaletteOffset { get; set; }
 		public int SatolistPaletteOffsetX { get; set; }
 		public int SatolistPaletteOffsetY { get; set; }
+		public int SatolistPaletteFrameX { get; set; }
+		public int SatolistPaletteFrameY { get; set; }
 		public bool UseSatolistPaletteExpand { get; set; }
 		public double SatolistPaletteExpand { get; set; }
 		public bool UseSatolistPaletteVisible { get; set; }
