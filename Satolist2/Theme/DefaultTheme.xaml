@@ -8,4 +8,5 @@
 	<SolidColorBrush x:Key="TextEditorBackgroundColor">#FFFFFF</SolidColorBrush>
 
 	<Style TargetType="ListViewItem" />
+	<Style TargetType="ListView" />
 </ResourceDictionary>
