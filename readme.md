@@ -50,12 +50,14 @@ https://opensource.org/licenses/MS-PL
 
 * MITライセンスのパッケージを使用しています  
 https://opensource.org/licenses/mit-license.php
-  * AvalonEdit
   * Newtonsoft.Json
   * FluentFTP
   * WindowsAPICodePack
   * ControlzEx
   * MahApps.Metro
+
+* MITライセンスのソースコードを使用しています
+  * https://github.com/icsharpcode/AvalonEdit
 
 * Apache2.0 ライセンスの素材を使用しています。  
   https://www.apache.org/licenses/LICENSE-2.0
