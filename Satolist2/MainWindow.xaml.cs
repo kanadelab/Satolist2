@@ -1095,6 +1095,10 @@ namespace Satolist2
 				o =>
 				{
 					var fontDialog = new System.Windows.Forms.FontDialog();
+					if (!string.IsNullOrEmpty(MainViewModel.EditorSettings.GeneralSettings.TextEditorFontName) && MainViewModel.EditorSettings.GeneralSettings.TextEditorFontSize > 0)
+					{
+						fontDialog.Font = new System.Drawing.Font(MainViewModel.EditorSettings.GeneralSettings.TextEditorFontName, (float)MainViewModel.EditorSettings.GeneralSettings.TextEditorFontSize);
+					}
 					fontDialog.AllowScriptChange = false;
 					fontDialog.AllowVerticalFonts = false;
 					fontDialog.AllowSimulations = false;
@@ -1104,7 +1108,7 @@ namespace Satolist2
 					if (fontDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
 					{
 						EditorSettings.GeneralSettings.TextEditorFontName = fontDialog.Font.Name;
-						EditorSettings.GeneralSettings.TextEditorFontSize = fontDialog.Font.SizeInPoints;
+						EditorSettings.GeneralSettings.TextEditorFontSize = fontDialog.Font.Size;
 						MainWindow.UpdateTextEditorFonts();
 						EditorSettings.SaveGeneralSettings();
 					}
