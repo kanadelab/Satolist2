@@ -186,7 +186,9 @@ namespace Satolist2.Control
 			if(!string.IsNullOrEmpty(MainViewModel.EditorSettings.GeneralSettings.TextEditorFontName) && MainViewModel.EditorSettings.GeneralSettings.TextEditorFontSize > 0 )
 			{
 				MainTextEditor.TextArea.FontFamily = new FontFamily(MainViewModel.EditorSettings.GeneralSettings.TextEditorFontName);
-				MainTextEditor.TextArea.FontSize = MainViewModel.EditorSettings.GeneralSettings.TextEditorFontSize;
+
+				//フォントサイズが小数点付きだと正しくタブサイズが計算できない
+				MainTextEditor.TextArea.FontSize = (int)MainViewModel.EditorSettings.GeneralSettings.TextEditorFontSize;
 			}
 		}
 
