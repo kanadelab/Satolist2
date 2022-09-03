@@ -211,11 +211,29 @@ namespace Satolist2.Dialog
 				Syntax = ScriptSyntax.Comment
 			});
 
+			/*
 			Colors.Add(new GeneralSettingsColorSettingViewModel(this)
 			{
 				Label = "タブ",
 				DefaultColor = Themes.ApplicationTheme.GetEditorHilight(ScriptSyntax.Tab),
 				Syntax = ScriptSyntax.Tab,
+				IsBackgroundColor = true
+			});
+			*/
+
+			Colors.Add(new GeneralSettingsColorSettingViewModel(this)
+			{
+				Label = "半角スペース",
+				DefaultColor = Themes.ApplicationTheme.GetEditorHilight(ScriptSyntax.Space),
+				Syntax = ScriptSyntax.Space,
+				IsBackgroundColor = true
+			});
+
+			Colors.Add(new GeneralSettingsColorSettingViewModel(this)
+			{
+				Label = "全角スペース",
+				DefaultColor = Themes.ApplicationTheme.GetEditorHilight(ScriptSyntax.WideSpace),
+				Syntax = ScriptSyntax.WideSpace,
 				IsBackgroundColor = true
 			});
 

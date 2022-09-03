@@ -1054,8 +1054,8 @@ namespace ICSharpCode.AvalonEdit.Rendering
 			return new VisualLineTextParagraphProperties {
 				defaultTextRunProperties = defaultTextRunProperties,
 				textWrapping = canHorizontallyScroll ? TextWrapping.NoWrap : TextWrapping.Wrap,
-				//tabSize = Options.IndentationSize * WideSpaceWidth
-				tabSize = (Options.IndentationSize + 0.9) * WideSpaceWidth	//nanachi: 末尾に全角文字がある場合にTabを入力するとタブのサイズがゼロになって見えない問題があった。そのためタブサイズを中途半端にしてタブが見えるように調整…。
+				tabSize = Options.IndentationSize * WideSpaceWidth
+				//tabSize = (Options.IndentationSize + 0.9) * WideSpaceWidth	//nanachi: 末尾に全角文字がある場合にTabを入力するとタブのサイズがゼロになって見えない問題があった。そのためタブサイズを中途半端にしてタブが見えるように調整…。
 			};
 		}
 

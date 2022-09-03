@@ -121,7 +121,9 @@ namespace Satolist2.Themes
 			{ ScriptSyntax.Function, 0x0080ff },
 			{ ScriptSyntax.Saori, 0x0080ff },
 			{ ScriptSyntax.Replace, 0x404070 },
-			{ ScriptSyntax.ReplaceAfter, 0x404070 }
+			{ ScriptSyntax.ReplaceAfter, 0x404070 },
+			{ ScriptSyntax.Space, 0xDDDDFF },
+			{ ScriptSyntax.WideSpace, 0xDDFFDD }
 		};
 
 		private static Dictionary<ScriptSyntax, uint> DarkThemeEditorHilight = new Dictionary<ScriptSyntax, uint>()
@@ -144,7 +146,9 @@ namespace Satolist2.Themes
 			{ ScriptSyntax.Function, 0x0080ff },
 			{ ScriptSyntax.Saori, 0x44AAff },
 			{ ScriptSyntax.Replace, 0x8080A0 },
-			{ ScriptSyntax.ReplaceAfter, 0x8080A0 }
+			{ ScriptSyntax.ReplaceAfter, 0x8080A0 },
+			{ ScriptSyntax.Space, 0x202066 },
+			{ ScriptSyntax.WideSpace, 0x306630 }
 		};
 
 		public static Color UintToColorRGB(uint color)

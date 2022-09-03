@@ -31,7 +31,10 @@ namespace Satolist2.Utility
 		Function,
 		Saori,
 		Replace,
-		ReplaceAfter
+		ReplaceAfter,
+		Space,
+		WideSpace,
+		
 	}
 
 	class SatoriSyntaxRuleSet : HighlightingRuleSet
@@ -87,7 +90,9 @@ namespace Satolist2.Utility
 
 			new SyntaxDefinition("＃.*", ScriptSyntax.Comment),
 
-			new SyntaxDefinition("\t", ScriptSyntax.Tab)
+			//new SyntaxDefinition("\t", ScriptSyntax.Tab)
+			new SyntaxDefinition(" ", ScriptSyntax.Space),
+			new SyntaxDefinition("　", ScriptSyntax.WideSpace)
 		};
 
 
@@ -109,10 +114,18 @@ namespace Satolist2.Utility
 				var brush = new SimpleHighlightingBrush(col);
 
 				rule.Color = new HighlightingColor();
-				if (def.syntaxType != ScriptSyntax.Tab)
-					rule.Color.Foreground = brush;
-				else
-					rule.Color.Background = brush;
+				switch(def.syntaxType)
+				{
+					case ScriptSyntax.Tab:
+					case ScriptSyntax.Space:
+					case ScriptSyntax.WideSpace:
+						rule.Color.Background = brush;
+						break;
+					default:
+						rule.Color.Foreground = brush;
+						break;
+				}
+
 				rule.Regex = new System.Text.RegularExpressions.Regex(def.pattern);
 				Rules.Add(rule);
 			}
