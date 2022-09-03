@@ -1,4 +1,6 @@
-﻿using ICSharpCode.AvalonEdit.Editing;
+﻿using ICSharpCode.AvalonEdit.Document;
+using ICSharpCode.AvalonEdit.Editing;
+using ICSharpCode.AvalonEdit.Rendering;
 using Satolist2.Utility;
 using System;
 using System.Collections.Generic;
@@ -78,10 +80,12 @@ namespace Satolist2.Control
 		private string searchString;
 		private string searchInformation;
 		private MatchCollection currentMatches;
+		private SearchHilighter searchHilighter_;
 
 		public ActionCommand CloseSearchBoxCommand { get; }
 		public ActionCommand SearchNextCommand { get; }
 		public ActionCommand SearchPrevCommand { get; }
+
 		public string SearchString
 		{
 			get => searchString ?? string.Empty;
@@ -90,6 +94,7 @@ namespace Satolist2.Control
 				if (searchString != value)
 				{
 					searchString = value;
+					searchHilighter_.SearchString = searchString;
 					NotifyChanged();
 					UpdateSearchString();
 				}
@@ -142,20 +147,9 @@ namespace Satolist2.Control
 			//結果表示
 			SetSearchInformation();
 
-			//ハイライタを再設定
-			if (control.AttachEditor.SyntaxHighlighting is SatoriSyntaxHilighter hilighter)
-			{
-				hilighter.SearchHilightRule.Regex = new Regex(Regex.Escape(SearchString));
-				hilighter.UpdateSearchHilighter();
-
-				//再設定。直接設定しても反映されないようなので遅延で再設定する
-				control.AttachEditor.SyntaxHighlighting = null;
-				control.Dispatcher.BeginInvoke(new Action(() =>
-				{
-					control.AttachEditor.SyntaxHighlighting = hilighter;
-				}
-				), DispatcherPriority.Render);
-			}
+			//検索ハイライタを再設定
+			control.AttachEditor.TextArea.TextView.LineTransformers.Remove(searchHilighter_);
+			control.AttachEditor.TextArea.TextView.LineTransformers.Add(searchHilighter_);
 		}
 
 		//検索対象の更新
@@ -239,6 +233,7 @@ namespace Satolist2.Control
 		{
 			this.control = control;
 			searchString = string.Empty;
+			searchHilighter_ = new SearchHilighter();
 
 			CloseSearchBoxCommand = new ActionCommand(
 				o =>
@@ -261,6 +256,30 @@ namespace Satolist2.Control
 					MoveSearch(false);
 				}
 				);
+		}
+	}
+
+	//検索色付け用の機能
+	internal class SearchHilighter : DocumentColorizingTransformer
+	{
+		public string SearchString { get; set; }
+
+		protected override void ColorizeLine(DocumentLine line)
+		{
+			var lineStr = CurrentContext.Document.GetText(line.Offset, line.Length);
+			var pattern = new Regex(Regex.Escape(SearchString));
+			if (!string.IsNullOrEmpty(pattern.ToString()))
+			{
+				var matches = pattern.Matches(lineStr);
+				foreach(Match m in matches)
+				{
+					ChangeLinePart(line.Offset + m.Index, line.Offset + m.Index + SearchString.Length,
+						(elem) =>
+						{
+							elem.BackgroundBrush = Brushes.Yellow;
+						});
+				}
+			}
 		}
 	}
 }

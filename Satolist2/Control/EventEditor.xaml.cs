@@ -249,8 +249,6 @@ namespace Satolist2.Control
 		public object HilightColors { get; private set; }
 		public bool EnableHeaderEdit => Event.Type != EventType.Header;
 
-		public HighlightingRule searchRule = new HighlightingRule();
-
 		public EventEditorViewModel(MainViewModel main, EventModel ev)
 		{
 			Main = main;
