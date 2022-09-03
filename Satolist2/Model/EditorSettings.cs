@@ -28,7 +28,7 @@ namespace Satolist2.Model
 		private const string LoadErrorMessage = "設定ファイルのロードに失敗しました。";
 
 		//デフォルトフォント
-		public const string DefaultFont = "MS ゴシック";
+		public const string DefaultFont = "ＭＳ ゴシック";
 		public const int DefaultFontSize = 14;
 
 		public InsertItemPaletteModel InsertPalette { get; set; }
@@ -309,6 +309,9 @@ namespace Satolist2.Model
 
 			IsEnableUpdateCheck = true;
 			IsEnablePreReleaseUpdate = false;
+
+			TextEditorFontName = EditorSettings.DefaultFont;
+			TextEditorFontSize = EditorSettings.DefaultFontSize;
 		}
 
 		public GeneralSettings Clone()
