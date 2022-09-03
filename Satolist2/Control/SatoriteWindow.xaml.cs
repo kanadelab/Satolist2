@@ -26,6 +26,7 @@ namespace Satolist2.Control
 		public SatoriteWindow()
 		{
 			InitializeComponent();
+			MainTextEditor.TextArea.IndentationStrategy = null;
 		}
 
 		public void UpdateHilighting()
