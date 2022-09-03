@@ -1099,6 +1099,10 @@ namespace Satolist2
 					{
 						fontDialog.Font = new System.Drawing.Font(MainViewModel.EditorSettings.GeneralSettings.TextEditorFontName, (float)MainViewModel.EditorSettings.GeneralSettings.TextEditorFontSize);
 					}
+					else
+					{
+						fontDialog.Font = new System.Drawing.Font(EditorSettings.DefaultFont, EditorSettings.DefaultFontSize);
+					}
 					fontDialog.AllowScriptChange = false;
 					fontDialog.AllowVerticalFonts = false;
 					fontDialog.AllowSimulations = false;

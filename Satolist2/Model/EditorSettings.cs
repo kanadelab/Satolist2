@@ -27,6 +27,10 @@ namespace Satolist2.Model
 		//ロードエラー定型文
 		private const string LoadErrorMessage = "設定ファイルのロードに失敗しました。";
 
+		//デフォルトフォント
+		public const string DefaultFont = "MS ゴシック";
+		public const int DefaultFontSize = 14;
+
 		public InsertItemPaletteModel InsertPalette { get; set; }
 		public UploadServerSettingModelBase[] UploadSettings { get; set; }
 		public TemporarySettings TemporarySettings { get; set; }
