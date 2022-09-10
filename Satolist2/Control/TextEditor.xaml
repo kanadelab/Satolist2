@@ -43,6 +43,7 @@
 				<avalonEdit:TextEditor.InputBindings>
 					<KeyBinding Gesture="ALT+Q" Command="{Binding SendToGhostCommand}" />
 					<KeyBinding Gesture="CTRL+F" Command="{Binding ShowSearchBoxCommand}" />
+					<KeyBinding Gesture="CTRL+SPACE" Command="{Binding CompletionCommand}" />
 				</avalonEdit:TextEditor.InputBindings>
 				<avalonEdit:TextEditor.ContextMenu>
 					<ContextMenu x:Name="ContextMenuRoot">

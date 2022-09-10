@@ -124,8 +124,9 @@ namespace Satolist2.Model
 		private string fullPath;
 		private string body;
 		private bool isChanged;     //変更検出
-		private ObservableCollection<EventModel> events;
-		private bool isSerialized;                          //リスト化解除されたか
+		private ObservableCollection<EventModel> events;		//リスト化された辞書の内容一覧
+		private List<EventModel> instantDeserializedEvents;		//リスト化解除されているが、簡易解析された一覧
+		private bool isSerialized;								//リスト化解除されたか
 
 		public GhostModel Ghost { get; }
 		public bool IsInlineEventAnalyze { get; set; }
@@ -184,6 +185,9 @@ namespace Satolist2.Model
 					isSerialized = true;
 					NotifyChanged(nameof(IsSerialized));
 				}
+
+				//解析データを無効にする
+				instantDeserializedEvents = null;
 			}
 		}
 
@@ -259,6 +263,31 @@ namespace Satolist2.Model
 		public ReadOnlyObservableCollection<EventModel> Events
 		{
 			get => new ReadOnlyObservableCollection<EventModel>(events);
+		}
+
+		//解析用の一時的なデータを取得
+		public IEnumerable<EventModel> InstantDeserializedEvents
+		{
+			get
+			{
+				if (IsSatoriDictionary)
+				{
+					if (isSerialized)
+					{
+						if (instantDeserializedEvents == null)
+							InstantDeserialize();
+						return instantDeserializedEvents;
+					}
+					else
+					{
+						return Events;
+					}
+				}
+				else
+				{
+					return Array.Empty<EventModel>();
+				}
+			}
 		}
 
 		//リスト化解除されているか
@@ -401,7 +430,7 @@ namespace Satolist2.Model
 			return string.Join(Constants.NewLine, serializedEvents);
 		}
 
-		private string TruncateDisableMark(string name, out bool isDisabled)
+		private static string TruncateDisableMark(string name, out bool isDisabled)
 		{
 			if (string.IsNullOrEmpty(name))
 			{
@@ -424,6 +453,15 @@ namespace Satolist2.Model
 		public void Deserialize(string text)
 		{
 			bool isChanged = IsChanged;
+
+			DeserializeInternal(text, (ev) => AddEvent(ev));
+
+			//isChangedの状態を復元
+			IsChanged = isChanged;
+		}
+
+		public void DeserializeInternal(string text, Action<EventModel> addEventAction)
+		{
 			var lines = text.Split(Constants.NewLineSeparator, StringSplitOptions.None);
 			var eventLines = new List<string>();
 			string eventName = null;
@@ -455,7 +493,7 @@ namespace Satolist2.Model
 					eventName = TruncateDisableMark(eventName, out isDisabled);
 					var ev = new EventModel(eventType, eventName, eventCondition, string.Join(Constants.NewLine, eventLines), IsInlineEventAnalyze, eventLineIndex);
 					ev.Disabled = isDisabled;
-					AddEvent(ev);
+					addEventAction(ev);
 
 					eventLastEmptyLineCount = 0;
 					eventLineIndex = index + 1;
@@ -510,11 +548,15 @@ namespace Satolist2.Model
 				eventName = TruncateDisableMark(eventName, out isDisabled);
 				var lastEvent = new EventModel(eventType, eventName, eventCondition, string.Join(Constants.NewLine, eventLines), IsInlineEventAnalyze, eventLineIndex);
 				lastEvent.Disabled = isDisabled;
-				AddEvent(lastEvent);
+				addEventAction(lastEvent);
 			}
+		}
 
-			//isChangedの状態を復元
-			IsChanged = isChanged;
+		//検索等の目的での内部的なリスト化解除
+		private void InstantDeserialize()
+		{
+			instantDeserializedEvents = new List<EventModel>();
+			DeserializeInternal(Body, (ev) => instantDeserializedEvents.Add(ev));
 		}
 
 		//変更済みとしてマーク

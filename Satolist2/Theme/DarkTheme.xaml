@@ -1,6 +1,6 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 					xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-					xmlns:metro="clr-namespace:MetroRadiance.Themes;assembly=MetroRadiance"
+					xmlns:avalonEditCodeComp="clr-namespace:ICSharpCode.AvalonEdit.CodeCompletion;assembly=ICSharpCode.AvalonEdit"
 					xmlns:avalonEdit="http://icsharpcode.net/sharpdevelop/avalonedit">
 	<ResourceDictionary.MergedDictionaries>
 		<ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
@@ -16,7 +16,9 @@
 
 	<Style TargetType="avalonEdit:TextEditor" BasedOn="{StaticResource {x:Type avalonEdit:TextEditor}}">
 		<Setter Property="Background" Value="#1e1e1e" />
-		<Setter Property="Foreground" Value="#DCDCDC" />
+		<Setter Property="Foreground" Value="#dcdcdc" />
 	</Style>
-
+	<Style TargetType="avalonEditCodeComp:CompletionWindow">
+		<Setter Property="Foreground" Value="#dcdcdc" />
+	</Style>
 </ResourceDictionary>

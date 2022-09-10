@@ -246,6 +246,7 @@
     <Compile Include="Model\TextEditor.cs" />
     <Compile Include="Model\UploadSettings.cs" />
     <Compile Include="Theme\ApplicationTheme.cs" />
+    <Compile Include="Utility\CompletionManager.cs" />
     <Compile Include="Utility\Converter.cs" />
     <Compile Include="Utility\DataModelManager.cs" />
     <Compile Include="Utility\DictionaryUtility.cs" />

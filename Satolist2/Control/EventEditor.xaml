@@ -24,6 +24,12 @@
 			<RowDefinition Height="*" />
 		</Grid.RowDefinitions>
 
+		<Popup x:Name="InputHelpPopup">
+			<Grid Width="200" Height="50" Background="DarkGray">
+				<TextBlock Text="テストテキスト" />
+			</Grid>
+		</Popup>
+
 		<Grid Grid.Row="0" IsEnabled="{Binding EnableHeaderEdit}">
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition Width="auto" />
@@ -71,6 +77,7 @@
 				<avalonEdit:TextEditor.InputBindings>
 					<KeyBinding Gesture="ALT+Q" Command="{Binding SendToGhostCommand}" />
 					<KeyBinding Gesture="CTRL+F" Command="{Binding ShowSearchBoxCommand}" />
+					<KeyBinding Gesture="CTRL+SPACE" Command="{Binding CompletionCommand}" />
 				</avalonEdit:TextEditor.InputBindings>
 
 				<avalonEdit:TextEditor.ContextMenu>

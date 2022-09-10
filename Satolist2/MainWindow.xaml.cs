@@ -357,7 +357,7 @@ namespace Satolist2
 		internal TemporaryTextEditor OpenTemporaryTextEditor(string body, string title)
 		{
 			var editor = new TemporaryTextEditor();
-			var viewModel = new TemporaryTextEditorViewModel()
+			var viewModel = new TemporaryTextEditorViewModel(mainViewModel)
 			{
 				Title = title,
 				Text = body

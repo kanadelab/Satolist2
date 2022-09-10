@@ -74,18 +74,16 @@ namespace Satolist2.Control
 		
 		public DictionaryModel TextFile { get; }
 		public TextDocument Document { get; }
-		public MainViewModel Main { get; }
 		public ActionCommand SendToGhostCommand { get; }
 		public ActionCommand InsertCommand { get; }
 
 		public override ICSharpCode.AvalonEdit.TextEditor MainTextEditor => control.MainTextEditor;
 
-		public TextEditorViewModel(MainViewModel main, DictionaryModel textFile)
+		public TextEditorViewModel(MainViewModel main, DictionaryModel textFile) : base(main)
 		{
 			randomizedContetnId = Guid.NewGuid().ToString();    //複数出現するのでユニークなIDを振る
 			TextFile = textFile;
 
-			Main = main;
 			Main.PropertyChanged += Main_PropertyChanged;
 
 			Document = new TextDocument(TextFile.Body);

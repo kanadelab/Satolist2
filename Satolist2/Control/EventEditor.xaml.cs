@@ -20,6 +20,9 @@ using System.Windows.Shapes;
 using Satolist2.Dialog;
 using ICSharpCode.AvalonEdit.Highlighting;
 using System.Windows.Threading;
+using System.Windows.Controls.Primitives;
+using ICSharpCode.AvalonEdit.CodeCompletion;
+using ICSharpCode.AvalonEdit.Editing;
 
 namespace Satolist2.Control
 {
@@ -91,6 +94,7 @@ namespace Satolist2.Control
 
 	internal abstract class TextEditorViewModelBase : NotificationObject, IDockingWindowContent
 	{
+		public MainViewModel Main { get; }
 		private bool isShowSearchBox;
 		private bool isActiveTextEditor;
 
@@ -121,6 +125,7 @@ namespace Satolist2.Control
 		public abstract string DocumentTitle { get; }
 
 		public ActionCommand ShowSearchBoxCommand { get; }
+		public ActionCommand CompletionCommand { get; }
 
 		public abstract ICSharpCode.AvalonEdit.TextEditor MainTextEditor { get; }
 
@@ -163,8 +168,10 @@ namespace Satolist2.Control
 		}
 		public abstract string DockingContentId {get;}
 
-		public TextEditorViewModelBase()
+		public TextEditorViewModelBase(MainViewModel main)
 		{
+			Main = main;
+
 			//検索
 			ShowSearchBoxCommand = new ActionCommand(
 				o =>
@@ -172,6 +179,14 @@ namespace Satolist2.Control
 					IsShowSearchBox = true;
 				}
 				);
+
+			//入力補助
+			CompletionCommand = new ActionCommand(
+				o =>
+				{
+					CompletionManager p = new CompletionManager();
+					p.RequestCompletion(MainTextEditor, Main);
+				});
 		}
 
 		protected void NotifyDocumentTitleChanged()
@@ -244,14 +259,13 @@ namespace Satolist2.Control
 
 		public ActionCommand SendToGhostCommand {get;}
 		public ActionCommand InsertCommand { get; }
-		public MainViewModel Main { get; }
+
 		public override ICSharpCode.AvalonEdit.TextEditor MainTextEditor => control.MainTextEditor;
 		public object HilightColors { get; private set; }
 		public bool EnableHeaderEdit => Event.Type != EventType.Header;
 
-		public EventEditorViewModel(MainViewModel main, EventModel ev)
+		public EventEditorViewModel(MainViewModel main, EventModel ev) : base(main)
 		{
-			Main = main;
 			Main.PropertyChanged += Main_PropertyChanged;
 
 			randomizedContentId = Guid.NewGuid().ToString();	//複数出現するのでユニークなIDを振る
@@ -278,6 +292,7 @@ namespace Satolist2.Control
 				);
 		}
 
+		
 		private void Main_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
 		{
 			if(e.PropertyName == nameof(MainViewModel.InsertPalette))

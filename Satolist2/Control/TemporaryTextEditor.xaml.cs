@@ -82,7 +82,7 @@ namespace Satolist2.Control
 
 		public override ICSharpCode.AvalonEdit.TextEditor MainTextEditor => control.MainTextEditor;
 
-		public TemporaryTextEditorViewModel()
+		public TemporaryTextEditorViewModel(MainViewModel main):base(main)
 		{
 			document = new TextDocument();
 			title = "無題";
