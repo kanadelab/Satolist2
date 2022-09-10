@@ -89,7 +89,7 @@ namespace SatolistTest
 		[TestMethod]
 		public void SurfaceRangeTest()
 		{
-			string input = "10-20,10-20";
+			string input = "10-20,10-20,!15";
 			SurfaceRangeCollection range = SurfaceRangeCollection.MakeRange(input);
 			Console.WriteLine( string.Format("\"{0}\" -> \"{1}\"", input, range));
 		}
