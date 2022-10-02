@@ -7,6 +7,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Satolist2.Core.Win32Import;
 
 namespace Satolist2.Model
 {
@@ -20,6 +21,8 @@ namespace Satolist2.Model
 		public ObservableCollection<OpenGhostHistory> GhostHistory { get; set; }
 		[JsonProperty]
 		public string SerializedDockingLayout { get; set; }
+		[JsonProperty]
+		public WindowPlacement? WindowPlacement { get; set; }
 
 		public TemporarySettings()
 		{

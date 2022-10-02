@@ -42,6 +42,7 @@ namespace Satolist2
 		private MainViewModel mainViewModel;
 		private LayoutDocumentPane DocumentPane { get; set; }
 		private DockingWindow ActiveEditor { get; set; }
+		private IntPtr HWnd { get; set; }
 		public Window RootWindow { get; set; }
 
 		public ICSharpCode.AvalonEdit.TextEditor ActiveTextEditor
@@ -129,15 +130,21 @@ namespace Satolist2
 			//さとりすとのSSTP受信用ウインドウを起動
 			RootWindow.Closed += MainWindow_Closed;
 			RootWindow.Closing += Window_Closing;
-			Dispatcher.BeginInvoke(new Action(() =>
+			
+			//ハンドルのとりだし
+			var hwnd = (new System.Windows.Interop.WindowInteropHelper(RootWindow)).Handle;
+			Core.SSTPCallBackNativeWindow.Create(hwnd);
+			HWnd = hwnd;
+
+			//ここでhwndが確定するのでさとりすとの起動イベントを発生する
+			Utility.Satorite.NotifySSTPBroadcast("OnSatolistBoot", hwnd.ToString(), string.Empty, System.Reflection.Assembly.GetExecutingAssembly().Location);
+
+			if(MainViewModel.EditorSettings.TemporarySettings.WindowPlacement != null)
 			{
-				var hwnd = (new System.Windows.Interop.WindowInteropHelper(RootWindow)).Handle;
-				Core.SSTPCallBackNativeWindow.Create(hwnd);
-
-				//ここでhwndが確定するのでさとりすとの起動イベントを発生する
-				Utility.Satorite.NotifySSTPBroadcast("OnSatolistBoot", hwnd.ToString(), string.Empty, System.Reflection.Assembly.GetExecutingAssembly().Location);
-
-			}), System.Windows.Threading.DispatcherPriority.Render);
+				var placement = MainViewModel.EditorSettings.TemporarySettings.WindowPlacement.Value;
+				//ウインドウ設定
+				Win32Import.SetWindowPlacement(hwnd, ref placement);
+			}
 		}
 
 		private void MainWindow_Closed(object sender, EventArgs e)
@@ -619,6 +626,16 @@ namespace Satolist2
 				{
 					e.Cancel = true;
 					return;
+				}
+			}
+
+			//ウインドウ本体の配置も保存する
+			if (HWnd != default(IntPtr))
+			{
+				Win32Import.WindowPlacement placement = new Win32Import.WindowPlacement();
+				if (Win32Import.GetWindowPlacement(HWnd, ref placement) != 0)
+				{
+					MainViewModel.EditorSettings.TemporarySettings.WindowPlacement = placement;
 				}
 			}
 

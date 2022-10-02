@@ -22,6 +22,11 @@ namespace Satolist2
 		public DefaultRootWindow()
 		{
 			InitializeComponent();
+		}
+
+		protected override void OnSourceInitialized(EventArgs e)
+		{
+			base.OnSourceInitialized(e);
 			Main.SetRoot(this);
 		}
 	}

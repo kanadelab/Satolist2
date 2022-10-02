@@ -1,4 +1,5 @@
-﻿using Satolist2.Utility;
+﻿using MahApps.Metro.Converters;
+using Satolist2.Utility;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -145,6 +146,81 @@ namespace Satolist2.Core
 			public IntPtr lpData;
 		}
 
+		public struct WindowPlacement
+		{
+			public int length;
+			public int flags;
+			public SW chowCmd;
+			public POINT minPosition;
+			public POINT maxPosition;
+			public RECT normalPosition;
+		}
+
+		public enum SW
+		{
+			HIDE = 0,
+			SHOWNORMAL = 1,
+			SHOWMINIMIZED = 2,
+			SHOWMAXIMIZED = 3,
+			SHOWNOACTIVATE = 4,
+			SHOW = 5,
+			MINIMIZE = 6,
+			SHOWMINNOACTIVE = 7,
+			SHOWNA = 8,
+			RESTORE = 9,
+			SHOWDEFAULT = 10,
+		}
+
+		public struct POINT
+		{
+			public int x;
+			public int y;
+
+			public int X
+			{
+				get => x;
+				set => x = value;
+			}
+
+			public int Y
+			{
+				get => y;
+				set => y = value;
+			}
+		}
+
+		public struct RECT
+		{
+			public int left;
+			public int top;
+			public int right;
+			public int bottom;
+
+			public int Left
+			{
+				get => left;
+				set => left = value;
+			}
+
+			public int Top
+			{
+				get => top;
+				set => top = value;
+			}
+
+			public int Right
+			{
+				get => right;
+				set => right = value;
+			}
+
+			public int Bottom
+			{
+				get => bottom;
+				set => bottom = value;
+			}
+		}
+
 		public static string CopyDataStructToString(IntPtr lParam, UIntPtr targetDwData )
 		{
 			CopyDataStruct cds = (CopyDataStruct)Marshal.PtrToStructure<CopyDataStruct>(lParam);
@@ -175,5 +251,10 @@ namespace Satolist2.Core
 		public static extern IntPtr SendMessageTimeoutA(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam, uint flags, uint timeout, IntPtr lpdwResult);
 		[DllImport("user32.dll")]
 		public static extern int IsWindow(IntPtr hwnd);
+		[DllImport("user32.dll")]
+		public static extern int SetWindowPlacement(IntPtr hwnd, ref WindowPlacement placement);
+		[DllImport("user32.dll")]
+		public static extern int GetWindowPlacement(IntPtr hwnd, ref WindowPlacement placement);
+
 	}
 }

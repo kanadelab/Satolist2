@@ -1,4 +1,5 @@
 ﻿using MahApps.Metro.Controls;
+using Satolist2.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,6 +24,11 @@ namespace Satolist2
 		public DarkRootWindow()
 		{
 			InitializeComponent();
+		}
+
+		protected override void OnSourceInitialized(EventArgs e)
+		{
+			base.OnSourceInitialized(e);
 			Main.SetRoot(this);
 		}
 	}
