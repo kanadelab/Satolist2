@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.31729.503
+# Visual Studio Version 17
+VisualStudioVersion = 17.3.32811.315
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Satolist2", "Satolist2\Satolist2.csproj", "{63F464CC-8796-40B0-A823-18C07B7C86AA}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -21,10 +21,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SatolistDeploy", "SatolistDeploy\SatolistDeploy.csproj", "{5B7644AA-2E0F-4F45-80C0-01C50208EB22}"
 EndProject
 Global
-	GlobalSection(SharedMSBuildProjectFiles) = preSolution
-		SatolistResource\SatolistResource.projitems*{63f464cc-8796-40b0-a823-18c07b7c86aa}*SharedItemsImports = 4
-		SatolistResource\SatolistResource.projitems*{b1229b67-46c4-4a31-8ea9-6736d543c08d}*SharedItemsImports = 13
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Debug|x64 = Debug|x64
@@ -150,5 +146,9 @@ Global
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {ECD96FF8-04C8-4688-A4E8-02616B872ACD}
+	EndGlobalSection
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		SatolistResource\SatolistResource.projitems*{63f464cc-8796-40b0-a823-18c07b7c86aa}*SharedItemsImports = 4
+		SatolistResource\SatolistResource.projitems*{b1229b67-46c4-4a31-8ea9-6736d543c08d}*SharedItemsImports = 13
 	EndGlobalSection
 EndGlobal
