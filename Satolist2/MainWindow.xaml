@@ -78,7 +78,7 @@
 				<MenuItem Header="さとりて" x:Name="SatoriteVisibleMenu" IsCheckable="True" IsChecked="{Binding IsVisible, Mode=TwoWay}" />
 			</MenuItem>
 			<MenuItem Header="デバッグ">
-				<MenuItem Header="SHIORI Reload" Command="{Binding ReloadShioriCommand}" InputGestureText="Ctrl+Alt+R" />
+				<MenuItem Header="起動中のゴーストの辞書をリロード" Command="{Binding ReloadShioriCommand}" InputGestureText="Ctrl+Alt+R" />
 			</MenuItem>
 			<MenuItem Header="更新">
 				<MenuItem Header="narファイル作成" Command="{Binding ExportNarCommand}" />
