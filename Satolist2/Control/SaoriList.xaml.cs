@@ -123,12 +123,12 @@ namespace Satolist2.Control
 			foreach(var item in lines)
 			{
 				var sp = item.Split(Constants.CommaSeparator, 3, StringSplitOptions.None);
-				if(sp.Length == 3)
+				if(sp.Length >= 2)
 				{
 					//SAORI有効レコード
 					var call = sp[0];
 					var module = sp[1];
-					var command = sp[2];
+					var command = sp.Length == 3 ? sp[2] : string.Empty;
 
 					var moduleViewModel = items.FirstOrDefault(o => o.ModulePath == module);
 					if(moduleViewModel == null)
