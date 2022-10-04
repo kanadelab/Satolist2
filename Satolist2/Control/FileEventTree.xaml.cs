@@ -303,7 +303,7 @@ namespace Satolist2.Control
 		}
 
 		//ファイルイベントツリー上で表示する名前
-		public string Label => Dictionary.RelativeName;
+		public string Label => Dictionary.Name;
 
 		//アイテムを追加
 		public ActionCommand AddItemCommand { get; }
