@@ -42,7 +42,6 @@ namespace Satolist2.Utility
 						var tagName = jobj.Value<string>("tag_name");
 						var name = jobj.Value<string>("name");
 						var body = jobj.Value<string>("body");
-						long versionIndex;
 
 						//bodyを解析してバージョンを取得
 						if (isDraft)
