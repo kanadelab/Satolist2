@@ -64,7 +64,6 @@ namespace Satolist2.Control
 	internal class TextEditorViewModel : TextEditorViewModelBase, IDisposable, IControlBindedReceiver
 	{
 		private TextEditor control;
-		private bool disableBodyPropertyChanged;
 		private string randomizedContetnId;
 		
 		public override string DocumentTitle => TextFile.RelativeName;
@@ -116,9 +115,7 @@ namespace Satolist2.Control
 
 		private void Document_TextChanged(object sender, EventArgs e)
 		{
-			disableBodyPropertyChanged = true;
 			TextFile.Body = Document.Text;
-			disableBodyPropertyChanged = false;
 		}
 
 		public void MoveCaretToLine(int lineIndex)

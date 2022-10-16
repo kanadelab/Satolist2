@@ -7,6 +7,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
 using System.Windows.Media;
+#pragma warning disable CS0649
+#pragma warning disable CS0414
 
 namespace Satolist2.Utility
 {
