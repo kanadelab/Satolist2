@@ -1694,8 +1694,8 @@ namespace Satolist2
 				Process.Start(info);
 			}
 			catch { }
-		}
 #endif
+		}
 	}
 
 	//サーフェスプレビュー共通ビューモデル
