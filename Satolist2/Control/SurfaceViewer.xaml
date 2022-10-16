@@ -25,11 +25,26 @@
 
 		<Grid Visibility="{Binding IsPreviewDataEnable, Converter={StaticResource BoolToVisibilityConverter}}">
 			<Grid.RowDefinitions>
+				<RowDefinition Height="auto" />
 				<RowDefinition Height="*" />
 				<RowDefinition Height="auto" />
 			</Grid.RowDefinitions>
 
-			<Grid Grid.Row="0">
+			<Menu Grid.Row="0">
+				<MenuItem Header="範囲選択">
+					<MenuItem Header="判定選択をリセット" Command="{Binding CloseCollisionToolCommand}" />
+					<MenuItem Header="触り判定作成">
+						<MenuItem Header="オフ" IsCheckable="True" IsChecked="{Binding IsCollisionModeInvalid, Mode=TwoWay}" />
+						<MenuItem Header="矩形" IsCheckable="True" IsChecked="{Binding IsCollisionModeRect, Mode=TwoWay}" />
+						<MenuItem Header="楕円形" IsCheckable="True" IsChecked="{Binding IsCollisionModeEllipse, Mode=TwoWay}" />
+						<MenuItem Header="多角形" IsCheckable="True" IsChecked="{Binding IsCollisionModePolygon, Mode=TwoWay}" />
+					</MenuItem>
+					<Separator />
+					<MenuItem Header="選択位置をサーフェスパレットのデフォルト表示位置に設定" Command="{Binding SetSurfacePaletteDefaultPositionCommand}" />
+				</MenuItem>
+			</Menu>
+			
+			<Grid Grid.Row="1">
 				<Grid.ColumnDefinitions>
 					<ColumnDefinition Width="auto"/>
 					<ColumnDefinition Width="*" />
@@ -47,7 +62,8 @@
 
 					<Rectangle Fill="#77FFFFFF" Stroke="{StaticResource ThemeRed}" Canvas.Top="{Binding RectTop, FallbackValue=0}" Canvas.Left="{Binding RectLeft,FallbackValue=0}"
 							   Width="{Binding RectWidth,FallbackValue=100}" Height="{Binding RectHeight, FallbackValue=100}"
-							   SnapsToDevicePixels="True" Visibility="{Binding IsCollisionModeRect, Converter={StaticResource BoolToVisibilityConverter}}" />
+							   SnapsToDevicePixels="True" Visibility="{Binding IsCollisionModeRect, Converter={StaticResource BoolToVisibilityConverter}}">
+					</Rectangle>
 
 
 					<Ellipse  Fill="#77FFFFFF" Stroke="{StaticResource ThemeRed}" Canvas.Top="{Binding RectTop, FallbackValue=0}" Canvas.Left="{Binding RectLeft,FallbackValue=0}"
@@ -156,6 +172,11 @@
 								<Rectangle Fill="Transparent" />
 							</ControlTemplate>
 						</Thumb.Template>
+						<Thumb.ContextMenu>
+							<ContextMenu>
+								<MenuItem Header="サーフェスパレットのデフォルト表示位置に設定" Command="{Binding SetSurfacePaletteDefaultPositionCommand}" />
+							</ContextMenu>
+						</Thumb.ContextMenu>
 					</Thumb>
 					
 				</Canvas>
@@ -181,7 +202,7 @@
 			</Grid>
 
 			<!--生成判定情報-->
-			<Grid Grid.Row="1">
+			<Grid Grid.Row="2">
 				<Grid.Style>
 					<Style TargetType="Grid">
 						<Setter Property="Visibility" Value="Visible" />

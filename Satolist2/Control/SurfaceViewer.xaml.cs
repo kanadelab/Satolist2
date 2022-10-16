@@ -274,6 +274,7 @@ namespace Satolist2.Control
 			{
 				collisionType = value;
 				NotifyChanged();
+				SetSurfacePaletteDefaultPositionCommand.NotifyCanExecuteChanged();
 			}
 		}
 
@@ -365,41 +366,56 @@ namespace Satolist2.Control
 					(IsCollisionModeRect || IsCollisionModeEllipse);
 			}
 		}
-		public string SelectedRange
+
+		public double[] SelectedPoints
 		{
 			get
 			{
 				if ((control?.SurfaceImage?.ActualWidth ?? 0.0) == 0.0)
-					return string.Empty;
+					return Array.Empty<double>();
 				if (SelectedSurfaceBitmap == null)
-					return string.Empty;
+					return Array.Empty<double>();
 
 				//自動拡大縮小によって変更されたシェルのスケールを適用する
 				var shellScale = control.SurfaceImage.Width / control.SurfaceImage.ActualWidth;
 				double baseSizeOffsetX = 0;
 				double baseSizeOffsetY = 0;
 
-				if(selectedSurface.Model.BaseSizeWidth > 0)
+				if (selectedSurface.Model.BaseSizeWidth > 0)
 					baseSizeOffsetX = selectedSurface.Model.BaseSizeWidth - SelectedSurfaceBitmap.Width;
 				if (SelectedSurface.Model.BaseSizeHeight > 0)
 					baseSizeOffsetY = selectedSurface.Model.BaseSizeHeight - SelectedSurfaceBitmap.Height;
 
-				switch(CurrentCollisionType)
+				switch (CurrentCollisionType)
 				{
 					case CollisionType.Rect:
 					case CollisionType.Ellipse:
-						return string.Format("{0},{1},{2},{3}", 
-							(int)((RectLeft+baseSizeOffsetX)*shellScale),
-							(int)((RectTop+baseSizeOffsetY)*shellScale),
-							(int)((RectLeft + RectWidth + baseSizeOffsetX )*shellScale),
-							(int)((RectTop + RectHeight + baseSizeOffsetY )*shellScale));
+						return new double[] {
+							((RectLeft + baseSizeOffsetX) * shellScale),
+							((RectTop + baseSizeOffsetY) * shellScale),
+							((RectLeft + RectWidth + baseSizeOffsetX) * shellScale),
+							((RectTop + RectHeight + baseSizeOffsetY) * shellScale)
+						};
 					case CollisionType.Polygon:
-						return string.Join(",", PolygonPointsViewModel.Select(o => string.Format("{0},{1}",
-							(int)((o.Point.X + baseSizeOffsetX) * shellScale),
-							(int)((o.Point.Y + baseSizeOffsetY) * shellScale)
-							)));
+						var list = new List<double>();
+						var points = PolygonPointsViewModel.Select(o => new double[] {
+							((o.Point.X + baseSizeOffsetX) * shellScale),
+							((o.Point.Y + baseSizeOffsetY) * shellScale)
+						});
+						foreach (var p in points)
+							list.AddRange(p);
+						return list.ToArray();
+						
 				}
-				return string.Empty;
+				return Array.Empty<double>();
+			}
+		}
+
+		public string SelectedRange
+		{
+			get
+			{
+				return string.Join(",", SelectedPoints.Select(o => (int)o));
 			}
 		}
 
@@ -427,6 +443,7 @@ namespace Satolist2.Control
 			NotifyChanged(nameof(RectWidth));
 			NotifyChanged(nameof(RectHeight));
 			NotifyChanged(nameof(RectHeight));
+			SetSurfacePaletteDefaultPositionCommand.NotifyCanExecuteChanged();
 		}
 
 		public void NotifyUpdateCollisionType()
@@ -503,6 +520,7 @@ namespace Satolist2.Control
 
 		public ActionCommand CopyToClipBoardCommand { get; }
 		public ActionCommand CloseCollisionToolCommand { get; }
+		public ActionCommand SetSurfacePaletteDefaultPositionCommand { get; }
 
 		public SurfaceViewerViewModel(MainViewModel main)
 		{
@@ -543,6 +561,27 @@ namespace Satolist2.Control
 				o => NotifyUpdateCollisionType()
 				);
 
+
+			SetSurfacePaletteDefaultPositionCommand = new ActionCommand(
+				o => SetSurfacePaletteDefaultOffset(),
+				//polygonを不許容
+				o => IsCollisionMaking && SelectedPoints.Length > 2 && (CurrentCollisionType == CollisionType.Rect || CurrentCollisionType == CollisionType.Circle)
+				);
+			
+		}
+
+		//サーフェスパレットの表示位置を設定
+		public void SetSurfacePaletteDefaultOffset()
+		{
+			var selectedPoints = SelectedPoints;
+			if (selectedPoints.Length > 2)	
+			{
+				MainViewModel.EditorSettings.GhostTemporarySettings.SetSurfacePaletteOffset(Main.SurfacePreview.SelectedShell.ShellName, (int)selectedPoints[0], (int)selectedPoints[1]);
+				MainViewModel.EditorSettings.SaveGhostTemporarySettings(Main.Ghost);
+
+				//サーフェスパレットをリロード
+				Main.SurfacePaletteViewModel.UpdateSurfacePreviewData();
+			}
 		}
 
 		public void UpdateSurfacePreviewData()

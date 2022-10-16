@@ -43,6 +43,7 @@ namespace Satolist2.Model
 		public EditorSettings()
 		{
 			LoadErrors = new List<Dialog.ErrorListDialogItemViewModel>();
+			GhostTemporarySettings = new GhostLocalSettings();	//ゴースト設定のダミーを作成。サーフェスプレビュー設定とかゴースト側に設定するものがとりあえず動くような感じ
 			LoadTemporarySettings();
 			LoadInsertPalette();
 			LoadUploadSettings();
@@ -73,9 +74,14 @@ namespace Satolist2.Model
 
 		public void SaveGhostTemporarySettings(GhostModel ghost)
 		{
-			var path = Utility.DictionaryUtility.ConbinePath(ghost.FullDictionaryPath, GhostLocalSettingPath);
-			System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(path));
-			JsonUtility.SerializeToFile(path, GhostTemporarySettings);
+			//ゴーストを開いてない状態で保存しようとしたら蹴る
+			//ゴーストを開いてなくてもダミーを用意するので保存だけキャンセルする方向
+			if (ghost != null)
+			{
+				var path = Utility.DictionaryUtility.ConbinePath(ghost.FullDictionaryPath, GhostLocalSettingPath);
+				System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(path));
+				JsonUtility.SerializeToFile(path, GhostTemporarySettings);
+			}
 		}
 
 		private void LoadInsertPalette()

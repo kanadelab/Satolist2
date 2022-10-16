@@ -165,7 +165,16 @@ namespace Satolist2.Control
 					//ベースサイズとオフセット計算
 					var offsetX = vm.OffsetX;
 					var offsetY = vm.OffsetY;
-					if(vm.BaseSizeX > 0)
+
+					//オフセットがゼロの場合ゴーストローカル設定を使用
+					int ghostLocalOffsetX, ghostLocalOffsetY;
+					MainViewModel.EditorSettings.GhostTemporarySettings.GetSurfacePaletteOffset(Main.SurfacePreview.SelectedShell.ShellName, out ghostLocalOffsetX , out ghostLocalOffsetY);
+					if (offsetX == 0.0)
+						offsetX = ghostLocalOffsetX;
+					if(offsetY == 0.0)
+						offsetY = ghostLocalOffsetY;
+
+					if (vm.BaseSizeX > 0)
 						offsetX += (image.Image.Size.Width - vm.BaseSizeX);
 					if (vm.BaseSizeY > 0)
 						offsetY += (image.Image.Size.Height - vm.BaseSizeY);
