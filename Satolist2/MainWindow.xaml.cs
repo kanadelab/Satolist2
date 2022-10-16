@@ -680,7 +680,9 @@ namespace Satolist2
 	{
 		private bool isUpdateAvailable;
 		private string updateVersionLabel;
+#if DEPLOY
 		private UpdateReleaseInfo updateInfo;
+#endif
 
 		public static EditorSettings EditorSettings { get; private set; }
 		public MainWindow MainWindow { get; }
@@ -814,7 +816,6 @@ namespace Satolist2
 			Ghost = initializeData.Ghost;
 
 			IsGhostEnable = Ghost != null;
-			string shellPath = null;
 
 			//サーフェスプレビューデータを読込
 			SurfacePreview = new SurfacePreviewViewModel(this);
@@ -1665,6 +1666,7 @@ namespace Satolist2
 		//ネットワーク更新を行う
 		private void BootNetworkUpdator()
 		{
+#if DEPLOY
 			try
 			{
 				string updatorPath = App.UpdatorPath ?? SatolistUpdator.UpdatorInfo.GetLocation();
@@ -1693,7 +1695,7 @@ namespace Satolist2
 			}
 			catch { }
 		}
-
+#endif
 	}
 
 	//サーフェスプレビュー共通ビューモデル
