@@ -16,7 +16,7 @@ https://creativecommons.org/licenses/by-nc/4.0/deed.ja
     http://ssp.shillest.net/
         SSP (data/ssp)
 
-    SatolistResource/data/template/satori_license.txt によってライセンスされています。
+    二条項BSDライセンスによってライセンスされています。ライセンス文はdllバイナリそのものに含まれています。
     https://github.com/ponapalt/satoriya-shiori
         里々 (data/template/satori.dll)
 
