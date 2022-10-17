@@ -53,16 +53,6 @@
 								<TextBox Grid.Column="0" Text="{Binding ImportSatoriPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="3" VerticalAlignment="Center" />
 								<Button Grid.Column="1" Command="{Binding OpenImportSatoriSelectDialogCommand}" Content="参照" Padding="1" Width="50" Margin="3" />
 							</Grid>
-							<Separator Margin="3" />
-							<TextBlock Text="里々ライセンス(satori_licence.txt) 里々の使用条件として同梱が求められています" />
-							<Grid>
-								<Grid.ColumnDefinitions>
-									<ColumnDefinition Width="*" />
-									<ColumnDefinition Width="auto" />
-								</Grid.ColumnDefinitions>
-								<TextBox Grid.Column="0" Text="{Binding ImportLicencePath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="3" VerticalAlignment="Center" />
-								<Button Grid.Column="1" Command="{Binding OpenImportLicenceSelectDialogCommand}" Content="参照" Padding="1" Width="50" Margin="3" />
-							</Grid>
 							<Separator Margin="3"/>
 							<TextBlock Text="マスターシェル" />
 							<Grid>

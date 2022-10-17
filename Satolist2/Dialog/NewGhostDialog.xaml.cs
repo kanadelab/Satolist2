@@ -50,11 +50,9 @@ namespace Satolist2.Dialog
 		private string createName;
 		private bool isUseDefaultImportPath;
 		private string importSatoriPath;
-		private string importLicencePath;
 		private string importMasterShellPath;
 
 		private string defaultImportSatoriPath;
-		private string defaultImportLicencePath;
 		private string defaultImportMasterShellPath;
 
 		//作成する場所
@@ -102,7 +100,6 @@ namespace Satolist2.Dialog
 					if(isUseDefaultImportPath)
 					{
 						ImportSatoriPath = defaultImportSatoriPath;
-						ImportLicencePath = defaultImportLicencePath;
 						ImportMasterShellPath = defaultImportMasterShellPath;
 					}
 				}
@@ -116,18 +113,6 @@ namespace Satolist2.Dialog
 			set
 			{
 				importSatoriPath = value;
-				NotifyChanged();
-				NotifyChanged(nameof(IsValidIOPath));
-			}
-		}
-
-		//ライセンスパス
-		public string ImportLicencePath
-		{
-			get => importLicencePath;
-			set
-			{
-				importLicencePath = value;
 				NotifyChanged();
 				NotifyChanged(nameof(IsValidIOPath));
 			}
@@ -152,7 +137,6 @@ namespace Satolist2.Dialog
 				return
 					!string.IsNullOrEmpty(CreatePath) &&
 					!string.IsNullOrEmpty(ImportSatoriPath) &&
-					!string.IsNullOrEmpty(ImportLicencePath) &&
 					!string.IsNullOrEmpty(ImportMasterShellPath) &&
 					!string.IsNullOrEmpty(CreateName);
 			}
@@ -160,7 +144,6 @@ namespace Satolist2.Dialog
 
 		public ActionCommand OpenTargetSelectDialogCommand { get; }
 		public ActionCommand OpenImportSatoriSelectDialogCommand { get; }
-		public ActionCommand OpenImportLicenceSelectDialogCommand { get; }
 		public ActionCommand OpenImportMasterShellSelectDialogCommand { get; }
 		public ActionCommand CancelCommand { get; }
 		public ActionCommand SelectPathPageNextCommand { get; }
@@ -216,15 +199,12 @@ namespace Satolist2.Dialog
 			templates = new ObservableCollection<NewGhostDialogGhostTemplateViewModel>();
 			isUseDefaultImportPath = true;
 
-			defaultImportLicencePath = DictionaryUtility.NormalizeFullPath("data/template/satori_license.txt");
 			defaultImportSatoriPath = DictionaryUtility.NormalizeFullPath("data/template/satori.dll");
 			defaultImportMasterShellPath = DictionaryUtility.NormalizeFullPath("data/template/shell/master");
 
 			importSatoriPath = defaultImportSatoriPath;
-			importLicencePath = defaultImportLicencePath;
 			ImportMasterShellPath = defaultImportMasterShellPath;
 
-			
 			//インポートなしテンプレート
 			var emptyTemplate = NewGhostDialogGhostTemplateViewModel.EmptyTempalte;
 			SelectedTemplate = emptyTemplate;
@@ -277,15 +257,6 @@ namespace Satolist2.Dialog
 				}
 				);
 
-			OpenImportLicenceSelectDialogCommand = new ActionCommand(
-				o =>
-				{
-					var path = OpenFileSelectDialog(ImportLicencePath, "里々ライセンス(satori_licence.txt)", "txt");
-					if (!string.IsNullOrEmpty(path))
-						ImportLicencePath = path;
-				}
-				);
-
 			OpenImportMasterShellSelectDialogCommand = new ActionCommand(
 				o =>
 				{
@@ -329,7 +300,7 @@ namespace Satolist2.Dialog
 					{
 						try
 						{
-							CreateNewGhost(EffectiveCreatePath, SelectedTemplate, ImportMasterShellPath, ImportSatoriPath, ImportLicencePath);
+							CreateNewGhost(EffectiveCreatePath, SelectedTemplate, ImportMasterShellPath, ImportSatoriPath);
 							dialog.DialogResult = true;
 							dialog.Close();
 						}
@@ -390,12 +361,6 @@ namespace Satolist2.Dialog
 				return false;
 			}
 
-			if(!System.IO.File.Exists(ImportLicencePath))
-			{
-				MessageBox.Show("「里々ライセンス」が指定されたパスに見つかりません。");
-				return false;
-			}
-
 			if(!System.IO.Directory.Exists(ImportMasterShellPath))
 			{
 				MessageBox.Show("「マスターシェル」が指定されたパスに見つかりません。");
@@ -406,7 +371,7 @@ namespace Satolist2.Dialog
 		}
 
 		//テンプレートを使用してゴーストを新規作成
-		private void CreateNewGhost(string path, NewGhostDialogGhostTemplateViewModel template, string shellPath, string satoriPath, string licencePath)
+		private void CreateNewGhost(string path, NewGhostDialogGhostTemplateViewModel template, string shellPath, string satoriPath)
 		{
 			//作成先が存在してないことを確認
 			if (System.IO.File.Exists(path))
@@ -431,10 +396,9 @@ namespace Satolist2.Dialog
 				//辞書の作成
 				var dictionaryPath = DictionaryUtility.ConbinePath(path, "ghost/master");
 
-				//里々とライセンスをコピー
+				//里々をコピー
 				System.IO.Directory.CreateDirectory(dictionaryPath);
 				System.IO.File.Copy(satoriPath, DictionaryUtility.ConbinePath(dictionaryPath, "satori.dll"), true);
-				System.IO.File.Copy(licencePath, DictionaryUtility.ConbinePath(dictionaryPath, "satori_licence.txt"), true);
 
 				//ファイルをコピー
 				foreach (var file in template.GenerateGhostFiles)
