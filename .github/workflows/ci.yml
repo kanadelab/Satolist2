@@ -21,7 +21,7 @@ jobs:
       - name: set version
         shell: cmd
         run: |
-          echo namespace Satolist2 { public static class Version { public static string VersionString = "さとりすとv2beta {0} (Build#%GITHUB_RUN_NUMBER%)"; public static long VersionIndex = %GITHUB_RUN_NUMBER%;} } > Satolist2\Version.cs
+          echo namespace Satolist2 { public static class Version { public static string VersionString = "さとりすと {0} (Build#%GITHUB_RUN_NUMBER%)"; public static long VersionIndex = %GITHUB_RUN_NUMBER%;} } > Satolist2\Version.cs
 
       - name: run msbuild
         shell: cmd

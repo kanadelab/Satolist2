@@ -440,7 +440,7 @@ namespace Satolist2
 				MessageBox.Show("ゴーストを開けませんでした。", "さとりすと", MessageBoxButton.OK, MessageBoxImage.Warning);
 				return;
 			}
-			RootWindow.Title = string.Format("{0} - さとりすとv2", ghost.GhostDescriptName);
+			RootWindow.Title = string.Format("{0} - さとりすと", ghost.GhostDescriptName);
 
 			//メインの起動
 			var init = new MainViewModelInitializeData();

@@ -5,7 +5,7 @@
 		xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 		xmlns:local="clr-namespace:Satolist2"
 		mc:Ignorable="d"
-		Title="さとりすとv2" Height="800" Width="1200"
+		Title="さとりすと" Height="800" Width="1200"
 		xmlns:metro="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro">
 	<local:MainWindow x:Name="Main" />
 </metro:MetroWindow>
