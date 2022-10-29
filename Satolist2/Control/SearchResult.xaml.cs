@@ -267,7 +267,7 @@ namespace Satolist2.Control
 		{
 			get
 			{
-				if (ev != null)
+				if (ev != null && ev.Dictionary != null)
 					return ev.Dictionary.RelativeName;
 				else if (textFile != null)
 					return textFile.RelativeName;
