@@ -1,5 +1,4 @@
-﻿using AngleSharp.Dom;
-using AvalonDock.Controls;
+﻿using AvalonDock.Controls;
 using AvalonDock.Layout;
 using AvalonDock.Layout.Serialization;
 using MahApps.Metro.Controls;
