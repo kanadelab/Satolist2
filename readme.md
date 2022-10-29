@@ -36,7 +36,7 @@ https://colorbox.saloon.jp/ghost/archive/ghost_free/index.htm
 http://ssp.shillest.net/ 
   * SSP (SatolistResource/data/ssp)
 
-* SatolistResource/data/template/satori_license.txt によってライセンスされています。  
+* 二条項BSDライセンスによってライセンスされています。ライセンス文はdllバイナリそのものに含まれています。
 https://github.com/ponapalt/satoriya-shiori
   * 里々 (SatolistResource/data/template/satori.dll)
 
