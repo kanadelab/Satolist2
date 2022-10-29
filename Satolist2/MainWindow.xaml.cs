@@ -1,4 +1,5 @@
-﻿using AvalonDock.Controls;
+﻿using AngleSharp.Dom;
+using AvalonDock.Controls;
 using AvalonDock.Layout;
 using AvalonDock.Layout.Serialization;
 using MahApps.Metro.Controls;
@@ -43,6 +44,7 @@ namespace Satolist2
 		private LayoutDocumentPane DocumentPane { get; set; }
 		private DockingWindow ActiveEditor { get; set; }
 		private IntPtr HWnd { get; set; }
+		private string DefaultWindowLayout { get; set; }
 		public Window RootWindow { get; set; }
 
 		public ICSharpCode.AvalonEdit.TextEditor ActiveTextEditor
@@ -101,6 +103,9 @@ namespace Satolist2
 			mainViewModel = new MainViewModel(this);
 			DataContext = mainViewModel;
 			ReflectControlViewModel(mainViewModel);
+
+			//デフォルトレイアウトをバックアップ
+			DefaultWindowLayout = SerializeDockingLayout();
 
 			//レイアウトの復元
 			DeserializeLayout(MainViewModel.EditorSettings.TemporarySettings.SerializedDockingLayout);
@@ -531,6 +536,12 @@ namespace Satolist2
 			}
 		}
 
+		//ドッキングレイアウトをデフォルトに戻す
+		public void ResetLayout()
+		{
+			DeserializeLayout(DefaultWindowLayout);
+		}
+
 		private void DeserializeLayout(string serializedLayout)
 		{
 			//無効な設定
@@ -550,13 +561,14 @@ namespace Satolist2
 			}
 			catch
 			{
-				//だめそうだったらパス
+				//だめそうだったらデフォルト戻し
+				if (serializedLayout != DefaultWindowLayout)
+					ResetLayout();
 			}
 		}
 
 		private void Serializer_LayoutSerializationCallback(object sender, LayoutSerializationCallbackEventArgs e)
 		{
-		//	throw new NotImplementedException();
 			switch(e.Model.ContentId)
 			{
 				case FileEventTreeViewModel.ContentId:
@@ -742,6 +754,7 @@ namespace Satolist2
 		public ActionCommand ShowLogMessageCommand { get; }
 		public ActionCommand ClearLogMessageCommand { get; }
 		public ActionCommand NetworkUpdateCommand { get; }
+		public ActionCommand ResetDockingLayoutCommand { get; }
 
 		//設定情報
 		public InsertItemPaletteModel InsertPalette
@@ -1408,6 +1421,12 @@ namespace Satolist2
 					BootNetworkUpdator();
 				}
 				);
+
+			ResetDockingLayoutCommand = new ActionCommand(
+				o =>
+				{
+					mainWindow.ResetLayout();
+				});
 
 			//読込エラーが発生している場合に通知
 			List<ErrorListDialogItemViewModel> errorItems = new List<ErrorListDialogItemViewModel>();

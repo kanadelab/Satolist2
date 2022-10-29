@@ -76,6 +76,8 @@
 				<MenuItem Header="れしばイベントログ" x:Name="RecvEventLogVisibleMenu" IsCheckable="True" IsChecked="{Binding IsVisible, Mode=TwoWay}" />
 				<MenuItem Header="挿入パレット" x:Name="InsertPaletteVisibleMenu" IsCheckable="True" IsChecked="{Binding IsVisible, Mode=TwoWay}" />
 				<MenuItem Header="さとりて" x:Name="SatoriteVisibleMenu" IsCheckable="True" IsChecked="{Binding IsVisible, Mode=TwoWay}" />
+				<Separator />
+				<MenuItem Header="ウインドウレイアウトをデフォルトに戻す" Command="{Binding ResetDockingLayoutCommand}" />
 			</MenuItem>
 			<MenuItem Header="デバッグ">
 				<MenuItem Header="起動中のゴーストの辞書をリロード" Command="{Binding ReloadShioriCommand}" InputGestureText="Ctrl+Alt+R" />
