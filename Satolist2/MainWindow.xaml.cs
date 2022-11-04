@@ -126,7 +126,6 @@ namespace Satolist2
 			UkadocDownloader.DownloadAsync().ContinueWith(
 				o =>
 				{
-					return;
 					if (o.Result != null)
 					{
 						//正しく取得できた場合はキャッシュを保存する
