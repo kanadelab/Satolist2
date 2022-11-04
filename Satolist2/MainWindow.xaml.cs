@@ -8,6 +8,7 @@ using Satolist2.Control;
 using Satolist2.Core;
 using Satolist2.Dialog;
 using Satolist2.Model;
+using Satolist2.Properties;
 using Satolist2.Utility;
 using System;
 using System.Collections.Generic;
@@ -29,6 +30,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Resources;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 
 namespace Satolist2
 {
@@ -91,6 +93,7 @@ namespace Satolist2
 			InsertPalette.IsVisible = false;
 			Satorite.IsVisible = false;
 			DebugMainMenu.IsVisible = false;
+			UkadocEventReference.IsVisible = false;
 
 			AllowDrop = true;
 			EventEditors = new List<DockingWindow>();
@@ -118,6 +121,27 @@ namespace Satolist2
 			//さとりてウインドウのシンタックスハイライトを設定
 			((SatoriteWindow)Satorite.Content).UpdateHilighting();
 			((SatoriteWindow)Satorite.Content).UpdateFontSettings();
+
+			//Ukadocリソースのダウンロード
+			UkadocDownloader.DownloadAsync().ContinueWith(
+				o =>
+				{
+					return;
+					if (o.Result != null)
+					{
+						//正しく取得できた場合はキャッシュを保存する
+						UkadocCacheData data = o.Result;
+						Dispatcher.Invoke(() =>
+						{
+							//更新する
+							MainViewModel.EditorSettings.TemporarySettings.UkadocCache = data;
+							MainViewModel.EditorSettings.SaveTemporarySettings();
+
+							//ビューモデルをリフレッシュ
+							mainViewModel.UkadocEventReferenceViewModel.RefleshView();
+						});
+					}
+				});
 
 #if DEPLOY
 			//公開時はデバッグメニューを封じておく。今のところ根本に消すわけではないけど
@@ -497,6 +521,7 @@ namespace Satolist2
 			RecvEventLog.ViewModel = mainVm.RecvEventLogViewModel;
 			InsertPalette.ViewModel = mainVm.InsertPaletteViewModel;
 			Satorite.ViewModel = mainVm.SatoriteViewModel;
+			UkadocEventReference.ViewModel = mainVm.UkadocEventReferenceViewModel;
 		}
 
 		private void ReflectVisibleMenuDataContext()
@@ -520,6 +545,7 @@ namespace Satolist2
 			RecvEventLogVisibleMenu.DataContext = RecvEventLog;
 			InsertPaletteVisibleMenu.DataContext = InsertPalette;
 			SatoriteVisibleMenu.DataContext = Satorite;
+			UkadocEventReferenceVisibleMenu.DataContext = UkadocEventReference;
 			//
 			
 		}
@@ -535,6 +561,64 @@ namespace Satolist2
 			}
 		}
 
+		//何かしらのドッキングできる対象を探す
+		//新規追加ウインドウなどで復元対象が見つからなかった場合のため
+		private void RequestDocking(DockingWindow window, bool requestDocumentPane)
+		{
+			var root = DockingManager.Layout.RootPanel;
+			var items = EnumDockingChildren(root);
+			if (requestDocumentPane)
+			{
+				LayoutDocumentPane documentPane = (LayoutDocumentPane)items.Last(o => o is LayoutDocumentPane);
+				if(documentPane != null)
+				{
+					documentPane.Children.Add(window);
+					return;
+				}
+				LayoutAnchorablePane anchorablePane = (LayoutAnchorablePane)items.Last(o => o is LayoutAnchorablePane);
+				if(anchorablePane != null)
+				{
+					anchorablePane.Children.Add(window);
+					return;
+				}
+			}
+			else
+			{
+				LayoutAnchorablePane anchorablePane = (LayoutAnchorablePane)items.Last(o => o is LayoutAnchorablePane);
+				if (anchorablePane != null)
+				{
+					anchorablePane.Children.Add(window);
+					return;
+				}
+				LayoutDocumentPane documentPane = (LayoutDocumentPane)items.Last(o => o is LayoutDocumentPane);
+				if (documentPane != null)
+				{
+					documentPane.Children.Add(window);
+					return;
+				}
+			}
+		}
+
+		private IEnumerable<ILayoutContainer> EnumDockingChildren(ILayoutContainer obj)
+		{
+			foreach(var item in obj.Children)
+			{
+				if(item is LayoutAnchorablePane anchorablePane)
+				{
+					yield return anchorablePane;
+				}
+				else if(item is LayoutDocumentPane documentPane)
+				{
+					yield return documentPane;
+				}
+				else if(item is ILayoutContainer layoutPanel)
+				{
+					foreach (var o in EnumDockingChildren(layoutPanel))
+						yield return o;
+				}
+			}
+		}
+
 		//ドッキングレイアウトをデフォルトに戻す
 		public void ResetLayout()
 		{
@@ -546,8 +630,7 @@ namespace Satolist2
 			//無効な設定
 			if (string.IsNullOrEmpty(serializedLayout))
 				return;
-			//return;	
-			//読込
+
 			try
 			{
 				XmlLayoutSerializer serializer = new XmlLayoutSerializer(DockingManager);
@@ -555,6 +638,19 @@ namespace Satolist2
 				{
 					serializer.LayoutSerializationCallback += Serializer_LayoutSerializationCallback;
 					serializer.Deserialize(reader);
+
+					//復元に失敗しているウインドウをなんとかする。ルートと異なるものが配置失敗として扱う
+					//もうちょっとうまい方法がありそうだけどあまり詳しくない…
+					foreach(var item in GetDockingWindowsForDocumentPane())
+					{
+						if (item.Root != DockingManager.Layout)
+							RequestDocking(item, true);
+					}
+					foreach (var item in GetDockingWindowsForAnchorablePane())
+					{
+						if (item.Root != DockingManager.Layout)
+							RequestDocking(item, false);
+					}
 					ReflectVisibleMenuDataContext();
 				}
 			}
@@ -564,6 +660,34 @@ namespace Satolist2
 				if (serializedLayout != DefaultWindowLayout)
 					ResetLayout();
 			}
+		}
+
+		//上下左右のアンカー領域に設定したいウインドウ類
+		private IEnumerable<DockingWindow> GetDockingWindowsForAnchorablePane()
+		{
+			yield return FileEventTree;
+			yield return EventList;
+			yield return SurfacePalette;
+			yield return SurfaceViewer;
+			yield return SearchResult;
+			yield return InsertPalette;
+			yield return Satorite;
+			yield return UkadocEventReference;
+		}
+
+		//中央のドキュメント領域に設定したいウインドウ類
+		private IEnumerable<DockingWindow> GetDockingWindowsForDocumentPane()
+		{
+			yield return StartMenu;
+			yield return DebugMainMenu;
+			yield return GhostDescriptEditor;
+			yield return GhostInstallEditor;
+			yield return UpdateIgnoreList;
+			yield return SaoriList;
+			yield return ReplaceList;
+			yield return VariableList;
+			yield return SearchMenu;
+			yield return RecvEventLog;
 		}
 
 		private void Serializer_LayoutSerializationCallback(object sender, LayoutSerializationCallbackEventArgs e)
@@ -620,6 +744,9 @@ namespace Satolist2
 					break;
 				case SatoriteViewModel.ContentId:
 					Satorite = (DockingWindow)e.Model;
+					break;
+				case ShioriEventReferenceViewModel.ContentId:
+					UkadocEventReference = (DockingWindow)e.Model;
 					break;
 				default:
 					//イベントエディタ等一時的なモノはデシリアライズする必要はない
@@ -721,6 +848,7 @@ namespace Satolist2
 		public RecvEventLogViewModel RecvEventLogViewModel { get; }
 		public InsertPaletteViewModel InsertPaletteViewModel { get; }
 		public SatoriteViewModel SatoriteViewModel { get; }
+		public ShioriEventReferenceViewModel UkadocEventReferenceViewModel { get; }
 		
 
 		public List<EventEditorViewModel> EventEditors { get; }
@@ -901,6 +1029,7 @@ namespace Satolist2
 			RecvEventLogViewModel = new RecvEventLogViewModel(this);
 			InsertPaletteViewModel = new InsertPaletteViewModel(this);
 			SatoriteViewModel = new SatoriteViewModel(this);
+			UkadocEventReferenceViewModel = new ShioriEventReferenceViewModel();
 
 			SaveFileCommand = new ActionCommand(
 				o => AskSave(false),

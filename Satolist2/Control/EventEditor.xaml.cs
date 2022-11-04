@@ -97,6 +97,7 @@ namespace Satolist2.Control
 		public MainViewModel Main { get; }
 		private bool isShowSearchBox;
 		private bool isActiveTextEditor;
+		private int caretLine;
 
 		//検索ボックスの表示
 		public bool IsShowSearchBox
@@ -115,9 +116,17 @@ namespace Satolist2.Control
 			get => isActiveTextEditor;
 			set
 			{
-				isActiveTextEditor = value;
-				NotifyChanged();
-				NotifyChanged(nameof(DockingTitle));
+				if (IsActiveTextEditor != value)
+				{
+					isActiveTextEditor = value;
+					NotifyChanged();
+					NotifyChanged(nameof(DockingTitle));
+
+					if(isActiveTextEditor)
+					{
+						TrySelectEventOnUkadocViewer();
+					}
+				}
 			}
 		}
 
@@ -230,13 +239,63 @@ namespace Satolist2.Control
 			}
 			), DispatcherPriority.Render);
 		}
+
+		//カレットの位置から編集中のイベント名を取得する
+		public virtual string FindEditingEventName()
+		{
+			if (MainTextEditor?.Document == null)
+				return null;
+
+			var currentLine = MainTextEditor.TextArea.Caret.Line - 1;   //indexにするので-1
+
+			//開始行の検索(＠または＊を含まない範囲)
+			for (int i = currentLine; i >= 0; i--)
+			{
+				//ヘッダ行の上がエスケープされてないことが必要
+				if (i > 0)
+				{
+					var nextLineData = MainTextEditor.Document.Lines[i - 1];
+					var nextLine = MainTextEditor.Text.Substring(nextLineData.Offset, nextLineData.Length);
+					if (DictionaryUtility.IsLineEndEscaped(nextLine))
+						continue;
+				}
+
+				var lineData = MainTextEditor.Document.Lines[i];
+				var lineString = MainTextEditor.Text.Substring(lineData.Offset, lineData.Length);
+				if (lineString.IndexOf(Constants.SentenceHead) == 0)
+				{
+					return lineString.Substring(1);
+				}
+				else if (lineString.IndexOf(Constants.WordHead) == 0)
+				{
+					return lineString.Substring(1);
+				}
+			}
+
+			//見つからなかった場合はnull
+			return null;
+		}
+
+		public void Caret_PositionChanged(object sender, EventArgs e)
+		{
+			if (caretLine != MainTextEditor.TextArea.Caret.Line)
+			{
+				TrySelectEventOnUkadocViewer();
+			}
+		}
+
+		protected void TrySelectEventOnUkadocViewer()
+		{
+			var eventName = FindEditingEventName();
+			if (!string.IsNullOrEmpty(eventName))
+				Main.UkadocEventReferenceViewModel.TrySelectEvent(eventName);
+		}
 	}
 
 	internal class EventEditorViewModel : TextEditorViewModelBase, IDisposable, IControlBindedReceiver
 	{
 		private bool disableBodyPropertyChanged;
 		private EventEditor control;
-		
 
 		public EventModel Event { get; }
 		public string randomizedContentId;
@@ -407,11 +466,22 @@ namespace Satolist2.Control
 			Core.LogMessage.AddLog("ゴーストにトークを送信しました。");
 		}
 
+		//編集中のイベント名を取得
+		public override string FindEditingEventName()
+		{
+			var baseResult = base.FindEditingEventName();
+			if(baseResult == null)
+				return Event.Name;	//nullの場合はここで編集中のイベントを示す
+			else
+				return baseResult;
+		}
+
 		public void Dispose()
 		{
 			Event.PropertyChanged -= Event_PropertyChanged;
 			Document.TextChanged -= Document_TextChanged;
 			Main.PropertyChanged -= Main_PropertyChanged;
+			control.MainTextEditor.TextArea.Caret.PositionChanged -= Caret_PositionChanged;
 		}
 
 		public void ControlBind(System.Windows.Controls.Control ctrl)
@@ -419,6 +489,7 @@ namespace Satolist2.Control
 			if(ctrl is EventEditor eventEditor)
 			{
 				control = eventEditor;
+				control.MainTextEditor.TextArea.Caret.PositionChanged += Caret_PositionChanged;
 				control.UpdateInsertPaletteKeyBindings(Main.InsertPalette, InsertCommand);
 				UpdateGeneralSettings();
 			}

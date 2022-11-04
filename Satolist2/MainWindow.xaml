@@ -76,6 +76,7 @@
 				<MenuItem Header="れしばイベントログ" x:Name="RecvEventLogVisibleMenu" IsCheckable="True" IsChecked="{Binding IsVisible, Mode=TwoWay}" />
 				<MenuItem Header="挿入パレット" x:Name="InsertPaletteVisibleMenu" IsCheckable="True" IsChecked="{Binding IsVisible, Mode=TwoWay}" />
 				<MenuItem Header="さとりて" x:Name="SatoriteVisibleMenu" IsCheckable="True" IsChecked="{Binding IsVisible, Mode=TwoWay}" />
+				<MenuItem Header="Ukadocイベントリファレンス" x:Name="UkadocEventReferenceVisibleMenu" IsCheckable="True" IsChecked="{Binding IsVisible, Mode=TwoWay}" />
 				<Separator />
 				<MenuItem Header="ウインドウレイアウトをデフォルトに戻す" Command="{Binding ResetDockingLayoutCommand}" />
 			</MenuItem>
@@ -112,7 +113,7 @@
 					<avalonDock:LayoutPanel Orientation="Horizontal">
 
 						<!--左ペイン-->
-						<avalonDock:LayoutAnchorablePane DockWidth="200" >
+						<avalonDock:LayoutAnchorablePane DockWidth="200">
 
 							<!--ファイルイベントツリー-->
 							<util:DockingWindow x:Name="FileEventTree">
@@ -173,7 +174,7 @@
 							<util:DockingWindow x:Name="RecvEventLog">
 								<ctl:RecvEventLog />
 							</util:DockingWindow>
-
+							
 						</avalonDock:LayoutDocumentPane>
 
 						<!--右ペイン-->
@@ -213,6 +214,11 @@
 						<!--さとりて-->
 						<util:DockingWindow x:Name="Satorite">
 							<ctl:SatoriteWindow />
+						</util:DockingWindow>
+
+						<!--Ukadocイベントリファレンス-->
+						<util:DockingWindow x:Name="UkadocEventReference">
+							<ctl:ShioriEventReference />
 						</util:DockingWindow>
 
 					</avalonDock:LayoutAnchorablePane>

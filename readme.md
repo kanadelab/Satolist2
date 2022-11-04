@@ -51,6 +51,7 @@ https://opensource.org/licenses/mit-license.php
   * WindowsAPICodePack
   * ControlzEx
   * MahApps.Metro
+  * AngleSharp
 
 * Apache2.0 ライセンスの素材を使用しています。  
   https://www.apache.org/licenses/LICENSE-2.0

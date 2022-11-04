@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Satolist2.Control;
 using Satolist2.Model;
 using Satolist2.Utility;
 using System;
@@ -23,6 +24,8 @@ namespace Satolist2.Model
 		public string SerializedDockingLayout { get; set; }
 		[JsonProperty]
 		public WindowPlacement? WindowPlacement { get; set; }
+		[JsonProperty]
+		public UkadocCacheData UkadocCache { get; set; }
 
 		public TemporarySettings()
 		{

@@ -1,4 +1,5 @@
 ﻿using ICSharpCode.AvalonEdit.Document;
+using ICSharpCode.AvalonEdit.Editing;
 using Satolist2.Model;
 using Satolist2.Utility;
 using System;
@@ -127,6 +128,8 @@ namespace Satolist2.Control
 			}
 		}
 
+		
+
 		//カレットの位置からトークを特定して送信する
 		public void SendToGhost()
 		{
@@ -208,8 +211,8 @@ namespace Satolist2.Control
 
 		public void Dispose()
 		{
-			//TextFile.PropertyChanged -= TextFile_PropertyChanged;
 			Document.TextChanged -= Document_TextChanged;
+			control.MainTextEditor.TextArea.Caret.PositionChanged -= Caret_PositionChanged;
 		}
 
 		public void ControlBind(System.Windows.Controls.Control ctrl)
@@ -217,9 +220,13 @@ namespace Satolist2.Control
 			if (ctrl is TextEditor textEditor)
 			{
 				control = textEditor;
+				control.MainTextEditor.TextArea.Caret.PositionChanged += Caret_PositionChanged;
 				control.UpdateInsertPaletteKeyBindings(Main.InsertPalette, InsertCommand);
 				UpdateGeneralSettings();
 			}
 		}
+
+		
+		
 	}
 }
