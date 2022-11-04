@@ -63,7 +63,13 @@ namespace SatolistDeploy
 				"Microsoft.WindowsAPICodePack.ShellExtensions.dll",
 				"Microsoft.Xaml.Behaviors.dll",
 				"Newtonsoft.Json.dll",
-				"SatolistUpdator.exe"
+				"SatolistUpdator.exe",
+				"AngleSharp.dll",
+				"System.Buffers.dll",
+				"System.Memory.dll",
+				"System.Numerics.Vectors.dll",
+				"System.Runtime.CompilerServices.Unsafe.dll",
+				"System.Text.Encoding.CodePages.dll"
 			};
 
 			foreach(var item in copyItems )
