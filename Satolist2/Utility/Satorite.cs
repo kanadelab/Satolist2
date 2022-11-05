@@ -97,6 +97,7 @@ namespace Satolist2.Utility
 			var sstpBuilder = new ProtocolBuilder();
 			sstpBuilder.Command = "SEND SSTP/1.0";
 			sstpBuilder.Parameters["Script"] = script;
+			sstpBuilder.Parameters["Charset"] = "Shift_JIS";
 			sstpBuilder.Parameters["Sender"] = "さとりすと";
 
 			if(hWnd != default(IntPtr))
