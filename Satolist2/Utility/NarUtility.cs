@@ -190,6 +190,12 @@ namespace Satolist2.Utility
 					File.Copy(item, temporaryDirectory + "/" + relativePath, true);
 				}
 
+				//ファイルが存在したら上書きのため古いファイルをゴミ箱に捨てる
+				if(File.Exists(outputPath))
+				{
+					DictionaryUtility.RecycleFile(outputPath);
+				}
+
 				//zipに固める
 				ZipFile.CreateFromDirectory(temporaryDirectory.ToString(), outputPath, CompressionLevel.Optimal, false, Constants.EncodingShiftJis);
 			}
