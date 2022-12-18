@@ -29,7 +29,7 @@
 					<CheckBox Content="Owned SSTPによるトークの送信" IsChecked="{Binding Model.UseOwnedSSTP, Mode=TwoWay}" Margin="3"/>
 					<TextBlock Margin="25 0 0 0" Text="トークの送信機能ですべてのさくらスクリプトタグを実行します。vanishbymyself(ゴーストの削除)タグなども実行されるためリスクをよく理解した上で使ってください。" TextWrapping="Wrap" />
 					<CheckBox Content="リスト化解除モードをデフォルトにする" IsChecked="{Binding Model.IsTextModeDefault, Mode=TwoWay}" Margin="3"/>
-					<CheckBox Content="ダークテーマ(試験的/さとりすとの再起動が必要)" IsChecked="{Binding Model.IsEnableDarkMode, Mode=TwoWay}" Margin="3" />
+					<CheckBox Content="ダークテーマにする (さとりすとの再起動が必要)" IsChecked="{Binding Model.IsEnableDarkMode, Mode=TwoWay}" Margin="3" />
 					<StackPanel Margin="3">
 						<TextBlock Text="リスト化した辞書の項目間に空白行を挿入する" Margin="1"/>
 						<ComboBox SelectedIndex="{Binding Model.ListedDictionaryInsertEmptyLineCount, Mode=TwoWay}" Width="100" HorizontalAlignment="Left" Margin="1">
