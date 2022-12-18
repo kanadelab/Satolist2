@@ -48,6 +48,9 @@
     <ErrorReport>prompt</ErrorReport>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Resource\satolist.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="AngleSharp, Version=0.17.1.0, Culture=neutral, PublicKeyToken=e83494dcdc6d31ea, processorArchitecture=MSIL">
       <HintPath>..\packages\AngleSharp.0.17.1\lib\net472\AngleSharp.dll</HintPath>
@@ -510,6 +513,16 @@
       <Project>{789c550a-4b6a-40bb-9355-10d7c27eee40}</Project>
       <Name>SatolistUpdator</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resource\satolist.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resource\satolist.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resource\satolist.svg" />
+    <None Include="Resource\satolist_opt.svg" />
   </ItemGroup>
   <Import Project="..\SatolistResource\SatolistResource.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

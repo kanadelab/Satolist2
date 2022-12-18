@@ -41,3 +41,5 @@ https://creativecommons.org/licenses/by-nc/4.0/deed.ja
     Apache2.0 ライセンスの素材を使用しています。
     https://www.apache.org/licenses/LICENSE-2.0
         https://materialdesignicons.com/
+
+    月波 清火 (@tukinami_seika@fedibird.com) 様がアイコンを作ってくださいました。

@@ -57,3 +57,5 @@ https://opensource.org/licenses/mit-license.php
   https://www.apache.org/licenses/LICENSE-2.0
   * https://materialdesignicons.com/
   * Satolist2/Icons.xaml に集約しています。
+
+* 月波 清火 (@tukinami_seika@fedibird.com) 様がアイコンを作ってくださいました。
