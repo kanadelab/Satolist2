@@ -64,7 +64,7 @@
 										<ColumnDefinition Width="*" />
 									</Grid.ColumnDefinitions>
 									<TextBlock Grid.Column="0" Text="{Binding Item1}" Margin="0 0 8 0" />
-									<TextBox Grid.Column="1" Text="{Binding Item2, Mode=OneWay}" BorderThickness="0" IsReadOnly="True" TextWrapping="Wrap" Background="Transparent" />
+									<TextBox Grid.Column="1" Text="{Binding Item2, Mode=OneWay}" BorderThickness="0" IsReadOnly="True" TextWrapping="Wrap" Background="Transparent" Padding="0" />
 								</Grid>
 							</DataTemplate>
 						</ItemsControl.ItemTemplate>
