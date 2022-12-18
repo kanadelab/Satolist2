@@ -281,6 +281,7 @@ namespace Satolist2.Control
 			if (caretLine != MainTextEditor.TextArea.Caret.Line)
 			{
 				TrySelectEventOnUkadocViewer();
+				caretLine = MainTextEditor.TextArea.Caret.Line;
 			}
 		}
 
