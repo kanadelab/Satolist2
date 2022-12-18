@@ -264,11 +264,12 @@ namespace Satolist2.Control
 				var lineString = MainTextEditor.Text.Substring(lineData.Offset, lineData.Length);
 				if (lineString.IndexOf(Constants.SentenceHead) == 0)
 				{
-					return lineString.Substring(1);
+					//条件部と＠や＊を取り除く
+					return lineString.Substring(1).Split(new char[] { '\t' }).FirstOrDefault();
 				}
 				else if (lineString.IndexOf(Constants.WordHead) == 0)
 				{
-					return lineString.Substring(1);
+					return lineString.Substring(1).Split(new char[] { '\t' }).FirstOrDefault();
 				}
 			}
 
