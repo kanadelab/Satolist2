@@ -12,19 +12,8 @@ namespace Satolist2.Utility
 {
 	public class DockingWindow : LayoutAnchorable
 	{
-		//public static readonly DependencyProperty ContentProperty = DependencyProperty.Register(nameof(Content), typeof(System.Windows.Controls.Control), typeof(DockingWindow));
-		/*
-		public static readonly DependencyProperty ViewModelProperty = DependencyProperty.Register("ViewModel", typeof(object), typeof(DockingWindow),
-			new PropertyMetadata(null, (d,e) =>
-			{
-				((System.Windows.Controls.Control)((DockingWindow)d).Content).DataContext = e.NewValue;
-			}
-			));
-		*/
-
 		public object ViewModel
 		{
-			//get => GetValue(ViewModelProperty);
 			get => ((System.Windows.Controls.Control)Content)?.DataContext;
 			set
 			{
@@ -40,8 +29,6 @@ namespace Satolist2.Utility
 					oldVm.PropertyChanged -= ViewModel_PropertyChanged;
 				}
 
-				//TODO: set
-				//SetValue(ViewModelProperty, value);
 				((System.Windows.Controls.Control)Content).DataContext = value;
 
 				if( value is IControlBindedReceiver recv)
@@ -73,7 +60,7 @@ namespace Satolist2.Utility
 			ViewModel = viewModel;
 		}
 
-		//??
+		//デシリアライズ用
 		public DockingWindow()
 		{ }
 
