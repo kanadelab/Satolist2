@@ -263,7 +263,7 @@ namespace Satolist2.Core
 				main.MainWindow.Dispatcher.Invoke(() =>
 				progressCallback(new Progress()
 				{
-					Message = "失敗しました: " + ex.Message,
+					Message = "失敗しました: " + ex.ToString(),
 					UseProgress = true,
 					Value = 0
 				}));
