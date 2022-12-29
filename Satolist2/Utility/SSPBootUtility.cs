@@ -41,7 +41,7 @@ namespace Satolist2.Utility
 			startInfo.FileName = executablePath;
 			startInfo.WorkingDirectory = System.IO.Directory.GetParent(executablePath).FullName;
 			startInfo.UseShellExecute = true;
-			startInfo.Arguments = string.Format(@"/o nobootcheck /g ""{0}""", ghostPath.Replace('/','\\'));
+			startInfo.Arguments = string.Format(@"/o nobootcheck /g ""{0}""", DictionaryUtility.NormalizeWindowsPath(ghostPath));
 			Process.Start(startInfo);
 		}
 	}
