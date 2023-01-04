@@ -37,7 +37,7 @@
 				</avalonEdit:TextEditor.Style>
 
 				<avalonEdit:TextEditor.Options>
-					<avalonEdit:TextEditorOptions ShowSpaces="True" ShowTabs="False"/>
+					<avalonEdit:TextEditorOptions ShowSpaces="False" ShowTabs="False"/>
 				</avalonEdit:TextEditor.Options>
 
 				<avalonEdit:TextEditor.InputBindings>
