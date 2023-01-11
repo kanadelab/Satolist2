@@ -1,0 +1,65 @@
+﻿<UserControl x:Class="SatolistDocument.DocumentControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:SatolistDocument"
+			 xmlns:pages="clr-namespace:SatolistDocument.Pages"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+	<UserControl.Resources>
+		<x:Array x:Key="DocumentPages" Type="local:DocumentPage">
+
+			<local:DocumentPage Label="はじめに">
+				<local:DocumentPage.PageTemplate>
+					<DataTemplate>
+						<pages:IndexPage />
+					</DataTemplate>
+				</local:DocumentPage.PageTemplate>
+			</local:DocumentPage>
+			
+			<local:DocumentPage Label="立ち絵・表情を一覧で確認する">
+				<local:DocumentPage.PageTemplate>
+					<DataTemplate>
+						<pages:SurfacePreviewPage />
+					</DataTemplate>
+				</local:DocumentPage.PageTemplate>
+			</local:DocumentPage>
+		</x:Array>
+	</UserControl.Resources>
+	<Grid>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="auto" />
+			<RowDefinition Height="*" />
+		</Grid.RowDefinitions>
+
+		<Button x:Name="IndexButton" Content="目次" HorizontalAlignment="Left" Margin="3" Command="{Binding ShowMenuCommand}" />
+		<Popup IsOpen="{Binding IsMenuOpened, Mode=TwoWay}" StaysOpen="False" PlacementTarget="{Binding ., ElementName=IndexButton}">
+			<Border BorderBrush="Gray" BorderThickness="2" Height="200" Width="300">
+				<Grid>
+					<Grid.RowDefinitions>
+						<RowDefinition Height="auto" />
+						<RowDefinition Height="*" />
+					</Grid.RowDefinitions>
+					<TextBlock Text="目次" Grid.Row="0" />
+					<ListBox x:Name="PageList" Grid.Row="1" SelectedIndex="0" ItemsSource="{StaticResource DocumentPages}" DisplayMemberPath="Label">
+					</ListBox>
+				</Grid>
+			</Border>
+		</Popup>
+	
+
+		<ScrollViewer Grid.Row="1">
+			<Grid Margin="5">
+				<!--
+				スケーリング
+				<Grid.LayoutTransform>
+					<ScaleTransform ScaleX="2" ScaleY="2" />
+				</Grid.LayoutTransform>
+				-->
+				<ContentControl ContentTemplate="{Binding SelectedItem.PageTemplate, ElementName=PageList, FallbackValue={x:Null}}" />
+			</Grid>
+		</ScrollViewer>
+
+	</Grid>
+</UserControl>

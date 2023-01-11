@@ -64,6 +64,7 @@ namespace SatolistDeploy
 				"Microsoft.Xaml.Behaviors.dll",
 				"Newtonsoft.Json.dll",
 				"SatolistUpdator.exe",
+				"SatolistDocument.dll",
 				"AngleSharp.dll",
 				"System.Buffers.dll",
 				"System.Memory.dll",

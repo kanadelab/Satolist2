@@ -1,0 +1,22 @@
+﻿<UserControl x:Class="SatolistDocument.Control.CodeSnippet"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:SatolistDocument.Control"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+	<Border BorderThickness="2" BorderBrush="Gray" Padding="3" Margin="5">
+		<Grid>
+			<Grid.RowDefinitions>
+				<RowDefinition Height="auto" />
+				<RowDefinition Height="*" />
+			</Grid.RowDefinitions>
+			<StackPanel Orientation="Horizontal">
+				<Button Grid.Row="0" Content="Copy" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="0 0 5 0" Command="{Binding CopyCommand, RelativeSource={RelativeSource AncestorType=local:CodeSnippet}}" />
+				<TextBlock Text="{Binding Description, RelativeSource={RelativeSource AncestorType=local:CodeSnippet}}" VerticalAlignment="Center" />
+			</StackPanel>
+			<TextBox Grid.Row="1" Text="{Binding Text, RelativeSource={RelativeSource AncestorType=local:CodeSnippet},FallbackValue=Text}" AcceptsReturn="True" IsReadOnly="True" />
+		</Grid>
+	</Border>
+</UserControl>

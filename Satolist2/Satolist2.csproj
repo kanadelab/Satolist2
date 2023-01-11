@@ -143,6 +143,9 @@
     <Compile Include="Control\BindablePasswordBox.xaml.cs">
       <DependentUpon>BindablePasswordBox.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Control\HelpViewer.xaml.cs">
+      <DependentUpon>HelpViewer.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Control\InsertPalette.xaml.cs">
       <DependentUpon>InsertPalette.xaml</DependentUpon>
     </Compile>
@@ -317,6 +320,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Control\GhostDescriptEditor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Control\HelpViewer.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -509,6 +516,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\SatolistDocument\SatolistDocument.csproj">
+      <Project>{301040b1-0bf2-4af1-9526-516b519497ae}</Project>
+      <Name>SatolistDocument</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SatolistUpdator\SatolistUpdator.csproj">
       <Project>{789c550a-4b6a-40bb-9355-10d7c27eee40}</Project>
       <Name>SatolistUpdator</Name>

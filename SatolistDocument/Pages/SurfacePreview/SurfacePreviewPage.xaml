@@ -1,0 +1,78 @@
+﻿<UserControl x:Class="SatolistDocument.Pages.SurfacePreviewPage"
+			 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+			 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+			 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+			 xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+			 xmlns:doc="clr-namespace:SatolistDocument.Control"
+			 xmlns:sys="clr-namespace:System;assembly=mscorlib"
+			 mc:Ignorable="d" 
+			 d:DesignHeight="450" d:DesignWidth="800">
+	<StackPanel>
+		<doc:H1 Text="サーフェスビューワ・サーフェスパレットの設定方法" />
+		<doc:Paragraph Text="サーフェスビューワ、サーフェスパレットを使用してゴーストの立ち絵をリストで確認することができます。"/>
+
+		<doc:H2 Text="機能紹介" />
+
+		<doc:H3 Text="サーフェスビューワ" />
+		<doc:Paragraph Text="サーフェスビューワでは立ち絵を確認することができます。" />
+		<doc:Image Source="surfaceviewer.png" MaxHeight="400" />
+
+		<doc:H3 Text="サーフェスパレット" />
+		<doc:Paragraph Text="サーフェスパレットでは顔部分など立ち絵の切り抜きを一覧化して表示することができます。" />
+		<doc:Image Source="surfacepalette.png" MaxHeight="400" />
+
+		<doc:H2 Text="前準備" />
+		<doc:H3 Text="立ち絵画像の生成" />
+		<doc:Paragraph>
+			<doc:Paragraph.Lines>
+				<x:Array Type="sys:String">
+					<sys:String>はじめてサーフェスビューワ・サーフェスパレットを使用するときは、立ち絵画像を生成する必要があります。</sys:String>
+					<sys:String>いずれかのウインドウを開くと立ち絵画像を生成するボタンが表示されていますので、押すと立ち絵を生成することができます。</sys:String>
+				</x:Array>
+			</doc:Paragraph.Lines>
+		</doc:Paragraph>
+		<doc:Paragraph Text="surfaces.txt で表示設定を変更した場合は立ち絵画像を再生成することで反映されます。「編集」→「サーフェスプレビュー画像を再生成」で再生性できます。" />
+		<doc:H3 Text="立ち絵生成でエラーになる場合" />
+		<doc:Paragraph Text="立ち絵生成でエラーになる場合は、いちどそのシェルをゴーストで起動してSSPでエラーや警告が出ていないか確認して、それらが出ている場合は修正してから再度試してみてください。" />
+		<doc:Paragraph Text="さとりすとでだけエラーになる場合は一度PCを再起動して試してみてください。それでもだめならさとりすとの不具合の可能性がありますので、お手数ですがシェルを添えてさとりすとの開発までご連絡をお願いします。" />
+
+		<doc:H2 Text="表示設定" />
+		<doc:Paragraph>
+			<doc:Paragraph.Lines>
+				<x:Array Type="sys:String">
+					<sys:String>初期状態では、サーフェスパレットに顔ではない部分が表示されてしまったり、不要なサーフェスが大量に表示されたりしているかもしれません。</sys:String>
+					<sys:String>シェルの「surfaces.txt」にさとりすと用の設定を記入することで画像の表示を調整することができます。</sys:String>
+					<sys:String>surfaces.txt の「一番上(最初の { よりも上)」か「サーフェスブレス内(elementやanimationを書くところ)」にこれらの設定を記入すると効果があります。</sys:String>
+					<sys:String>基本的にはsurfaces.txtの一番上に書いた設定が全体に効果があるのと、個別のサーフェスブレスに書いた設定が優先されます。</sys:String>
+				</x:Array>
+			</doc:Paragraph.Lines>
+		</doc:Paragraph>
+		<doc:Paragraph Text="設定項目はすべて「//」から始まります。使うときはそのまま「//」をつけておく必要があります。これはsurfaces.txtの設定ではないのでSSPにはコメントと思って無視してもらうためです。" />
+
+		<doc:H3 Text="表示位置の変更" />
+		<doc:Paragraph Text="サーフェスパレット上の表示位置をずらすことができます。画像上の指定位置はサーフェスパレットの左上に来ます。" />
+		<doc:CodeSnippet Text="//satolist.palette.offset,X座標,Y座標" Description="書式" />
+		<doc:CodeSnippet Text="//surface.palette.offset,100,100" Description="例：画像の左上から100,100ずらして表示" />
+		<doc:Paragraph Text="サーフェスビューワの立ち絵画像をドラッグして範囲選択、その後「選択位置をサーフェスパレットのデフォルト表示位置に設定」でサーフェスパレットの表示位置を簡易的に指定することもできます。ただし、すべての画像に対して適用することになるので、２人以上のキャラクターが居るなど立ち絵ごとに帰る必要がある場合は surfaces.txt で設定を行ってください。" />
+
+		<doc:H3 Text="表示倍率を変更" />
+		<doc:CodeSnippet Text="//satolist.palette.expand,倍率" Description="書式" />
+		<doc:CodeSnippet Text="//satolist.palette.expand,2" Description="例：２倍に拡大して表示" />
+
+		<doc:H3 Text="枠の大きさを変更" />
+		<doc:Paragraph Text="この設定は、surfaces.txt の先頭でのみ効果があり、個別のサーフェスに設定することはできません。" />
+		<doc:CodeSnippet Text="//satolist.palette.frame,幅,高さ" Description="書式" />
+
+		<doc:H3 Text="表示の有無を設定" />
+		<doc:Paragraph Text="0なら非表示、1なら表示をします。デフォルトは1ですが、surfaces.txtの一番上ですべて非表示に設定してから個別に表示するように設定することで選んだものだけを表示するようにできます。" />
+		<doc:CodeSnippet Text="//satolist.palette.visible,0または1" Description="サーフェスパレットの表示有無を設定" />
+		<doc:CodeSnippet Text="//satolist.viewer.visible,0または1" Description="サーフェスビューワの表示有無を設定" />
+		<doc:CodeSnippet Text="//satolist.surface.visible,0または1" Description="両方まとめての表示有無を設定" />
+
+		<doc:H3 Text="スコープの設定" />
+		<doc:Paragraph Text="プレビュー画像を生成する際に、きせかえ設定で使用するキャラ番号を指定します。" />
+		<doc:Paragraph Text="メインキャラ(sakura)なら0、サブキャラクタ(kero)なら1、３人目以降もそれぞれのスコープ番号を設定します。" />
+		<doc:CodeSnippet Text="//satolist.scope,スコープID" />
+
+	</StackPanel>
+</UserControl>

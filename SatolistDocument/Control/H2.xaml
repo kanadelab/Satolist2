@@ -1,0 +1,12 @@
+﻿<UserControl x:Class="SatolistDocument.Control.H2"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:SatolistDocument.Control"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+	<Border BorderThickness="0 0 0 3" BorderBrush="#8888FF" HorizontalAlignment="Left" VerticalAlignment="Top" Padding="0 0 10 0" Margin="0 0 3 3">
+		<TextBlock Text="{Binding Text, RelativeSource={RelativeSource AncestorType=local:H2},FallbackValue=Text}" FontSize="16" />
+	</Border>
+</UserControl>

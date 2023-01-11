@@ -20,6 +20,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SatolistUpdator", "Satolist
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SatolistDeploy", "SatolistDeploy\SatolistDeploy.csproj", "{5B7644AA-2E0F-4F45-80C0-01C50208EB22}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SatolistDocument", "SatolistDocument\SatolistDocument.csproj", "{301040B1-0BF2-4AF1-9526-516B519497AE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -140,6 +142,24 @@ Global
 		{5B7644AA-2E0F-4F45-80C0-01C50208EB22}.Release|x64.Build.0 = Release|Any CPU
 		{5B7644AA-2E0F-4F45-80C0-01C50208EB22}.Release|x86.ActiveCfg = Release|Any CPU
 		{5B7644AA-2E0F-4F45-80C0-01C50208EB22}.Release|x86.Build.0 = Release|Any CPU
+		{301040B1-0BF2-4AF1-9526-516B519497AE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{301040B1-0BF2-4AF1-9526-516B519497AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{301040B1-0BF2-4AF1-9526-516B519497AE}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{301040B1-0BF2-4AF1-9526-516B519497AE}.Debug|x64.Build.0 = Debug|Any CPU
+		{301040B1-0BF2-4AF1-9526-516B519497AE}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{301040B1-0BF2-4AF1-9526-516B519497AE}.Debug|x86.Build.0 = Debug|Any CPU
+		{301040B1-0BF2-4AF1-9526-516B519497AE}.Deploy|Any CPU.ActiveCfg = Debug|Any CPU
+		{301040B1-0BF2-4AF1-9526-516B519497AE}.Deploy|Any CPU.Build.0 = Debug|Any CPU
+		{301040B1-0BF2-4AF1-9526-516B519497AE}.Deploy|x64.ActiveCfg = Debug|Any CPU
+		{301040B1-0BF2-4AF1-9526-516B519497AE}.Deploy|x64.Build.0 = Debug|Any CPU
+		{301040B1-0BF2-4AF1-9526-516B519497AE}.Deploy|x86.ActiveCfg = Debug|Any CPU
+		{301040B1-0BF2-4AF1-9526-516B519497AE}.Deploy|x86.Build.0 = Debug|Any CPU
+		{301040B1-0BF2-4AF1-9526-516B519497AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{301040B1-0BF2-4AF1-9526-516B519497AE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{301040B1-0BF2-4AF1-9526-516B519497AE}.Release|x64.ActiveCfg = Release|Any CPU
+		{301040B1-0BF2-4AF1-9526-516B519497AE}.Release|x64.Build.0 = Release|Any CPU
+		{301040B1-0BF2-4AF1-9526-516B519497AE}.Release|x86.ActiveCfg = Release|Any CPU
+		{301040B1-0BF2-4AF1-9526-516B519497AE}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
