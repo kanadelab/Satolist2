@@ -17,8 +17,8 @@
 					</DataTemplate>
 				</local:DocumentPage.PageTemplate>
 			</local:DocumentPage>
-			
-			<local:DocumentPage Label="立ち絵・表情を一覧で確認する">
+
+			<local:DocumentPage Label="サーフェスビューワ・サーフェスパレットの設定方法">
 				<local:DocumentPage.PageTemplate>
 					<DataTemplate>
 						<pages:SurfacePreviewPage />
@@ -35,13 +35,13 @@
 
 		<Button x:Name="IndexButton" Content="目次" HorizontalAlignment="Left" Margin="3" Command="{Binding ShowMenuCommand}" />
 		<Popup IsOpen="{Binding IsMenuOpened, Mode=TwoWay}" StaysOpen="False" PlacementTarget="{Binding ., ElementName=IndexButton}">
-			<Border BorderBrush="Gray" BorderThickness="2" Height="200" Width="300">
+			<Border BorderBrush="Gray" Background="#222222" BorderThickness="2" Height="200" Width="300">
 				<Grid>
 					<Grid.RowDefinitions>
 						<RowDefinition Height="auto" />
 						<RowDefinition Height="*" />
 					</Grid.RowDefinitions>
-					<TextBlock Text="目次" Grid.Row="0" />
+					<TextBlock Text="目次" Grid.Row="0" Foreground="White" />
 					<ListBox x:Name="PageList" Grid.Row="1" SelectedIndex="0" ItemsSource="{StaticResource DocumentPages}" DisplayMemberPath="Label">
 					</ListBox>
 				</Grid>
