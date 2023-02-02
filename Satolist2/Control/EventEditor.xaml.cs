@@ -97,6 +97,7 @@ namespace Satolist2.Control
 		public MainViewModel Main { get; }
 		private bool isShowSearchBox;
 		private bool isActiveTextEditor;
+		private bool searchBoxFocusTrigger;
 		private int caretLine;
 
 		//検索ボックスの表示
@@ -127,6 +128,16 @@ namespace Satolist2.Control
 						TrySelectEventOnUkadocViewer();
 					}
 				}
+			}
+		}
+
+		public bool SearchBoxFocusTrigger
+		{
+			get => searchBoxFocusTrigger;
+			set
+			{
+				searchBoxFocusTrigger = value;
+				NotifyChanged();
 			}
 		}
 
@@ -186,6 +197,9 @@ namespace Satolist2.Control
 				o =>
 				{
 					IsShowSearchBox = true;
+
+					//すでに開いている場合でもフォーカスを移す必要がある
+					SearchBoxFocusTrigger = true;
 				}
 				);
 

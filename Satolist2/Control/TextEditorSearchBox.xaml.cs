@@ -29,13 +29,29 @@ namespace Satolist2.Control
 		public static readonly DependencyProperty AttachEditorProperty = DependencyProperty.Register(nameof(AttachEditor), typeof(ICSharpCode.AvalonEdit.TextEditor), typeof(TextEditorSearchBox),
 			new PropertyMetadata( (d,e) =>
 			{
-				if(e.OldValue is ICSharpCode.AvalonEdit.TextEditor oldEditor)
+				if (d is TextEditorSearchBox ctl)
 				{
-					oldEditor.TextChanged -= ((TextEditorSearchBox)d).TextChanged;
+					if (e.OldValue is ICSharpCode.AvalonEdit.TextEditor oldEditor)
+					{
+						oldEditor.TextChanged -= ctl.TextChanged;
+					}
+					if (e.NewValue is ICSharpCode.AvalonEdit.TextEditor newEditor)
+					{
+						newEditor.TextChanged += ctl.TextChanged;
+					}
 				}
-				if(e.NewValue is ICSharpCode.AvalonEdit.TextEditor newEditor)
+			}));
+
+		//フォーカストリガー。trueするとフォーカスする
+		public static readonly DependencyProperty FocusTriggerProperty = DependencyProperty.Register(nameof(FocusTrigger), typeof(bool), typeof(TextEditorSearchBox),
+			new PropertyMetadata((d,e) =>
+			{
+				if(d is TextEditorSearchBox ctl)
 				{
-					newEditor.TextChanged += ((TextEditorSearchBox)d).TextChanged;
+					if(e.NewValue is bool trigger && trigger)
+					{
+						ctl.MainTextBox.Focus();
+					}
 				}
 			}));
 
@@ -44,12 +60,25 @@ namespace Satolist2.Control
 		private void TextChanged(object sender, EventArgs e)
 		{
 			viewModel.RefleshSearch();
+			MainTextBox.LostFocus += MainTextBox_LostFocus;
+		}
+
+		private void MainTextBox_LostFocus(object sender, RoutedEventArgs e)
+		{
+			//フォーカスを失った
+			FocusTrigger = false;
 		}
 
 		public ICSharpCode.AvalonEdit.TextEditor AttachEditor
 		{
 			get => (ICSharpCode.AvalonEdit.TextEditor)GetValue(AttachEditorProperty);
 			set => SetValue(AttachEditorProperty, value);
+		}
+
+		public bool FocusTrigger
+		{
+			get => (bool)GetValue(FocusTriggerProperty);
+			set => SetValue(FocusTriggerProperty, value);
 		}
 
 		public TextEditorSearchBox()

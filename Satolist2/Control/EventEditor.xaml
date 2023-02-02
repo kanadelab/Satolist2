@@ -106,7 +106,8 @@
 		</Grid>
 		<local:TextEditorSearchBox x:Name="SearchBox" Grid.Row="1"
 				AttachEditor="{Binding .,ElementName=MainTextEditor}" 
-				Visibility="{Binding IsShowSearchBox, Converter={StaticResource BoolToVisibilityConverter}, Mode=TwoWay}" />
+				Visibility="{Binding IsShowSearchBox, Converter={StaticResource BoolToVisibilityConverter}, Mode=TwoWay}" 
+				FocusTrigger="{Binding SearchBoxFocusTrigger, Mode=TwoWay}"/>
 
 	</Grid>
 </UserControl>
