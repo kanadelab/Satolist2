@@ -134,6 +134,7 @@
 								<s:Boolean>True</s:Boolean>
 							</Trigger.Value>
 						</Trigger>
+						
 						<MultiTrigger>
 							<MultiTrigger.Conditions>
 								<Condition Property="TreeViewItem.IsSelected">
@@ -147,13 +148,16 @@
 									</Condition.Value>
 								</Condition>
 							</MultiTrigger.Conditions>
-							<Setter TargetName="Bd" Property="Panel.Background" Value="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" />
+							
+							<!--非フォーカス時でもハイライトブラシを使用して、フォーカス時と見た目を同じにする。ダークテーマ時の見栄えが悪くならないように。-->
+							<Setter TargetName="Bd" Property="Panel.Background" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" />
 							<Setter Property="TextElement.Foreground">
 								<Setter.Value>
-									<DynamicResource ResourceKey="{x:Static SystemColors.ControlTextBrushKey}" />
+									<DynamicResource ResourceKey="{x:Static SystemColors.HighlightTextBrushKey}" />
 								</Setter.Value>
 							</Setter>
 						</MultiTrigger>
+						
 						<Trigger Property="UIElement.IsEnabled">
 							<Setter Property="TextElement.Foreground">
 								<Setter.Value>
