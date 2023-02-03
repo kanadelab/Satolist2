@@ -68,9 +68,7 @@ namespace Satolist2.Control
 		private string randomizedContetnId;
 		
 		public override string DocumentTitle => TextFile.RelativeName;
-
 		public override string DockingContentId => randomizedContetnId;
-
 		
 		public DictionaryModel TextFile { get; }
 		public TextDocument Document { get; }
@@ -127,8 +125,6 @@ namespace Satolist2.Control
 				control.MainTextEditor.CaretOffset = Document.Lines[lineIndex].Offset;
 			}
 		}
-
-		
 
 		//カレットの位置からトークを特定して送信する
 		public void SendToGhost()
@@ -224,9 +220,6 @@ namespace Satolist2.Control
 				control.UpdateInsertPaletteKeyBindings(Main.InsertPalette, InsertCommand);
 				UpdateGeneralSettings();
 			}
-		}
-
-		
-		
+		}	
 	}
 }

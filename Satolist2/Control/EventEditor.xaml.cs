@@ -511,8 +511,4 @@ namespace Satolist2.Control
 			}
 		}
 	}
-
-	
-
-	
 }

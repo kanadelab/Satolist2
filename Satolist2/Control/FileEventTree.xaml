@@ -90,37 +90,10 @@
 								</Setter.Value>
 							</Setter>
 						</DataTrigger>
-						
+
 						<DataTrigger Binding="{Binding NodeType}" Value="InlineEvent">
 							<!--なにもない-->
 						</DataTrigger>
-						
-						
-						<!--リスト化解除モードの辞書表示切替-->
-						<!--
-						<MultiDataTrigger>
-							<MultiDataTrigger.Conditions>
-								<Condition Binding="{Binding NodeType}" Value="Dictionary" />
-								<Condition Binding="{Binding Dictionary.IsSerialized}" Value="True" />
-							</MultiDataTrigger.Conditions>
-							<MultiDataTrigger.Setters>
-								<Setter Property="Background" Value="{StaticResource ThemePeachPuff}" />
-							</MultiDataTrigger.Setters>
-						</MultiDataTrigger>
-						-->
-						
-						<!--非里々辞書-->
-						<!--
-						<MultiDataTrigger>
-							<MultiDataTrigger.Conditions>
-								<Condition Binding="{Binding NodeType}" Value="Dictionary" />
-								<Condition Binding="{Binding Dictionary.IsSatoriDictionary}" Value="False" />
-							</MultiDataTrigger.Conditions>
-							<MultiDataTrigger.Setters>
-								<Setter Property="Background" Value="Blue" />	
-							</MultiDataTrigger.Setters>
-						</MultiDataTrigger>
-						-->
 					</Style.Triggers>
 				</Style>
 			</TreeView.ItemContainerStyle>

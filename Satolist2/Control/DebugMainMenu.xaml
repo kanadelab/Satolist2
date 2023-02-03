@@ -18,6 +18,8 @@
 			<Button Content="Recv Start" Command="{Binding RecvStartCommand}" />
 
 			<Button Content="Test" Command="{Binding UITestCommand}" />
+
+	
 		</StackPanel>
 	</Grid>
 </UserControl>
