@@ -280,7 +280,7 @@ namespace Satolist2.Model
 		public string TextEditorFontName { get; set; }
 		[JsonProperty]
 		public bool IsEnableDarkMode { get; set; }
-
+		
 		//テキストエディタ
 		[JsonProperty]
 		public bool IsShowLineNumber { get; set; }
@@ -289,7 +289,11 @@ namespace Satolist2.Model
 		[JsonProperty]
 		public bool IsWardWrap { get; set; }
 		[JsonProperty]
+		public bool IsHilightCurrentLine { get; set; }
+		[JsonProperty]
 		public bool IsIndent { get; set; }
+		[JsonProperty]
+		public bool IsSurfacePaletteInserTypeSakuraScript { get; set; }
 
 		//カラー
 		[JsonProperty]
@@ -298,8 +302,6 @@ namespace Satolist2.Model
 		//試験的
 		[JsonProperty]
 		public string TextEditorBackgroundImagePath { get; set; }
-		[JsonProperty]
-		public bool IsSurfacePaletteInserTypeSakuraScript { get; set; }
 		[JsonProperty]
 		public double TextEditorOffsetX { get; set; }
 		[JsonProperty]
