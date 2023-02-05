@@ -391,16 +391,16 @@ namespace Satolist2.Control
 					case CollisionType.Rect:
 					case CollisionType.Ellipse:
 						return new double[] {
-							((RectLeft + baseSizeOffsetX) * shellScale),
-							((RectTop + baseSizeOffsetY) * shellScale),
-							((RectLeft + RectWidth + baseSizeOffsetX) * shellScale),
-							((RectTop + RectHeight + baseSizeOffsetY) * shellScale)
+							(RectLeft * shellScale + baseSizeOffsetX),
+							(RectTop * shellScale + baseSizeOffsetY),
+							((RectLeft + RectWidth) * shellScale + baseSizeOffsetX),
+							((RectTop + RectHeight) * shellScale + baseSizeOffsetY)
 						};
 					case CollisionType.Polygon:
 						var list = new List<double>();
 						var points = PolygonPointsViewModel.Select(o => new double[] {
-							((o.Point.X + baseSizeOffsetX) * shellScale),
-							((o.Point.Y + baseSizeOffsetY) * shellScale)
+							(o.Point.X * shellScale + baseSizeOffsetX),
+							(o.Point.Y * shellScale + baseSizeOffsetY)
 						});
 						foreach (var p in points)
 							list.AddRange(p);
