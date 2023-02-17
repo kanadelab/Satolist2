@@ -380,7 +380,7 @@ namespace Satolist2.Dialog
 				if (shortcutKeyCtrl || shortcutKeyAlt)
 				{
 					var items = new List<string>();
-					items.Add(Label);
+					items.Add(shortcutKeyNumber.ToString());
 					if (shortcutKeyCtrl)
 						items.Add("Ctrl");
 					if (shortcutKeyAlt)
