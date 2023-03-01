@@ -45,57 +45,71 @@ namespace Satolist2.Utility
 		private static CustomSyntaxHilightRecord[] customHilighter = null;
 		private const string CustomHilighterPath = "settings/hilighter.json";
 
-		private readonly List<SyntaxDefinition> Definitions = new List<SyntaxDefinition>()
+		static SatoriSyntaxRuleSet()
 		{
-			new SyntaxDefinition("\\\\s\\[.+?\\]", ScriptSyntax.ChangeSurface),
-			new SyntaxDefinition("\\\\s[0-9]", ScriptSyntax.ChangeSurface),
-			new SyntaxDefinition("（[1234567890１２３４５６７８９０\\-－]+）", ScriptSyntax.ChangeSurface),
+			//基本ルールセットを作成
+			Definitions = new List<SyntaxDefinition>()
+			{
+				new SyntaxDefinition("\\\\s\\[.+?\\]", ScriptSyntax.ChangeSurface),
+				new SyntaxDefinition("\\\\s[0-9]", ScriptSyntax.ChangeSurface),
+				new SyntaxDefinition("（[1234567890１２３４５６７８９０\\-－]+）", ScriptSyntax.ChangeSurface),
 
-			new SyntaxDefinition("φ.", ScriptSyntax.Escape),
+				new SyntaxDefinition("φ.", ScriptSyntax.Escape),
 
-			new SyntaxDefinition("\\\\!\\[(raise|embed|get,property|timerraise|notify),.+?\\]", ScriptSyntax.ScriptTag),
-			new SyntaxDefinition("\\\\[!pibncjmfx\\&]\\[.+?\\]", ScriptSyntax.ScriptTag),
-			new SyntaxDefinition("\\\\_[wblvums]\\[.+?\\]", ScriptSyntax.ScriptTag),
-			new SyntaxDefinition("\\\\__w\\[\\d+?\\]", ScriptSyntax.ScriptTag),
-			new SyntaxDefinition("\\\\&\\[.+?\\]", ScriptSyntax.ScriptTag),
-			new SyntaxDefinition("\\\\[01456huncvCxt\\*e\\-\\+]", ScriptSyntax.ScriptTag),
-			new SyntaxDefinition("\\\\_[nqs\\?\\+V]", ScriptSyntax.ScriptTag),
-			new SyntaxDefinition("\\\\w[0-9]", ScriptSyntax.ScriptTag),
+				new SyntaxDefinition("\\\\!\\[(raise|embed|get,property|timerraise|notify),.+?\\]", ScriptSyntax.ScriptTag),
+				new SyntaxDefinition("\\\\[!pibncjmfx\\&]\\[.+?\\]", ScriptSyntax.ScriptTag),
+				new SyntaxDefinition("\\\\_[wblvums]\\[.+?\\]", ScriptSyntax.ScriptTag),
+				new SyntaxDefinition("\\\\__w\\[\\d+?\\]", ScriptSyntax.ScriptTag),
+				new SyntaxDefinition("\\\\&\\[.+?\\]", ScriptSyntax.ScriptTag),
+				new SyntaxDefinition("\\\\[01456huncvCxt\\*e\\-\\+]", ScriptSyntax.ScriptTag),
+				new SyntaxDefinition("\\\\_[nqs\\?\\+V]", ScriptSyntax.ScriptTag),
+				new SyntaxDefinition("\\\\w[0-9]", ScriptSyntax.ScriptTag),
 
-			new SyntaxDefinition("^[＿].+", ScriptSyntax.Choice),
-			new SyntaxDefinition("\\\\q\\[.+?\\]", ScriptSyntax.Choice),
-			new SyntaxDefinition("\\\\__q\\[.+?\\].+?\\\\__q", ScriptSyntax.Choice),
+				new SyntaxDefinition("^[＿].+", ScriptSyntax.Choice),
+				new SyntaxDefinition("\\\\q\\[.+?\\]", ScriptSyntax.Choice),
+				new SyntaxDefinition("\\\\__q\\[.+?\\].+?\\\\__q", ScriptSyntax.Choice),
 
-			new SyntaxDefinition("^[＞].+", ScriptSyntax.Jump),
+				new SyntaxDefinition("^[＞].+", ScriptSyntax.Jump),
 
-			//new SyntaxDefinition("\\\\_a\\[.+?\\].+?\\\\_a", ScriptSyntax.Anchor),	//アンカー分ける意味無いか
-			new SyntaxDefinition("\\\\_a\\[.+?\\].+?\\\\_a", ScriptSyntax.Choice),
+				//new SyntaxDefinition("\\\\_a\\[.+?\\].+?\\\\_a", ScriptSyntax.Anchor),	//アンカー分ける意味無いか
+				new SyntaxDefinition("\\\\_a\\[.+?\\].+?\\\\_a", ScriptSyntax.Choice),
 
-			new SyntaxDefinition("^＊[^\t]*", ScriptSyntax.Sentence),
+				new SyntaxDefinition("^＊[^\t]*", ScriptSyntax.Sentence),
 
-			new SyntaxDefinition("^＠[^\t]+", ScriptSyntax.Word),
+				new SyntaxDefinition("^＠[^\t]+", ScriptSyntax.Word),
 
-			new SyntaxDefinition("^＄.+[\t＝\\=]", ScriptSyntax.Variable),
+				new SyntaxDefinition("^＄.+[\t＝\\=]", ScriptSyntax.Variable),
 
-			new SyntaxDefinition("\\b(単語の追加|追加単語の削除|追加単語の全削除|合成単語群|バイト値)\\b", ScriptSyntax.Function),
-			new SyntaxDefinition("\\b(call|nop|remember|set|sync|when|whenlist|loop|times|while|for|vncall|equal)\\b", ScriptSyntax.Function),
+				new SyntaxDefinition("\\b(Value\\d+|教わること|引数区切り追加|引数区切り削除|文「.+」の重複回避|ウィンドウハンドル\\d+|スクリプトの一番頭|呼び出し回数制限|ジャンプ回数制限|デバッグ|SAORI引数の計算|BalloonOffset\\d+|Log|RequestLog|OperationLog|ResposeLog)\\b", ScriptSyntax.Getter),
+				new SyntaxDefinition("\\b(スコープ切り替え時|さくらスクリプトによるスコープ切り替え時|.+タイマ|全タイマ解除|次から[0123456789０１２３４５６７８９]+回目のトーク|次のトーク|トーク予約のキャンセル|デフォルトサーフェス\\d+|会話時サーフェス戻し|サーフェス加算値\\d+|辞書フォルダ|辞書リロード|＄自動セーブ間隔|手動セーブ|セーブデータ暗号化|自動挿入ウェイトタイプ|自動挿入ウェイトの倍率|喋り間隔|喋り間隔誤差|今回は喋らない|見切れてても喋る|自動アンカー|今回は自動アンカー|トーク中のなでられ反応|なでられ持続秒数|なでられ反応回数)\\b", ScriptSyntax.Getter),
+				new SyntaxDefinition("（(現在[時分秒]|起動回数|起動[時分秒]|累計[時分秒]|ＯＳ起動[時分秒]|単純累計[時分秒]|単純起動[時分秒]|単純ＯＳ起動[時分秒]|最終トークからの経過秒|ゴースト起動時間累計ミリ秒|サーフェス\\d+?|前回終了時サーフェス\\d+?|文「.+?」の数|文「.+?」の存在|単語群「.+?」の数|単語群「.+?」の存在|変数「.+?」の存在)）", ScriptSyntax.Getter),
+				new SyntaxDefinition("（(里々のバージョン|本体の所在|Sender|Status|Charset|[ARSＡＲＳ]の数|隣で起動しているゴースト|起動しているゴースト数|.+?の存在|.+?のサーフェス|予約トーク|次から.+回目の予約トーク|トーク「.+?」の予約有無)）", ScriptSyntax.Getter),
 
-			new SyntaxDefinition("\\b(Value\\d+|教わること|引数区切り追加|引数区切り削除|文「.+」の重複回避|ウィンドウハンドル\\d+|スクリプトの一番頭|呼び出し回数制限|ジャンプ回数制限|デバッグ|SAORI引数の計算|BalloonOffset\\d+|Log|RequestLog|OperationLog|ResposeLog)\\b", ScriptSyntax.Getter),
-			new SyntaxDefinition("\\b(スコープ切り替え時|さくらスクリプトによるスコープ切り替え時|.+タイマ|全タイマ解除|次から[0123456789０１２３４５６７８９]+回目のトーク|次のトーク|トーク予約のキャンセル|デフォルトサーフェス\\d+|会話時サーフェス戻し|サーフェス加算値\\d+|辞書フォルダ|辞書リロード|＄自動セーブ間隔|手動セーブ|セーブデータ暗号化|自動挿入ウェイトタイプ|自動挿入ウェイトの倍率|喋り間隔|喋り間隔誤差|今回は喋らない|見切れてても喋る|自動アンカー|今回は自動アンカー|トーク中のなでられ反応|なでられ持続秒数|なでられ反応回数)\\b", ScriptSyntax.Getter),
-			new SyntaxDefinition("（(現在[時分秒]|起動回数|起動[時分秒]|累計[時分秒]|ＯＳ起動[時分秒]|単純累計[時分秒]|単純起動[時分秒]|単純ＯＳ起動[時分秒]|最終トークからの経過秒|ゴースト起動時間累計ミリ秒|サーフェス\\d+?|前回終了時サーフェス\\d+?|文「.+?」の数|文「.+?」の存在|単語群「.+?」の数|単語群「.+?」の存在|変数「.+?」の存在)）", ScriptSyntax.Getter),
-			new SyntaxDefinition("（(里々のバージョン|本体の所在|Sender|Status|Charset|[ARSＡＲＳ]の数|隣で起動しているゴースト|起動しているゴースト数|.+?の存在|.+?のサーフェス|予約トーク|次から.+回目の予約トーク|トーク「.+?」の予約有無)）", ScriptSyntax.Getter),
+				new SyntaxDefinition("（Reference(\\d+?|（/+?）)）", ScriptSyntax.Argument),
 
-			new SyntaxDefinition("（Reference(\\d+?|（/+?）)）", ScriptSyntax.Argument),
+				new SyntaxDefinition("（乱数([－\\-]?[01234567890０１２３４５６７８９０]+?|（.+?）)～([－\\-]?[01234567890０１２３４５６７８９０]+?|（.+?）)）", ScriptSyntax.Random),
+				new SyntaxDefinition("（乱数（.+?））", ScriptSyntax.Random),
 
-			new SyntaxDefinition("（乱数([－\\-]?[01234567890０１２３４５６７８９０]+?|（.+?）)～([－\\-]?[01234567890０１２３４５６７８９０]+?|（.+?）)）", ScriptSyntax.Random),
-			new SyntaxDefinition("（乱数（.+?））", ScriptSyntax.Random),
+				new SyntaxDefinition("＃.*", ScriptSyntax.Comment),
 
-			new SyntaxDefinition("＃.*", ScriptSyntax.Comment),
+				//new SyntaxDefinition("\t", ScriptSyntax.Tab)
+				new SyntaxDefinition(" ", ScriptSyntax.Space),
+				new SyntaxDefinition("　", ScriptSyntax.WideSpace)
+			};
 
-			//new SyntaxDefinition("\t", ScriptSyntax.Tab)
-			new SyntaxDefinition(" ", ScriptSyntax.Space),
-			new SyntaxDefinition("　", ScriptSyntax.WideSpace)
-		};
+
+			string[] satoriFunctions =
+			{
+				"calc", "calc_float", "set", "nop", "call", "vncall", "loop", "times", "while", "for", "if", "when", "unless", "iflist", "whenlist", "switch", "nswitch",
+				"substr", "at", "split", "replace", "replace_first", "erase", "erase_first", "join", "reverse", "zen2han", "han2zen", "kata2hira", "hira2kata",
+				"compare", "compare_head", "compare_tail", "compare_case", "compare_head_case", "compare_tail_case", "equal", "count", "length", "is_empty", "is_digit", "is_alpha",
+				"choice", "lsimg", "mkdir", "remember", "sync", "sprintf", "フォーマット指定子", "バイト値", "単語の追加", "追加単語の削除", "追加単語の全削除", "合成丹後郡", "load_saori"
+			};
+
+			Definitions.Add(new SyntaxDefinition(string.Format("\\b({0})\\b", string.Join("|", satoriFunctions)), ScriptSyntax.Function));
+		}
+
+		private static List<SyntaxDefinition> Definitions { get; }
 
 		public SatoriSyntaxRuleSet()
 		{
