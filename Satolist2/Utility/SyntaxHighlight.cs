@@ -103,7 +103,7 @@ namespace Satolist2.Utility
 				"calc", "calc_float", "set", "nop", "call", "vncall", "loop", "times", "while", "for", "if", "when", "unless", "iflist", "whenlist", "switch", "nswitch",
 				"substr", "at", "split", "replace", "replace_first", "erase", "erase_first", "join", "reverse", "zen2han", "han2zen", "kata2hira", "hira2kata",
 				"compare", "compare_head", "compare_tail", "compare_case", "compare_head_case", "compare_tail_case", "equal", "count", "length", "is_empty", "is_digit", "is_alpha",
-				"choice", "lsimg", "mkdir", "remember", "sync", "sprintf", "フォーマット指定子", "バイト値", "単語の追加", "追加単語の削除", "追加単語の全削除", "合成丹後郡", "load_saori"
+				"choice", "lsimg", "mkdir", "remember", "sync", "sprintf", "フォーマット指定子", "バイト値", "単語の追加", "追加単語の削除", "追加単語の全削除", "合成単語群", "load_saori"
 			};
 
 			Definitions.Add(new SyntaxDefinition(string.Format("\\b({0})\\b", string.Join("|", satoriFunctions)), ScriptSyntax.Function));
