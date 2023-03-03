@@ -60,11 +60,15 @@ namespace SatoriProxy
 			byte[] requestBytes = SatoriEncoding.GetBytes(request);
 			IntPtr requestPtr = Marshal.AllocHGlobal(requestBytes.Length);
 			Marshal.Copy(requestBytes, 0, requestPtr, requestBytes.Length);
-			IntPtr sizePtr = Marshal.AllocHGlobal(sizeof(long));
-			Marshal.Copy(BitConverter.GetBytes(requestBytes.LongLength), 0, sizePtr, sizeof(long));
+			IntPtr sizePtr = Marshal.AllocHGlobal(sizeof(int));
+			Marshal.Copy(BitConverter.GetBytes(requestBytes.LongLength), 0, sizePtr, sizeof(int));
 
 			IntPtr resultPtr = SatoriRequest(requestPtr, sizePtr);
-			string result = Marshal.PtrToStringAnsi(resultPtr);
+			int[] resultSize = new int[1];
+			Marshal.Copy(sizePtr, resultSize, 0, 1);
+			string result = Marshal.PtrToStringAnsi(resultPtr, resultSize[0]);
+
+			//TODO: ちゃんと検証するのがいいかも
 
 			Marshal.FreeHGlobal(sizePtr);
 			Marshal.FreeHGlobal(resultPtr);
@@ -78,11 +82,13 @@ namespace SatoriProxy
 			IntPtr requestPtr = Marshal.AllocHGlobal(requestBytes.Length);
 			Marshal.Copy(requestBytes, 0, requestPtr, requestBytes.Length);
 
-			IntPtr sizePtr = Marshal.AllocHGlobal(sizeof(long));
-			Marshal.Copy(BitConverter.GetBytes(requestBytes.LongLength), 0, sizePtr, sizeof(long));
+			IntPtr sizePtr = Marshal.AllocHGlobal(sizeof(int));
+			Marshal.Copy(BitConverter.GetBytes(requestBytes.LongLength), 0, sizePtr, sizeof(int));
 
 			IntPtr resultPtr = SatoriRequest(requestPtr, sizePtr);
-			string result = Marshal.PtrToStringAnsi(resultPtr);
+			int[] resultSize = new int[1];
+			Marshal.Copy(sizePtr, resultSize, 0, 1);
+			string result = Marshal.PtrToStringAnsi(resultPtr, resultSize[0]);
 
 			Marshal.FreeHGlobal(sizePtr);
 			Marshal.FreeHGlobal(resultPtr);
@@ -101,7 +107,7 @@ namespace SatoriProxy
 			return (IntPtr)SatoriRequestMethodInfo.Invoke(null, new object[] { h, len });
 		}
 
-		static int SatoriLoad(IntPtr h, long len)
+		static int SatoriLoad(IntPtr h, int len)
 		{
 			return (int)SatoriLoadMethodInfo.Invoke(null, new object[] { h, len });
 		}
@@ -136,7 +142,7 @@ namespace SatoriProxy
 				MethodAttributes.Public | MethodAttributes.Static | MethodAttributes.PinvokeImpl | MethodAttributes.HideBySig,
 				CallingConventions.Standard,
 				typeof(int),
-				new Type[] { typeof(IntPtr), typeof(long) },
+				new Type[] { typeof(IntPtr), typeof(int) },
 				CallingConvention.Cdecl,
 				CharSet.Ansi
 				);
