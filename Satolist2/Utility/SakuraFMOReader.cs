@@ -29,6 +29,41 @@ namespace Satolist2.Utility
 			records = new Dictionary<string, SakuraFMORecord>();
 		}
 
+		public static void DumpToFile(string fileName)
+		{
+			using (var mutex = new Mutex(false, MutexName))
+			{
+				if (mutex.WaitOne(MutexTimeoutMs))
+				{
+					try
+					{
+						using (var fmo = MemoryMappedFile.OpenExisting(FMOName))
+						{
+							using (var fmoStream = fmo.CreateViewStream())
+							{
+								using(var reader = new BinaryReader(fmoStream))
+								{
+									byte[] data = new byte[fmoStream.Length];
+									reader.Read(data, 0, (int)fmoStream.Length);
+
+									File.WriteAllBytes(fileName, data);
+								}
+							}
+						}
+					}
+					catch(FileNotFoundException)
+					{
+						//fmoうまく読めなかった…
+						throw;
+					}
+					finally
+					{
+						mutex.ReleaseMutex();
+					}
+				}
+			}
+		}
+
 		//場合によって同期待ちするので注意
 		public void Read()
 		{

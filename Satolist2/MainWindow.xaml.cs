@@ -888,6 +888,7 @@ namespace Satolist2
 		public ActionCommand EditTextEditorFontCommand { get; }
 		public ActionCommand OpenSatolistDirectoryCommand { get; }
 		public ActionCommand ReloadShioriCommand { get; }
+		public ActionCommand DumpFMOCommand { get; }
 		public ActionCommand ShowSearchBoxCommand { get; }
 		public ActionCommand ExportNarCommand { get; }
 		public ActionCommand MakeUpdateFileCommand { get; }
@@ -1311,6 +1312,28 @@ namespace Satolist2
 			ReloadShioriCommand = new ActionCommand(
 				o => GhostRuntimeRequest.ReloadShiori(Ghost),
 				o => Ghost != null
+				);
+
+			DumpFMOCommand = new ActionCommand(
+				o =>
+				{
+					SaveFileDialog d = new SaveFileDialog();
+					d.DefaultExt = ".bin";
+					d.Filter = "バイナリ|*.bin";
+					d.FileName = "fmo.bin";
+					if(d.ShowDialog() == true)
+					{
+						try
+						{
+							SakuraFMOReader.DumpToFile(d.FileName);
+							MessageBox.Show("FMOをダンプしました。", "さとりすと", MessageBoxButton.OK, MessageBoxImage.Information);
+						}
+						catch
+						{
+							MessageBox.Show("FMOダンプに失敗しました。", "さとりすと", MessageBoxButton.OK, MessageBoxImage.Warning);
+						}
+					}
+				}
 				);
 
 			ShowSearchBoxCommand = new ActionCommand(
