@@ -1,5 +1,21 @@
 [
 	{
+		"Property": "charset",
+		"Description": "",
+		"Help": "",
+		"Type": "Constant",
+		"Default": "Shift_JIS",
+		"Hidden": true
+	},
+	{
+		"Property": "type",
+		"Description": "",
+		"Help": "",
+		"Type": "Constant",
+		"Default": "ghost",
+		"Hidden": true
+	},
+	{
 		"Property": "name",
 		"Description": "(必須)ゴースト名",
 		"Help": "例:奏でる日常の旋律",

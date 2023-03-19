@@ -12,7 +12,8 @@ namespace Satolist2.Utility
 		internal enum DescriptType
 		{
 			String,
-			Select
+			Select,
+			Constant
 		}
 
 		public string Property { get; set; }
@@ -20,6 +21,7 @@ namespace Satolist2.Utility
 		public string Help { get; set; }
 		public string Default { get; set; }
 		public bool Required { get; set; }
+		public bool Hidden { get; set; }
 		public DescriptType Type { get; set; }
 		public DescriptSelectItem[] Items { get; set; }
 	}
@@ -69,6 +71,7 @@ namespace Satolist2.Utility
 				d.Property = item[nameof(DescriptItemModel.Property)]?.ToString() ?? string.Empty;
 				d.Description = item[nameof(DescriptItemModel.Description)]?.ToString() ?? string.Empty;
 				d.Required = item[nameof(DescriptItemModel.Required)]?.Value<bool>() ?? false;  //TODO: 配列改行対応
+				d.Hidden = item[nameof(DescriptItemModel.Hidden)]?.Value<bool>() ?? false;
 				d.Type = ((DescriptItemModel.DescriptType)Enum.Parse(typeof(DescriptItemModel.DescriptType), item[nameof(DescriptItemModel.Type)].ToString()));
 
 				var help = item[nameof(DescriptItemModel.Help)];

@@ -82,6 +82,17 @@
 																</Setter.Value>
 															</Setter>
 														</DataTrigger>
+														<DataTrigger Binding="{Binding Type}" Value="Constant">
+															<Setter Property="Template">
+																<Setter.Value>
+																	<ControlTemplate>
+																		<Grid>
+																			<TextBlock Text="{Binding Value}" />
+																		</Grid>
+																	</ControlTemplate>
+																</Setter.Value>
+															</Setter>
+														</DataTrigger>
 													</Style.Triggers>
 												</Style>
 											</ContentControl.Style>
@@ -120,6 +131,11 @@
 								<EventSetter Event="GotFocus" Handler="ListViewItem_GotFocus" />
 								<EventSetter Event="Selected" Handler="ListViewItem_GotFocus" />
 								<Setter Property="ToolTip" Value="{Binding Help}" />
+								<Style.Triggers>
+									<DataTrigger Binding="{Binding Hidden}" Value="True">
+										<Setter Property="Visibility" Value="Collapsed" />
+									</DataTrigger>
+								</Style.Triggers>
 							</Style>
 						</ListView.ItemContainerStyle>
 

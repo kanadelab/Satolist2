@@ -357,6 +357,7 @@ namespace Satolist2.Control
 		}
 		public DescriptItemModel.DescriptType Type => model.Type;
 		public bool Required => model.Required;
+		public bool Hidden => model.Hidden;
 		public IEnumerable<DescriptSelectItem> Items
 		{
 			get
@@ -372,7 +373,18 @@ namespace Satolist2.Control
 
 		public string Value
 		{
-			get => val;
+			get
+			{
+				if (Type == DescriptItemModel.DescriptType.Constant)
+				{
+					//constantなら必ずdefaultが帰る
+					return Default;
+				}
+				else
+				{
+					return val;
+				}
+			}
 			set
 			{
 				if (val != value)
