@@ -35,6 +35,11 @@ namespace Satolist2.Model
 		public void AddHistory(GhostModel ghost)
 		{
 			var history = new OpenGhostHistory(ghost.GhostDescriptName, ghost.FullPath);
+			if(!string.IsNullOrEmpty(ghost.GhostIconPath))
+			{
+				history.IconPath = ghost.FullGhostIconPath;
+			}
+
 			var item = GhostHistory.FirstOrDefault(o => o.IsEquals(history));
 			if (item != null)
 			{
@@ -83,6 +88,8 @@ namespace Satolist2.Model
 		public string Name { get; set; }
 		[JsonProperty]
 		public string Path { get; set; }
+		[JsonProperty]
+		public string IconPath { get; set; }
 		[JsonProperty]
 		public bool IsFavorite { get; set; }
 

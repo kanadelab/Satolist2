@@ -46,6 +46,16 @@ namespace Satolist2.Model
 			get; private set;
 		}
 
+		public string GhostIconPath
+		{
+			get; private set;
+		}
+
+		public string FullGhostIconPath
+		{
+			get => DictionaryUtility.ConbinePath(FullDictionaryPath, GhostIconPath);
+		}
+
 		//ゴーストが持っている辞書データ
 		public ReadOnlyObservableCollection<DictionaryModel> Dictionaries
 		{
@@ -90,12 +100,12 @@ namespace Satolist2.Model
 				}
 			}
 
-			//descriptを探す
-			//TODO: descript editor ができたら一時的でなくてもよさそう
+			//descriptから基本情報を得る
 			var tempDescript = new CsvBuilder();
 			tempDescript.DeserializeFromFile(FullGhostDescriptPath);
 			GhostDescriptSakuraName = tempDescript.GetValue("sakura.name");
 			GhostDescriptName = tempDescript.GetValue("name");
+			GhostIconPath = tempDescript.GetValue("icon");
 		}
 
 		public DictionaryModel AddNewDictionary(string filename)

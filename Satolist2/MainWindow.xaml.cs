@@ -173,6 +173,13 @@ namespace Satolist2
 				//ウインドウ設定
 				Win32Import.SetWindowPlacement(hwnd, ref placement);
 			}
+
+			//指定ゴーストを開く
+			//NOTE: 最初にカラのVMを作るタイミングで作ってもいいかも？
+			if (Environment.GetCommandLineArgs().Length >= 2)
+			{
+				OpenGhost(Environment.GetCommandLineArgs()[1]);
+			}
 		}
 
 		private void MainWindow_Closed(object sender, EventArgs e)
