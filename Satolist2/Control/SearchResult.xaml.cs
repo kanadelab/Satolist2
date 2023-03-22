@@ -3,6 +3,7 @@ using Satolist2.Utility;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -39,6 +40,26 @@ namespace Satolist2.Control
 		}
 	}
 
+	//検索条件オブジェクト
+	internal class SearchQuery
+	{
+		//検索テキスト
+		public string SearchString { get; set; }
+		
+		//タイトルを検索対象にするか
+		public bool IsSearchTitle { get; set; }
+
+		//本文を検索対象にするか
+		public bool IsSearchBody { get; set; }
+
+		public SearchQuery()
+		{
+			SearchString = string.Empty;
+			IsSearchTitle = true;
+			IsSearchBody = true;
+		}
+	}
+
 	internal class SearchResultViewModel : NotificationObject, IDockingWindowContent, IDisposable
 	{
 		public const string ContentId = "SearchResult";
@@ -72,8 +93,10 @@ namespace Satolist2.Control
 		}
 
 		//検索の実行?
-		public void RunSearch(string searchString)
+		public void RunSearch(SearchQuery query)
 		{
+			var searchString = query.SearchString;
+
 			//クリア処理
 			foreach (var item in items)
 				item.Dispose();
@@ -87,11 +110,25 @@ namespace Satolist2.Control
 					//どこかにヒットするか
 					foreach (var ev in dic.Events)
 					{
-						if (
-							ev.Name.IndexOf(searchString) >= 0 ||
-							ev.Body.IndexOf(searchString) >= 0 ||
-							ev.Condition.IndexOf(searchString) >= 0
-							)
+						bool isHit = false;
+						if(query.IsSearchTitle)
+						{
+							if(ev.Name.Contains(searchString))
+							{
+								isHit = true;
+							}
+						}
+
+						if(!isHit && query.IsSearchBody)
+						{
+							if(ev.Body.Contains(searchString) ||
+								ev.Condition.Contains(searchString))
+							{
+								isHit = true;
+							}
+						}
+
+						if (isHit)
 						{
 							//hit
 							items.Add(new SearchResultItemViewModel(this, ev));
@@ -104,9 +141,48 @@ namespace Satolist2.Control
 					for(int i = 0; i < lines.Length; i++)
 					{
 						var line = lines[i];
-						if(line.IndexOf(searchString) >= 0)
+						if (string.IsNullOrEmpty(line))
+							continue;
+
+						bool isHit = false;
+
+						//行頭が＊＠ではじまるなら項目名として検索する
+						if (line[0] == Constants.WordHead || line[0] == Constants.SentenceHead)
 						{
-							//hit
+							//項目名と条件部を分離
+							var sp = line.Split(Constants.TabSeparator, 2, StringSplitOptions.None);
+
+							//タイトルの一致
+							if (query.IsSearchTitle)
+							{
+								if (sp[0].Contains(searchString))
+								{
+									isHit = true;
+								}
+							}
+
+							//それ以外
+							if(!isHit && sp.Length>=2 && query.IsSearchBody)
+							{
+								if (sp[1].Contains(searchString))
+								{
+									isHit = true;
+								}
+							}
+						}
+						else if(query.IsSearchBody)
+						{
+							//本文
+							if (line.Contains(searchString))
+							{
+								//hit
+								isHit = true;
+							}
+						}
+
+						//ヒットしていたら結果を作成
+						if(isHit)
+						{
 							items.Add(new SearchResultItemViewModel(this, i, line, dic));
 						}
 					}
