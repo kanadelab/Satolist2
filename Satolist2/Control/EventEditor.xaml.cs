@@ -23,6 +23,7 @@ using System.Windows.Threading;
 using System.Windows.Controls.Primitives;
 using ICSharpCode.AvalonEdit.CodeCompletion;
 using ICSharpCode.AvalonEdit.Editing;
+using ICSharpCode.AvalonEdit;
 
 namespace Satolist2.Control
 {
@@ -31,9 +32,22 @@ namespace Satolist2.Control
 	/// </summary>
 	public partial class EventEditor : UserControl
 	{
+		private System.Windows.Controls.Control lastForcusTextBox;
+
 		public EventEditor()
 		{
 			InitializeComponent();
+
+			//フォーカスを記憶
+			MainTextEditor.GotFocus += (s,e) => {
+				lastForcusTextBox = (System.Windows.Controls.Control)s;
+			};
+			ConditionTextBox.GotFocus += (s, e) => {
+				lastForcusTextBox = (System.Windows.Controls.Control)s;
+			};
+			EventNameTextBox.GotFocus += (s, e) => {
+				lastForcusTextBox = (System.Windows.Controls.Control)s;
+			};
 		}
 
 		internal void UpdateInsertPaletteKeyBindings(InsertItemPaletteModel palette, ICommand command)
@@ -65,7 +79,15 @@ namespace Satolist2.Control
 
 		public void RequestFocus()
 		{
-			Dispatcher.Invoke(new Action(() => { MainTextEditor.Focus(); }), System.Windows.Threading.DispatcherPriority.Render);
+			Dispatcher.Invoke(new Action(() => {
+
+				//最後にフォーカスがあったものを基準
+				if (lastForcusTextBox != null)
+					lastForcusTextBox.Focus();
+				else
+					MainTextEditor.Focus();
+
+			}), System.Windows.Threading.DispatcherPriority.Render);
 		}
 	}
 
@@ -145,6 +167,7 @@ namespace Satolist2.Control
 		public abstract string DocumentTitle { get; }
 
 		public ActionCommand ShowSearchBoxCommand { get; }
+		public ActionCommand ShowGlobalSearchCommand { get; }
 		public ActionCommand CompletionCommand { get; }
 
 		public abstract ICSharpCode.AvalonEdit.TextEditor MainTextEditor { get; }
@@ -202,6 +225,16 @@ namespace Satolist2.Control
 					SearchBoxFocusTrigger = true;
 				}
 				);
+
+			//全体検索
+			ShowGlobalSearchCommand = new ActionCommand(
+				o =>
+				{
+					if(o is ICSharpCode.AvalonEdit.TextEditor ae)
+						Main.ShowSearchBoxCommand.Execute(ae?.SelectedText);
+					else if(o is TextBox tb)
+						Main.ShowSearchBoxCommand.Execute(tb?.SelectedText);
+				});
 
 			//入力補助
 			CompletionCommand = new ActionCommand(

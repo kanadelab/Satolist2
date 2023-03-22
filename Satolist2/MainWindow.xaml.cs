@@ -76,6 +76,12 @@ namespace Satolist2
 			}
 		}
 
+		public bool IsShowSearchMenu
+		{
+			get => SearchMenuVisibleMenu.IsChecked;
+			set => SearchMenuVisibleMenu.IsChecked = value;
+		}
+
 		public MainWindow()
 		{
 			InitializeComponent();
@@ -809,6 +815,9 @@ namespace Satolist2
 		//挿入機能等で別のコントロールをアクティブにしている想定で、テキストエディタをアクティブにに戻す
 		public void ActivateActiveEditor()
 		{
+			if (ActiveEditor == null)
+				return;
+
 			if(!ActiveEditor.IsActive)
 			{
 				ActiveEditor.IsActive = true;
@@ -1346,9 +1355,16 @@ namespace Satolist2
 			ShowSearchBoxCommand = new ActionCommand(
 				o =>
 				{
+					var searchString = o as string;
 					MainWindow.SearchMenu.Show();
 					MainWindow.SearchMenu.IsActive = true;
-					MainWindow.Dispatcher.BeginInvoke(new Action(() => { ((SearchMenu)MainWindow.SearchMenu.Content).SearchTextBox.Focus(); }), System.Windows.Threading.DispatcherPriority.Render);
+					MainWindow.Dispatcher.BeginInvoke(new Action(() => 
+					{
+						if(!string.IsNullOrEmpty(searchString))
+							SearchMenuViewModel.SearchString = searchString;
+						((SearchMenu)MainWindow.SearchMenu.Content).SearchTextBox.Focus();
+						((SearchMenu)MainWindow.SearchMenu.Content).SearchTextBox.SelectAll();
+					}), System.Windows.Threading.DispatcherPriority.Render);
 				}
 				);
 

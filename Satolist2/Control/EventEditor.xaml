@@ -45,12 +45,20 @@
 
 			<StackPanel Grid.Column="1" Margin="3">
 				<TextBlock Text="名前" />
-				<TextBox Text="{Binding Event.Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+				<TextBox x:Name="EventNameTextBox" Text="{Binding Event.Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+					<TextBox.InputBindings>
+						<KeyBinding Gesture="CTRL+SHIFT+F" Command="{Binding ShowGlobalSearchCommand}" CommandParameter="{Binding .,RelativeSource={RelativeSource AncestorType=TextBox}}"/>
+					</TextBox.InputBindings>
+				</TextBox>
 			</StackPanel>
 
 			<StackPanel Grid.Column="2" Margin="3">
 				<TextBlock Text="条件"/>
-				<TextBox Text="{Binding Event.Condition, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+				<TextBox x:Name="ConditionTextBox" Text="{Binding Event.Condition, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+					<TextBox.InputBindings>
+						<KeyBinding Gesture="CTRL+SHIFT+F" Command="{Binding ShowGlobalSearchCommand}" CommandParameter="{Binding .,RelativeSource={RelativeSource AncestorType=TextBox}}"/>
+					</TextBox.InputBindings>
+				</TextBox>
 			</StackPanel>
 
 		</Grid>
@@ -77,6 +85,7 @@
 				<avalonEdit:TextEditor.InputBindings>
 					<KeyBinding Gesture="ALT+Q" Command="{Binding SendToGhostCommand}" />
 					<KeyBinding Gesture="CTRL+F" Command="{Binding ShowSearchBoxCommand}" />
+					<KeyBinding Gesture="CTRL+SHIFT+F" Command="{Binding ShowGlobalSearchCommand}" CommandParameter="{Binding .,RelativeSource={RelativeSource AncestorType=avalonEdit:TextEditor}}"/>
 					<KeyBinding Gesture="CTRL+SPACE" Command="{Binding CompletionCommand}" />
 				</avalonEdit:TextEditor.InputBindings>
 
