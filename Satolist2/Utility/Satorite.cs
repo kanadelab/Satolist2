@@ -90,8 +90,7 @@ namespace Satolist2.Utility
 			var fmoRecord = SakuraFMOReader.Read(ghost);
 			if (fmoRecord == null)
 			{
-				Core.LogMessage.AddLog("編集中のゴーストにアクセスできません。SSPでゴーストを起動していますか？", Core.LogMessageType.Error);
-				return; //送信できてない
+				throw new GhostNotFoundException();
 			}
 
 			var sstpBuilder = new ProtocolBuilder();
@@ -248,10 +247,14 @@ namespace Satolist2.Utility
 		{
 			return ExecuteSatori(ghost, "（里々のバージョン）", EventType.Word);
 		}
-
 	}
 
-
-
-
+	//ゴーストが見つかりません例外
+	public class GhostNotFoundException : Exception
+	{
+		public void PrintErrorLog()
+		{
+			Core.LogMessage.AddLog("編集中のゴーストにアクセスできません。SSPでゴーストを起動していますか？", Core.LogMessageType.Error);
+		}
+	}
 }

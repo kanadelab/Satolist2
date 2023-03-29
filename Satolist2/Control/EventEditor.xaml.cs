@@ -512,8 +512,16 @@ namespace Satolist2.Control
 				var lineString = control.MainTextEditor.Text.Substring(lineData.Offset, lineData.Length);
 				builder.AppendLine(lineString);
 			}
-			Satorite.SendSatori(Main.Ghost, builder.ToString(), type);
-			Core.LogMessage.AddLog("ゴーストにトークを送信しました。");
+
+			try
+			{
+				Satorite.SendSatori(Main.Ghost, builder.ToString(), type);
+				Core.LogMessage.AddLog("ゴーストにトークを送信しました。");
+			}
+			catch(GhostNotFoundException ex)
+			{
+				ex.PrintErrorLog();
+			}
 		}
 
 		//編集中のイベント名を取得

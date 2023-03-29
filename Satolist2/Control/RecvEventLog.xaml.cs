@@ -167,7 +167,7 @@ namespace Satolist2.Control
 						//SHIORIを読み直し(里々の再起動によってれしばに接続)
 						if(Main.Ghost != null)
 						{
-							GhostRuntimeRequest.ReloadShiori(Main.Ghost, "れしばに接続するため、ゴーストをリロードしました。");
+							GhostRuntimeRequest.ReloadShiori(Main.Ghost, "れしばに接続するため、ゴーストをリロードしました。", false);
 						}
 						IsRunning = true;
 					}

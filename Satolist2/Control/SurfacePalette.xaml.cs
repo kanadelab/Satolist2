@@ -148,7 +148,14 @@ namespace Satolist2.Control
 		public void SendRuntimeChangeSurface(SurfacePaletteItemViewModel item)
 		{
 			var insertStr = string.Format(@"\p[{0}]\s[{1}]", item.Scope, item.Id.ToString());
-			Satorite.SendSSTP(Main.Ghost, insertStr, false, false);
+			try
+			{
+				Satorite.SendSSTP(Main.Ghost, insertStr, false, false);
+			}
+			catch(GhostNotFoundException ex)
+			{
+				ex.PrintErrorLog();
+			}
 		}
 
 		public void SurfaceLoadTask(CancellationToken cancelObject)

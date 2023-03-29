@@ -67,8 +67,15 @@ namespace Satolist2.Control
 			SendToGhostCommand = new ActionCommand(
 				o =>
 				{
-					Satorite.SendSatori(main.Ghost, Document.Text, EventType.Sentence);
-					Core.LogMessage.AddLog("ゴーストにトークを送信しました。");
+					try
+					{
+						Satorite.SendSatori(main.Ghost, Document.Text, EventType.Sentence);
+						Core.LogMessage.AddLog("ゴーストにトークを送信しました。");
+					}
+					catch(GhostNotFoundException ex)
+					{
+						ex.PrintErrorLog();
+					}
 				},
 				o => main.Ghost != null
 				);

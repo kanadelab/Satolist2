@@ -10,12 +10,19 @@ namespace Satolist2.Utility
 	public static class GhostRuntimeRequest
 	{
 		//SHIORIリロードスクリプトでリロードを行う
-		public static void ReloadShiori(GhostModel ghost, string message = "SHIORIリロード。")
+		public static void ReloadShiori(GhostModel ghost, string message = "SHIORIリロード。", bool showErrorLog = true)
 		{
-			Core.LogMessage.AddLog("SHIORIをリロードします。");
-
-			string script = @"\0\![reload,shiori]\![quicksession,true]" + message;
-			Satorite.SendSSTP(ghost, script, true, true);
+			try
+			{
+				string script = @"\0\![reload,shiori]\![quicksession,true]" + message;
+				Satorite.SendSSTP(ghost, script, true, true);
+				Core.LogMessage.AddLog("SHIORIをリロードします。");
+			}
+			catch(GhostNotFoundException)
+			{
+				if(showErrorLog)
+					Core.LogMessage.AddLog("編集中のゴーストにアクセスできません。SSPでゴーストを起動していますか？", Core.LogMessageType.Error);
+			}
 		}
 
 	}

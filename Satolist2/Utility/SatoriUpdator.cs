@@ -137,7 +137,11 @@ namespace Satolist2.Utility
 					   if (ghostExists)
 					   {
 						   Application.Current.Dispatcher.Invoke(() => progressViewModel.SetMessage("対象のゴーストが起動しているためSSPから里々をアンロードします。"));
-						   Satorite.SendSSTP(ghost, @"\![unload,shiori]", true, true);
+						   try
+						   {
+							   Satorite.SendSSTP(ghost, @"\![unload,shiori]", true, true);
+						   }
+						   catch { }
 					   }
 
 					   //アンロードに時間がかかるかもしれないので何度かリトライする
@@ -164,7 +168,11 @@ namespace Satolist2.Utility
 					   if (ghostExists)
 					   {
 						   Application.Current.Dispatcher.Invoke(() => progressViewModel.SetMessage("起動中のゴーストの里々をSSPに再ロードします。"));
-						   Satorite.SendSSTP(ghost, @"\![load,shiori]", true, true);
+						   try
+						   {
+							   Satorite.SendSSTP(ghost, @"\![load,shiori]", true, true);
+						   }
+						   catch { }
 					   }
 
 					   if (success)

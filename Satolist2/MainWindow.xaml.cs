@@ -1485,22 +1485,19 @@ namespace Satolist2
 			GenerateSurfacePreviewCommand = new ActionCommand(
 				o =>
 				{
-					//ゴーストの起動をチェック
-					/*
-					if(!SakuraFMOReader.Exists(Ghost))
-					{
-						MessageBox.Show("SSPで起動中のゴーストからサーフェスプレビューを作る機能です。\r\nゴーストを起動した状態でこの機能を使用して下さい。");
-						return;
-					}
-					*/
-
 					//編集中のゴーストが起動していたら、シェルをリロードする。きせかえの状態を吐かせるため
 					if (Ghost != null)
 					{
-						if (SakuraFMOReader.Exists(Ghost))
+						try
 						{
-							Satorite.SendSSTP(Ghost, @"\![reload,shell]\m[{0},{1},{2}]", true, true);
-							LogMessage.AddLog("起動中のゴーストの状態をプレビューに反映するため、動作中のシェルをリロードしました。");
+							if (SakuraFMOReader.Exists(Ghost))
+							{
+								Satorite.SendSSTP(Ghost, @"\![reload,shell]\m[{0},{1},{2}]", true, true);
+								LogMessage.AddLog("起動中のゴーストの状態をプレビューに反映するため、動作中のシェルをリロードしました。");
+							}
+						}
+						catch(GhostNotFoundException)
+						{
 						}
 					}
 
