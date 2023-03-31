@@ -12,6 +12,8 @@ namespace Satolist2.Core
 {
 	internal class SurfacePreviewImageGenerator
 	{
+		public const int CurrentVersion = 2;
+
 		private IntPtr sessionId;
 		private Mutex mutex;
 		private string shellPath;
@@ -183,6 +185,11 @@ namespace Satolist2.Core
 
 							//出力した画像をコピー
 							var previewFileName = string.Format("surface{0}.png", surfaceId);
+							using(var previewBitmap = Bitmap.FromFile(DictionaryUtility.ConbinePath(temporaryDumpDirectory, previewFileName)))
+							{
+								item.SizeWidth = previewBitmap.Width;
+								item.SizeHeight = previewBitmap.Height;
+							}
 							System.IO.File.Copy(DictionaryUtility.ConbinePath(temporaryDumpDirectory, previewFileName), DictionaryUtility.ConbinePath(outputPath, previewFileName), true);
 
 							//0位置切り出し画像を作成
@@ -197,9 +204,11 @@ namespace Satolist2.Core
 
 							//画像サイズをロード
 							var zeroFileName = string.Format("surfacezero{0}.png", surfaceId);
-							var zeroBitmap = Bitmap.FromFile(DictionaryUtility.ConbinePath(temporaryDumpDirectory, zeroFileName));
-							item.BaseSizeWidth = zeroBitmap.Width;
-							item.BaseSizeHeight = zeroBitmap.Height;
+							using (var zeroBitmap = Bitmap.FromFile(DictionaryUtility.ConbinePath(temporaryDumpDirectory, zeroFileName)))
+							{
+								item.BaseSizeWidth = zeroBitmap.Width;
+								item.BaseSizeHeight = zeroBitmap.Height;
+							}
 
 							//進捗の通知
 							var progressMessage = string.Format("({1}/{2}) surface{0}.png", surfaceId, i+1, generateSurfaces.Count);
@@ -232,6 +241,7 @@ namespace Satolist2.Core
 					//完了したらjsonに内容を保存
 					var metadata = new SurfacePreviewMetaData();
 					metadata.Items = generateSurfaces.ToArray();
+					metadata.Version = CurrentVersion;
 					var metadataPath = DictionaryUtility.ConbinePath(outputPath, "surfaces.json");
 					JsonUtility.SerializeToFile(metadataPath, metadata);
 				}
@@ -321,6 +331,9 @@ namespace Satolist2.Core
 		[JsonProperty]
 		public SurfacePreviewMetaDataRecord[] Items { get; set; }
 
+		[JsonProperty]
+		public int Version { get; set; }
+
 		public SurfacePreviewMetaData()
 		{
 			Items = Array.Empty<SurfacePreviewMetaDataRecord>();
@@ -350,6 +363,10 @@ namespace Satolist2.Core
 		public string SurfaceTableLabel { get; set; }
 		[JsonProperty]
 		public double Expand { get; set; }
+		[JsonProperty]
+		public int SizeWidth { get; set; }
+		[JsonProperty]
+		public int SizeHeight { get; set; }
 		//当たり判定マイナス座標を抜いたサイズ
 		[JsonProperty]
 		public int BaseSizeWidth { get; set; }
