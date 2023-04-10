@@ -27,7 +27,7 @@
 						</Button>
 					</StackPanel>
 					
-					<ListView x:Name="MainList" Grid.Row="1" ItemsSource="{Binding Items}">
+					<ListView x:Name="MainList" Grid.Row="1" ItemsSource="{Binding Items}" ScrollViewer.CanContentScroll="True">
 						<ListView.InputBindings>
 							<KeyBinding Key="Delete" Command="{Binding RemoveItemCommand}" />
 						</ListView.InputBindings>

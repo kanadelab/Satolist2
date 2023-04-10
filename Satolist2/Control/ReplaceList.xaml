@@ -40,7 +40,7 @@
 						</Button>
 					</StackPanel>
 
-					<ListView Grid.Row="1" x:Name="MainList" ItemsSource="{Binding Items}">
+					<ListView Grid.Row="1" x:Name="MainList" ItemsSource="{Binding Items}" ScrollViewer.CanContentScroll="True">
 						<ListView.InputBindings>
 							<KeyBinding Key="Delete" Command="{Binding RemoveItemCommand}" />
 						</ListView.InputBindings>

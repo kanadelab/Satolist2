@@ -15,7 +15,7 @@
 		</ResourceDictionary>
 	</UserControl.Resources>
 	<Grid>
-		<ListView ItemsSource="{Binding Items}" x:Name="MainListView" SelectionMode="Extended" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+		<ListView ItemsSource="{Binding Items}" x:Name="MainListView" SelectionMode="Extended" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.CanContentScroll="True">
 			<ListView.View>
 				<GridView>
 					<GridViewColumn Header="内容" x:Name="EventBodyColumn" DisplayMemberBinding="{Binding Event.BodyPreview}" />
