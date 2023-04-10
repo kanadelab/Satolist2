@@ -6,6 +6,7 @@ using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -45,6 +46,9 @@ namespace Satolist2.Control
 	{
 		//検索テキスト
 		public string SearchString { get; set; }
+
+		//検索オブジェクト
+		public Regex SearchRegex { get; set; }
 		
 		//タイトルを検索対象にするか
 		public bool IsSearchTitle { get; set; }
@@ -95,12 +99,13 @@ namespace Satolist2.Control
 		//検索の実行?
 		public void RunSearch(SearchQuery query)
 		{
-			var searchString = query.SearchString;
-
 			//クリア処理
 			foreach (var item in items)
 				item.Dispose();
 			items.Clear();
+
+			//検索対象を作成
+			object queryObj = (object)query.SearchRegex ?? (object)query.SearchString ?? string.Empty;
 
 			//検索操作
 			foreach(var dic in Main.Ghost.Dictionaries)
@@ -113,7 +118,7 @@ namespace Satolist2.Control
 						bool isHit = false;
 						if(query.IsSearchTitle)
 						{
-							if(ev.Name.Contains(searchString))
+							if(QuerySearchHit(ev.Name, queryObj))
 							{
 								isHit = true;
 							}
@@ -121,8 +126,8 @@ namespace Satolist2.Control
 
 						if(!isHit && query.IsSearchBody)
 						{
-							if(ev.Body.Contains(searchString) ||
-								ev.Condition.Contains(searchString))
+							if(QuerySearchHit(ev.Body, queryObj) ||
+								QuerySearchHit(ev.Condition, queryObj))
 							{
 								isHit = true;
 							}
@@ -155,7 +160,7 @@ namespace Satolist2.Control
 							//タイトルの一致
 							if (query.IsSearchTitle)
 							{
-								if (sp[0].Contains(searchString))
+								if (QuerySearchHit(sp[0], queryObj))
 								{
 									isHit = true;
 								}
@@ -164,7 +169,7 @@ namespace Satolist2.Control
 							//それ以外
 							if(!isHit && sp.Length>=2 && query.IsSearchBody)
 							{
-								if (sp[1].Contains(searchString))
+								if (QuerySearchHit(sp[1], queryObj))
 								{
 									isHit = true;
 								}
@@ -173,7 +178,7 @@ namespace Satolist2.Control
 						else if(query.IsSearchBody)
 						{
 							//本文
-							if (line.Contains(searchString))
+							if (QuerySearchHit(line, queryObj))
 							{
 								//hit
 								isHit = true;
@@ -193,6 +198,23 @@ namespace Satolist2.Control
 			Main.MainWindow.SearchResult.IsActive = true;
 			Main.MainWindow.SearchResult.IsVisible = true;
 			DockingTitle = string.Format("検索結果 ({0})", items.Count);
+		}
+
+		//検索処理
+		private	bool QuerySearchHit(string target, object query)
+		{
+			if(query is Regex regex)
+			{
+				return regex.IsMatch(target);
+			}
+			else if(query is string searchString)
+			{
+				return target.Contains(searchString);
+			}
+			else
+			{
+				throw new NotImplementedException();
+			}
 		}
 
 		//選択中のアイテムを開く

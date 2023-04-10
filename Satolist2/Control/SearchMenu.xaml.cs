@@ -2,7 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.ServiceModel.Security;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -34,6 +36,8 @@ namespace Satolist2.Control
 		private string searchString;
 		private bool isSearchTitle;
 		private bool isSearchBody;
+		private bool isRegiex;
+		private bool hasRegexError;
 
 		public string DockingTitle => "検索";
 		public string DockingContentId => ContentId;
@@ -74,6 +78,28 @@ namespace Satolist2.Control
 			}
 		}
 
+		//正規表現検索を使用するか
+		public bool IsRegex
+		{
+			get => isRegiex;
+			set
+			{
+				isRegiex = value;
+				NotifyChanged();
+			}
+		}
+
+		//正規表現にエラーがあるかどうか
+		public bool HasRegexError
+		{
+			get => hasRegexError;
+			set
+			{
+				hasRegexError = value;
+				NotifyChanged();
+			}
+		}
+
 		public ActionCommand SearchCommand { get; }
 		public ActionCommand BackToEditorCommand { get; }
 
@@ -86,14 +112,37 @@ namespace Satolist2.Control
 			SearchCommand = new ActionCommand(
 				o =>
 				{
-					//検索の実行。
-					//searchResultに検索を投げる
-					Main.SearchResultViewModel.RunSearch(new SearchQuery()
+					var query = new SearchQuery()
 					{
 						IsSearchBody = IsSearchBody,
 						IsSearchTitle = IsSearchTitle,
 						SearchString = searchString
-					});
+					};
+
+					if (isRegiex)
+					{
+						try
+						{
+							query.SearchRegex = new Regex(searchString);
+						}
+						catch
+						{
+							//正規表現パターン不正
+							HasRegexError = true;
+							return;
+						}
+					}
+					else
+					{
+						query.SearchString = searchString;
+					}
+
+					//ここまでくればエラー表示は消える
+					HasRegexError = false;
+
+					//検索の実行。
+					//searchResultに検索を投げる
+					Main.SearchResultViewModel.RunSearch(query);
 				},
 
 				//検索文字列があるかどうか、何かしら検索対象に選択しているかどうか
