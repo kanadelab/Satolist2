@@ -1,4 +1,5 @@
 ﻿using ICSharpCode.AvalonEdit.Document;
+using Satolist2.Module.TextEditor;
 using Satolist2.Utility;
 using System;
 using System.Collections.Generic;
@@ -25,10 +26,7 @@ namespace Satolist2.Control
 		public TemporaryTextEditor()
 		{
 			InitializeComponent();
-
-			var hilighter = new SatoriSyntaxHilighter();
-			MainTextEditor.SyntaxHighlighting = hilighter;
-			MainTextEditor.Foreground = hilighter.MainForegroundColor;
+			MainTextEditor.MainTextEditor.UpdateHighlighter();
 		}
 
 		public void RequestFocus()
@@ -40,28 +38,16 @@ namespace Satolist2.Control
 	internal class TemporaryTextEditorViewModel : TextEditorViewModelBase, IControlBindedReceiver
 	{
 		private TemporaryTextEditor control;
-		private TextDocument document;
+		private string text;
 		private string title;
-
-		public TextDocument Document
-		{
-			get => document;
-			set
-			{
-				Document = value;
-				NotifyChanged();
-				NotifyChanged(nameof(Text));
-			}
-		}
 
 		public string Text
 		{
-			get => document.Text;
+			get => text;
 			set
 			{
-				document.Text = value;
+				text = value;
 				NotifyChanged();
-				NotifyChanged(nameof(Document));
 			}
 		}
 
@@ -80,18 +66,18 @@ namespace Satolist2.Control
 
 		public override string DockingContentId { get; } = Guid.NewGuid().ToString();
 
-		public override ICSharpCode.AvalonEdit.TextEditor MainTextEditor => control.MainTextEditor;
+		public override TextEditorModuleBase MainTextEditor => control.MainTextEditor.MainTextEditor;
 
 		public TemporaryTextEditorViewModel(MainViewModel main):base(main)
 		{
-			document = new TextDocument();
 			title = "無題";
-			document.Text = string.Empty;
+			Text = string.Empty;
 		}
 
 		public void ControlBind(System.Windows.Controls.Control control)
 		{
 			this.control = (TemporaryTextEditor)control;
+			this.control.MainTextEditor.MainTextEditor.Text = Text;
 		}
 	}
 }

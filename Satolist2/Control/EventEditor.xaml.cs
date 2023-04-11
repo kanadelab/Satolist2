@@ -24,6 +24,7 @@ using System.Windows.Controls.Primitives;
 using ICSharpCode.AvalonEdit.CodeCompletion;
 using ICSharpCode.AvalonEdit.Editing;
 using ICSharpCode.AvalonEdit;
+using Satolist2.Module.TextEditor;
 
 namespace Satolist2.Control
 {
@@ -183,7 +184,7 @@ namespace Satolist2.Control
 		public ActionCommand ShowGlobalSearchCommand { get; }
 		public ActionCommand CompletionCommand { get; }
 
-		public abstract ICSharpCode.AvalonEdit.TextEditor MainTextEditor { get; }
+		public abstract TextEditorModuleBase MainTextEditor { get; }
 
 		//背景画像パス
 		public string BackgroundImagePath
@@ -227,7 +228,6 @@ namespace Satolist2.Control
 		public TextEditorViewModelBase(MainViewModel main)
 		{
 			Main = main;
-			textEditorBackgroundColor = SatoriSyntaxRuleSet.GetHilightColor(ScriptSyntax.Background);
 
 			//検索
 			ShowSearchBoxCommand = new ActionCommand(
@@ -254,8 +254,7 @@ namespace Satolist2.Control
 			CompletionCommand = new ActionCommand(
 				o =>
 				{
-					CompletionManager p = new CompletionManager();
-					p.RequestCompletion(MainTextEditor, Main);
+					MainTextEditor.RequestCompletion(Main);
 				});
 		}
 
@@ -270,10 +269,12 @@ namespace Satolist2.Control
 		{
 			if(!string.IsNullOrEmpty(MainViewModel.EditorSettings.GeneralSettings.TextEditorFontName) && MainViewModel.EditorSettings.GeneralSettings.TextEditorFontSize > 0 )
 			{
-				MainTextEditor.TextArea.FontFamily = new FontFamily(MainViewModel.EditorSettings.GeneralSettings.TextEditorFontName);
-
 				//フォントサイズが小数点付きだと正しくタブサイズが計算できない
-				MainTextEditor.TextArea.FontSize = (int)MainViewModel.EditorSettings.GeneralSettings.TextEditorFontSize;
+				MainTextEditor.SetFont(
+					MainViewModel.EditorSettings.GeneralSettings.TextEditorFontName,
+					(int)MainViewModel.EditorSettings.GeneralSettings.TextEditorFontSize
+					);
+
 			}
 		}
 
@@ -283,33 +284,21 @@ namespace Satolist2.Control
 			//設定
 			MainTextEditor.ShowLineNumbers = MainViewModel.EditorSettings.GeneralSettings.IsShowLineNumber;
 			MainTextEditor.WordWrap = MainViewModel.EditorSettings.GeneralSettings.IsWardWrap;
-			MainTextEditor.Options.ShowEndOfLine = MainViewModel.EditorSettings.GeneralSettings.IsShowEndOfLine;
-			MainTextEditor.Options.HighlightCurrentLine = MainViewModel.EditorSettings.GeneralSettings.IsHilightCurrentLine;
-
-			if (MainViewModel.EditorSettings.GeneralSettings.IsIndent)
-				MainTextEditor.TextArea.IndentationStrategy = new ICSharpCode.AvalonEdit.Indentation.DefaultIndentationStrategy();
-			else
-				MainTextEditor.TextArea.IndentationStrategy = null;
+			MainTextEditor.ShowEndOfLine = MainViewModel.EditorSettings.GeneralSettings.IsShowEndOfLine;
+			MainTextEditor.HighlightCurrentLine = MainViewModel.EditorSettings.GeneralSettings.IsHilightCurrentLine;
+			MainTextEditor.AutoIndent = MainViewModel.EditorSettings.GeneralSettings.IsIndent;
 
 			//ハイライト
-			TextEditorBackgroundColor = SatoriSyntaxRuleSet.GetHilightColor(ScriptSyntax.Background);
-			MainTextEditor.SyntaxHighlighting = null;
-			MainTextEditor.Dispatcher.BeginInvoke(new Action(() =>
-			{
-				var hilighter = new SatoriSyntaxHilighter();
-				MainTextEditor.SyntaxHighlighting = hilighter;
-				MainTextEditor.Foreground = hilighter.MainForegroundColor;
-			}
-			), DispatcherPriority.Render);
+			MainTextEditor.UpdateHighlighter();
 		}
 
 		//カレットの位置から編集中のイベント名を取得する
 		public virtual string FindEditingEventName()
 		{
-			if (MainTextEditor?.Document == null)
-				return null;
+			//if (MainTextEditor?.Document == null)
+			//	return null;
 
-			var currentLine = MainTextEditor.TextArea.Caret.Line - 1;   //indexにするので-1
+			var currentLine = MainTextEditor.CaretLine - 1;   //indexにするので-1
 
 			//開始行の検索(＠または＊を含まない範囲)
 			for (int i = currentLine; i >= 0; i--)
@@ -317,13 +306,13 @@ namespace Satolist2.Control
 				//ヘッダ行の上がエスケープされてないことが必要
 				if (i > 0)
 				{
-					var nextLineData = MainTextEditor.Document.Lines[i - 1];
+					var nextLineData = MainTextEditor.GetLineData(i - 1);
 					var nextLine = MainTextEditor.Text.Substring(nextLineData.Offset, nextLineData.Length);
 					if (DictionaryUtility.IsLineEndEscaped(nextLine))
 						continue;
 				}
 
-				var lineData = MainTextEditor.Document.Lines[i];
+				var lineData = MainTextEditor.GetLineData(i);
 				var lineString = MainTextEditor.Text.Substring(lineData.Offset, lineData.Length);
 				if (lineString.IndexOf(Constants.SentenceHead) == 0)
 				{
@@ -342,10 +331,10 @@ namespace Satolist2.Control
 
 		public void Caret_PositionChanged(object sender, EventArgs e)
 		{
-			if (caretLine != MainTextEditor.TextArea.Caret.Line)
+			if (caretLine != MainTextEditor.CaretLine)
 			{
 				TrySelectEventOnUkadocViewer();
-				caretLine = MainTextEditor.TextArea.Caret.Line;
+				caretLine = MainTextEditor.CaretLine;
 			}
 		}
 
@@ -379,12 +368,10 @@ namespace Satolist2.Control
 
 		public override string DockingContentId => randomizedContentId;
 
-		public TextDocument Document { get; }
-
 		public ActionCommand SendToGhostCommand {get;}
 		public ActionCommand InsertCommand { get; }
 
-		public override ICSharpCode.AvalonEdit.TextEditor MainTextEditor => control.MainTextEditor;
+		public override TextEditorModuleBase MainTextEditor => control.MainTextEditor.MainTextEditor;
 		public object HilightColors { get; private set; }
 		public bool EnableHeaderEdit => Event.Type != EventType.Header;
 
@@ -395,9 +382,6 @@ namespace Satolist2.Control
 			randomizedContentId = Guid.NewGuid().ToString();	//複数出現するのでユニークなIDを振る
 			Event = ev;
 			Event.PropertyChanged += Event_PropertyChanged;
-
-			Document = new TextDocument(Event.Body);
-			Document.TextChanged += Document_TextChanged;
 
 			//コマンド
 			SendToGhostCommand = new ActionCommand(
@@ -411,7 +395,7 @@ namespace Satolist2.Control
 			InsertCommand = new ActionCommand(
 				o =>
 				{
-					control.MainTextEditor.Document.Insert(control.MainTextEditor.CaretOffset, ((InsertItemPaletteModel)o).Body);
+					MainTextEditor.PerformTextInput(((InsertItemPaletteModel)o).Body);
 				}
 				);
 		}
@@ -431,7 +415,7 @@ namespace Satolist2.Control
 			//メインのテキストが変更された場合にModelに伝える
 			//その際PropertyChangedは呼ばないようにしておく
 			disableBodyPropertyChanged = true;
-			Event.Body = Document.Text;
+			Event.Body = MainTextEditor.Text;
 			disableBodyPropertyChanged = false;
 		}
 		private void Event_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -439,24 +423,24 @@ namespace Satolist2.Control
 			if (e.PropertyName == nameof(EventModel.Name))
 				NotifyChanged(nameof(DockingTitle));
 			else if (e.PropertyName == nameof(EventModel.Body) && !disableBodyPropertyChanged)
-				Document.Text = Event.Body;
+				MainTextEditor.Text = Event.Body;
 		}
 
 		public void MoveCaretToLine(int lineIndex)
 		{
-			if (lineIndex < control.MainTextEditor.LineCount)
+			if (lineIndex < MainTextEditor.LineCount)
 			{
-				control.MainTextEditor.ScrollToLine(lineIndex);
-				control.MainTextEditor.CaretOffset = Document.Lines[lineIndex].Offset;
+				MainTextEditor.CaretOffset = MainTextEditor.GetLineData(lineIndex).Offset;
+				MainTextEditor.ScrollToCaret();
 			}
 		}
 
 		//ゴーストにトークを送信
 		public void SendToGhost()
 		{
-			var currentLine = control.MainTextEditor.TextArea.Caret.Line - 1;	//indexにするので-1
+			var currentLine = MainTextEditor.CaretLine - 1;	//indexにするので-1
 			var beginLine = 0;
-			var endLine = control.MainTextEditor.LineCount-1;
+			var endLine = MainTextEditor.LineCount-1;
 			EventType type = EventType.Header;
 
 			//開始行の検索(＠または＊を含まない範囲)
@@ -465,14 +449,14 @@ namespace Satolist2.Control
 				//ヘッダ行の上がエスケープされてないことが必要
 				if (i > 0)
 				{
-					var nextLineData = control.MainTextEditor.Document.Lines[i - 1];
-					var nextLine = control.MainTextEditor.Text.Substring(nextLineData.Offset, nextLineData.Length);
+					var nextLineData = MainTextEditor.GetLineData(i - 1);
+					var nextLine = MainTextEditor.Text.Substring(nextLineData.Offset, nextLineData.Length);
 					if (DictionaryUtility.IsLineEndEscaped(nextLine))
 						continue;
 				}
 
-				var lineData = control.MainTextEditor.Document.Lines[i];
-				var lineString = control.MainTextEditor.Text.Substring(lineData.Offset, lineData.Length);
+				var lineData = MainTextEditor.GetLineData(i);
+				var lineString = MainTextEditor.Text.Substring(lineData.Offset, lineData.Length);
 
 				if (lineString.IndexOf(Constants.SentenceHead) == 0)
 				{
@@ -494,19 +478,19 @@ namespace Satolist2.Control
 				type = Event.Type;
 
 			//終了行の検索
-			for (int i = currentLine + 1; i < control.MainTextEditor.LineCount; i++)
+			for (int i = currentLine + 1; i < MainTextEditor.LineCount; i++)
 			{
 				//ヘッダ行の上がエスケープされてないことが必要
 				if (i > 0)
 				{
-					var nextLineData = control.MainTextEditor.Document.Lines[i - 1];
-					var nextLine = control.MainTextEditor.Text.Substring(nextLineData.Offset, nextLineData.Length);
+					var nextLineData = MainTextEditor.GetLineData(i - 1);
+					var nextLine = MainTextEditor.Text.Substring(nextLineData.Offset, nextLineData.Length);
 					if (DictionaryUtility.IsLineEndEscaped(nextLine))
 						continue;
 				}
 
-				var lineData = control.MainTextEditor.Document.Lines[i];
-				var lineString = control.MainTextEditor.Text.Substring(lineData.Offset, lineData.Length);
+				var lineData = MainTextEditor.GetLineData(i);
+				var lineString = MainTextEditor.Text.Substring(lineData.Offset, lineData.Length);
 				if (lineString.IndexOfAny(Constants.SentenceOrWordHead) == 0)
 				{
 					//決定。ヘッダの前の行までが対象になる
@@ -523,8 +507,8 @@ namespace Satolist2.Control
 			StringBuilder builder = new StringBuilder();
 			for (int i = beginLine; i <= endLine; i++)
 			{
-				var lineData = control.MainTextEditor.Document.Lines[i];
-				var lineString = control.MainTextEditor.Text.Substring(lineData.Offset, lineData.Length);
+				var lineData = MainTextEditor.GetLineData(i);
+				var lineString = MainTextEditor.Text.Substring(lineData.Offset, lineData.Length);
 				builder.AppendLine(lineString);
 			}
 
@@ -552,9 +536,9 @@ namespace Satolist2.Control
 		public void Dispose()
 		{
 			Event.PropertyChanged -= Event_PropertyChanged;
-			Document.TextChanged -= Document_TextChanged;
+			MainTextEditor.TextChanged -= Document_TextChanged;
 			Main.PropertyChanged -= Main_PropertyChanged;
-			control.MainTextEditor.TextArea.Caret.PositionChanged -= Caret_PositionChanged;
+			MainTextEditor.CaretPositionChanged -= Caret_PositionChanged;
 		}
 
 		public void ControlBind(System.Windows.Controls.Control ctrl)
@@ -562,7 +546,9 @@ namespace Satolist2.Control
 			if(ctrl is EventEditor eventEditor)
 			{
 				control = eventEditor;
-				control.MainTextEditor.TextArea.Caret.PositionChanged += Caret_PositionChanged;
+				MainTextEditor.Text = Event.Body;
+				MainTextEditor.TextChanged += Document_TextChanged;
+				MainTextEditor.CaretPositionChanged += Caret_PositionChanged;
 				control.UpdateInsertPaletteKeyBindings(Main.InsertPalette, InsertCommand);
 				UpdateGeneralSettings();
 			}

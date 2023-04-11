@@ -1,4 +1,5 @@
 ﻿using Satolist2.Utility;
+using Sgry.Azuki.WinForms;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,6 +25,8 @@ namespace Satolist2.Control
 		public DebugMainMenu()
 		{
 			InitializeComponent();
+			var azuki = new AzukiControl();
+			FormsHost.Child = azuki;
 			
 			
 		}

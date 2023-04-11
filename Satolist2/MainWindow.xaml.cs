@@ -8,6 +8,7 @@ using Satolist2.Control;
 using Satolist2.Core;
 using Satolist2.Dialog;
 using Satolist2.Model;
+using Satolist2.Module.TextEditor;
 using Satolist2.Properties;
 using Satolist2.Utility;
 using SatolistLegacyCompat.CompatControls;
@@ -49,7 +50,7 @@ namespace Satolist2
 		private string DefaultWindowLayout { get; set; }
 		public Window RootWindow { get; set; }
 
-		public ICSharpCode.AvalonEdit.TextEditor ActiveTextEditor
+		public TextEditorModuleBase ActiveTextEditor
 		{
 			get
 			{
@@ -89,7 +90,7 @@ namespace Satolist2
 
 			//互換システムの初期化
 			{
-				var isLegacyEnable = Model.EditorSettings.TemporaryLoadGeneralSettings()?.IsEnableLegacyCompat ?? false;
+				var isLegacyEnable = true;//テストで必ず有効 = Model.EditorSettings.TemporaryLoadGeneralSettings()?.IsEnableLegacyCompat ?? false;
 				EditorSettings.LoadLegacySettings();
 				SatolistLegacyCompat.CompatCore.ProjectCompat.InitializeControls(isLegacyEnable);
 			}
@@ -1827,7 +1828,7 @@ namespace Satolist2
 		{
 			if(MainWindow.ActiveTextEditor != null)
 			{
-				MainWindow.ActiveTextEditor.TextArea.PerformTextInput(str);
+				MainWindow.ActiveTextEditor.PerformTextInput(str);
 
 				if(isActivate)
 				{

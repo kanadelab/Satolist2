@@ -4,6 +4,7 @@
 			 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
 			 xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
 			 xmlns:local="clr-namespace:Satolist2.Control"
+			 xmlns:module="clr-namespace:Satolist2.Module.TextEditor"
 			 xmlns:avalonEdit="http://icsharpcode.net/sharpdevelop/avalonedit"
 			 mc:Ignorable="d" 
 			 d:DesignHeight="450" d:DesignWidth="800">
@@ -15,7 +16,9 @@
 			<RowDefinition Height="auto" />
 			<RowDefinition Height="*" />
 		</Grid.RowDefinitions>
-		
+
+		<module:TextEditorModuleSelector Grid.Row="2" Margin="3" x:Name="MainTextEditor"/>
+		<!--
 		<avalonEdit:TextEditor Grid.Row="1" x:Name="MainTextEditor"
 							   Margin="3" Document="{Binding Document, Mode=OneWay}">
 			<avalonEdit:TextEditor.InputBindings>
@@ -30,6 +33,7 @@
 				</ContextMenu>
 			</avalonEdit:TextEditor.ContextMenu>
 		</avalonEdit:TextEditor>
+		-->
 
 		<local:TextEditorSearchBox x:Name="SearchBox" Grid.Row="0"
 								   AttachEditor="{Binding .,ElementName=MainTextEditor}"

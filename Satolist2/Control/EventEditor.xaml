@@ -7,6 +7,7 @@
 			 xmlns:model="clr-namespace:Satolist2.Model"
 			 xmlns:avalonEdit="http://icsharpcode.net/sharpdevelop/avalonedit"
 			 xmlns:util="clr-namespace:Satolist2.Utility"
+			 xmlns:module="clr-namespace:Satolist2.Module.TextEditor"
 			 mc:Ignorable="d" 
 			 d:DesignHeight="450" d:DesignWidth="800">
 	<UserControl.Resources>
@@ -64,6 +65,9 @@
 
 		</Grid>
 
+		<module:TextEditorModuleSelector Grid.Row="2" Margin="3" x:Name="MainTextEditor"/>
+
+		<!--
 		<Grid Grid.Row="2" Margin="3" Background="{Binding TextEditorBackgroundColor, Converter={StaticResource ColorToBrushConverter}}">
 			<Image Source="{Binding BackgroundImagePath}" Visibility="{Binding IsEnableBackgroundImage, Converter={StaticResource BoolToVisibilityConverter}}" Stretch="None" HorizontalAlignment="Left" VerticalAlignment="Top" />
 			<avalonEdit:TextEditor x:Name="MainTextEditor" Document="{Binding Document}"
@@ -105,6 +109,7 @@
 				</avalonEdit:TextEditor.ContextMenu>
 			</avalonEdit:TextEditor>
 		</Grid>
+		-->
 		<local:TextEditorSearchBox x:Name="SearchBox" Grid.Row="1"
 				AttachEditor="{Binding .,ElementName=MainTextEditor}" 
 				Visibility="{Binding IsShowSearchBox, Converter={StaticResource BoolToVisibilityConverter}, Mode=TwoWay}" 
