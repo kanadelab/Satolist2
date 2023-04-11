@@ -65,12 +65,14 @@ namespace SatolistDeploy
 				"Newtonsoft.Json.dll",
 				"SatolistUpdator.exe",
 				"SatolistDocument.dll",
+				"SatolistLegacyCompat.dll",
 				"AngleSharp.dll",
 				"System.Buffers.dll",
 				"System.Memory.dll",
 				"System.Numerics.Vectors.dll",
 				"System.Runtime.CompilerServices.Unsafe.dll",
-				"System.Text.Encoding.CodePages.dll"
+				"System.Text.Encoding.CodePages.dll",
+				"Azuki.dll"
 			};
 
 			foreach(var item in copyItems )
