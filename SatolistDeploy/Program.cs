@@ -65,6 +65,7 @@ namespace SatolistDeploy
 				"Newtonsoft.Json.dll",
 				"SatolistUpdator.exe",
 				"SatolistDocument.dll",
+				"SatolistLegacyCompat.dll",
 				"AngleSharp.dll",
 				"System.Buffers.dll",
 				"System.Memory.dll",
