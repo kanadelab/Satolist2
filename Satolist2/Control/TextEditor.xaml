@@ -13,6 +13,7 @@
 		<model:InsertItemPaletteShortCutGestureConverter x:Key="ShortCutGestureConverter" />
 		<util:ReferenceToBoolConverter x:Key="ReferenceToBoolConverter" />
 		<BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+		<util:ColorToBrushConverter x:Key="ColorToBrushConverter" />
 	</UserControl.Resources>
 	<Grid>
 		<Grid.RowDefinitions>
@@ -21,20 +22,11 @@
 		</Grid.RowDefinitions>
 
 
-		<Grid Grid.Row="1"  Margin="3" Background="{StaticResource TextEditorBackgroundColor}">
+		<Grid Grid.Row="1"  Margin="3" Background="{Binding TextEditorBackgroundColor, Converter={StaticResource ColorToBrushConverter}}">
 			<Image Source="{Binding BackgroundImagePath}" Visibility="{Binding IsEnableBackgroundImage, Converter={StaticResource BoolToVisibilityConverter}}" Stretch="None" HorizontalAlignment="Left" VerticalAlignment="Top" />
 			<avalonEdit:TextEditor x:Name="MainTextEditor" Document="{Binding Document, Mode=OneWay}"
-								   SnapsToDevicePixels="True" Margin="{Binding TextEditorMargin}">
-
-				<avalonEdit:TextEditor.Style>
-					<Style TargetType="avalonEdit:TextEditor" BasedOn="{StaticResource {x:Type avalonEdit:TextEditor}}">
-						<Style.Triggers>
-							<DataTrigger Binding="{Binding IsEnableBackgroundImage}" Value="True">
-								<Setter Property="Background" Value="Transparent" />
-							</DataTrigger>
-						</Style.Triggers>
-					</Style>
-				</avalonEdit:TextEditor.Style>
+								   SnapsToDevicePixels="True" Margin="{Binding TextEditorMargin}"
+								   Background="Transparent">
 
 				<avalonEdit:TextEditor.Options>
 					<avalonEdit:TextEditorOptions ShowSpaces="False" ShowTabs="False"/>

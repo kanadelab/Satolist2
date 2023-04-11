@@ -223,6 +223,14 @@ namespace Satolist2.Dialog
 
 			Colors.Add(new GeneralSettingsColorSettingViewModel(this)
 			{
+				Label = "テキストエディタ背景",
+				DefaultColor = Themes.ApplicationTheme.GetEditorHilight(ScriptSyntax.Background),
+				Syntax = ScriptSyntax.Background,
+				IsBackgroundColor = true
+			});
+
+			Colors.Add(new GeneralSettingsColorSettingViewModel(this)
+			{
 				Label = "半角スペース",
 				DefaultColor = Themes.ApplicationTheme.GetEditorHilight(ScriptSyntax.Space),
 				Syntax = ScriptSyntax.Space,
@@ -236,6 +244,7 @@ namespace Satolist2.Dialog
 				Syntax = ScriptSyntax.WideSpace,
 				IsBackgroundColor = true
 			});
+
 
 			//現在の設定をロードする
 			foreach(var item in Colors)

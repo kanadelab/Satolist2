@@ -120,6 +120,7 @@ namespace Satolist2.Control
 		private bool isShowSearchBox;
 		private bool isActiveTextEditor;
 		private bool searchBoxFocusTrigger;
+		private Color textEditorBackgroundColor;
 		private int caretLine;
 
 		//検索ボックスの表示
@@ -153,12 +154,24 @@ namespace Satolist2.Control
 			}
 		}
 
+		//検索ボックス表示用のトリガー
 		public bool SearchBoxFocusTrigger
 		{
 			get => searchBoxFocusTrigger;
 			set
 			{
 				searchBoxFocusTrigger = value;
+				NotifyChanged();
+			}
+		}
+
+		//ボックス背景色
+		public Color TextEditorBackgroundColor
+		{
+			get => textEditorBackgroundColor;
+			set
+			{
+				textEditorBackgroundColor = value;
 				NotifyChanged();
 			}
 		}
@@ -214,6 +227,7 @@ namespace Satolist2.Control
 		public TextEditorViewModelBase(MainViewModel main)
 		{
 			Main = main;
+			textEditorBackgroundColor = SatoriSyntaxRuleSet.GetHilightColor(ScriptSyntax.Background);
 
 			//検索
 			ShowSearchBoxCommand = new ActionCommand(
@@ -278,6 +292,7 @@ namespace Satolist2.Control
 				MainTextEditor.TextArea.IndentationStrategy = null;
 
 			//ハイライト
+			TextEditorBackgroundColor = SatoriSyntaxRuleSet.GetHilightColor(ScriptSyntax.Background);
 			MainTextEditor.SyntaxHighlighting = null;
 			MainTextEditor.Dispatcher.BeginInvoke(new Action(() =>
 			{

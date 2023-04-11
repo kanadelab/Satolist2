@@ -14,6 +14,7 @@ namespace Satolist2.Utility
 {
 	enum ScriptSyntax
 	{
+		Background,
 		Default,
 		Escape,
 		ScriptTag,
