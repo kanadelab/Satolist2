@@ -79,6 +79,10 @@
 				<MenuItem Header="Ukadocイベントリファレンス" x:Name="UkadocEventReferenceVisibleMenu" IsCheckable="True" IsChecked="{Binding IsVisible, Mode=TwoWay}" />
 				<MenuItem Header="ヘルプ(試験的)" x:Name="HelpViewerVisibleMenu" IsCheckable="True" IsChecked="{Binding IsVisible, Mode=TwoWay}" />
 				<Separator />
+				<MenuItem Header="さとりすと1.x互換機能" Visibility="{Binding IsEnabledLegacyCompat, Converter={StaticResource BoolToVisibilityConverter}}">
+					<MenuItem Header="サーフェスビューワ" x:Name="LegacySurfaceViewerVisibleMenu" IsCheckable="True" IsChecked="{Binding IsVisible, Mode=TwoWay}" />
+				</MenuItem>
+				<Separator />
 				<MenuItem Header="ウインドウレイアウトをデフォルトに戻す" Command="{Binding ResetDockingLayoutCommand}" />
 			</MenuItem>
 			<MenuItem Header="デバッグ">
@@ -190,6 +194,11 @@
 							<!--サーフェスビューワ-->
 							<util:DockingWindow x:Name="SurfaceViewer">
 								<ctl:SurfaceViewer />
+							</util:DockingWindow>
+							
+							<!--旧サーフェスビューワ-->
+							<util:DockingWindow x:Name="LegacySurfaceViewer">
+								<ctl:LegacyControlHost />
 							</util:DockingWindow>
 
 							<!--サーフェスパレット-->

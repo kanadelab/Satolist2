@@ -22,6 +22,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SatolistDeploy", "SatolistD
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SatolistDocument", "SatolistDocument\SatolistDocument.csproj", "{301040B1-0BF2-4AF1-9526-516B519497AE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SatolistLegacyCompat", "SatolistLegacyCompat\SatolistLegacyCompat.csproj", "{9EEBD3AD-95AC-45C9-AD60-E17C7AD7FC21}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -160,6 +162,24 @@ Global
 		{301040B1-0BF2-4AF1-9526-516B519497AE}.Release|x64.Build.0 = Release|Any CPU
 		{301040B1-0BF2-4AF1-9526-516B519497AE}.Release|x86.ActiveCfg = Release|Any CPU
 		{301040B1-0BF2-4AF1-9526-516B519497AE}.Release|x86.Build.0 = Release|Any CPU
+		{9EEBD3AD-95AC-45C9-AD60-E17C7AD7FC21}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9EEBD3AD-95AC-45C9-AD60-E17C7AD7FC21}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9EEBD3AD-95AC-45C9-AD60-E17C7AD7FC21}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{9EEBD3AD-95AC-45C9-AD60-E17C7AD7FC21}.Debug|x64.Build.0 = Debug|Any CPU
+		{9EEBD3AD-95AC-45C9-AD60-E17C7AD7FC21}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{9EEBD3AD-95AC-45C9-AD60-E17C7AD7FC21}.Debug|x86.Build.0 = Debug|Any CPU
+		{9EEBD3AD-95AC-45C9-AD60-E17C7AD7FC21}.Deploy|Any CPU.ActiveCfg = Debug|Any CPU
+		{9EEBD3AD-95AC-45C9-AD60-E17C7AD7FC21}.Deploy|Any CPU.Build.0 = Debug|Any CPU
+		{9EEBD3AD-95AC-45C9-AD60-E17C7AD7FC21}.Deploy|x64.ActiveCfg = Debug|Any CPU
+		{9EEBD3AD-95AC-45C9-AD60-E17C7AD7FC21}.Deploy|x64.Build.0 = Debug|Any CPU
+		{9EEBD3AD-95AC-45C9-AD60-E17C7AD7FC21}.Deploy|x86.ActiveCfg = Debug|Any CPU
+		{9EEBD3AD-95AC-45C9-AD60-E17C7AD7FC21}.Deploy|x86.Build.0 = Debug|Any CPU
+		{9EEBD3AD-95AC-45C9-AD60-E17C7AD7FC21}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9EEBD3AD-95AC-45C9-AD60-E17C7AD7FC21}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9EEBD3AD-95AC-45C9-AD60-E17C7AD7FC21}.Release|x64.ActiveCfg = Release|Any CPU
+		{9EEBD3AD-95AC-45C9-AD60-E17C7AD7FC21}.Release|x64.Build.0 = Release|Any CPU
+		{9EEBD3AD-95AC-45C9-AD60-E17C7AD7FC21}.Release|x86.ActiveCfg = Release|Any CPU
+		{9EEBD3AD-95AC-45C9-AD60-E17C7AD7FC21}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

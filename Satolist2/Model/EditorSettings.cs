@@ -20,6 +20,7 @@ namespace Satolist2.Model
 		private const string UploadSettingPath = "settings/accounts.json";
 		private const string TemporarySettingsPath = "settings/temporary.json";
 		private const string GeneralSettingPath = "settings/general.json";
+		private const string LegacySettingPath = "settings/legacy.json";
 
 		//ゴーストのprofile格納
 		private const string GhostLocalSettingPath = "profile/satolist/ghost.json";
@@ -48,7 +49,6 @@ namespace Satolist2.Model
 			LoadInsertPalette();
 			LoadUploadSettings();
 			LoadGeneralSettings();
-		
 		}
 
 		//ゴースト依存の情報をロード
@@ -206,6 +206,9 @@ namespace Satolist2.Model
 			catch
 			{
 			}
+
+			//互換設定もこのタイミングで保存してしまう。同じタイミングが良さそう
+			SaveLegacySettings();
 		}
 
 		//基本設定の読込
@@ -250,10 +253,41 @@ namespace Satolist2.Model
 		//基本設定の保存
 		public void SaveGeneralSettings()
 		{
-			System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(TemporarySettingsPath));
+			System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(GeneralSettingPath));
 			try
 			{
 				JsonUtility.SerializeToFile(GeneralSettingPath, GeneralSettings);
+			}
+			catch { }
+		}
+
+		//互換性設定の保存
+		public static void LoadLegacySettings()
+		{
+			try
+			{
+				if(System.IO.File.Exists(LegacySettingPath))
+				{
+					SatolistLegacyCompat.CompatCore.ProjectCompat.Deserialize(
+						JsonUtility.DeserializeFromFile(LegacySettingPath) as JObject ?? new JObject()
+						);
+				}
+			}
+			catch
+			{
+				SatolistLegacyCompat.CompatCore.ProjectCompat.Deserialize(
+						new JObject()
+						);
+			}
+		}
+
+		//互換性設定の保存
+		public static void SaveLegacySettings()
+		{
+			System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(LegacySettingPath));
+			try
+			{
+				JsonUtility.SerializeToFile(LegacySettingPath, SatolistLegacyCompat.CompatCore.ProjectCompat.Serialize());
 			}
 			catch { }
 		}
@@ -306,6 +340,8 @@ namespace Satolist2.Model
 		public double TextEditorOffsetX { get; set; }
 		[JsonProperty]
 		public double TextEditorOffsetY { get; set; }
+		[JsonProperty]
+		public bool IsEnableLegacyCompat { get; set; }
 
 		public GeneralSettings()
 		{

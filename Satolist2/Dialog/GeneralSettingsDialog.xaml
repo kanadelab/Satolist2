@@ -129,6 +129,7 @@
 							</StackPanel>
 						</StackPanel>
 					</GroupBox>
+					<CheckBox Content="さとりすと1.x互換機能を有効化(さとりすとの再起動が必要)" IsChecked="{Binding Model.IsEnableLegacyCompat, Mode=TwoWay}" />
 				</StackPanel>
 			</TabItem>
 

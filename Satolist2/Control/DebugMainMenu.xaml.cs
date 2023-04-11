@@ -25,6 +25,7 @@ namespace Satolist2.Control
 		{
 			InitializeComponent();
 			
+			
 		}
 	}
 

@@ -134,6 +134,7 @@
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
+    <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">
@@ -148,6 +149,9 @@
     </Compile>
     <Compile Include="Control\InsertPalette.xaml.cs">
       <DependentUpon>InsertPalette.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Control\LegacyControlHost.xaml.cs">
+      <DependentUpon>LegacyControlHost.xaml</DependentUpon>
     </Compile>
     <Compile Include="Control\RecvEventLog.xaml.cs">
       <DependentUpon>RecvEventLog.xaml</DependentUpon>
@@ -329,6 +333,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Control\InsertPalette.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Control\LegacyControlHost.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -520,6 +528,10 @@
     <ProjectReference Include="..\SatolistDocument\SatolistDocument.csproj">
       <Project>{301040b1-0bf2-4af1-9526-516b519497ae}</Project>
       <Name>SatolistDocument</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SatolistLegacyCompat\SatolistLegacyCompat.csproj">
+      <Project>{9eebd3ad-95ac-45c9-ad60-e17c7ad7fc21}</Project>
+      <Name>SatolistLegacyCompat</Name>
     </ProjectReference>
     <ProjectReference Include="..\SatolistUpdator\SatolistUpdator.csproj">
       <Project>{789c550a-4b6a-40bb-9355-10d7c27eee40}</Project>
