@@ -1,0 +1,529 @@
+== 1.7.13 (2016-xx-xx) ==
+ * fix: The underline of UnderlineTextDecoration will not be drawn properly when LinePadding is not small (Ticket #36590, Special thanks: nabebanosdn)
+
+== 1.7.12 (2014-11-15) ==
+ * fix: [Ann] Horizontal scroll position becomes invalid and can't control under rare condition. The condition is, firstly, line-wrapping mode was on and the caret is at end of a long line in a file last time Ann quit, and secondly, Ann was launched with the file. (Ticket #34071, Special thanks: himajin100000)
+ * fix: Executing block un-indentation to a line without an EOL code which contains whitespaces only causes an exception. (Special thanks: kakowee)
+
+== 1.7.11 (2014-07-19) ==
+ * mod: Now IUserInterface.UnindentsWithBackspace is false by default. (The behavior of this mode is not natural in most cases except editing some languages such as Python.)
+ * fix: If IUserInterface.UnindentsWithBackspace is true, pressing backspace key while caret is in an empty line could not delete the line. (Special thanks: Frankie)
+
+== 1.7.10 (2014-06-07) ==
+ * add: Added AutoIndentHooks.Python; an auto-indentation logic for Python
+ * add: Now pressing Backspace key unindents the line when the caret is at end of a line which ends with whitespace (Can be turned off by IUserInterface.UnindentsWithBackspace)
+ * fix: Changing ViewType resets AzukiControl.ScrollsBeyondLastLine to true (Special thanks: dck)
+
+== 1.7.9 (2014-02-08) ==
+ * fix: Dragging mouse on line number area does not expand selection properly under specific condition (Special thanks: Bracketter)
+ * fix: Resizing AzukiControl whose vertical scroll bar is not visible forces the scroll bar visible (Special thanks: rokos)
+
+== 1.7.8 (2013-09-22) ==
+ * add: Now a matched bracket of a bracket before the caret is also highlighted
+ * add: Added AzukiControl.ScrollPos property to set/get scroll position
+ * add: Now selecting text does not change its foreground color if ColorScheme.SelectionBack is Color.Transparent.
+ * add: Now IVS (Ideographic Variation Sequences) can be treated as one character
+ * mod: Now moving caret near border by mouse operation does not scroll the viewport
+ * fix: Built-in highlighter for batch file could not highlight complex variable properly (ex. %DATE:/=%)
+ * fix: Now WatchPattern whose pattern is an empty string can be used with Document.WatchPattern to unmark text (more efficient than unmarking entire document at once)
+ * fix: Document.WatchPattern does nothing if the document contains only one line (Special thanks: Bracketter)
+ * fix: Document.WatchPattern throws an exception if there is a text line which contains the two or more watching patterns (Special thanks: rokos)
+ * fix: Improved performance of extracting strings from Document (Special thanks: Bracketter)
+
+== 1.7.7 (2013-07-20) ==
+ * fix: Under rare condition, the very first character in a newly opened document will be highlighted as a "matched bracket."
+ * fix: Built-in diff highlighter highlights a line like "+    aaa:" not as a inserted line but as a comment line
+ * fix: Nested call of group UNDO (Document.BeginUndo and Document.EndUndo) does not work properly
+ * fix: [Ann] Now newly created documents never be recorded in MRU history (recently opened documents.)
+ * fix: [Ann] An exception occures on opening a file if recorded caret position was invalid in the file
+
+== 1.7.6 (2013-07-07) ==
+ * add: Added VScroll event and HScroll event for AzukiControl (IUserInterface)
+ * mod: Renamed Document.GetTextInRange(ref int, ref int) to Document.GetTextInRangeRef so that VB.NET can call the method correctly.
+ * fix: Deleting a marked segment causes internal problem which may cause an exception
+ * add: [Ann] Now Ann remembers recently opened file's path and caret position
+ * add: [Ann] Added UTF-8 + BOM, UTF-16LE + BOM, and UTF-16BE + BOM to encoding menu
+ * fix: [Ann] Reloading newly created document raises an exception
+
+== 1.7.5 (2013-02-17) ==
+ * add: Added Action.TrimTrailingSpace which removes whitespaces from end of selected lines
+ * add: Added Action.TrimLeadingSpace which removes whitespaces from beginning of selected lines
+ * add: Added Action.ConvertTabsToSpaces which replaces every tab characters in selection range to equivalent amount of space characters
+ * add: Added Action.ConvertSpacesToTabs which replaces space characters in selection range to tab characters as much as possible
+ * fix: Group undo action will not be stacked if it has no effect at all
+ * fix: LaTeX highlighter may not update highlight of headings
+ * fix: An exception occurs every time a non-GUI thread ends (this was the reason of the exception thrown just after a printing)
+ * fix: Does not scrolls to caret if caret does not move by pressing an arrow key, and if Azuki is in read-only mode
+ * fix: A graphical glitch happens under specific condition (this never happens in line-wrapping mode)
+ * add: [Ann] Added feature to remove spaces from end of each selected lines (shortcut key is Ctrl+Shift+R)
+ * add: [Ann] Added feature to remove spaces from beginning of each selected lines (shortcut key is Ctrl+Shift+L)
+ * add: [Ann] Added feature to convert tab characters in selected text to equivalent amount of spaces (shortcut key is Ctrl+Shift+P)
+ * add: [Ann] Added feature to convert space characters in selected text to tab characters as much as possible (shortcut key is Ctrl+Shift+T)
+ * add: [Ann] Added feature to reload files using specified Japanese character encodings
+ * add: [Ann] Added feature to change character encoding to be used on saving files
+ * fix: [Ann] Now Backspace key can be used in goto line dialog
+ * fix: [Ann] Could not open files with name contains a comma by launching another Ann.exe
+ * fix: [Ann] Now opening files triggered by launching another Ann.exe is much stable
+
+== 1.7.4 (2012-12-22) ==
+ * add: Added a highlighter for Diff/Patch file format
+ * add: Added KeywordHighlighter.HighlightsNumericLiterals property which can turn off or on whether to highlight numeric literals by its built-in logic
+ * fix: Block-indent action now ignores empty lines
+ * add: [Ann] Added feature to highlight Diff (Patch) files
+ * fix: [Ann] Now Ann can edit its own configuration file (Ann.ini)
+ * fix: [Ann] Fixed problem that Ann opens .c file as .cmd file (MS-DOS batch file type.)
+
+== 1.7.3 (2012-11-29) ==
+ * add: Added a highlighter for Python script
+ * add: Added a highlighter for Batch file
+ * add: JavaScript highlighter now recognizes regular expression literals better (ex. highlights c=/e+f/g but doesn't highlight c=d/e+f/g)
+ * add: Added an overload method of KeywordHighlighter.AddRegex which takes one CharClass and applies it to matched patterns
+ * add: Now KeywordHighlighter can use "ignore case" option for matching enclosure and line highlight
+ * mod: Changed color of regular expression literals of default color set
+ * fix: KeywordHighlighter doesn't stop highlighting if no closing pattern of non-multiline enclosures was found (problem since 1.7.1)
+ * fix: If certain condition is met, KeywordHighlighter doesn't stop highlighting even if a closer of multi-line enclosure was found (problem since 1.7.1)
+ * fix: KeywordHighlighter highlights text patterns matched with regular expressions even if it's in an enclosed part (problem since 1.7.2)
+ * fix: Highlighting completely new document or removing very last part of document causes an exception (problem since 1.7.0)
+ * fix: Reduced unnecessary calculation on drawing a very long word (because of this, drawing text in a binary file oftenly slow)
+ * add: [Ann] Added "Goto line" feature
+ * add: [Ann] Added feature to highlight Python files
+ * add: [Ann] Added feature to highlight MS-DOS batch files
+ * mod: [Ann] Now font color of number literals are red
+ * fix: [Ann] Caret position was reset when a document which is opened already is opened
+
+== 1.7.2 (2012-11-10) ==
+ * add: Now KeywordHighlighter can use regular expression
+ * add: Added a highlighter for .ini / .properties file format
+ * add: Added a highlighter for JavaScript file format
+ * add: Now CSharpHighlighter highlights preprocessor directive even if a sharp sign and keyword are separated with white spaces
+ * add: Added Document.GetLineEndIndexFromCharIndex method
+ * fix: Switching highlighter while the document is empty raises an exception
+ * add: [Ann] Added feature to highlight .ini / .properties files
+ * add: [Ann] Added feature to highlight JavaScript files
+ * mod: [Ann] Changed how to display information about caret position and selection
+
+== 1.7.1 (2012-11-01) ==
+ * fix: Placing a token which is similar to the closer of an Enclosure (of KeywordHighlighter) at the end of file causes an exception.
+ * fix: [Ann] Ann recognizes a file without an extension as a LaTeX file.
+
+== 1.7.0 (2012-10-29) ==
+ * add: Speeded up highlighting logic (optimized delay time, and optimized text range to highlight)
+ * add: Improved performance of built-in highlighters (now they never scan characters beyond end of the range to be highlighted)
+ * add: Added feature to watch for text patterns and mark them automatically with specified marking ID (text patterns can be specified with regular expression)
+ * add: Now XML highlighter recognizes CDATA sections
+ * add: For marking feature, added BgColorTextDecoration class which overrides default background color
+ * add: The feature to highlight matching bracket can be disabled through AzukiControl.HighlightsMatchedBracket
+ * add: Now 32 different marker IDs can be used at same time (in previous version, 8 marker IDs can be used at most)
+ * add: Added ShowsVScrollBar property to AzukiControl to change visibility of vertical scroll bar
+ * add: [Ann] Text search targets in the document is now emphasized visually (after the search condition was fixed)
+ * add: [Ann] When user selects text, Ann displays number of char/bytes currently selected on status-bar
+ * add: [Ann] Ann opens all file paths which were given as command line arguments
+ * mod: Rotating mouse wheel towards the user while pressing Ctrl key now means zoom-out (previously it meant zoom-in)
+ * mod: Removed meaningless Flags attribute from LineStyle enumeration
+ * mod: Now calling Document.Mark and Document.Unmark for an empty range (beginning position equals to endding position) never causes an exception
+ * mod: Changed value of the marking ID for built-in URI marker from 0 to 31
+ * fix: In line-wrapping mode, horizontal ruler will be drawn as if it is a part of the dirt-bar when the first visible screen line is not the fisrt screen line of a logical line
+
+== 1.6.3 (2012-10-11) ==
+ * add: Added IsSingleLineMode property to AzukiControl (IUserInterface) which determines whether to limit the content to a single line or not
+ * fix: CanCut, CanCopy, and CanPaste properties does not work properly
+ * fix: Now dragging selected text in a read-only document will do nothing to the document
+ * fix: URI marking does not stop before a quotation mark nor a 'less than' mark after a URI starting with "mailto:"
+ * fix: Application never exits if AzukiControl instances are used in multiple forms and their Dispose method were not called explicitly
+ * fix: Now for background color of matched bracket, ColorScheme.BackColor will be used if ColorScheme.MatchedBracketBack is Color.Transparent
+ * fix: [Ann] Ann crashes if a file path which contains a wildcard (? or *) was specified as a command line parameter
+ * fix: [Ann] Now text searching GUI only accepts the first line of the pasted text
+ * fix: [Ann] An exception occurs if two processes of Ann.exe were created in a very short duration
+ * fix: [Ann] Now the area on a status bar which shows the number of selected characters will automatically adjust its width so that the content is always visible
+
+== 1.6.2 (2011-04-02) ==
+ * mod: Azuki uses 'Arrow' mouse cursor graphic when the cursor is on horizontal ruler area
+ * fix: URIs already marked up will be unmarked when MarksUri property of IUserInterface (AzukiControl) is changed to false
+ * fix: CanUndo property of IUserInterface (AzukiControl) is not updated to True yet in ContentChanged event handler which is invoked when the document is firstly modified
+ * fix: a bug of built-in LaTeX highlighter (if a pair of curly brackets appears after a \section command and before other command, then its content will be highlighted as a heading)
+ * fix: [Ann] URIs in newly created document will never be marked
+ * fix: [Ann] tagged as version 1.6.2
+
+== 1.6.1 (2011-02-20) ==
+ * add: now Document.IsDirty will be False automatically when UNDO/REDO restores document to the state of when the Document.IsDirty was set False by application code
+ * add: now UNDOing text modification also restores modification state of each lines
+ * add: added CanCut, CanCopy, CanPaste properties to AzukiControl (IUserInterface.)
+ * add: now built-in URI marker can be enabled or disabled through AzukiControl.MarksUri property or Document.MarksUri property
+ * add: IView now has some properties to get rectangle of informational areas; DirtBarRectangle, LineNumberAreaRectangle, and TextAreaRectangle.
+ * add: [Ann] disables menu items which are not usable or effectless according to the situation
+ * add: [Ann] clicking an URI string which is already selected, Ann now clears selection and place the caret at clicked position
+ * mod: Document.IsDirty cannot be set as True by application code
+ * mod: added some properties to IHighlighter for supporting 'hook' mechanism which can overre default highlighting logic
+ * mod: built-in URI marker is now disabled by default
+ * fix: improved logic to detect URI
+ * fix: now information of marking ID of URI (0) can be changed; it is now not 'reserved ID' but simply 'internally used ID'
+ * fix: built-in highlighter for C/C++ now highlights preprocessor macros properly if there are spaces between '#' and keyword of it (31 spaces at maximum)
+ * fix: bug of kinsoku shori: some of the characters in CharsForbiddenToStartLine or CharsForbiddenToEndLine of DefaultWordProcforbidden can be ignored if unsorted character array was set to them
+ * fix: added ShowsDirBar property to IUserInterface
+ * fix: now Azuki do nothing for double click in other areas than text area
+ * fix: now AzukiControl.Click nor AzukiControl.MouseClick event will not be invoked on a MouseUp event which was occurred at far place from where preceding MouseDown event occurred at
+ * fix: now IMouseEventArgs.Location for AzukiControl.Click and AzukiControl.MouseClick event is not the position of last MouseDown event but the position of the last MouseUp event
+ * fix: [Ann] little resource leak in searching GUI of Ann
+ * fix: [Ann] tagged as version 1.6.1
+
+== 1.6.0 (2010-12-11) ==
+ * add: supported word wrap including kinsoku shori
+ * add: supported marking feature
+ * add: supported clickable URI feature (through marking feature)
+ * add: supported drag and drop editing of selected text (dragging rectangular selection is not supported)
+ * add: now Azuki highlights a bracket which is matched to (is considered to be a counter-part of) a bracket at caret position
+ * add: now Unicode combining character sequence can be treated as one character on selecting or editing
+ * add: supported 'Sticky Caret' mode (can be enable/disable by AzukiControl.UsesStickyCaret property)
+ * add: now uses ColorScheme.ForeColor if fore-ground for a CharClass was set to Color.Transparent
+ * add: now uses ColorScheme.BackColor if back-ground for a CharClass was set to Color.Transparent
+ * add: supported owner draw feature (added AzukiControl.LineDrawing event and AzukiControl.LineDrawn event)
+ * add: now selecting text by line can be executed by keyboard
+ * add: now mouse click or drag with Ctrl key selects word by word
+ * add: now selection mode can be set programmatically through Document.SelectionMode property
+ * add: now with Document.SetSelection method, Azuki can select text line by line
+ * add: now with Document.SetSelection method, Azuki can select text in specific rectangle
+ * add: added new overload of Document.GetWordAt method
+ * add: added new overload of Document.GetLineLength method
+ * add: scroll margin can be set by number of lines with UserPref.AutoScrollMargin
+ * add: added AzukiControl.OverwriteModeChanged event
+ * mod: now AzukiControl.IsRectSelectModeChanged event is obsoleted by Document.SelectionModeChanged event
+ * mod: now KeywordHighlighter.SetKeywords method is obsoleted by AddKeywordSet method
+ * mod: double buffering also be enabled for .NET Compact Framework version
+ * mod: now the underline to highlight current line will be hidden when Azuki has no focus
+ * mod: improved how a word is selected on double click
+ * mod: Document.FindMatchedBracket now returns -1 if search start position is in the middle of CDATA (comment, string literal, ...)
+ * mod: changed name of Sgry.Azuki.Windows namespace to Sgry.Azuki.WinForms
+ * fix: corrected usage of 'GDI device context' which is system shared resource (incorrect usage might make graphics totally invalid)
+ * add: [Ann] now the Mode menu item corresponding to the active editing mode is checked
+ * add: [Ann] added status bar (not available in .NET Compact Framework)
+ * mod: [Ann] added "All files" to the list of the file type in save file dialog
+ * fix: [Ann] font settings is not saved properly if the font is not TrueType font
+ * fix: [Ann] now Ann can open files opened by other processes which allows to read it
+ * fix: [Ann] corrected usage of 'GDI device context' which is system shared resource (incorrect usage might make graphics totally invalid)
+ * fix: [Ann] tagged as version 1.6.0
+
+== 1.5.8 (2010-11-27) ==
+ * fix: in visual designer, ForeColor and BackColor property of AzukiControl cannot be changed
+ * fix: [Ann] tagged as version 1.4.8
+
+== 1.5.7 (2010-07-09) ==
+ * fix: pasting non-text clipboard data locks clipboard system and prevents any other program from using  clipboard (degrade problem since 1.5.0)
+ * fix: now Azuki does not uses System.Drawing.Font.OriginalFontName property
+ * fix: [Ann] tagged as version 1.4.7
+
+== 1.5.6 (2010-06-12) ==
+ * fix: if a word of specific pattern such as "11aa" was starting the document, and if a user deleted or selected it, an exception occurs (bug since 1.2.0)
+ * fix: graphic may not be properly refreshed under rare condition (bug since 1.3.0)
+ * fix: on Windows Mobile, text input by IME is inserted twice (bug since 1.5.1)
+ * fix: [Ann] opening a file (which is already opened file by a Ann.exe process) with a new Ann.exe process causes internal exception
+ * fix: [Ann] tagged as version 1.4.6
+
+== 1.5.5 (2010-05-16) ==
+ * fix: now calling AzukiControl.ClearHistory properly redraws DirtBar
+ * fix: now changing AzukiControl.TabWidth updates line-wrapping information
+ * fix: [Ann] now tab width can not be set as 0 or less in drawing option dialog
+ * fix: [Ann] tagged as version 1.4.5
+
+== 1.5.4 (2010-04-17) ==
+ * add: now anti-alias method applied to text rendering can be changed through UserPref.Antialias property
+ * add: now color value literal used in HTML such as #E0C184 is treated as one word
+ * fix: dragging mouse cursor from text area to line number area makes selection anchor invalid
+ * fix: [Ann] tagged as version 1.4.4
+
+== 1.5.3 (2010-04-06) ==
+ * fix: in line-wrapping mode, deleting a character at beginning of line with BackSpace key corrupts line management data
+ * fix: in line-wrapping mode, dragging mouse on line number area toward document head may make selection range invalid
+ * fix: dragging mouse on text area near left border turns line selection mode on
+ * fix: [Ann] many dialogs will appear when main window was activated if multiple files editing are update by other programs
+ * fix: [Ann] tagged as version 1.4.3
+
+== 1.5.2 (2010-03-22) ==
+ * fix: fixed a degrade problem in 1.5.1 (AzukiControl cannot be focused by mouse click)
+ * fix: now line number area will properly be widen when a figure of maximum line number increases
+ * fix: improved automatic range expansion function of horizontal scroll bar for very long line (only in non-line-wrapping mode)
+ * fix: now Azuki properly updates line wrapping information when editing text at head of a line made by line wrapping
+ * fix: [Ann] tagged as version 1.4.2
+
+== 1.5.1 (2010-03-21) ==
+ * add: clicking or dragging line number area now selects physical lines
+ * add: added an action to insert new line above the caret (implemented as Actions.BreakPreviousLine, default key-bind is Ctrl+Enter)
+ * add: added an action to insert new line below the caret (implemented as Actions.BreakNextLine, default key-bind is Ctrl+Shift+Enter)
+ * add: now scrolling beyond final line can be prevented with AzukiControl.ScrollsBeyondLastLine property
+ * add: added IsRectSelectModeChanged event for AzukiControl
+ * add: added IView.GetLineLength method for retrieving length of a physical line
+ * add: now Azuki accepts text input from IME at once, not one character by one character
+ * mod: now Azuki draws line number area and dirt bar area for (non-existing) lines beyond EOF
+ * mod: now Azuki does not break line on pressing Enter key with Shift, Ctrl or Windows
+ * mod: now AzukiControl.ConvertsTabToSpaces property is not attributed as obsoleted
+ * mod: now Katakana middle dot (U+30fb) is treated not as katakana but as symbol/punctuation character
+ * mod: now Ideographic iteration mark (U+3005) is treated not as symbol/punctuation but kanji/other character
+ * mod: now Azuki respects system setting of font rendering method (enabling anti-alias or not, etc.)
+ * fix: in WPF application, menu is activated after rectangular selection by alt+mouse if using AzukiControl through WindowsFormsHost window
+ * fix: now AzukiControl can be used with DockPanel Suite
+ * fix: FindNext(string, int, bool matchCase) method always ignores 'matchCase' parameter
+ * fix: calling Document.ClearHistory now properly resets Document.IsDirty property
+ * fix: now dragging on left margin area correctly selects text
+ * fix: in line-wrapping mode, DirtBar area for final line will not be redrawn after editing
+ * fix: improved drawing logic of horizontal ruler to avoid drawing numbers on long column lines 
+ * add: [Ann] created application icon
+ * add: [Ann] now multiple instances cannot be launched
+ * add: [Ann] now Ann can detect modification of files by other programs
+ * add: [Ann] now Ann automatically chooses EOL code for input when opening file by first EOL code in the file
+ * fix: [Ann] one extra EOL code is inserted on unifying EOL code of document
+ * fix: [Ann] tab graphic would not be not redrawn under certain condition
+ * fix: [Ann] giving directory path as command line argument causes exception
+ * fix: [Ann] tagged as version 1.4.1
+
+== 1.5.0 (2009-12-12) ==
+ * add: rectangular selection feature by both mouse and keyboard
+ * add: horizontal ruler can be used by AzukiControl.ShowsHRuler
+ * add: added AzukiControl.ShowsDirtBar property to display 'DirtBar'; special area which indicates whether each line is modified or not
+ * add: now copied special (line, rectangle) text data can be paste in Visual Studio (and vice-versa)
+ * add: added AzukiControl.UsesTabForIndent property
+ * add: enhanced KeywordHighlighter; now keyword matching can be case insensitive (ignore case option)
+ * add: enhanced KeywordHighlighter; now word-character set can be customizable for each keyword set
+ * add: by AzukiControl.TopMargin property, drawing margin at top of the view can be now customizable
+ * add: by AzukiControl.LeftMargin property, drawing margin at left of the view can be now customizable
+ * add: added AzukiControl.DrawsEofMark property for drawing EOF position
+ * add: added AzukiControl.LinePadding for customizing padding from bottom of a line to top of the next line
+ * add: added AzukiControl.LineSpacing
+ * add: supported group UNDO (groups actions between call of Document.BeginUndo and call of Document.EndUndo)
+ * add: added overloads for Document.FindNext and Document.FindPrev
+ * add: now supports some of the OpenType fonts which were not supported by GDI+
+ * add: improved behavior of horizontal scroll bar in non-line-wrapping mode
+ * add: improved the scroll position after switching line-wrapping mode
+ * mod: Azuki records selection state with UNDO action and restores the state when the UNDO action executed
+ * mod: AzukiControl.GetIndexFromScreenPos uses nearest valid position if given position is invalid
+ * mod: changed argument of AutoIndentHook.
+ * mod: ConvertsTabToSpaces property of both AzukiControl and IUserInterface is now obsolete
+ * mod: now width of text area will be adjusted after executing ZoomIn or ZoomOut
+ * fix: caret graphic becomes invisible after executing ZoomIn or ZoomOut
+ * fix: on input of close curly bracket '}', auto-indentation logic for C styled language properly decrement the line containing only white spaces
+ * add: [Ann] now Ann has simple tab interface
+ * add: [Ann] now Ann can change text font in drawing option dialog
+ * add: [Ann] now Ann remembers last window size
+ * add: [Ann] now Ann remembers drawing options
+ * add: [Ann] now Ann opens a file in appropriate mode chosen by file extension
+ * add: [Ann] now Ann can change line end code for input, and can change all existing line end code to specific code
+ * add: [Ann] now Ann can open UTF-16 encoded text without BOM code
+ * mod: [Ann] changed layout of the text search panel
+ * mod: [Ann] now F3 is bound to "Find next", Shift+F3 is bound to "Find previous"
+ * mod: [Ann] now mnemonic of "Select all" menu item is A, not L
+ * mod: [Ann] now Ann shows revision version number of Ann and Azuki in "About" dialog
+ * fix: [Ann] tagged as version 1.4.0
+
+== 1.4.7 (2010-  -  ) ==
+ * fix: setting TabWidth property of AzukiControl to 4 in Visual Studio's visual designer resets actual tab width to 8
+
+== 1.4.6 (2010-01-02) ==
+ * fix: graphic will not be redrawn correctly if selection anchor was changed by API
+ * fix: after losting focus while dragging text with mouse, Azuki looses track of the state of the button
+ * fix: selecting 'Bottom' in a menu appeared by clicking vertical scrollbar may not scrolls window properly
+ * fix: surrogate pair character or CR+LF symbol was not redrawn correctly under specific condition
+ * fix: [Ann] tagged as version 1.3.6
+
+== 1.4.5 (2009-12-06) ==
+ * fix: in ReadOnly mode, pressing BackSpace key deletes selected text
+ * fix: [Ann] tagged as version 1.3.5
+
+== 1.4.4 (2009-11-14) ==
+ * fix: using built-in Ruby highlighter always causes an exception
+ * fix: in line-wrapping mode, inserting character at near right end of the view now does not scrolls
+ * fix: in non-line-wrapping mode, underline to highlight current line was not always drawn to right end
+ * fix: now AzukiControl ignores key events if an outer event handler set true for Handled property of KeyEventArgs (KeyPressEvent)
+ * fix: [Ann] Ann freezes when opening a file whose size is exactly 1 byte
+ * fix: [Ann] tagged as version 1.3.4
+
+== 1.4.3 (2009-09-21) ==
+ * fix: in particular condition, pressing tab key inserts nothing if "converting input tab to spaces" feature is enabled
+ * fix: caret movement stops improper position when pressing Ctrl+Left on particular condition (ex. pressing Ctrl+Left when caret is at right of "5ii")
+ * fix: [Ann] file will be improperly saved in case of that the file will be shorten (this problem exists only in Ann 1.3.2)
+ * fix: [Ann] tagged as version 1.3.3
+
+== 1.4.2 (2009-09-05) ==
+ * fix: fixed a problem that executing block-indent to non empty final line causes an exception
+ * fix: now Azuki always scrolls to caret after releasing selection with left key or right key
+ * fix: auto-indentation for C styled language now properly ignores '{' character in comment, string literal and so on
+ * fix: added lacked C# keywords for CSharpHighlighter
+ * fix: [Ann] now UTF encoded files are saved without BOM code unless it originally save with it
+ * fix: [Ann] tagged as version 1.3.2
+
+== 1.4.1 (2009-08-23) ==
+ * fix: fixed a problem that "converting input tab to spaces" feature inserts wrong number of spaces (mis-calculation)
+ * fix: fixed a problem that XML highlighter treats the character '\' as escape character in quoted strings
+ * fix: [Ann] tagged as version 1.3.1
+
+== 1.4.0 (2009-07-12) ==
+ * add: built-in highlighter for LaTeX
+ * add: now Azuki supports IME re-conversion
+ * add: added "Go to matched bracket" feature
+ * add: XmlHighlighter now highlights HTML entities
+ * add: now large line number than 9999 can be shown
+ * add: added Tag property to Document class (now one any object can be associate with each document)
+ * add: AzukiControl.TextChanged event will be invoked when the active document has modified
+ * add: added AzukiControl.BorderStyle property
+ * add: added AzukiControl.FirstVisibleLine property
+ * add: auto-indentation will also be executed for full-width spaces
+ * add: implemented AzukiControl.UseCtrlTabToMoveFocus property for .NET Compact Framework environment
+ * fix: now Document object can be modified programmatically regardless of the value of Document.IsReadOnly
+ * fix: now KeywordHighlighter treats 'escaped escape char' properly (token like '\\' in C++ can be highlighted correctly)
+ * fix: fixed a problem that clearing UNDO history will not release using memory area instantly
+ * fix: now AzukiControl.AcceptsTab property works on .NET Compact Framework environment
+ * fix: reduced memory usage
+ * fix: corrected mis-spelling of ViewType members (no more "propotional")
+ * fix: corrected mis-spelling of CharType.Delimiter (no more "delimitter")
+ * add: [Ann] now Ann scrolls to caret automatically after changing line-wrapping mode
+ * fix: [Ann] crashes if an invalid (as regular expression) text pattern was used on regular expression search mode
+ * fix: [Ann] tagged as version 1.3.0
+
+== 1.3.5 (2009-06-28) ==
+ * fix: fixed a problem that AzukiControl.CanRedo property always returns invalid value
+ * fix: [Ann] tagged as version 1.2.4
+
+== 1.3.4 (2009-06-20) ==
+ * fix: fixed a problem that an exception will be thrown on changing selection range just after switching active document under certain condition
+ * fix: fixed a problem that if the final line was line-wrapped, the line will not be redrawn correctly on inputting characters
+
+== 1.3.3 (2009-06-13) ==
+ * fix: fixed a problem that pressing backspace key at the char just after a surrogate pair breaks the surrogate pair
+ * fix: fixed a degrade problem made in 1.3.2 (line management data will be corrupted)
+ * fix: fixed a problem that selection range cannot be shrunk to left of a surrogate pair if we select the surrogate pair from left to right
+
+== 1.3.2 (2009-05-01) ==
+ * fix: fixed a problem that document will be corrupted if user UNDOes just after inputting a surrogate pair by IME
+ * fix: fixed a problem that caret stops on 'x' of "exec" when moving caret from right to left (Ctrl+Left)
+ * fix: [Ann] tagged as version 1.2.1
+ * fix: [Ann] version of Azuki is now shown on version information dialog
+
+== 1.3.1 (2009-04-20) ==
+ * mod: added Document.Capacity property to allow users to expand internal buffer size from outside
+ * fix: fixed a problem that XmlHighlighter goes into busy loop under specific conditions
+ * fix: fixed a problem that XmlHighlighter may improperly highlight document
+ * fix: fixed a problem that dragging mouse pointer to outside (left or top) of AzukiControl makes text caret jump to right or bottom end
+ * add: [Ann] tagged as version 1.2.0
+ * add: [Ann] now each document's scroll state will be restored when switching documents
+ * add: [Ann] improved the performance of opening a large document
+
+== 1.3.0 (2009-02-03) ==
+ * add: added text search feature
+ * add: now Azuki.dll in binary distribution is digitally signed
+ * mod: changed zoom ratio (for Ctrl+Wheel feature) from 0.8 to 0.9
+ * mod: removed DummyHighlighter class
+ * fix: fixed minor problem that Azuki with no highlighter object redraws entire graphics area when content changed
+ * fix: pressing Ctrl+Left or Ctrl+Home while selecting some text now actually moves cursor
+ * add: [Ann] implemented incremental search feature
+ * add: [Ann] now the document which was modified and not was saved will be temporarily activated on asking whether to discard the modification or not
+
+== 1.2.4 (2008-12-28) ==
+ * fix: registering multiple pairs that one pair's start/end pattern contains another pair's start/end pattern to built-in highlighters may cause invalid highlighting result
+ * fix: using same type of built-in highlighter for multiple document may cause invalid highlighting result
+ * fix: [Ann] using same type of built-in highlighter for multiple document may cause invalid highlighting result
+
+== 1.2.3 (2008-12-07) ==
+ * fix: now size of the scrollbar thumbs are properly set
+ * fix: scrolling with high-resolution mouse wheel could be difficult
+ * fix: now Azuki can handle broken wheel event properly which is sent by 64 bit Windows sometimes
+ * fix: now switching document properly updates scrollbar parameters
+ * add: [Ann] Ann now opens the file specified by command line parameter
+ * mod: [Ann] Ann now uses basic auto-indent logic under Text mode and XML mode
+ * mod: [Ann] in document list window, now an item can be selected by double click
+ * fix: [Ann] window title now properly updated after "Save as" action
+ * fix: [Ann] (Compact Framework version) fixed problem that "Save as" action always throws an exception
+ * fix: [Ann] (Compact Framework version) "Save" top level menu item now works properly
+
+== 1.2.2 (2008-11-24) ==
+ * fix: if a token which is used to begin enclosing comment exists in line comment, Highlighters based on KeywordHighlighter detects it on re-highlighting and highlights document improperly
+ * add: [Ann] added New command in File menu
+ * add: [Ann] now Ann opens drag & dropped files
+ * fix: [Ann] set auto-indent mode according to selected file mode
+ * fix: [Ann] now opening a file which is already opened will not open it but activate the document object of the file
+ * fix: [Ann] fixed problems caused on opening files that was opened by other processes in non-share mode
+
+== 1.2.1 (2008-11-03) ==
+ * add: many improvements for Ann
+ * add: exposed AzukiControl.DrawingOption property
+ * fix: 1px-width graphical noise line appears in line-wrapped view at right most edge
+ * fix: fixed a threading issue that content modification during highlighting could breaks highlighting logic's assumptions and causes exception.
+ * fix: loading files whose size match specific condition will cause exception
+ * fix: C# highlighter now parses /// as doc comment line.
+ * fix: hide language specialized highlighter classes.
+
+== 1.2.0 (2008-11-01) ==
+ * add: changed sample application to "Ann"
+ * add: SmartHome action
+ * add: built-in highlighter for C/C++
+ * add: built-in highlighter for C#
+ * add: built-in highlighter for Java
+ * add: built-in highlighter for Ruby
+ * add: built-in highlighter for XML
+ * add: added method to get already associated action from key-code
+ * add: improved caret movement
+ * add: added GetWordAt method
+ * add: added IsDirty and DirtyStateChanged
+ * add: now literals begins with "0x" is treated as one word on caret movement
+ * fix: changing AzukiControl.Highlighter had not do clearing highlight information nor invalidating view
+ * fix: DesiredColumn had not been updated after Undo nor Redo
+ * fix: if insertion or deletion divides/creates a CR+LF, inner data structure will be broken
+
+== 1.1.0 (2008-08-15) ==
+ * add: feature to convert input tab character to corresponding number of spaces automatically
+ * add: feature to convert a full-width space character to a half-width space character
+ * mod: disabled double-buffering feature on Windows Mobile for performance
+ * fix: changing the document of a window in line-wrapping mode did not re-calculate wrapped line positions
+ * fix: when a document was opened in multiple windows, shows caret graphic only on focused window
+
+== 1.0.2 (2008-07-24) ==
+ * fix: now setting tab-width updates graphics properly
+
+== 1.0.1 (2008-07-21) ==
+ * fix: in line-wrapping mode under some condition, wrapped line position was mis-calculated and text layout was broken
+ * fix: when used by Visual Studio's visual designer, ColorScheme object that any member color is black was set to the Azuki
+
+== 1.0.0 (2008-07-20) ==
+ * add: syntax highlighter support
+ * add: multiple-document support
+ * add: number of lines scrolled by mouse wheel is now determined by OS setting
+ * add: PageDown / PageUp support
+ * fix: in overwrite mode and caret is on a tab, caret width is always tab width
+ * fix: now setting AzukiControl.Text property automatically calls ScrollToCaret
+
+== 0.9.3 (2008-06-14) ==
+ * fix: AzukiControl.ShowHScrollBar property always be set true after modifying/scrolling in Windows Mobile
+ * fix: current line highlight does not disappear when selection begins if vertically scrolled
+
+== 0.9.2 (2008-06-08) ==
+ * add: color of the EOL graphics can be specified separately
+ * add: added overload method of Azuki.SetKeyBind for ease of use
+ * add: added feature to show/hide horizontal scroll bar
+ * add: improve auto-indentation logic
+ * add: mouse cursor hovering over AzukiControl is now not an arrow but an I-Beam
+ * fix: modifying content of final line without EOL code break line wrapping data
+ * fix: joining non-empty final line to previous line break line wrapping data
+ * fix: pressing Ctrl+Shift+Left could not select back to previous line
+ * fix: lines were not properly wrapped when only EOL graphic cross the right edge
+ * fix: when scrolling up under Windows Mobile, 1px graphic noise appears at line number area
+ * fix: auto-indentation does not work if caret is not at the end of a line
+ * fix: exception occurred when double clicking EOF position
+
+== 0.9.1 (2008-06-04) ==
+ * fix: fixed that scroll bar range may not be updated when AzukiControl.Text property was changed
+ * fix: graphical noise appeared when chars were added/removed from final line (only in wrapping mode)
+ * mod: changed method name from AzukiControl.ClearUndo to ClearHistory
+
+== 0.9.0 (2008-06-01) ==
+ * add: lines can be wrapped with specified width
+ * add: added auto-indent feature (standard auto-indent and C-style auto-indent)
+ * add: added overwrite mode
+ * add: added read-only mode
+ * add: added block-indent feature
+
+== 0.8.2 (2008-05-08) ==
+ * fix: doing 64 or more action breaks UNDO stack and program aborted
+
+== 0.8.1 (2008-05-06) ==
+ * fix: removed debug code left
+
+== 0.8.0 (2008-05-06) ==
+ * first release
+
+
