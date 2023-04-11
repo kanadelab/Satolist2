@@ -13,11 +13,10 @@
 	</UserControl.Resources>
 	<Grid>
 		<Grid.RowDefinitions>
-			<RowDefinition Height="auto" />
 			<RowDefinition Height="*" />
 		</Grid.RowDefinitions>
 
-		<module:TextEditorModuleSelector Grid.Row="2" Margin="3" x:Name="MainTextEditor"/>
+		<module:TextEditorModuleSelector Grid.Row="0" Margin="3" x:Name="MainTextEditor"/>
 		<!--
 		<avalonEdit:TextEditor Grid.Row="1" x:Name="MainTextEditor"
 							   Margin="3" Document="{Binding Document, Mode=OneWay}">
@@ -34,9 +33,5 @@
 			</avalonEdit:TextEditor.ContextMenu>
 		</avalonEdit:TextEditor>
 		-->
-
-		<local:TextEditorSearchBox x:Name="SearchBox" Grid.Row="0"
-								   AttachEditor="{Binding .,ElementName=MainTextEditor}"
-								   Visibility="{Binding IsShowSearchBox, Converter={StaticResource BoolToVisibilityConverter}, Mode=TwoWay}" />
 	</Grid>
 </UserControl>

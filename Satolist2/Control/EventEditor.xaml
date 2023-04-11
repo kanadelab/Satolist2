@@ -22,7 +22,6 @@
 	<Grid>
 		<Grid.RowDefinitions>
 			<RowDefinition Height="auto"/>
-			<RowDefinition Height="auto" />
 			<RowDefinition Height="*" />
 		</Grid.RowDefinitions>
 
@@ -65,7 +64,7 @@
 
 		</Grid>
 
-		<module:TextEditorModuleSelector Grid.Row="2" Margin="3" x:Name="MainTextEditor"/>
+		<module:TextEditorModuleSelector Grid.Row="1" Margin="3" x:Name="MainTextEditor"/>
 
 		<!--
 		<Grid Grid.Row="2" Margin="3" Background="{Binding TextEditorBackgroundColor, Converter={StaticResource ColorToBrushConverter}}">
@@ -110,10 +109,6 @@
 			</avalonEdit:TextEditor>
 		</Grid>
 		-->
-		<local:TextEditorSearchBox x:Name="SearchBox" Grid.Row="1"
-				AttachEditor="{Binding .,ElementName=MainTextEditor}" 
-				Visibility="{Binding IsShowSearchBox, Converter={StaticResource BoolToVisibilityConverter}, Mode=TwoWay}" 
-				FocusTrigger="{Binding SearchBoxFocusTrigger, Mode=TwoWay}"/>
 
 	</Grid>
 </UserControl>
