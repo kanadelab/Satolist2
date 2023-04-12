@@ -1,9 +1,14 @@
-﻿using MahApps.Metro.Controls;
+﻿using ICSharpCode.AvalonEdit.Document;
+using ICSharpCode.AvalonEdit.Editing;
+using ICSharpCode.AvalonEdit.Rendering;
+using MahApps.Metro.Controls;
+using Satolist2.Control;
 using Satolist2.Utility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -23,10 +28,13 @@ namespace Satolist2.Module.TextEditor
 	/// </summary>
 	public partial class AvalonEditModule : TextEditorModuleBase
 	{
+		private SearchHilighter searchHilighter;
+
 		public AvalonEditModule()
 		{
 			InitializeComponent();
 			MainTextEditor.Document = new ICSharpCode.AvalonEdit.Document.TextDocument();
+			searchHilighter = new SearchHilighter();
 		}
 
 		public override int LineCount => MainTextEditor.LineCount;
@@ -40,6 +48,22 @@ namespace Satolist2.Module.TextEditor
 		public override int CaretLine
 		{
 			get => MainTextEditor.TextArea.Caret.Line;
+		}
+
+		//選択位置
+		public override int SelectionBegin
+		{
+			get => MainTextEditor.TextArea.Selection.IsEmpty ?
+				CaretOffset : 
+				MainTextEditor.Document.GetOffset(MainTextEditor.TextArea.Selection.StartPosition.Location);
+		}
+
+		//選択終了位置
+		public override int SelectionEnd
+		{
+			get => MainTextEditor.TextArea.Selection.IsEmpty ?
+				CaretOffset :
+				MainTextEditor.Document.GetOffset(MainTextEditor.TextArea.Selection.EndPosition.Location);
 		}
 
 		public override string Text
@@ -110,6 +134,12 @@ namespace Satolist2.Module.TextEditor
 			MainTextEditor.ScrollToLine(CaretLine);
 		}
 
+		public override void SetSelection(int anchor, int caret)
+		{
+			MainTextEditor.TextArea.Selection = Selection.Create(MainTextEditor.TextArea, anchor, caret);
+			MainTextEditor.CaretOffset = caret;
+		}
+
 		public override void SetFont(string fontFamilyName, int fontSize)
 		{
 			MainTextEditor.FontFamily = new FontFamily(fontFamilyName);
@@ -129,11 +159,51 @@ namespace Satolist2.Module.TextEditor
 			), DispatcherPriority.Render);
 		}
 
+		public override int UpdateSearchString(string searchString)
+		{
+			//検索ハイライタを再設定
+			searchHilighter.SearchString = searchString;
+			MainTextEditor.TextArea.TextView.LineTransformers.Remove(searchHilighter);
+			MainTextEditor.TextArea.TextView.LineTransformers.Add(searchHilighter);
+
+			return base.UpdateSearchString(searchString);
+		}
+
+		public override void RequestFocusToEditor()
+		{
+			MainTextEditor.Focus();
+		}
+
 		//入力候補の表示
 		internal override void RequestCompletion(MainViewModel main)
 		{
 			CompletionManager p = new CompletionManager();
 			p.RequestCompletion(MainTextEditor, main);
 		}
+
+		//検索色付け用の機能
+		private class SearchHilighter : DocumentColorizingTransformer
+		{
+			public string SearchString { get; set; }
+
+			protected override void ColorizeLine(DocumentLine line)
+			{
+				var lineStr = CurrentContext.Document.GetText(line.Offset, line.Length);
+				var pattern = new Regex(Regex.Escape(SearchString));
+				if (!string.IsNullOrEmpty(pattern.ToString()))
+				{
+					var matches = pattern.Matches(lineStr);
+					foreach (Match m in matches)
+					{
+						ChangeLinePart(line.Offset + m.Index, line.Offset + m.Index + SearchString.Length,
+							(elem) =>
+							{
+								elem.BackgroundBrush = Brushes.Yellow;
+							});
+					}
+				}
+			}
+		}
 	}
+
 }

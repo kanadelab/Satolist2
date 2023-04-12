@@ -4,11 +4,38 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Satolist2.Module.TextEditor"
+			 xmlns:ctrl="clr-namespace:Satolist2.Control"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-	<local:AzukiEditModule x:Name="MainTextEditor" />
-	<!--
-	<local:AvalonEditModule x:Name="MainTextEditor" />
-	-->
+	<UserControl.Resources>
+		<BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+	</UserControl.Resources>
+
+	<Grid>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="auto" />
+			<RowDefinition Height="*" />
+		</Grid.RowDefinitions>
+		
+		
+		<local:AzukiEditModule x:Name="MainTextEditor" Grid.Row="1"
+						   InsertPaletteItems="{Binding Main.InsertPalette.Items, FallbackValue={x:Null}}"
+						   SendToGhostCommand="{Binding SendToGhostCommand}"
+						   ShowSearchBoxCommand="{Binding ShowSearchBoxCommand}"
+						   InsertCommand="{Binding InsertCommand}">
+		</local:AzukiEditModule>
+		
+		
+<!--
+		<local:AvalonEditModule x:Name="MainTextEditor" Grid.Row="1" />
+		-->
+		
+
+		<ctrl:TextEditorSearchBox x:Name="SearchBox" Grid.Row="0"
+			AttachEditor="{Binding .,ElementName=MainTextEditor}"
+			Visibility="{Binding IsShowSearchBox, Converter={StaticResource BoolToVisibilityConverter}, Mode=TwoWay}"
+			FocusTrigger="{Binding SearchBoxFocusTrigger, Mode=TwoWay}"/>
+	</Grid>
+	
 	
 </UserControl>

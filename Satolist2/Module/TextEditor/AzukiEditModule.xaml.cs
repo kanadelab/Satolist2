@@ -1,4 +1,5 @@
 ﻿using Satolist2.Control;
+using Satolist2.Model;
 using Satolist2.Utility;
 using Sgry.Azuki;
 using Sgry.Azuki.Highlighter;
@@ -7,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -21,6 +23,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Color = System.Drawing.Color;
 using ContextMenu = System.Windows.Forms.ContextMenu;
+using Menu = System.Windows.Forms.Menu;
 using MenuItem = System.Windows.Forms.MenuItem;
 
 namespace Satolist2.Module.TextEditor
@@ -30,7 +33,45 @@ namespace Satolist2.Module.TextEditor
 	/// </summary>
 	public partial class AzukiEditModule : TextEditorModuleBase
 	{
-		private AzukiControl MainTextEditor;
+		public static readonly DependencyProperty SendToGhostCommandProperty = DependencyProperty.Register(nameof(SendToGhostCommand), typeof(ICommand), typeof(AzukiEditModule));
+		public static readonly DependencyProperty InsertCommandProperty = DependencyProperty.Register(nameof(InsertCommand), typeof(ICommand), typeof(AzukiEditModule));
+		public static readonly DependencyProperty ShowSearchBoxCommandProperty = DependencyProperty.Register(nameof(ShowSearchBoxCommand), typeof(ICommand), typeof(AzukiEditModule));
+		public static readonly DependencyProperty InsertPaletteItemsProperty = DependencyProperty.Register(nameof(InsertPaletteItems), typeof(IEnumerable<InsertItemPaletteModel>), typeof(AzukiEditModule),
+			new PropertyMetadata(
+				(d, e) =>
+				{
+					if(d is AzukiEditModule control)
+					{
+						control.UpdateInsertPalette((IEnumerable<InsertItemPaletteModel>)e.NewValue);
+					}
+				}));
+
+		private AzukiControl MainTextEditor { get; set; }
+		private MenuItem insertPaletteMenuItem;
+
+		public ICommand SendToGhostCommand
+		{
+			get => (ICommand)GetValue(SendToGhostCommandProperty);
+			set => SetValue(SendToGhostCommandProperty, value);
+		}
+
+		public ICommand InsertCommand
+		{
+			get => (ICommand)GetValue(InsertCommandProperty);
+			set => SetValue(InsertCommandProperty, value);
+		}
+
+		public ICommand ShowSearchBoxCommand
+		{
+			get => (ICommand)GetValue(ShowSearchBoxCommandProperty);
+			set => SetValue(ShowSearchBoxCommandProperty, value);
+		}
+
+		internal IEnumerable<InsertItemPaletteModel> InsertPaletteItems
+		{
+			get => (IEnumerable<InsertItemPaletteModel>)GetValue(InsertPaletteItemsProperty);
+			set => SetValue(InsertPaletteItemsProperty, value);
+		}
 
 		public AzukiEditModule()
 		{
@@ -42,7 +83,12 @@ namespace Satolist2.Module.TextEditor
 			contextmenu.MenuItems.Add(new MenuItem("コピー", RequestCopy, Shortcut.CtrlC));
 			contextmenu.MenuItems.Add(new MenuItem("切り取り", RequestCut, Shortcut.CtrlX));
 			contextmenu.MenuItems.Add(new MenuItem("貼り付け", RequestPaste, Shortcut.CtrlV));
-			//contextmenu.MenuItems.Add(new MenuItem("ゴーストに送信", null, (Shortcut)(Keys.Alt | Keys.Q)));
+			contextmenu.MenuItems.Add(new MenuItem("ゴーストに送信", RequestSendToGhost, (Shortcut)(Keys.Alt | Keys.Q)));
+			contextmenu.MenuItems.Add(new MenuItem("検索", RequestShowSearchBox, Shortcut.CtrlF));
+			insertPaletteMenuItem = new MenuItem("挿入");
+			insertPaletteMenuItem.Enabled = false;	//初期はアイテムが無いので無効
+			contextmenu.MenuItems.Add(insertPaletteMenuItem);
+
 			MainTextEditor.ContextMenu = contextmenu;
 			MainTextEditor.ShowsDirtBar = false;
 			MainTextEditor.ShowsHRuler = true;
@@ -65,11 +111,23 @@ namespace Satolist2.Module.TextEditor
 			MainTextEditor.Paste();
 		}
 
-		/*
 		private void RequestSendToGhost(object sender, EventArgs args)
 		{
+			SendToGhostCommand?.Execute(null);
 		}
-		*/
+
+		private void RequestShowSearchBox(object sender, EventArgs args)
+		{
+			ShowSearchBoxCommand?.Execute(null);
+		}
+
+		private void RequestInsert(object sender, EventArgs args)
+		{
+			if(sender is MenuItem item)
+			{
+				InsertCommand?.Execute(item.Tag);
+			}
+		}
 
 		public override int LineCount => MainTextEditor.LineCount;
 
@@ -85,6 +143,26 @@ namespace Satolist2.Module.TextEditor
 		public override int CaretLine
 		{
 			get => MainTextEditor.GetLineIndexFromCharIndex(CaretOffset);
+		}
+
+		public override int SelectionBegin
+		{
+			get
+			{
+				int begin, end;
+				MainTextEditor.GetSelection(out begin, out end);
+				return begin;
+			}
+		}
+
+		public override int SelectionEnd
+		{
+			get
+			{
+				int begin, end;
+				MainTextEditor.GetSelection(out begin, out end);
+				return end;
+			}
 		}
 
 		public override string Text
@@ -103,28 +181,73 @@ namespace Satolist2.Module.TextEditor
 			set => MainTextEditor.ShowsLineNumber = value;
 		}
 
-		//TODO: 
 		public override bool WordWrap
 		{
-			get { return false; }
-			set { }
+			get
+			{
+				return MainTextEditor.ViewType == ViewType.WrappedProportional;
+			}
+			set
+			{
+				MainTextEditor.ViewType = value ? ViewType.WrappedProportional : ViewType.Proportional;
+			}
 		}
 
+		//NOTE: Azukiに一致する設定が無い…
 		public override bool ShowEndOfLine
 		{
-			get { return false; }
+			get
+			{
+				return false;
+			}
 			set { }
 		}
 		public override bool HighlightCurrentLine
 		{
-			get { return false; }
-			set { }
+			get => MainTextEditor.HighlightsCurrentLine;
+			set => MainTextEditor.HighlightsCurrentLine = value;
 		}
 
 		public override bool AutoIndent
 		{
-			get { return false; }
-			set { }
+			get => MainTextEditor.AutoIndentHook != null;
+			set
+			{
+				if(value)
+				{
+					MainTextEditor.AutoIndentHook = (ui, ch) =>
+					{
+						if (ch == '\r')
+						{
+							//インデント
+							String indent = "";
+							int line, cm;
+							ui.Document.GetCaretIndex(out line, out cm);
+							String data = ui.Document.GetLineContent(line);
+							foreach (char item in data)
+							{
+								if (item == '\t' || item == ' ' || item == '　')
+								{
+									indent += item;
+								}
+								else
+								{
+									break;
+								}
+
+							}
+
+							ui.Document.Replace("\r\n" + indent);
+							return true;
+						}
+						return false;
+					};
+				}
+				else
+				{
+					MainTextEditor.AutoIndentHook = null;
+				}
+			}
 		}
 
 		public override event EventHandler CaretPositionChanged
@@ -157,24 +280,108 @@ namespace Satolist2.Module.TextEditor
 			MainTextEditor.ScrollToCaret();
 		}
 
+		public override void SetSelection(int anchor, int caret)
+		{
+			MainTextEditor.SetSelection(anchor, caret);
+		}
+
 		public override void SetFont(string fontFamilyName, int fontSize)
 		{
 			MainTextEditor.Font = new System.Drawing.Font(fontFamilyName, fontSize);
-			//MainTextEditor.ColorScheme
+		}
+
+		public override void RequestFocusToEditor()
+		{
+			MainTextEditor.Focus();
 		}
 
 		public override void UpdateHighlighter()
 		{
 			var kh = new KeywordHighlighter();
-			MainTextEditor.Highlighter = kh;
-			MainTextEditor.BackColor = SatoriSyntaxDictionary.GetHilightDrawingColor(ScriptSyntax.Background);
-			MainTextEditor.ForeColor = SatoriSyntaxDictionary.GetHilightDrawingColor(ScriptSyntax.Default);
+			kh.HighlightsNumericLiterals = false;
 			var colors = MainTextEditor.ColorScheme;
 			foreach (var def in SatoriSyntaxDictionary.Definitions)
 			{
 				var klass = (CharClass)(def.syntaxType + (int)CharClass.IndexLine + 1);
 				kh.AddRegex(def.pattern, klass);
 				colors.SetColor(klass, SatoriSyntaxDictionary.GetHilightDrawingColor(def.syntaxType), Color.Transparent);
+			}
+			MainTextEditor.Highlighter = kh;
+			MainTextEditor.BackColor = SatoriSyntaxDictionary.GetHilightDrawingColor(ScriptSyntax.Background);
+			MainTextEditor.ForeColor = SatoriSyntaxDictionary.GetHilightDrawingColor(ScriptSyntax.Default);
+		}
+
+		internal void UpdateInsertPalette(IEnumerable<InsertItemPaletteModel> items)
+		{
+			//挿入パレットの構築
+			insertPaletteMenuItem.MenuItems.Clear();
+			if (items != null)
+			{
+				CreateInsertPalette(items, insertPaletteMenuItem);
+			}
+
+			//アイテムがなければ無効
+			if(insertPaletteMenuItem.MenuItems.Count>0)
+			{
+				insertPaletteMenuItem.Enabled = true;
+			}
+			else
+			{
+				insertPaletteMenuItem.Enabled = false;
+			}
+		}
+
+		internal void CreateInsertPalette(IEnumerable<Model.InsertItemPaletteModel> items, Menu parent)
+		{
+			foreach(var item in items)
+			{
+				if(item.Type == Model.InsertItemPaletteModel.NodeType.Group)
+				{
+					var menuItem = new MenuItem(item.Label);
+					CreateInsertPalette(item.Items, menuItem);
+					parent.MenuItems.Add(menuItem);
+				}
+				else
+				{
+					var menuItem = new MenuItem(item.Label, RequestInsert, MakeShortcut(item));
+					menuItem.Tag = item;
+					parent.MenuItems.Add(menuItem);
+				}
+			}
+		}
+
+		//Forms用のショートカットキー組み合わせを作成
+		private Shortcut MakeShortcut(Model.InsertItemPaletteModel item)
+		{
+			if(item.ShortCutKeyAlt || item.ShortCutKeyShift || item.ShortCutKeyCtrl)
+			{
+				Shortcut result = Shortcut.None;
+				if (item.ShortCutKeyAlt)
+					result |= (Shortcut)Keys.Alt;
+				if (item.ShortCutKeyShift)
+					result |= (Shortcut)Keys.Shift;
+				if (item.ShortCutKeyCtrl)
+					result |= (Shortcut)Keys.Control;
+
+				var keys = new Keys[]
+				{
+					Keys.D0,
+					Keys.D1,
+					Keys.D2,
+					Keys.D3,
+					Keys.D4,
+					Keys.D5,
+					Keys.D6,
+					Keys.D7,
+					Keys.D8,
+					Keys.D9
+				};
+				result |= (Shortcut)keys[item.ShortCutKeyNumber];
+				return result;
+			}
+			else
+			{
+				return Shortcut.None;
 			}
 		}
 

@@ -20,6 +20,8 @@ namespace Satolist2.Module.TextEditor
 	/// </summary>
 	public partial class TextEditorModuleSelector : UserControl
 	{
+		
+
 		public TextEditorModuleSelector()
 		{
 			InitializeComponent();
