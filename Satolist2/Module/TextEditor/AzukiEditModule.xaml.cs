@@ -156,7 +156,19 @@ namespace Satolist2.Module.TextEditor
 
 		public override int CaretLine
 		{
-			get => MainTextEditor.GetLineIndexFromCharIndex(CaretOffset);
+			get
+			{
+				//折り返し有効時、MainTextEditor.GetLineIndexFromCharIndex()が折り返しベースで計算する問題がある
+				//仕方ないので数える
+				int sum = 0;
+				for(var i = 0; i<LineCount;i++)
+				{
+					sum += MainTextEditor.GetLineLength(i) + Environment.NewLine.Length;
+					if (CaretOffset < sum)
+						return i;
+				}
+				return LineCount - 1;
+			}
 		}
 
 		public override int SelectionBegin
@@ -274,8 +286,16 @@ namespace Satolist2.Module.TextEditor
 
 		public override LineData GetLineData(int line)
 		{
+			//折り返し有効時、GetLineHeadIndex()が折り返しベースで計算する問題がある
+			//仕方ないので効率は悪いが数えてみる
+			int sum = 0;
+			for(int i = 0; i<line;i++)
+			{
+				sum += MainTextEditor.GetLineLength(i) + Environment.NewLine.Length;
+			}
+
 			return new LineData(
-				MainTextEditor.GetLineHeadIndex(line),
+				sum,
 				MainTextEditor.GetLineLength(line)
 				);
 		}
