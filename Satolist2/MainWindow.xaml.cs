@@ -90,7 +90,7 @@ namespace Satolist2
 
 			//互換システムの初期化
 			{
-				var isLegacyEnable = Model.EditorSettings.TemporaryLoadGeneralSettings()?.IsEnableLegacyCompat ?? false;
+				var isLegacyEnable = Model.EditorSettings.TemporaryLoadGeneralSettings()?.IsEnableLegacyCompat ?? true;	//テストとしてデフォルトtrue
 				EditorSettings.LoadLegacySettings();
 				SatolistLegacyCompat.CompatCore.ProjectCompat.InitializeControls(isLegacyEnable);
 			}
