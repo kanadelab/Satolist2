@@ -51,11 +51,26 @@
     <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CompatControls\LegacySurfacePalette.xaml.cs">
+      <DependentUpon>LegacySurfacePalette.xaml</DependentUpon>
+    </Compile>
     <Compile Include="CompatControls\LegacySurfaceViewer.xaml.cs">
       <DependentUpon>LegacySurfaceViewer.xaml</DependentUpon>
     </Compile>
     <Compile Include="CompatCore\ProjectCompat.cs" />
     <Compile Include="LegacyCodes\BlendBitmap.cs" />
+    <Compile Include="LegacyCodes\OpeningGhostDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="LegacyCodes\OpeningGhostDialog.designer.cs">
+      <DependentUpon>OpeningGhostDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="LegacyCodes\SurfacePalette.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="LegacyCodes\SurfacePalette.designer.cs">
+      <DependentUpon>SurfacePalette.cs</DependentUpon>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -86,8 +101,14 @@
     <Service Include="{94E38DFF-614B-4cbd-B67C-F211BB35CE8B}" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="LegacyCodes\OpeningGhostDialog.resx">
+      <DependentUpon>OpeningGhostDialog.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="LegacyCodes\ShellSelectDialog.resx">
       <DependentUpon>ShellSelectDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="LegacyCodes\SurfacePalette.resx">
+      <DependentUpon>SurfacePalette.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="LegacyCodes\SurfaceViewer.en.resx">
       <DependentUpon>SurfaceViewer.cs</DependentUpon>
@@ -108,6 +129,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Page Include="CompatControls\LegacySurfacePalette.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="CompatControls\LegacySurfaceViewer.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

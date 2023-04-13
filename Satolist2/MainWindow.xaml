@@ -81,6 +81,7 @@
 				<Separator />
 				<MenuItem Header="さとりすと1.x互換機能" Visibility="{Binding IsEnabledLegacyCompat, Converter={StaticResource BoolToVisibilityConverter}}">
 					<MenuItem Header="サーフェスビューワ" x:Name="LegacySurfaceViewerVisibleMenu" IsCheckable="True" IsChecked="{Binding IsVisible, Mode=TwoWay}" />
+					<MenuItem Header="サーフェスパレット" x:Name="LegacySurfacePaletteVisibleMenu" IsCheckable="True" IsChecked="{Binding IsVisible, Mode=TwoWay}" />
 				</MenuItem>
 				<Separator />
 				<MenuItem Header="ウインドウレイアウトをデフォルトに戻す" Command="{Binding ResetDockingLayoutCommand}" />
@@ -198,6 +199,11 @@
 							
 							<!--旧サーフェスビューワ-->
 							<util:DockingWindow x:Name="LegacySurfaceViewer">
+								<ctl:LegacyControlHost />
+							</util:DockingWindow>
+
+							<!--旧サーフェスパレット-->
+							<util:DockingWindow x:Name="LegacySurfacePalette">
 								<ctl:LegacyControlHost />
 							</util:DockingWindow>
 

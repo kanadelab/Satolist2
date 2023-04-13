@@ -90,7 +90,7 @@ namespace Satolist2
 
 			//互換システムの初期化
 			{
-				var isLegacyEnable = true;//テストで必ず有効 = Model.EditorSettings.TemporaryLoadGeneralSettings()?.IsEnableLegacyCompat ?? false;
+				var isLegacyEnable = Model.EditorSettings.TemporaryLoadGeneralSettings()?.IsEnableLegacyCompat ?? false;
 				EditorSettings.LoadLegacySettings();
 				SatolistLegacyCompat.CompatCore.ProjectCompat.InitializeControls(isLegacyEnable);
 			}
@@ -111,6 +111,7 @@ namespace Satolist2
 			UkadocEventReference.IsVisible = false;
 			HelpViewer.IsVisible = false;
 			LegacySurfaceViewer.IsVisible = false;
+			LegacySurfacePalette.IsVisible = false;
 
 			AllowDrop = true;
 			EventEditors = new List<DockingWindow>();
@@ -547,6 +548,7 @@ namespace Satolist2
 			UkadocEventReference.ViewModel = mainVm.UkadocEventReferenceViewModel;
 			HelpViewer.ViewModel = mainVm.HelpViewerViewModel;
 			LegacySurfaceViewer.ViewModel = mainVm.LegacySurfaceViewerViewModel;
+			LegacySurfacePalette.ViewModel = mainVm.LegacySurfacePaletteViewModel;
 		}
 
 		private void ReflectVisibleMenuDataContext()
@@ -573,7 +575,7 @@ namespace Satolist2
 			UkadocEventReferenceVisibleMenu.DataContext = UkadocEventReference;
 			HelpViewerVisibleMenu.DataContext = HelpViewer;
 			LegacySurfaceViewerVisibleMenu.DataContext = LegacySurfaceViewer;
-			//
+			LegacySurfacePaletteVisibleMenu.DataContext = LegacySurfacePalette;
 			
 		}
 
@@ -712,6 +714,7 @@ namespace Satolist2
 			yield return Satorite;
 			yield return UkadocEventReference;
 			yield return LegacySurfaceViewer;
+			yield return LegacySurfacePalette;
 		}
 
 		//中央のドキュメント領域に設定したいウインドウ類
@@ -793,6 +796,9 @@ namespace Satolist2
 					break;
 				case "LegacyCompat.SurfaceViewer":
 					LegacySurfaceViewer = (DockingWindow)e.Model;	//TODO: なんか考える
+					break;
+				case "LegacyCompat.SurfacePalette":
+					LegacySurfacePalette = (DockingWindow)e.Model;
 					break;
 				default:
 					//イベントエディタ等一時的なモノはデシリアライズする必要はない
@@ -900,6 +906,7 @@ namespace Satolist2
 		public ShioriEventReferenceViewModel UkadocEventReferenceViewModel { get; }
 		public HelpViewerViewModel HelpViewerViewModel { get; }
 		public LegacyControlViewModel LegacySurfaceViewerViewModel { get; }
+		public LegacyControlViewModel LegacySurfacePaletteViewModel { get; }
 		
 
 		public List<EventEditorViewModel> EventEditors { get; }
@@ -1094,6 +1101,7 @@ namespace Satolist2
 			UkadocEventReferenceViewModel = new ShioriEventReferenceViewModel();
 			HelpViewerViewModel = new HelpViewerViewModel();
 			LegacySurfaceViewerViewModel = new LegacyControlViewModel(SatolistLegacyCompat.CompatCore.ProjectCompat.SurfaceViewerControl);
+			LegacySurfacePaletteViewModel = new LegacyControlViewModel(SatolistLegacyCompat.CompatCore.ProjectCompat.SurfacePaletteControl);
 
 			SaveFileCommand = new ActionCommand(
 				o => AskSave(false),

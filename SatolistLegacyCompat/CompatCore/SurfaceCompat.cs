@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SatolistLegacyCompat.CompatCore;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -8,15 +9,7 @@ using System.Windows.Forms;
 
 namespace Satolist
 {
-	public enum CollisionType
-	{
-		RECT,
-		ELLIPSE,
-		CIRCLE,
-		POLYGON,
-		DISABLED
-	}
-
+	//さとりすと1側のセーブデータ
 	public class ProjectData
 	{
 		public static ProjectData Instance { get; internal set; }
@@ -29,6 +22,7 @@ namespace Satolist
 		public bool isUseSurfaceInsert { get; set; }
 		public bool isUseSurfaceInsertSatori { get; set; }
 		public bool isSurfaceUseNoSetting { get; set; }
+		public bool isNoAutoSurfacePalette { get; set; }
 
 		static ProjectData()
 		{
@@ -49,44 +43,34 @@ namespace Satolist
 		}
 	}
 
+	//さとりすと1側のRootWindow相当の互換クラス
 	public class RootWindow
 	{
-		public SurfacePaletteCompat surfacePalette { get; set; }
+		public SurfacePalette surfacePalette => ProjectCompat.SurfacePalette;
+		public SurfaceViewer surfaces => ProjectCompat.SurfaceViewer;
+
 		public SatoriCompat satori { get; set; }
+		public OpeningGhostDialog mOpeningGhostDialog { get; set; }
 
 		public SurfaceViewer surfaceViewer { get; set; }
 
-		public IWin32Window owner { get; set; }
-
 		public RootWindow()
 		{
-			surfacePalette = new SurfacePaletteCompat();
 			satori = new SatoriCompat();
-		}
-	}
-
-	public class SurfacePaletteCompat
-	{
-		public Font mUseFont { get; set; }
-		public Brush mUseBrush { get; set; }
-
-		public void UpdateOptionStatus()
-		{
-		}
-
-		public void UpdateMenuEnable(bool enable_directory)
-		{
-		}
-
-		public SurfacePaletteCompat()
-		{
-			mUseFont = new System.Drawing.Font("ＭＳ ゴシック", 8, FontStyle.Regular);
-			mUseBrush = System.Drawing.Brushes.Black;
 		}
 	}
 
 	public class SatoriCompat
 	{
 		public string Directory { get; set; }
+	}
+
+	public enum CollisionType
+	{
+		RECT,
+		ELLIPSE,
+		CIRCLE,
+		POLYGON,
+		DISABLED
 	}
 }

@@ -16,6 +16,12 @@ namespace SatolistLegacyCompat.CompatCore
 	{
 		public static CompatContol SurfaceViewerControl { get; private set; }
 		private static LegacySurfaceViewer SurfaceViewerHost => (LegacySurfaceViewer)SurfaceViewerControl.WpfControl;
+		internal static SurfaceViewer SurfaceViewer => SurfaceViewerHost.SurfaceViewer;
+
+		public static CompatContol SurfacePaletteControl { get; private set; }
+		private static LegacySurfacePalette SurfacePaletteHost => (LegacySurfacePalette)SurfacePaletteControl.WpfControl;
+		internal static SurfacePalette SurfacePalette => SurfacePaletteHost.SurfacePalette;
+
 		private static RootWindow CompatRoot { get; set; }
 
 		public static bool IsInitialized { get; private set; }
@@ -33,12 +39,16 @@ namespace SatolistLegacyCompat.CompatCore
 		//シェルロードを互換システムに通知
 		public static void NotifyShellDirectory(string dir)
 		{
+			if (!IsInitialized)
+				return;
 			SurfaceViewerHost.SurfaceViewer.LoadShell(dir);
 		}
 
 		//ゴーストのロードを互換システムに通知
 		public static void NotifyGhostDirectory(string dir)
 		{
+			if (!IsInitialized)
+				return;
 			CompatRoot.satori.Directory = dir;
 		}
 
@@ -51,11 +61,16 @@ namespace SatolistLegacyCompat.CompatCore
 			SurfaceViewerControl.Id = "SurfaceViewer";
 			SurfaceViewerControl.Label = "サーフェスビューワ(さとりすと 1.x)";
 
+			SurfacePaletteControl = new CompatContol();
+			SurfacePaletteControl.Id = "SurfacePalette";
+			SurfacePaletteControl.Label = "サーフェスパレット(さとりすと 1.x)";
+
 			//有効な場合に限り、実体のコントロールの生成を行う
 			//有効でない場合はドッキングコンテンツの識別むけに最低限の生成となる
 			if(isEnabled)
 			{
 				SurfaceViewerControl.WpfControl = new CompatControls.LegacySurfaceViewer(CompatRoot);
+				SurfacePaletteControl.WpfControl = new CompatControls.LegacySurfacePalette(CompatRoot);
 
 				IsInitialized = true;
 			}

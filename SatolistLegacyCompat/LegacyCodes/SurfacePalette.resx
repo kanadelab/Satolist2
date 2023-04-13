@@ -1,0 +1,542 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <metadata name="menuStrip1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>17, 17</value>
+  </metadata>
+  <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+  <data name="シェルを読み込むToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>200, 22</value>
+  </data>
+  <data name="シェルを読み込むToolStripMenuItem.Text" xml:space="preserve">
+    <value>シェルを読み込む</value>
+  </data>
+  <data name="シェルをリロードToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>200, 22</value>
+  </data>
+  <data name="シェルをリロードToolStripMenuItem.Text" xml:space="preserve">
+    <value>シェルをリロード</value>
+  </data>
+  <data name="toolStripSeparator1.Size" type="System.Drawing.Size, System.Drawing">
+    <value>197, 6</value>
+  </data>
+  <data name="シェルをエクスプローラで開くToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>200, 22</value>
+  </data>
+  <data name="シェルをエクスプローラで開くToolStripMenuItem.Text" xml:space="preserve">
+    <value>シェルをエクスプローラで開く</value>
+  </data>
+  <data name="シェルを選択ToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>46, 20</value>
+  </data>
+  <data name="シェルを選択ToolStripMenuItem.Text" xml:space="preserve">
+    <value>シェル</value>
+  </data>
+  <data name="リストをダブルクリックでサーフェス変更を挿入ToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>313, 22</value>
+  </data>
+  <data name="リストをダブルクリックでサーフェス変更を挿入ToolStripMenuItem.Text" xml:space="preserve">
+    <value>リストをダブルクリックでサーフェス変更を挿入</value>
+  </data>
+  <data name="挿入に里々形式のサーフェス変更を使用するToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>313, 22</value>
+  </data>
+  <data name="挿入に里々形式のサーフェス変更を使用するToolStripMenuItem.Text" xml:space="preserve">
+    <value>挿入に里々形式のサーフェス変更を使用する</value>
+  </data>
+  <data name="定義のないサーフェスも表示するリロードが必要ToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>313, 22</value>
+  </data>
+  <data name="定義のないサーフェスも表示するリロードが必要ToolStripMenuItem.Text" xml:space="preserve">
+    <value>定義のないサーフェスも表示する（リロードが必要）</value>
+  </data>
+  <data name="サーフェスパレットを無効にするToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>313, 22</value>
+  </data>
+  <data name="サーフェスパレットを無効にするToolStripMenuItem.Text" xml:space="preserve">
+    <value>サーフェスパレットを無効にする</value>
+  </data>
+  <data name="オプションToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>62, 20</value>
+  </data>
+  <data name="オプションToolStripMenuItem.Text" xml:space="preserve">
+    <value>オプション</value>
+  </data>
+  <data name="更新ファイル作成ToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>233, 22</value>
+  </data>
+  <data name="更新ファイル作成ToolStripMenuItem.Text" xml:space="preserve">
+    <value>更新ファイル作成</value>
+  </data>
+  <data name="narファイル作成ToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>233, 22</value>
+  </data>
+  <data name="narファイル作成ToolStripMenuItem.Text" xml:space="preserve">
+    <value>narファイル作成</value>
+  </data>
+  <data name="更新ファイルnar作成ToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>233, 22</value>
+  </data>
+  <data name="更新ファイルnar作成ToolStripMenuItem.Text" xml:space="preserve">
+    <value>更新ファイル＆nar作成</value>
+  </data>
+  <data name="toolStripSeparator2.Size" type="System.Drawing.Size, System.Drawing">
+    <value>230, 6</value>
+  </data>
+  <data name="更新ファイルを作成してアップロードToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>233, 22</value>
+  </data>
+  <data name="更新ファイルを作成してアップロードToolStripMenuItem.Text" xml:space="preserve">
+    <value>更新ファイルを作成してアップロード</value>
+  </data>
+  <data name="ツールtoolStripMenuItem1.Size" type="System.Drawing.Size, System.Drawing">
+    <value>46, 20</value>
+  </data>
+  <data name="ツールtoolStripMenuItem1.Text" xml:space="preserve">
+    <value>ツール</value>
+  </data>
+  <assembly alias="mscorlib" name="mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="ツールtoolStripMenuItem1.Visible" type="System.Boolean, mscorlib">
+    <value>False</value>
+  </data>
+  <data name="使い方ToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>53, 20</value>
+  </data>
+  <data name="使い方ToolStripMenuItem.Text" xml:space="preserve">
+    <value>使い方</value>
+  </data>
+  <data name="使い方ToolStripMenuItem.Visible" type="System.Boolean, mscorlib">
+    <value>False</value>
+  </data>
+  <data name="menuStrip1.Location" type="System.Drawing.Point, System.Drawing">
+    <value>0, 0</value>
+  </data>
+  <data name="menuStrip1.Size" type="System.Drawing.Size, System.Drawing">
+    <value>461, 24</value>
+  </data>
+  <data name="menuStrip1.TabIndex" type="System.Int32, mscorlib">
+    <value>0</value>
+  </data>
+  <data name="menuStrip1.Text" xml:space="preserve">
+    <value>menuStrip1</value>
+  </data>
+  <data name="&gt;&gt;menuStrip1.Name" xml:space="preserve">
+    <value>menuStrip1</value>
+  </data>
+  <data name="&gt;&gt;menuStrip1.Type" xml:space="preserve">
+    <value>System.Windows.Forms.MenuStrip, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;menuStrip1.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;menuStrip1.ZOrder" xml:space="preserve">
+    <value>1</value>
+  </data>
+  <metadata name="toolTip1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>139, 17</value>
+  </metadata>
+  <data name="label1.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="label1.Location" type="System.Drawing.Point, System.Drawing">
+    <value>12, 41</value>
+  </data>
+  <data name="label1.Size" type="System.Drawing.Size, System.Drawing">
+    <value>413, 24</value>
+  </data>
+  <data name="label1.TabIndex" type="System.Int32, mscorlib">
+    <value>1</value>
+  </data>
+  <data name="label1.Text" xml:space="preserve">
+    <value>サーフェス パレットは無効です。
+有効にするには「オプション」の「サーフェスパレットを無効にする」のチェックを外してください。</value>
+  </data>
+  <data name="label1.Visible" type="System.Boolean, mscorlib">
+    <value>False</value>
+  </data>
+  <data name="&gt;&gt;label1.Name" xml:space="preserve">
+    <value>label1</value>
+  </data>
+  <data name="&gt;&gt;label1.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;label1.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;label1.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <metadata name="$this.Localizable" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <data name="$this.AutoScroll" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="$this.ClientSize" type="System.Drawing.Size, System.Drawing">
+    <value>461, 401</value>
+  </data>
+  <data name="$this.Font" type="System.Drawing.Font, System.Drawing">
+    <value>MS UI Gothic, 9pt</value>
+  </data>
+  <data name="$this.Icon" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        AAABAAMAICAAAAEACACoCAAANgAAADAwAAABAAgAqA4AAN4IAAAQEAAAAQAIAGgFAACGFwAAKAAAACAA
+        AABAAAAAAQAIAAAAAACABAAAAAAAAAAAAAAAAAAAAAAAAP///wAzwnkALbxzAAAAAAA3xXwAKrhwADzI
+        gQAns2sAXpfcAFmS2QBJlxcARZIUAGif4QBimt4AUo3VAE6dGgBDjhIAP4kQAE2K0gBQoRwASYbQAFSm
+        HwBEgs0AV6ohAD9+ygBbryQAPHvIAF2zJwA3d8UAYbgqADN0wgBlvC0AjDzIAIg3xQCEM8IAvFEtALhO
+        KgCzSicAkkTNAI8/ygDCM2sAvC1lAK9HJACqRCEAnFLVAJlN0gCVSdAApkEfAKE/HACdOxoAqWLeAKZe
+        3ACiWdkAlzcXAJI0FACOMhIArWjhAIkvEADFN24AuCphAMg8cwCzJ10AAAAAAAMAAAA8rGUAAAAAAAAA
+        AAAAAAAACAgIAFpuaABhbmgAgW5oAP///wAAAAAAAP//AP///wD///8A////AP///wD///8A////AP//
+        /wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP//
+        /wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP//
+        /wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP//
+        /wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////ADg9SQDkzGgAhEJJAOTM
+        aACUQkkA5MxoAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAwMDAwMDAwMDAwMDAwMDAwMDAwMD
+        AwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDKCkD
+        AwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAzooKTsDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwM8
+        OigpOz0DAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAzw6KCk7PQMDAwMDAwMDAwMDAwMDAwMDAwMDAwMD
+        AwMDPDooKTs9AwMDAwMDAwMDAwMDAwMDAwMDAzM0AwMDAwMDOigpOwMDAwMDAzU2AwMDAwMDAwMDAzgy
+        MzQsAwMDAwM6KCk7AwMDAwMxNTY3OQMDAwMDAwMDODIzNCwtAwMDAzooKTsDAwMDMDE1Njc5AwMDAwMD
+        AwM4MjM0LC0uAwMDAygpAwMDAy8wMTU2NzkDAwMDAwMDAzgyMzQsLS4mAwMDKCkDAwMrLzAxNTY3OQMD
+        AwMDAwMDAzIzNCwtLiYnAwMoKQMDKisvMDE1NjcDAwMDAwMDAwMDAwMDLC0uJicgAygpAyUqKy8wMQMD
+        AwMDAwMDAwMDAwMDAwMDAwMmJyAhKCkkJSorAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDICEiIyQlAwMD
+        AwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMaHB4fHRsDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMWGBocAQId
+        GxkXAwMDAwMDAwMDAwMDAwMDAwMDAw4SFBYYGgMBAgMbGRcVEw8DAwMDAwMDAwMDAwMDDQgJDhIUFhgD
+        AwECAwMZFxUTDwoLEAMDAwMDAwMDAwwNCAkOEhQWAwMDAQIDAwMXFRMPCgsQEQMDAwMDAwMDDA0ICQ4S
+        FAMDAwMBAgMDAwMVEw8KCxARAwMDAwMDAwMMDQgJDhIDAwMDBAECBQMDAwMTDwoLEBEDAwMDAwMDAwwN
+        CAkOAwMDAwMEAQIFAwMDAwMPCgsQEQMDAwMDAwMDAwMICQMDAwMDAwQBAgUDAwMDAwMKCwMDAwMDAwMD
+        AwMDAwMDAwMDAwMGBAECBQcDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwYEAQIFBwMDAwMDAwMDAwMD
+        AwMDAwMDAwMDAwMDAwMDBgQBAgUHAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDBAECBQMDAwMDAwMD
+        AwMDAwMDAwMDAwMDAwMDAwMDAwMDAQIDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMD
+        AwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMD/////////////j////wf///4
+        D///+A////gP//x8Hx/wPB4H8BwcB/AOOAfwBjAH+AIgD/8AAH//4AP///gP///4D///4AP//wAAf/gC
+        IA/wBjAH8A44B/AcHAfwPB4H/HwfH//4D///+A////gP///8H////j////////////8oAAAAMAAAAGAA
+        AAABAAgAAAAAAIAKAAAAAAAAAAAAAAAAAAAAAAAA////AFfQigBUz4gAUs+GAAAAAABc0o4AWtGMAE/O
+        hABOzYMAS8yBAEjLfwBGy34Ad6vpAHaq6ABzqOgAcKbnAEPIewBfwTMAXr8yAF2/MABcvy8Afa7qAHqt
+        6gBupecAYcE1AFq9LgBZvSwAa6PmAGqi5QBnoOUAYcI2AFe7KgBWuikAY53kAGKc4wBkxDgAX5vjAGXE
+        OgBVuicAXJniAFqX4QBXleEAZsU7AFST3wBSkt8AT5DfAGfGPABOj94AQMh5AGnHPwBLjd0ASIvdAGrI
+        QABGidwAQ4faAECF2gDYVTwA2FQ7AK9c3QCuWd0ArVfcANpDfgDaQHwA2Vg/ANdTOgCyYN8AsV/eANk/
+        ewDYPHkA1lI4ANVPNgCzYt8A1E41ANRNMwC1Z+EAtGTfANNMMgDSSjAA0UkvALhs4gC3auEA2Dt4ANBI
+        LgDQRiwAuW/jAM9FKgDNRCkAvXblALxy5AC7ceMAzUInAMxAJgDLPyQAv3nlANc6eADWOHYAyj4jAMo9
+        IgDJOyAAv3rmAMc5HgDVNnQA1DV0AMc4HQDUM3IA0zJxANIwbwDRL28A////AP///wD///8A////AP//
+        /wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP//
+        /wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8AOD1JALTNbACEQkkAtM1sAJRC
+        SQC0zWwAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQE
+        BAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBARlZmhpBAQEBAQEBAQEBAQE
+        BAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEXl9lZmZoaWoEBAQEBAQEBAQEBAQEBAQEBAQEBAQE
+        BAQEBAQEBAQEBAQEBAQEBAQEUV5fZWZoaWoEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQE
+        BAQEBAREUV5fZWZoaWprBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAREUV5fX2Vm
+        aGlqBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBARDRFFeX2VmaGlqBAQEBAQEBAQE
+        BAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBARDRFFeX2VmaGlqBAQEBAQEBAQEBAQEBAQEBAQEBAQE
+        BAQEBAQEBAQEBAQEBAQEBARDRFFeXl9lZmhpBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBFRPUEoEBAQE
+        BAQEBAQEQ0RRXl9lZmgEBAQEBAQEBAQEXGBhYgQEBAQEBAQEBARYWVRPUEpLBAQEBAQEBAQEQ0RRXl9l
+        ZmgEBAQEBAQEBARbXGBhYmRnBAQEBAQEBARYWVlUT1BKSwQEBAQEBAQEQ0RRUV5fZWYEBAQEBAQEBFpb
+        XFxgYWJkBAQEBAQEBF1XWFlUT1BKS0cEBAQEBAQEPkNEUV5fZWYEBAQEBAQEVVZaW1xgYWJkZwQEBAQE
+        BF1XWFlUT1BKSktHBAQEBAQEBENEUV5fZQQEBAQEBARTVVZaW1xgYWJkZAQEBAQEBF1XWFhZVE9QSktH
+        QQQEBAQEBENDRFFeXwQEBAQEBFJTVVZaW1tcYGFiZAQEBAQEBGNdV1hZVE9QSktHQUIEBAQEBD5DRFFe
+        XwQEBAQETk5SU1VWWltcYGFiZAQEBAQEBARdV1hZVE9QUEpLR0FCBAQEBD5DRFFeXwQEBARMTU5SU1VW
+        WltcYGFiBAQEBAQEBAQEBFdYWVRPUEpLR0FCOgQEBAQ+Q0RRBAQEBElMTU5SU1VWVlpbXAQEBAQEBAQE
+        BAQEBAQEBFRPUEpLR0FBQjoEBAQ+Q0RRBAQESElMTU1OUlNVVgQEBAQEBAQEBAQEBAQEBAQEBAQET1BK
+        S0dBQjo7BAQ+Q0RRBARFRkhJTE1OUlMEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBARKS0dBQjo7PAQ9PkNE
+        BEBFRkhJTE1OBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBEdHQUI6Ozw9PkNEOUBFRkhJSQQEBAQE
+        BAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEQUI6Ozw9PkNEOTlARUYEBAQEBAQEBAQEBAQEBAQEBAQE
+        BAQEBAQEBAQEBAQEBAQEBAQ6Ozs8PT4/ODlABAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQE
+        BAQEBAQEMjM1NjcxODkEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQvMjM1NjAx
+        MS4qBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQELC0vLzIzCxA0MS4qJSMEBAQEBAQE
+        BAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBCgpKywtLzIKCxAwMS4qJSMjHgQEBAQEBAQEBAQEBAQEBAQE
+        BAQEBAQEBAQEBAQkJygpKywtLwQKCxAwBDEuKiUjHhgRBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEISIk
+        JygpKywtBAQJCgsQBAQuKiUjHhgREhMEBAQEBAQEBAQEBAQEBAQEBAQEBBwdISIkJCcoKSsEBAQJCgsQ
+        BAQEKiUlIx4YERITFAQEBAQEBAQEBAQEBAQEBA8XGxscHSEiJCcoKQQEBAgJCgsLEAQEBColIx4YERIT
+        FBkaHwQEBAQEBAQEBAQMDQ4PFxscHSEiJCcoBAQEBAcICQoLEAQEBAQlIx4YERESExQZGh8gBAQEBAQE
+        BBYMDQ4PFxscHSEiIiQEBAQEBAcICQoLEAQEBAQEJSMeGBESExQZGh8gJgQEBAQEBBYMDQ4PDxcbHB0h
+        IgQEBAQEBAcICQoKCwQEBAQEBCMeGBESExQZGRofIAQEBAQEBBUWDA0ODxcbHB0hBAQEBAQEAgMHCAkK
+        CxAEBAQEBAQeGBgREhMUGRofIAQEBAQEBBUWDA0ODxcbHB0EBAQEBAQEAgMHCAkKCxAEBAQEBAQEHhgR
+        EhMUGRofIAQEBAQEBAQWDA0ODg8XGwQEBAQEBAQEAgMHCAgJCgsEBAQEBAQEBBgREhMUFBkaBAQEBAQE
+        BAQVFgwNDg8XBAQEBAQEBAQEAQIDBwgJCgsEBAQEBAQEBAQYERITFBkaBAQEBAQEBAQEBAwNDg8EBAQE
+        BAQEBAQGAQIDBwgJCgsQBAQEBAQEBAQEERITFAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQGAQIDBwcI
+        CQoLBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQFBgECAwcICQoLBAQEBAQEBAQE
+        BAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQFBgECAwcICQoLBAQEBAQEBAQEBAQEBAQEBAQEBAQE
+        BAQEBAQEBAQEBAQEBAQEBAQFBgECAwMHCAkKBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQE
+        BAQEBAQEBQYBAgMHCAkEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBQYBAgMH
+        CAkEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQBAQIDBAQEBAQEBAQEBAQE
+        BAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBP//
+        ///////////8H/////////AH////////8Af////////gA////////+AD////////4AP////////gA///
+        /////+AD//////wf8Af8H///8A/wB/gH///wB/AH8Af//+AD8AfgA///4AH4D8AD///gAPgPgAP//+AA
+        eA8AA///8AA4DgAH///8ABwcAB////+ADBgA/////+AEEAP/////+AAAD//////+AAA///////+AAP//
+        /////+AD////////8Af////////gA////////4AA///////+AAA///////gAAA//////4AQQA/////+A
+        DBgA/////AAYDAAf///wADgOAAf//+AAeA8AA///4AD4D4AD///gAfAHwAP//+AD8AfgA///8AfwB/AH
+        ///wD/AH+Af///wf4AP8H//////gA////////+AD////////4AP////////gA/////////AH////////
+        8Af////////8H////////////////ygAAAAQAAAAIAAAAAEACAAAAAAAQAEAAAAAAAAAAAAAAAAAAAAA
+        AAAAAAAA5ubmAP///wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        AAAAAAAAKCgoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        AAAAAAAAAAAAAAD//wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        AAAAAAAAAAAAAAAAAAAA/wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        AAAAAAAAAAAAAAAAAAAAAAAA//8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        AAAAAAAAAAAAAAAAAAAAAAAAAAAAAP8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/AP8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJul6gAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/30AHv+bADz/uQAA4V8AAMNBAAAA
+        AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAZP8AAIL/HgCg/zwARuEAACjD
+        AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP9BAAD/Xx4A/308ANcj
+        AADDBQAAZDctAHNGPACCVUsAkWRaAKBzaQDNoJYAAAAAAAAAAAAAAAAAAAAAAAAAAAD/AGQA/x6CAP88
+        oADhAEYAwwAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAsqAAAAAA
+        AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJEA
+        /wCvHv8AzTz/AHMA4QBVAMMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        AAAAc/8AHpH/ADyv/wAAVeEAADfDAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        AAAAAAAAAAAAAAAAABAQEAAAAAAAAAAAAAAAAMPExBAAAAAAAAAAAAAAAADBwMQQAAAAAAAAABAQEAAA
+        wcDDEAAAABAQEOPk5BAQAMLBwwAAALO0tBDh4eDkEBAAwRAAALGwsLQQ4uLh4OMQEMIQALKxsbCzAAAA
+        AOLh4xDCELKysQAAAAAAAAAAEBCAAdAQEBAQAAAAABAQ8/T0AJQQpKSkEBAQEPHw8PPzAACUEAChoKOk
+        pBDy8PDwAAAAlBAQAKKhoKMQ8vLxAAAAk5OUEAAAoqGjAAAAAAAAAJGTlBAAAAAAAAAAAAAAAACRkJMQ
+        AAAAAAAAAAAAAAAAkpGTAAAAAAAAAP4/AAD8PwAA/D8AAIw4AAAEcAAAAmAAAABBAADgDwAA8AcAAIIA
+        AAAGQAAADiAAABwxAAD8PwAA/D8AAPx/AAA=
+</value>
+  </data>
+  <data name="$this.Text" xml:space="preserve">
+    <value>サーフェス パレット</value>
+  </data>
+  <data name="&gt;&gt;シェルを選択ToolStripMenuItem.Name" xml:space="preserve">
+    <value>シェルを選択ToolStripMenuItem</value>
+  </data>
+  <data name="&gt;&gt;シェルを選択ToolStripMenuItem.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;シェルを読み込むToolStripMenuItem.Name" xml:space="preserve">
+    <value>シェルを読み込むToolStripMenuItem</value>
+  </data>
+  <data name="&gt;&gt;シェルを読み込むToolStripMenuItem.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;シェルをリロードToolStripMenuItem.Name" xml:space="preserve">
+    <value>シェルをリロードToolStripMenuItem</value>
+  </data>
+  <data name="&gt;&gt;シェルをリロードToolStripMenuItem.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;toolStripSeparator1.Name" xml:space="preserve">
+    <value>toolStripSeparator1</value>
+  </data>
+  <data name="&gt;&gt;toolStripSeparator1.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripSeparator, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;シェルをエクスプローラで開くToolStripMenuItem.Name" xml:space="preserve">
+    <value>シェルをエクスプローラで開くToolStripMenuItem</value>
+  </data>
+  <data name="&gt;&gt;シェルをエクスプローラで開くToolStripMenuItem.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;オプションToolStripMenuItem.Name" xml:space="preserve">
+    <value>オプションToolStripMenuItem</value>
+  </data>
+  <data name="&gt;&gt;オプションToolStripMenuItem.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;リストをダブルクリックでサーフェス変更を挿入ToolStripMenuItem.Name" xml:space="preserve">
+    <value>リストをダブルクリックでサーフェス変更を挿入ToolStripMenuItem</value>
+  </data>
+  <data name="&gt;&gt;リストをダブルクリックでサーフェス変更を挿入ToolStripMenuItem.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;挿入に里々形式のサーフェス変更を使用するToolStripMenuItem.Name" xml:space="preserve">
+    <value>挿入に里々形式のサーフェス変更を使用するToolStripMenuItem</value>
+  </data>
+  <data name="&gt;&gt;挿入に里々形式のサーフェス変更を使用するToolStripMenuItem.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;定義のないサーフェスも表示するリロードが必要ToolStripMenuItem.Name" xml:space="preserve">
+    <value>定義のないサーフェスも表示するリロードが必要ToolStripMenuItem</value>
+  </data>
+  <data name="&gt;&gt;定義のないサーフェスも表示するリロードが必要ToolStripMenuItem.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;サーフェスパレットを無効にするToolStripMenuItem.Name" xml:space="preserve">
+    <value>サーフェスパレットを無効にするToolStripMenuItem</value>
+  </data>
+  <data name="&gt;&gt;サーフェスパレットを無効にするToolStripMenuItem.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;ツールtoolStripMenuItem1.Name" xml:space="preserve">
+    <value>ツールtoolStripMenuItem1</value>
+  </data>
+  <data name="&gt;&gt;ツールtoolStripMenuItem1.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;更新ファイル作成ToolStripMenuItem.Name" xml:space="preserve">
+    <value>更新ファイル作成ToolStripMenuItem</value>
+  </data>
+  <data name="&gt;&gt;更新ファイル作成ToolStripMenuItem.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;narファイル作成ToolStripMenuItem.Name" xml:space="preserve">
+    <value>narファイル作成ToolStripMenuItem</value>
+  </data>
+  <data name="&gt;&gt;narファイル作成ToolStripMenuItem.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;更新ファイルnar作成ToolStripMenuItem.Name" xml:space="preserve">
+    <value>更新ファイルnar作成ToolStripMenuItem</value>
+  </data>
+  <data name="&gt;&gt;更新ファイルnar作成ToolStripMenuItem.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;toolStripSeparator2.Name" xml:space="preserve">
+    <value>toolStripSeparator2</value>
+  </data>
+  <data name="&gt;&gt;toolStripSeparator2.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripSeparator, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;更新ファイルを作成してアップロードToolStripMenuItem.Name" xml:space="preserve">
+    <value>更新ファイルを作成してアップロードToolStripMenuItem</value>
+  </data>
+  <data name="&gt;&gt;更新ファイルを作成してアップロードToolStripMenuItem.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;使い方ToolStripMenuItem.Name" xml:space="preserve">
+    <value>使い方ToolStripMenuItem</value>
+  </data>
+  <data name="&gt;&gt;使い方ToolStripMenuItem.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;toolTip1.Name" xml:space="preserve">
+    <value>toolTip1</value>
+  </data>
+  <data name="&gt;&gt;toolTip1.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolTip, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;$this.Name" xml:space="preserve">
+    <value>SurfacePalette</value>
+  </data>
+  <data name="&gt;&gt;$this.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Form, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+</root>
