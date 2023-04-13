@@ -11,6 +11,7 @@ using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web.UI.WebControls;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -77,6 +78,7 @@ namespace Satolist2.Module.TextEditor
 		{
 			InitializeComponent();
 			MainTextEditor = new AzukiControl();
+			MainTextEditor.SizeChanged += MainTextEditor_SizeChanged;
 
 			//コンテキストメニューセットアップ
 			var contextmenu = new ContextMenu();
@@ -93,7 +95,19 @@ namespace Satolist2.Module.TextEditor
 			MainTextEditor.ShowsDirtBar = false;
 			MainTextEditor.ShowsHRuler = true;
 
+			/*
+			var panel = new System.Windows.Forms.Panel();
+			panel.Controls.Add(MainTextEditor);
+			FormsHost.Child = panel;
+			*/
 			FormsHost.Child = MainTextEditor;
+		}
+
+		private void MainTextEditor_SizeChanged(object sender, EventArgs e)
+		{
+			//改行位置基準を設定する必要あり
+			//値はさとりすとv1より
+			MainTextEditor.ViewWidth = MainTextEditor.Width - 30;
 		}
 
 		private void RequestCopy(object sender, EventArgs args)
@@ -193,14 +207,10 @@ namespace Satolist2.Module.TextEditor
 			}
 		}
 
-		//NOTE: Azukiに一致する設定が無い…
 		public override bool ShowEndOfLine
 		{
-			get
-			{
-				return false;
-			}
-			set { }
+			get => MainTextEditor.DrawsEolCode;
+			set => MainTextEditor.DrawsEolCode = value;
 		}
 		public override bool HighlightCurrentLine
 		{
@@ -304,7 +314,17 @@ namespace Satolist2.Module.TextEditor
 			{
 				var klass = (CharClass)(def.syntaxType + (int)CharClass.IndexLine + 1);
 				kh.AddRegex(def.pattern, klass);
-				colors.SetColor(klass, SatoriSyntaxDictionary.GetHilightDrawingColor(def.syntaxType), Color.Transparent);
+				switch(def.syntaxType)
+				{
+					case ScriptSyntax.Tab:
+					case ScriptSyntax.Space:
+					case ScriptSyntax.WideSpace:
+						colors.SetColor(klass, Color.Transparent, SatoriSyntaxDictionary.GetHilightDrawingColor(def.syntaxType));
+						break;
+					default:
+						colors.SetColor(klass, SatoriSyntaxDictionary.GetHilightDrawingColor(def.syntaxType), Color.Transparent);
+						break;
+				}
 			}
 			MainTextEditor.Highlighter = kh;
 			MainTextEditor.BackColor = SatoriSyntaxDictionary.GetHilightDrawingColor(ScriptSyntax.Background);

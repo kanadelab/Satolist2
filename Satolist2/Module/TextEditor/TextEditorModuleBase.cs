@@ -2,6 +2,7 @@
 using ICSharpCode.AvalonEdit.Editing;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -70,6 +71,11 @@ namespace Satolist2.Module.TextEditor
 
 		//テキスト変更
 		public abstract event EventHandler TextChanged;
+
+		public TextEditorModuleBase()
+		{
+			Debug.WriteLine("Test");
+		}
 
 		//ハイライタの更新
 		public abstract void UpdateHighlighter();

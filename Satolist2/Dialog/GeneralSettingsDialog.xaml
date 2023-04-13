@@ -129,7 +129,19 @@
 							</StackPanel>
 						</StackPanel>
 					</GroupBox>
-					<CheckBox Content="さとりすと1.x互換機能を有効化(さとりすとの再起動が必要)" IsChecked="{Binding Model.IsEnableLegacyCompat, Mode=TwoWay}" />
+
+					<GroupBox Header="さとりすと1.x 互換設定(さとりすとの再起動が必要)" Margin="3">
+						<StackPanel>
+							<CheckBox Content="1.x版サーフェスビューワ・パレットを有効化" IsChecked="{Binding Model.IsEnableLegacyCompat, Mode=TwoWay}" Margin="3" />
+							<StackPanel Margin="3 3 3 5">
+								<TextBlock Text="テキストエディタエンジンを変更" />
+								<ComboBox SelectedValuePath="Tag" SelectedValue="{Binding Model.OverrideTextEditorEngine, Mode=TwoWay}">
+									<ComboBoxItem Content="AvalonEdit (デフォルト)" Tag="AvalonEdit" />
+									<ComboBoxItem Content="Azuki (さとりすと1.x)" Tag="Azuki"/>
+								</ComboBox>
+							</StackPanel>
+						</StackPanel>
+					</GroupBox>
 				</StackPanel>
 			</TabItem>
 

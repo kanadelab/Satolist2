@@ -124,6 +124,9 @@ namespace Satolist2.Control
 		private Color textEditorBackgroundColor;
 		private int caretLine;
 
+		//エディタエンジンの指定
+		public string TextEditorEngineName => MainViewModel.EditorSettings.GeneralSettings.OverrideTextEditorEngine;
+
 		//検索ボックスの表示
 		public bool IsShowSearchBox
 		{
@@ -387,7 +390,6 @@ namespace Satolist2.Control
 			SendToGhostCommand = new ActionCommand(
 				o =>
 				{
-					//Satorite.SendSatori(main.Ghost, Document.Text, Event.Type);
 					SendToGhost();
 				}
 				);

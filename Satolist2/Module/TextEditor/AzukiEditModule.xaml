@@ -8,6 +8,6 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
-		<WindowsFormsHost x:Name="FormsHost" />
+		<WindowsFormsHost x:Name="FormsHost"/>
 	</Grid>
 </module:TextEditorModuleBase>
