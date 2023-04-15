@@ -38,24 +38,14 @@ namespace Satolist2.Control
 		public MainViewModel Main { get; }
 		private VariableList control;
 		private ObservableCollection<VariableListItemViewModel> items;
-		private TextDocument document;
 		private int currentTabIndex;
 		private List<string> commonLines;
+		private ListEditorSerializingScope serializingScope;
 
 		public ReadOnlyObservableCollection<VariableListItemViewModel> Items => new ReadOnlyObservableCollection<VariableListItemViewModel>(items);
 
 		public ActionCommand RemoveItemCommand { get; }
 		public ActionCommand AddItemCommand { get; }
-
-		public TextDocument Document
-		{
-			get => document;
-			set
-			{
-				document = value;
-				NotifyChanged();
-			}
-		}
 
 		public int CurrentTabIndex
 		{
@@ -84,7 +74,7 @@ namespace Satolist2.Control
 			Main = main;
 			items = new ObservableCollection<VariableListItemViewModel>();
 			commonLines = new List<string>();
-			document = new TextDocument();
+			serializingScope = new ListEditorSerializingScope();
 
 			RemoveItemCommand = new ActionCommand(
 				o =>
@@ -135,6 +125,7 @@ namespace Satolist2.Control
 		public void ControlBind(System.Windows.Controls.Control control)
 		{
 			this.control = (VariableList)control;
+			this.control.MainTextEditor.MainTextEditor.OnTextChanged -= Document_TextChanged;
 		}
 
 		public void RemoveItem(VariableListItemViewModel item)
@@ -188,20 +179,22 @@ namespace Satolist2.Control
 
 		public void TextToList()
 		{
-			Deserialize(Document.Text);
+			Deserialize(control.MainTextEditor.MainTextEditor.Text);
 		}
 		public void ListToText()
 		{
-			if (Document != null)
-				Document.TextChanged -= Document_TextChanged;
-
-			Document = new TextDocument(Serialize());
-			Document.TextChanged += Document_TextChanged;
+			using (serializingScope.NotifySerialize())
+			{
+				control.MainTextEditor.MainTextEditor.Text = Serialize();
+			}
 		}
 
 		private void Document_TextChanged(object sender, EventArgs e)
 		{
-			Main.SatoriConfViewModel.Changed();
+			if(!serializingScope.IsSerializing)
+			{
+				Main.SatoriConfViewModel.Changed();
+			}
 		}
 
 		//保存内容を出力
@@ -216,15 +209,14 @@ namespace Satolist2.Control
 			else
 			{
 				//テキストなのでdocumetを保存
-				saveText = document.Text;
+				saveText = control.MainTextEditor.MainTextEditor.Text;
 			}
 			return saveText;
 		}
 
 		public void Dispose()
 		{
-			if (Document != null)
-				Document.TextChanged -= Document_TextChanged;
+			control.MainTextEditor.MainTextEditor.OnTextChanged -= Document_TextChanged;
 		}
 	}
 

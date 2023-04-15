@@ -1,8 +1,10 @@
-﻿using ICSharpCode.AvalonEdit.Document;
+﻿using AngleSharp.Io;
+using ICSharpCode.AvalonEdit.Document;
 using ICSharpCode.AvalonEdit.Editing;
 using ICSharpCode.AvalonEdit.Rendering;
 using MahApps.Metro.Controls;
 using Satolist2.Control;
+using Satolist2.Model;
 using Satolist2.Utility;
 using System;
 using System.Collections.Generic;
@@ -30,11 +32,21 @@ namespace Satolist2.Module.TextEditor
 	{
 		private SearchHilighter searchHilighter;
 
+		internal new AvalonEditModuleViewModel DataContext
+		{
+			get => (AvalonEditModuleViewModel)base.DataContext;
+			set => base.DataContext = value;
+		}
+
 		public AvalonEditModule()
 		{
 			InitializeComponent();
 			MainTextEditor.Document = new ICSharpCode.AvalonEdit.Document.TextDocument();
 			searchHilighter = new SearchHilighter();
+			DataContext = new AvalonEditModuleViewModel(this);
+
+			//
+			IsEnableSendToGhost = false;	//デフォルトでオフ
 		}
 
 		public override int LineCount => MainTextEditor.LineCount;
@@ -48,6 +60,12 @@ namespace Satolist2.Module.TextEditor
 		public override int CaretLine
 		{
 			get => MainTextEditor.TextArea.Caret.Line;
+		}
+
+		//選択範囲
+		public override string SelectionString
+		{
+			get => MainTextEditor.Document.GetText(MainTextEditor.SelectionStart, MainTextEditor.SelectionLength);
 		}
 
 		//選択位置
@@ -106,13 +124,23 @@ namespace Satolist2.Module.TextEditor
 			}
 		}
 
-		public override event EventHandler CaretPositionChanged
+		public override bool IsEnableSendToGhost
+		{
+			get => SendToGhostMenuItem.IsEnabled;
+			set
+			{
+				SendToGhostMenuItem.IsEnabled = value;
+				SendToGhostMenuItem.Visibility = value ? Visibility.Visible : Visibility.Collapsed;
+			}
+		}
+
+		public override event EventHandler OnCaretPositionChanged
 		{
 			add => MainTextEditor.TextArea.Caret.PositionChanged += value;
 			remove => MainTextEditor.TextArea.Caret.PositionChanged -= value;
 		}
 
-		public override event EventHandler TextChanged
+		public override event EventHandler OnTextChanged
 		{
 			add => MainTextEditor.TextChanged += value;
 			remove => MainTextEditor.TextChanged -= value;
@@ -148,13 +176,16 @@ namespace Satolist2.Module.TextEditor
 
 		public override void UpdateHighlighter()
 		{
-			MainTextEditor.Background = new SolidColorBrush(SatoriSyntaxDictionary.GetHilightColor(ScriptSyntax.Background));
 			MainTextEditor.SyntaxHighlighting = null;
 			MainTextEditor.Dispatcher.BeginInvoke(new Action(() =>
 			{
-				var hilighter = new SatoriSyntaxHilighter();
-				MainTextEditor.SyntaxHighlighting = hilighter;
-				MainTextEditor.Foreground = hilighter.MainForegroundColor;
+				var highlighter = new SatoriSyntaxHilighter();
+				if (IsEnableSyntaxHighlighting)
+				{
+					MainTextEditor.SyntaxHighlighting = highlighter;
+				}
+				MainTextEditor.Background = highlighter.MainBackgroundColor;	//TODO: Background設定できると困るかもしれない
+				MainTextEditor.Foreground = highlighter.MainForegroundColor;
 			}
 			), DispatcherPriority.Render);
 		}
@@ -175,10 +206,10 @@ namespace Satolist2.Module.TextEditor
 		}
 
 		//入力候補の表示
-		internal override void RequestCompletion(MainViewModel main)
+		internal override void RequestCompletion()
 		{
 			CompletionManager p = new CompletionManager();
-			p.RequestCompletion(MainTextEditor, main);
+			p.RequestCompletion(MainTextEditor, MainWindow.Instance.DataContext);
 		}
 
 		//検索色付け用の機能
@@ -203,6 +234,115 @@ namespace Satolist2.Module.TextEditor
 					}
 				}
 			}
+		}
+
+		private void ShowSearchBox_Click(object sender, RoutedEventArgs e)
+		{
+			ShowSearchBox();
+		}
+
+		//InputBindingの更新
+		public override void UpdateInsertPalete()
+		{
+			//古いバインディング削除
+			List<InputBinding> removes = new List<InputBinding>();
+			foreach (var item in MainTextEditor.InputBindings)
+			{
+				if (item is InsertPaletteKeyBinding b)
+					removes.Add(b);
+			}
+
+			foreach (var item in removes)
+			{
+				MainTextEditor.InputBindings.Remove(item);
+			}
+
+			//バインディングの作成
+			var items = MainWindow.Instance.DataContext.InsertPalette?.AllItems() ?? Array.Empty<InsertItemPaletteModel>();
+			foreach (var item in items)
+			{
+				var gesture = InsertItemPaletteShortCutGestureConverter.ConvertToGesture(item);
+				if (gesture != null)
+				{
+					MainTextEditor.InputBindings.Add(new InsertPaletteKeyBinding(DataContext.InsertCommand, gesture, item));
+				}
+			}
+		}
+	}
+
+	/// <summary>
+	/// 内部ViewModel
+	/// </summary>
+	internal class AvalonEditModuleViewModel : NotificationObject
+	{
+		private AvalonEditModule Module { get; }
+		public ICommand SendToGhostCommand { get; }
+		public ICommand ShowSearchBoxCommand { get; }
+		public ICommand ShowGlobalSearchCommand { get; }
+		public ICommand CompletionCommand { get; }
+		public ICommand InsertCommand { get; }
+		public MainViewModel Main => MainWindow.Instance.DataContext;
+
+		//背景画像パス
+		public string BackgroundImagePath
+		{
+			get
+			{
+				return MainViewModel.EditorSettings.GeneralSettings.TextEditorBackgroundImagePath;
+			}
+		}
+
+		//背景画像
+		public bool IsEnableBackgroundImage
+		{
+			get
+			{
+				return !string.IsNullOrEmpty(MainViewModel.EditorSettings.GeneralSettings.TextEditorBackgroundImagePath);
+			}
+		}
+
+		//マージン
+		public Thickness TextEditorMargin
+		{
+			get
+			{
+				return new Thickness(MainViewModel.EditorSettings.GeneralSettings.TextEditorOffsetX, MainViewModel.EditorSettings.GeneralSettings.TextEditorOffsetY, 0.0, 0.0);
+			}
+		}
+
+		public AvalonEditModuleViewModel(AvalonEditModule module)
+		{
+			Module = module;
+			SendToGhostCommand = new ActionCommand(o =>
+			{
+				module.SendToGhost();
+			});
+
+			ShowSearchBoxCommand = new ActionCommand(o =>
+			{
+				module.ShowSearchBox();
+			});
+
+			ShowGlobalSearchCommand = new ActionCommand(o =>
+			{
+				module.ShowGlobalSearchBox();
+			});
+
+			CompletionCommand = new ActionCommand( o =>
+			{
+				module.RequestCompletion();
+			});
+
+			InsertCommand = new ActionCommand(o =>
+			{
+				if (o is InsertItemPaletteModel item)
+				{
+					if (!string.IsNullOrEmpty(item.Body))
+					{
+						module.PerformTextInput(item.Body);
+					}
+				}
+			});
 		}
 	}
 

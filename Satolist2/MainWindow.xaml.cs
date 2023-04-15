@@ -21,6 +21,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Web.SessionState;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -41,6 +42,30 @@ namespace Satolist2
 	/// </summary>
 	public partial class MainWindow : UserControl
 	{
+		public static MainWindow Instance { get; private set; }
+
+		internal new MainViewModel DataContext
+		{
+			get => (MainViewModel)base.DataContext;
+			set
+			{
+				if (DataContext != null)
+					DataContext.PropertyChanged -= DataContext_PropertyChanged;
+				base.DataContext = value;
+				DataContext.PropertyChanged += DataContext_PropertyChanged;
+			}
+		}
+
+		//MainViewModelのプロパティ変更
+		private void DataContext_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+		{
+			if(e.PropertyName == nameof(MainViewModel.InsertPalette))
+			{
+				//挿入パレットの更新
+				OnInsertPaletteChanged?.Invoke(this, new EventArgs());
+			}
+		}
+
 		private List<DockingWindow> EventEditors { get; }
 		private List<DockingWindow> TextEditors { get; }
 		private MainViewModel mainViewModel;
@@ -49,6 +74,9 @@ namespace Satolist2
 		private IntPtr HWnd { get; set; }
 		private string DefaultWindowLayout { get; set; }
 		public Window RootWindow { get; set; }
+
+		public event EventHandler OnTextEditorSettingsChanged;
+		public event EventHandler OnInsertPaletteChanged;
 
 		public TextEditorModuleBase ActiveTextEditor
 		{
@@ -86,6 +114,12 @@ namespace Satolist2
 
 		public MainWindow()
 		{
+			//ウインドウはViewModelと違って１個と確定しているのでstaticメンバとしてのアクセスを許容してしまう
+			Instance = this;
+
+			//テンポラリロード不要？
+			MainViewModel.StaticInitialize();
+
 			InitializeComponent();
 
 			//互換システムの初期化
@@ -136,10 +170,6 @@ namespace Satolist2
 			//スタートメニューは自動で閉じるので復活する
 			StartMenu.Show();
 
-			//さとりてウインドウのシンタックスハイライトを設定
-			((SatoriteWindow)Satorite.Content).UpdateHilighting();
-			((SatoriteWindow)Satorite.Content).UpdateFontSettings();
-
 			//Ukadocリソースのダウンロード
 			UkadocDownloader.DownloadAsync().ContinueWith(
 				o =>
@@ -178,7 +208,11 @@ namespace Satolist2
 			
 			//ハンドルのとりだし
 			var hwnd = (new System.Windows.Interop.WindowInteropHelper(RootWindow)).Handle;
-			Core.SSTPCallBackNativeWindow.Create(hwnd);
+			try
+			{
+				Core.SSTPCallBackNativeWindow.Create(hwnd);
+			}
+			catch { }	//??
 			HWnd = hwnd;
 
 			//ここでhwndが確定するのでさとりすとの起動イベントを発生する
@@ -262,7 +296,6 @@ namespace Satolist2
 				ev.OnRemove += OpendEventRemoved;
 				ev.PropertyChanged += Text_PropertyChanged;
 
-				viewModel.UpdateFontSettings();
 				EventEditors.Add(newWindow);
 				DocumentPane.Children.Insert(0, newWindow);
 				currentWindow = newWindow;
@@ -363,7 +396,6 @@ namespace Satolist2
 				newWindow.IsActiveChanged += NewWindow_IsActiveChanged;
 				text.OnDelete += TextFileDeleted;
 				text.PropertyChanged += Text_PropertyChanged;
-				viewModel.UpdateFontSettings();
 
 				TextEditors.Add(newWindow);
 				DocumentPane.Children.Add(newWindow);
@@ -424,7 +456,6 @@ namespace Satolist2
 			var newWindow = new DockingWindow(editor, viewModel);
 			newWindow.CanClose = true;
 			newWindow.CanHide = false;
-			viewModel.UpdateFontSettings();
 
 			DocumentPane.Children.Add(newWindow);
 
@@ -437,45 +468,13 @@ namespace Satolist2
 		//テキストエディタのフォントを更新
 		internal void UpdateTextEditorFonts()
 		{
-			foreach(var item in EventEditors)
-			{
-				if( item.ViewModel is TextEditorViewModelBase vm)
-				{
-					vm.UpdateFontSettings();
-				}
-			}
-
-			foreach (var item in TextEditors)
-			{
-				if (item.ViewModel is TextEditorViewModelBase vm)
-				{
-					vm.UpdateFontSettings();
-				}
-			}
-
-			((SatoriteWindow)Satorite.Content).UpdateFontSettings();
-			//NOTE: テンポラリエディタはすぐ閉じるだろうし一旦は考えてない
+			OnTextEditorSettingsChanged?.Invoke(this, new EventArgs());
 		}
 
 		internal void UpdateTextEditorHilights()
 		{
-			foreach (var item in EventEditors)
-			{
-				if (item.ViewModel is TextEditorViewModelBase vm)
-				{
-					vm.UpdateGeneralSettings();
-				}
-			}
-
-			foreach (var item in TextEditors)
-			{
-				if (item.ViewModel is TextEditorViewModelBase vm)
-				{
-					vm.UpdateGeneralSettings();
-				}
-			}
-
-			((SatoriteWindow)Satorite.Content).UpdateHilighting();
+			//TODO: 同じタイミングで問題ない？
+			OnTextEditorSettingsChanged?.Invoke(this, new EventArgs());
 		}
 
 		internal void OpenGhost(string ghostPath, string shellDirectoryName = "master", string executablePath = null)
@@ -942,6 +941,12 @@ namespace Satolist2
 		public ActionCommand NetworkUpdateCommand { get; }
 		public ActionCommand ResetDockingLayoutCommand { get; }
 
+		public static void StaticInitialize()
+		{
+			if(EditorSettings == null)
+				EditorSettings = new EditorSettings();
+		}
+
 		//設定情報
 		public InsertItemPaletteModel InsertPalette
 		{
@@ -1026,7 +1031,7 @@ namespace Satolist2
 			SurfacePreview = new SurfacePreviewViewModel(this);
 
 			//エディタ設定のロード
-			if (EditorSettings == null)
+			//if (EditorSettings == null)
 			{
 				EditorSettings = new EditorSettings();
 

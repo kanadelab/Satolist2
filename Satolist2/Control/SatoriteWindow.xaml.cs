@@ -1,4 +1,5 @@
 ﻿using ICSharpCode.AvalonEdit.Document;
+using Satolist2.Module.TextEditor;
 using Satolist2.Utility;
 using System;
 using System.Collections.Generic;
@@ -26,35 +27,13 @@ namespace Satolist2.Control
 		public SatoriteWindow()
 		{
 			InitializeComponent();
-			MainTextEditor.TextArea.IndentationStrategy = null;
-		}
-
-		public void UpdateHilighting()
-		{
-			MainTextEditor.SyntaxHighlighting = null;
-			MainTextEditor.Dispatcher.BeginInvoke(new Action(() =>
-			{
-				var hilighter = new SatoriSyntaxHilighter();
-				MainTextEditor.SyntaxHighlighting = hilighter;
-				MainTextEditor.Foreground = hilighter.MainForegroundColor;
-			}
-			), DispatcherPriority.Render);
-		}
-
-		public void UpdateFontSettings()
-		{
-			if (!string.IsNullOrEmpty(MainViewModel.EditorSettings.GeneralSettings.TextEditorFontName) && MainViewModel.EditorSettings.GeneralSettings.TextEditorFontSize > 0)
-			{
-				MainTextEditor.TextArea.FontFamily = new FontFamily(MainViewModel.EditorSettings.GeneralSettings.TextEditorFontName);
-				MainTextEditor.TextArea.FontSize = MainViewModel.EditorSettings.GeneralSettings.TextEditorFontSize;
-			}
 		}
 	}
 
-	internal class SatoriteViewModel : NotificationObject, IDockingWindowContent
+	internal class SatoriteViewModel : NotificationObject, IDockingWindowContent, IControlBindedReceiver
 	{
+		private SatoriteWindow control;
 		public const string ContentId = "Satorite";
-		public TextDocument Document { get; }
 		public string DockingTitle => "さとりて";
 
 		public string DockingContentId => ContentId;
@@ -63,13 +42,12 @@ namespace Satolist2.Control
 
 		public SatoriteViewModel(MainViewModel main)
 		{
-			Document = new TextDocument();
 			SendToGhostCommand = new ActionCommand(
 				o =>
 				{
 					try
 					{
-						Satorite.SendSatori(main.Ghost, Document.Text, EventType.Sentence);
+						Satorite.SendSatori(main.Ghost, control.MainTextEditor.MainTextEditor.Text, EventType.Sentence);
 						Core.LogMessage.AddLog("ゴーストにトークを送信しました。");
 					}
 					catch(GhostNotFoundException ex)
@@ -79,6 +57,14 @@ namespace Satolist2.Control
 				},
 				o => main.Ghost != null
 				);
+		}
+
+		public void ControlBind(System.Windows.Controls.Control control)
+		{
+			if(control is SatoriteWindow ctrl)
+			{
+				this.control = ctrl;
+			}
 		}
 	}
 }

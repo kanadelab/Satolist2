@@ -1,4 +1,4 @@
-﻿using ICSharpCode.AvalonEdit.Document;
+﻿using Satolist2.Module.TextEditor;
 using Satolist2.Utility;
 using System;
 using System.Collections.Generic;
@@ -83,7 +83,7 @@ namespace Satolist2.Control
 		}
 	}
 
-	internal class GhostDescriptEditorViewModel : NotificationObject, ISaveFileObject, IDockingWindowContent, IDisposable
+	internal class GhostDescriptEditorViewModel : NotificationObject, ISaveFileObject, IDockingWindowContent, IDisposable, IControlBindedReceiver
 	{
 		public const string ContentId = "GhostProperty";
 		public virtual string SaveFilePath => "/ghost/master/descript.txt";
@@ -95,26 +95,19 @@ namespace Satolist2.Control
 
 		private const int TabIndexList = 0;
 
+		private ListEditorSerializingScope serializingScope;
 		private MainViewModel main;
+		private GhostDescriptEditor control;
 		private int currentTabIndex;
 		private int selectedIndex;
 		private EditorLoadState loadState;
 		private List<string> commonLine;
-		private TextDocument document;
 		private bool isChanged;
 		private IEnumerable<DescriptItemViewModel> items;
 		private string searchString;
-
 		public ICollectionView Items { get; }
-		public TextDocument Document
-		{
-			get => document;
-			set
-			{
-				document = value;
-				NotifyChanged();
-			}
-		}
+
+		public TextEditorModuleBase MainTextEditor => control?.MainTextEditor?.MainTextEditor;
 
 		public int SelectedIndex
 		{
@@ -175,6 +168,7 @@ namespace Satolist2.Control
 		public GhostDescriptEditorViewModel(MainViewModel main)
 		{
 			this.main = main;
+			serializingScope = new ListEditorSerializingScope();
 			loadState = EditorLoadState.Initialized;
 			items = ItemModel.Select(o => new DescriptItemViewModel(o, this)).ToArray();
 			Items = CollectionViewSource.GetDefaultView(items);
@@ -229,7 +223,7 @@ namespace Satolist2.Control
 			else
 			{
 				//テキスト編集モードなのでDocumentを保存
-				saveText = document.Text;
+				saveText = MainTextEditor.Text;
 			}
 
 			try
@@ -284,21 +278,23 @@ namespace Satolist2.Control
 
 		private void TextToList()
 		{
-			Deserialize(Document.Text);
+			Deserialize(MainTextEditor.Text);
 		}
 
 		private void ListToText()
 		{
-			if (Document != null)
-				Document.TextChanged -= Document_TextChanged;
-
-			Document = new TextDocument(Serialize());
-			Document.TextChanged += Document_TextChanged;
+			using (serializingScope.NotifySerialize())
+			{
+				MainTextEditor.Text = Serialize();
+			}
 		}
 
 		private void Document_TextChanged(object sender, EventArgs e)
 		{
-			Changed();
+			if (!serializingScope.IsSerializing)
+			{
+				Changed();
+			}
 		}
 
 		public void Changed()
@@ -308,8 +304,17 @@ namespace Satolist2.Control
 
 		public void Dispose()
 		{
-			if (Document != null)
-				Document.TextChanged -= Document_TextChanged;
+			if (MainTextEditor != null)
+				MainTextEditor.OnTextChanged -= Document_TextChanged;
+		}
+
+		public void ControlBind(System.Windows.Controls.Control control)
+		{
+			if(control is GhostDescriptEditor editor)
+			{
+				this.control = editor;
+				MainTextEditor.OnTextChanged += Document_TextChanged;
+			}
 		}
 	}
 

@@ -17,46 +17,11 @@
 			<RowDefinition Height="*" />
 		</Grid.RowDefinitions>
 
-		<Grid Grid.Row="1" x:Name="ModuleContainer">
-			
-		</Grid>
-		
-		<!--
-		<Control Grid.Row="1" x:Name="ModuleSelector">
-			<Control.Style>
-				<Style TargetType="Control">
-					<Setter Property="Template">
-						<Setter.Value>
-							<ControlTemplate>
-								<local:AvalonEditModule x:Name="MainTextEditor" />
-							</ControlTemplate>
-						</Setter.Value>
-					</Setter>
-					<Style.Triggers>
-						<DataTrigger Binding="{Binding TextEditorEngineName, Mode=OneTime}" Value="Azuki">
-							<Setter Property="Template">
-								<Setter.Value>
-									<ControlTemplate>
-										<local:AzukiEditModule x:Name="MainTextEditor"
-										   InsertPaletteItems="{Binding Main.InsertPalette.Items, FallbackValue={x:Null}}"
-										   SendToGhostCommand="{Binding SendToGhostCommand}"
-										   ShowSearchBoxCommand="{Binding ShowSearchBoxCommand}"
-										   InsertCommand="{Binding InsertCommand}">
-										</local:AzukiEditModule>
-									</ControlTemplate>
-								</Setter.Value>
-							</Setter>
-						</DataTrigger>
-					</Style.Triggers>
-				</Style>
-			</Control.Style>
-		</Control>
-		-->
-		
-		<ctrl:TextEditorSearchBox x:Name="SearchBox" Grid.Row="0"
+		<Grid Grid.Row="1" x:Name="ModuleContainer" />
+
+		<ctrl:TextEditorSearchBox Grid.Row="0" x:Name="SearchBox"
 			Visibility="{Binding IsShowSearchBox, Converter={StaticResource BoolToVisibilityConverter}, Mode=TwoWay}"
 			FocusTrigger="{Binding SearchBoxFocusTrigger, Mode=TwoWay}"/>
 	</Grid>
-	
 	
 </UserControl>

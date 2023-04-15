@@ -303,6 +303,7 @@
     <Compile Include="Utility\GhostRuntimeRequest.cs" />
     <Compile Include="Utility\JsonUtility.cs" />
     <Compile Include="Utility\JumpListClient.cs" />
+    <Compile Include="Utility\ListEditorSerializingScope.cs" />
     <Compile Include="Utility\LiteSurfaceAnalyzer.cs" />
     <Compile Include="Utility\NarUtility.cs" />
     <Compile Include="Utility\NotificaionObject.cs" />

@@ -5,6 +5,7 @@
 			 xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
 			 xmlns:local="clr-namespace:Satolist2.Control"
 			 xmlns:avalonEdit="http://icsharpcode.net/sharpdevelop/avalonedit"
+			 xmlns:module="clr-namespace:Satolist2.Module.TextEditor"
 			 mc:Ignorable="d" 
 			 d:DesignHeight="450" d:DesignWidth="800">
 	<Grid>
@@ -137,11 +138,11 @@
 			</TabItem>
 
 			<TabItem Header="delete.txt">
-				<avalonEdit:TextEditor Document="{Binding DeleteText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+				<module:TextEditorModuleSelector x:Name="DeleteTextEditor" />
 			</TabItem>
 
 			<TabItem Header="developer__options.txt">
-				<avalonEdit:TextEditor Document="{Binding DeveloperOptionsText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+				<module:TextEditorModuleSelector x:Name="DeveloperOptionsEditor" />
 			</TabItem>
 			
 		</TabControl>

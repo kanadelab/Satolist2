@@ -229,6 +229,7 @@ namespace Satolist2.Utility
 		public IDictionary<string, string> Properties => throw new NotImplementedException();
 
 		public SolidColorBrush MainForegroundColor => new SolidColorBrush(SatoriSyntaxDictionary.GetHilightColor(ScriptSyntax.Default));
+		public SolidColorBrush MainBackgroundColor => new SolidColorBrush(SatoriSyntaxDictionary.GetHilightColor(ScriptSyntax.Background));
 
 		public HighlightingColor GetNamedColor(string name)
 		{

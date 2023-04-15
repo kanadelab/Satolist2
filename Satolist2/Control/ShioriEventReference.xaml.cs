@@ -195,6 +195,9 @@ namespace Satolist2.Control
 										var eventId = anchor.Hash.Substring(1);
 										var ev = document.GetElementById(eventId);
 
+										if (ev == null)
+											continue;
+
 										var evHead = ev.Children[0];
 										var evDetail = ev.Children[1];
 

@@ -8,13 +8,31 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
 
 namespace Satolist2.Module.TextEditor
 {
 	public abstract class TextEditorModuleBase : UserControl
 	{
+		private bool isEnableSyntaxHighlighting;
 		protected MatchCollection CurrentMatches { get; set; }
+
+		//シンタックスハイライトを使うかどうか
+		//使わない場合でも背景色と文字色は適用する
+		public virtual bool IsEnableSyntaxHighlighting
+		{
+			get => isEnableSyntaxHighlighting;
+			set
+			{
+				if(isEnableSyntaxHighlighting != value)
+				{
+					//変更があればハイライタの設定を更新する
+					isEnableSyntaxHighlighting = value;
+					UpdateHighlighter();
+				}
+			}
+		}
 
 		public virtual int CurrentMatchCount => CurrentMatches?.Count ?? 0;
 
@@ -36,6 +54,9 @@ namespace Satolist2.Module.TextEditor
 		//テキストボディ
 		public abstract string Text { get; set; }
 
+		//選択中の内容
+		public virtual string SelectionString { get; }
+
 		//行数の表示
 		public abstract bool ShowLineNumbers { get; set; }
 
@@ -50,6 +71,9 @@ namespace Satolist2.Module.TextEditor
 
 		//オートインデント
 		public abstract bool AutoIndent { get; set; }
+
+		//ゴーストに送信昨日を有効化
+		public abstract bool IsEnableSendToGhost { get; set; }
 
 		//現在行へスクロール
 		public abstract void ScrollToCaret();
@@ -67,18 +91,86 @@ namespace Satolist2.Module.TextEditor
 		public abstract void SetFont(string fontFamilyName, int fontSize);
 
 		//カレット位置変更
-		public abstract event EventHandler CaretPositionChanged;
+		public abstract event EventHandler OnCaretPositionChanged;
 
 		//テキスト変更
-		public abstract event EventHandler TextChanged;
+		public abstract event EventHandler OnTextChanged;
 
+		//ゴーストに送信
+		public event EventHandler OnSendToGhost;
+
+		//検索ボックス表示リクエスト
+		public event EventHandler OnShowSearchBoxRequested;
+
+		//グローバル検索ボックス表示リクエスト
+		public event EventHandler OnShowGlobalSearchBox;
+
+		//コンストラクタ
 		public TextEditorModuleBase()
 		{
-			Debug.WriteLine("Test");
+			Loaded += TextEditorModuleBase_Loaded;
+			Unloaded += TextEditorModuleBase_Unloaded;
+		}
+
+		private void TextEditorModuleBase_Loaded(object sender, System.Windows.RoutedEventArgs e)
+		{
+			MainWindow.Instance.OnTextEditorSettingsChanged += MainWindow_OnTextEditorSettingsChanged;
+			MainWindow.Instance.OnInsertPaletteChanged += MainWindow_OnInsertPaletteChanged;
+
+			//初期データ設定
+			UpdateSettings();
+			UpdateInsertPalete();
+		}
+
+		private void TextEditorModuleBase_Unloaded(object sender, System.Windows.RoutedEventArgs e)
+		{
+			MainWindow.Instance.OnTextEditorSettingsChanged -= MainWindow_OnTextEditorSettingsChanged;
+			MainWindow.Instance.OnInsertPaletteChanged += MainWindow_OnInsertPaletteChanged;
+		}
+
+		//テキストエディタ設定の変更時
+		private void MainWindow_OnTextEditorSettingsChanged(object sender, EventArgs e)
+		{
+			UpdateSettings();
+		}
+
+		//挿入パレットの設定変更時
+		private void MainWindow_OnInsertPaletteChanged(object sender, EventArgs e)
+		{
+			UpdateInsertPalete();
+		}
+
+		//設定の更新
+		public void UpdateSettings()
+		{
+			//設定
+			ShowLineNumbers = MainViewModel.EditorSettings.GeneralSettings.IsShowLineNumber;
+			WordWrap = MainViewModel.EditorSettings.GeneralSettings.IsWardWrap;
+			ShowEndOfLine = MainViewModel.EditorSettings.GeneralSettings.IsShowEndOfLine;
+			HighlightCurrentLine = MainViewModel.EditorSettings.GeneralSettings.IsHilightCurrentLine;
+			AutoIndent = MainViewModel.EditorSettings.GeneralSettings.IsIndent;
+
+			//ハイライト
+			UpdateHighlighter();
+
+			//フォント
+			if (!string.IsNullOrEmpty(MainViewModel.EditorSettings.GeneralSettings.TextEditorFontName) && MainViewModel.EditorSettings.GeneralSettings.TextEditorFontSize > 0)
+			{
+				//フォントサイズが小数点付きだと正しくタブサイズが計算できない
+				SetFont(
+					MainViewModel.EditorSettings.GeneralSettings.TextEditorFontName,
+					(int)MainViewModel.EditorSettings.GeneralSettings.TextEditorFontSize
+					);
+
+			}
 		}
 
 		//ハイライタの更新
 		public abstract void UpdateHighlighter();
+
+		//挿入パレットの更新
+		public abstract void UpdateInsertPalete();
+
 
 		//検索要求
 		public virtual int UpdateSearchString(string searchString)
@@ -169,12 +261,28 @@ namespace Satolist2.Module.TextEditor
 		}
 
 		//入力候補の表示
-		internal virtual void RequestCompletion(MainViewModel main)
-		{
-		}
+		internal virtual void RequestCompletion() {}
 
 		//エディタへのフォーカス
 		public abstract void RequestFocusToEditor();
+
+		//検索ボックスの表示
+		public void ShowSearchBox()
+		{
+			//TODO: 検索内容の表示
+			OnShowSearchBoxRequested?.Invoke(this, new EventArgs());
+		}
+
+		//グローバル検索ボックスの表示
+		public void ShowGlobalSearchBox()
+		{
+			OnShowGlobalSearchBox?.Invoke(this, new EventArgs());
+		}
+
+		public void SendToGhost()
+		{
+			OnSendToGhost?.Invoke(this, new EventArgs());
+		}
 	}
 
 	public class LineData

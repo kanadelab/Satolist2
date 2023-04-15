@@ -212,8 +212,8 @@ namespace Satolist2.Control
 
 		public void Dispose()
 		{
-			MainTextEditor.TextChanged -= Document_TextChanged;
-			MainTextEditor.CaretPositionChanged -= Caret_PositionChanged;
+			MainTextEditor.OnTextChanged -= Document_TextChanged;
+			MainTextEditor.OnCaretPositionChanged -= Caret_PositionChanged;
 		}
 
 		public void ControlBind(System.Windows.Controls.Control ctrl)
@@ -222,10 +222,9 @@ namespace Satolist2.Control
 			{
 				control = textEditor;
 				MainTextEditor.Text = TextFile.Body;
-				MainTextEditor.TextChanged += Document_TextChanged;
-				MainTextEditor.CaretPositionChanged += Caret_PositionChanged;
+				MainTextEditor.OnTextChanged += Document_TextChanged;
+				MainTextEditor.OnCaretPositionChanged += Caret_PositionChanged;
 				control.UpdateInsertPaletteKeyBindings(Main.InsertPalette, InsertCommand);
-				UpdateGeneralSettings();
 			}
 		}	
 	}

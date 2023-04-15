@@ -6,6 +6,7 @@
 			 xmlns:local="clr-namespace:Satolist2.Control"
 			 xmlns:util="clr-namespace:Satolist2.Utility"
 			 xmlns:avalonEdit="http://icsharpcode.net/sharpdevelop/avalonedit"
+			 xmlns:module="clr-namespace:Satolist2.Module.TextEditor"
 			 mc:Ignorable="d" 
 			 d:DesignHeight="450" d:DesignWidth="800">
 	<UserControl.Resources>
@@ -111,11 +112,11 @@
 			</TabItem>
 
 			<TabItem Header="replace.txt">
-				<avalonEdit:TextEditor Document="{Binding ReplaceDocument, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+				<module:TextEditorModuleSelector x:Name="ReplaceTextEditor" />
 			</TabItem>
 
 			<TabItem Header="replace__after.txt">
-				<avalonEdit:TextEditor Document="{Binding ReplaceAfterDocument, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+				<module:TextEditorModuleSelector x:Name="ReplaceAfterTextEditor" />
 			</TabItem>
 			
 		</TabControl>

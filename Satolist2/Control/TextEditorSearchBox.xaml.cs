@@ -27,21 +27,7 @@ namespace Satolist2.Control
 	/// </summary>
 	public partial class TextEditorSearchBox : UserControl
 	{
-		public static readonly DependencyProperty AttachEditorProperty = DependencyProperty.Register(nameof(AttachEditor), typeof(TextEditorModuleBase), typeof(TextEditorSearchBox),
-			new PropertyMetadata( (d,e) =>
-			{
-				if (d is TextEditorSearchBox ctl)
-				{
-					if (e.OldValue is TextEditorModuleBase oldEditor)
-					{
-						oldEditor.TextChanged -= ctl.TextChanged;
-					}
-					if (e.NewValue is TextEditorModuleBase newEditor)
-					{
-						newEditor.TextChanged += ctl.TextChanged;
-					}
-				}
-			}));
+		public static readonly DependencyProperty AttachEditorProperty = DependencyProperty.Register(nameof(AttachEditor), typeof(TextEditorModuleBase), typeof(TextEditorSearchBox));
 
 		//フォーカストリガー。trueするとフォーカスする
 		public static readonly DependencyProperty FocusTriggerProperty = DependencyProperty.Register(nameof(FocusTrigger), typeof(bool), typeof(TextEditorSearchBox),
@@ -55,14 +41,6 @@ namespace Satolist2.Control
 					}
 				}
 			}));
-
-		private TextEditorSearchBoxViewModel viewModel;
-
-		private void TextChanged(object sender, EventArgs e)
-		{
-			viewModel.RefleshSearch();
-			MainTextBox.LostFocus += MainTextBox_LostFocus;
-		}
 
 		private void MainTextBox_LostFocus(object sender, RoutedEventArgs e)
 		{
@@ -85,9 +63,8 @@ namespace Satolist2.Control
 		public TextEditorSearchBox()
 		{
 			InitializeComponent();
-			viewModel = new TextEditorSearchBoxViewModel(this);
-			MainPanel.DataContext = viewModel;
 			IsVisibleChanged += TextEditorSearchBox_IsVisibleChanged;
+			MainTextBox.LostFocus += MainTextBox_LostFocus;
 		}
 
 		private void TextEditorSearchBox_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
@@ -109,6 +86,8 @@ namespace Satolist2.Control
 		private TextEditorSearchBox control;
 		private string searchString;
 		private string searchInformation;
+		private bool isShowSearchBox;
+		private bool searchBoxFocusTrigger;
 
 		public ActionCommand CloseSearchBoxCommand { get; }
 		public ActionCommand SearchNextCommand { get; }
@@ -134,6 +113,28 @@ namespace Satolist2.Control
 			set
 			{
 				searchInformation = value;
+				NotifyChanged();
+			}
+		}
+
+		//検索ボックスの表示
+		public bool IsShowSearchBox
+		{
+			get => isShowSearchBox;
+			set
+			{
+				isShowSearchBox = value;
+				NotifyChanged();
+			}
+		}
+
+		//検索ボックス表示用のトリガー
+		public bool SearchBoxFocusTrigger
+		{
+			get => searchBoxFocusTrigger;
+			set
+			{
+				searchBoxFocusTrigger = value;
 				NotifyChanged();
 			}
 		}

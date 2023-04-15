@@ -51,33 +51,6 @@ namespace Satolist2.Control
 			};
 		}
 
-		internal void UpdateInsertPaletteKeyBindings(InsertItemPaletteModel palette, ICommand command)
-		{
-			//古いバインディング削除
-			List<InputBinding> removes = new List<InputBinding>();
-			foreach(var item in MainTextEditor.InputBindings)
-			{
-				if (item is InsertPaletteKeyBinding b)
-					removes.Add(b);
-			}
-
-			foreach(var item in removes)
-			{
-				MainTextEditor.InputBindings.Remove(item);
-			}
-
-			//バインディングの作成
-			var items = palette?.AllItems() ?? Array.Empty<InsertItemPaletteModel>();
-			foreach(var item in items)
-			{
-				var gesture = InsertItemPaletteShortCutGestureConverter.ConvertToGesture(item);
-				if (gesture != null)
-				{
-					MainTextEditor.InputBindings.Add(new InsertPaletteKeyBinding(command, gesture, item));
-				}
-			}
-		}
-
 		public void RequestFocus()
 		{
 			Dispatcher.Invoke(new Action(() => {
@@ -118,25 +91,12 @@ namespace Satolist2.Control
 	internal abstract class TextEditorViewModelBase : NotificationObject, IDockingWindowContent
 	{
 		public MainViewModel Main { get; }
-		private bool isShowSearchBox;
 		private bool isActiveTextEditor;
-		private bool searchBoxFocusTrigger;
 		private Color textEditorBackgroundColor;
 		private int caretLine;
 
 		//エディタエンジンの指定
 		public string TextEditorEngineName => MainViewModel.EditorSettings.GeneralSettings.OverrideTextEditorEngine;
-
-		//検索ボックスの表示
-		public bool IsShowSearchBox
-		{
-			get => isShowSearchBox;
-			set
-			{
-				isShowSearchBox = value;
-				NotifyChanged();
-			}
-		}
 
 		//アクティブなテキストエディタか（サーフェスパレットダブルクリックで挿入の対象）
 		public virtual bool IsActiveTextEditor
@@ -158,17 +118,6 @@ namespace Satolist2.Control
 			}
 		}
 
-		//検索ボックス表示用のトリガー
-		public bool SearchBoxFocusTrigger
-		{
-			get => searchBoxFocusTrigger;
-			set
-			{
-				searchBoxFocusTrigger = value;
-				NotifyChanged();
-			}
-		}
-
 		//ボックス背景色
 		public Color TextEditorBackgroundColor
 		{
@@ -183,38 +132,9 @@ namespace Satolist2.Control
 		//編集ウインドウのタイトル
 		public abstract string DocumentTitle { get; }
 
-		public ActionCommand ShowSearchBoxCommand { get; }
 		public ActionCommand ShowGlobalSearchCommand { get; }
-		public ActionCommand CompletionCommand { get; }
 
 		public abstract TextEditorModuleBase MainTextEditor { get; }
-
-		//背景画像パス
-		public string BackgroundImagePath
-		{
-			get
-			{
-				return MainViewModel.EditorSettings.GeneralSettings.TextEditorBackgroundImagePath;
-			}
-		}
-
-		//背景画像
-		public bool IsEnableBackgroundImage
-		{
-			get
-			{
-				return !string.IsNullOrEmpty(MainViewModel.EditorSettings.GeneralSettings.TextEditorBackgroundImagePath);
-			}
-		}
-
-		//マージン
-		public Thickness TextEditorMargin
-		{
-			get
-			{
-				return new Thickness(MainViewModel.EditorSettings.GeneralSettings.TextEditorOffsetX, MainViewModel.EditorSettings.GeneralSettings.TextEditorOffsetY, 0.0, 0.0);
-			}
-		}
 
 		public string DockingTitle
 		{
@@ -232,32 +152,12 @@ namespace Satolist2.Control
 		{
 			Main = main;
 
-			//検索
-			ShowSearchBoxCommand = new ActionCommand(
-				o =>
-				{
-					IsShowSearchBox = true;
-
-					//すでに開いている場合でもフォーカスを移す必要がある
-					SearchBoxFocusTrigger = true;
-				}
-				);
-
 			//全体検索
 			ShowGlobalSearchCommand = new ActionCommand(
 				o =>
 				{
-					if(o is ICSharpCode.AvalonEdit.TextEditor ae)
-						Main.ShowSearchBoxCommand.Execute(ae?.SelectedText);
-					else if(o is TextBox tb)
+					if(o is TextBox tb)
 						Main.ShowSearchBoxCommand.Execute(tb?.SelectedText);
-				});
-
-			//入力補助
-			CompletionCommand = new ActionCommand(
-				o =>
-				{
-					MainTextEditor.RequestCompletion(Main);
 				});
 		}
 
@@ -265,34 +165,6 @@ namespace Satolist2.Control
 		{
 			NotifyChanged(nameof(DocumentTitle));
 			NotifyChanged(nameof(DockingTitle));
-		}
-
-		//フォント設定を最新のものを使うようにする
-		public void UpdateFontSettings()
-		{
-			if(!string.IsNullOrEmpty(MainViewModel.EditorSettings.GeneralSettings.TextEditorFontName) && MainViewModel.EditorSettings.GeneralSettings.TextEditorFontSize > 0 )
-			{
-				//フォントサイズが小数点付きだと正しくタブサイズが計算できない
-				MainTextEditor.SetFont(
-					MainViewModel.EditorSettings.GeneralSettings.TextEditorFontName,
-					(int)MainViewModel.EditorSettings.GeneralSettings.TextEditorFontSize
-					);
-
-			}
-		}
-
-		//基本設定を最新のものに更新
-		public void UpdateGeneralSettings()
-		{
-			//設定
-			MainTextEditor.ShowLineNumbers = MainViewModel.EditorSettings.GeneralSettings.IsShowLineNumber;
-			MainTextEditor.WordWrap = MainViewModel.EditorSettings.GeneralSettings.IsWardWrap;
-			MainTextEditor.ShowEndOfLine = MainViewModel.EditorSettings.GeneralSettings.IsShowEndOfLine;
-			MainTextEditor.HighlightCurrentLine = MainViewModel.EditorSettings.GeneralSettings.IsHilightCurrentLine;
-			MainTextEditor.AutoIndent = MainViewModel.EditorSettings.GeneralSettings.IsIndent;
-
-			//ハイライト
-			MainTextEditor.UpdateHighlighter();
 		}
 
 		//カレットの位置から編集中のイベント名を取得する
@@ -380,8 +252,6 @@ namespace Satolist2.Control
 
 		public EventEditorViewModel(MainViewModel main, EventModel ev) : base(main)
 		{
-			Main.PropertyChanged += Main_PropertyChanged;
-
 			randomizedContentId = Guid.NewGuid().ToString();	//複数出現するのでユニークなIDを振る
 			Event = ev;
 			Event.PropertyChanged += Event_PropertyChanged;
@@ -400,16 +270,6 @@ namespace Satolist2.Control
 					MainTextEditor.PerformTextInput(((InsertItemPaletteModel)o).Body);
 				}
 				);
-		}
-
-		
-		private void Main_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-		{
-			if(e.PropertyName == nameof(MainViewModel.InsertPalette))
-			{
-				//insertPalette更新
-				control.UpdateInsertPaletteKeyBindings(Main.InsertPalette, InsertCommand);
-			}
 		}
 
 		private void Document_TextChanged(object sender, EventArgs e)
@@ -538,9 +398,8 @@ namespace Satolist2.Control
 		public void Dispose()
 		{
 			Event.PropertyChanged -= Event_PropertyChanged;
-			MainTextEditor.TextChanged -= Document_TextChanged;
-			Main.PropertyChanged -= Main_PropertyChanged;
-			MainTextEditor.CaretPositionChanged -= Caret_PositionChanged;
+			MainTextEditor.OnTextChanged -= Document_TextChanged;
+			MainTextEditor.OnCaretPositionChanged -= Caret_PositionChanged;
 		}
 
 		public void ControlBind(System.Windows.Controls.Control ctrl)
@@ -549,10 +408,8 @@ namespace Satolist2.Control
 			{
 				control = eventEditor;
 				MainTextEditor.Text = Event.Body;
-				MainTextEditor.TextChanged += Document_TextChanged;
-				MainTextEditor.CaretPositionChanged += Caret_PositionChanged;
-				control.UpdateInsertPaletteKeyBindings(Main.InsertPalette, InsertCommand);
-				UpdateGeneralSettings();
+				MainTextEditor.OnTextChanged += Document_TextChanged;
+				MainTextEditor.OnCaretPositionChanged += Caret_PositionChanged;
 			}
 		}
 	}

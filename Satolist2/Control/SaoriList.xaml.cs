@@ -31,14 +31,15 @@ namespace Satolist2.Control
 		}
 	}
 
-	internal class SaoriListViewModel : NotificationObject, IDockingWindowContent, IDisposable
+	internal class SaoriListViewModel : NotificationObject, IDockingWindowContent, IDisposable, IControlBindedReceiver
 	{
 		public const string ContentId = "SaoriList";
+		private SaoriList control;
 		private const int TabIndexList = 0;
-		private TextDocument document;
 		private int currentTabIndex;
 		private List<string> commonLines;
 
+		private ListEditorSerializingScope serializingScope;
 		private ObservableCollection<SaoriListModuleViewModel> items;
 
 		public ReadOnlyObservableCollection<SaoriListModuleViewModel> Items => new ReadOnlyObservableCollection<SaoriListModuleViewModel>(items);
@@ -47,16 +48,6 @@ namespace Satolist2.Control
 		public string DockingTitle => "SAORIリスト";
 
 		public string DockingContentId => ContentId;
-
-		public TextDocument Document
-		{
-			get => document;
-			set
-			{
-				document = value;
-				NotifyChanged();
-			}
-		}
 
 		public int CurrentTabIndex
 		{
@@ -80,6 +71,7 @@ namespace Satolist2.Control
 		public SaoriListViewModel(MainViewModel main)
 		{
 			Main = main;
+			serializingScope = new ListEditorSerializingScope();
 			items = new ObservableCollection<SaoriListModuleViewModel>();
 			commonLines = new List<string>();
 
@@ -163,24 +155,25 @@ namespace Satolist2.Control
 
 		private void TextToList()
 		{
-			Deserialize(Document.Text);
+			Deserialize(control.MainTextEditor.MainTextEditor.Text);
 		}
 
 		private void ListToText()
 		{
-			if (Document != null)
-				Document.TextChanged -= Document_TextChanged;
-
-			Document = new TextDocument(Serialize());
-			Document.TextChanged += Document_TextChanged;
+			using (serializingScope.NotifySerialize())
+			{
+				control.MainTextEditor.MainTextEditor.Text = Serialize();
+			}
 		}
 
 		private void Document_TextChanged(object sender, EventArgs e)
 		{
-			Main.SatoriConfViewModel.Changed();
+			if (!serializingScope.IsSerializing)
+			{
+				Main.SatoriConfViewModel.Changed();
+			}
 		}
-		
-
+	
 		private string GetSaveBody()
 		{
 			string saveText;
@@ -192,14 +185,22 @@ namespace Satolist2.Control
 			else
 			{
 				//テキストなのでdocumentを保存
-				saveText = document.Text;
+				saveText = control.MainTextEditor.MainTextEditor.Text;
 			}
 			return saveText;
 		}
 		public void Dispose()
 		{
-			if (Document != null)
-				Document.TextChanged -= Document_TextChanged;
+			control.MainTextEditor.MainTextEditor.OnTextChanged -= Document_TextChanged;
+		}
+
+		public void ControlBind(System.Windows.Controls.Control control)
+		{
+			if(control is SaoriList ctrl)
+			{
+				this.control = ctrl;
+				this.control.MainTextEditor.MainTextEditor.OnTextChanged -= Document_TextChanged;
+			}
 		}
 	}
 

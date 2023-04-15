@@ -26,7 +26,6 @@ namespace Satolist2.Control
 		public ReplaceList()
 		{
 			InitializeComponent();
-			
 		}
 	}
 
@@ -42,31 +41,10 @@ namespace Satolist2.Control
 		private ObservableCollection<ReplaceListItemViewModel> items;
 		private List<string> replaceCommonLine;
 		private List<string> replaceAfterCommonLine;
-		private TextDocument replaceDocument;
-		private TextDocument replaceAfterDocument;
 		private int currentTabIndex;
-		
+		private ListEditorSerializingScope serializingScope;
 
 		public ReadOnlyObservableCollection<ReplaceListItemViewModel> Items => new ReadOnlyObservableCollection<ReplaceListItemViewModel>(items);
-		public TextDocument ReplaceDocument
-		{
-			get => replaceDocument;
-			set
-			{
-				replaceDocument = value;
-				NotifyChanged();
-			}
-		}
-
-		public TextDocument ReplaceAfterDocument
-		{
-			get => replaceAfterDocument;
-			set
-			{
-				replaceAfterDocument = value;
-				NotifyChanged();
-			}
-		}
 
 		public int CurrentTabIndex
 		{
@@ -104,11 +82,10 @@ namespace Satolist2.Control
 		public ReplaceListViewModel(MainViewModel main)
 		{
 			this.main = main;
+			serializingScope = new ListEditorSerializingScope();
 			items = new ObservableCollection<ReplaceListItemViewModel>();
 			replaceCommonLine = new List<string>();
 			replaceAfterCommonLine = new List<string>();
-			replaceDocument = new TextDocument();
-			replaceAfterDocument = new TextDocument();
 
 			RemoveItemCommand = new ActionCommand(
 				o =>
@@ -218,7 +195,7 @@ namespace Satolist2.Control
 			else
 			{
 				//テキスト編集モードなのでDocumentを保存
-				saveText = ReplaceDocument.Text;
+				saveText = control.ReplaceTextEditor.MainTextEditor.Text;
 			}
 
 			try
@@ -248,7 +225,7 @@ namespace Satolist2.Control
 			else
 			{
 				//テキスト編集モードなのでDocument保存
-				saveText = ReplaceAfterDocument.Text;
+				saveText = control.ReplaceAfterTextEditor.MainTextEditor.Text;
 			}
 
 			try
@@ -341,45 +318,47 @@ namespace Satolist2.Control
 
 		private void ListToText()
 		{
-			if (ReplaceDocument != null)
-				ReplaceDocument.TextChanged -= ReplaceDocument_TextChanged;
-			if (ReplaceAfterDocument != null)
-				ReplaceAfterDocument.TextChanged -= ReplaceAfterDocument_TextChanged;
-
-			ReplaceDocument = new TextDocument(SerializeReplace());
-			ReplaceAfterDocument = new TextDocument(SerializeReplaceAfter());
-			ReplaceDocument.TextChanged += ReplaceDocument_TextChanged;
-			ReplaceAfterDocument.TextChanged += ReplaceAfterDocument_TextChanged;
+			using (serializingScope.NotifySerialize())
+			{
+				control.ReplaceTextEditor.MainTextEditor.Text = SerializeReplace();
+				control.ReplaceAfterTextEditor.MainTextEditor.Text = SerializeReplaceAfter();
+			}
 		}
 
 		private void ReplaceAfterDocument_TextChanged(object sender, EventArgs e)
 		{
-			ReplaceAfterSaveObject.Changed();
+			if (!serializingScope.IsSerializing)
+			{
+				ReplaceAfterSaveObject.Changed();
+			}
 		}
 
 		private void ReplaceDocument_TextChanged(object sender, EventArgs e)
 		{
-			ReplaceSaveObject.Changed();
+			if (!serializingScope.IsSerializing)
+			{
+				ReplaceSaveObject.Changed();
+			}
 		}
 
 		private void TextToList()
 		{
 			items.Clear();
-			DeserializeReplace(ReplaceDocument.Text);
-			DeserializeReplaceAfter(ReplaceAfterDocument.Text);
+			DeserializeReplace(control.ReplaceTextEditor.MainTextEditor.Text);
+			DeserializeReplaceAfter(control.ReplaceAfterTextEditor.MainTextEditor.Text);
 		}
 
 		public void ControlBind(System.Windows.Controls.Control control)
 		{
 			this.control = (ReplaceList)control;
+			this.control.ReplaceAfterTextEditor.MainTextEditor.OnTextChanged += ReplaceAfterDocument_TextChanged;
+			this.control.ReplaceTextEditor.MainTextEditor.OnTextChanged += ReplaceDocument_TextChanged;
 		}
 
 		public void Dispose()
 		{
-			if (ReplaceDocument != null)
-				ReplaceDocument.TextChanged -= ReplaceDocument_TextChanged;
-			if (ReplaceAfterDocument != null)
-				ReplaceAfterDocument.TextChanged -= ReplaceAfterDocument_TextChanged;
+			control.ReplaceAfterTextEditor.MainTextEditor.OnTextChanged -= ReplaceAfterDocument_TextChanged;
+			control.ReplaceTextEditor.MainTextEditor.OnTextChanged -= ReplaceDocument_TextChanged;
 		}
 	}
 
