@@ -62,8 +62,9 @@
     <Reference Include="AvalonDock.Themes.VS2013, Version=4.70.1.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
       <HintPath>..\packages\Dirkster.AvalonDock.Themes.VS2013.4.70.1\lib\net40\AvalonDock.Themes.VS2013.dll</HintPath>
     </Reference>
-    <Reference Include="Azuki">
-      <HintPath>..\refs\Azuki-1.7.13-bin\Azuki.dll</HintPath>
+    <Reference Include="Azuki, Version=1.7.12.38751, Culture=neutral, PublicKeyToken=46b77eb7f2d82aba, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\refs\Azuki\Azuki.dll</HintPath>
     </Reference>
     <Reference Include="ControlzEx, Version=4.0.0.0, Culture=neutral, PublicKeyToken=69f1c32f803d307e, processorArchitecture=MSIL">
       <HintPath>..\packages\ControlzEx.4.4.0\lib\net462\ControlzEx.dll</HintPath>
