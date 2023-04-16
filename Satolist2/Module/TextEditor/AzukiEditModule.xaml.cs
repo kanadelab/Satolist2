@@ -332,7 +332,7 @@ namespace Satolist2.Module.TextEditor
 			//挿入パレットの構築
 			insertPaletteMenuItem.MenuItems.Clear();
 
-			var items = MainWindow.Instance.DataContext.InsertPalette.Items;
+			var items = MainWindow.Instance.DataContext.InsertPalette?.Items;
 			if (items != null)
 			{
 				CreateInsertPalette(items, insertPaletteMenuItem);
