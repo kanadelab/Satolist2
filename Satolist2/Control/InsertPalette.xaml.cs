@@ -76,7 +76,7 @@ namespace Satolist2.Control
 				{
 					if (o is InsertItemPaletteModel model)
 					{
-						Main.InsertToActiveEditor(model.Body);
+						MainWindow.Instance.InsertToActiveEditor(model.Body);
 					}
 				},
 				o =>

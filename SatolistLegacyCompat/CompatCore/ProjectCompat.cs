@@ -26,6 +26,9 @@ namespace SatolistLegacyCompat.CompatCore
 
 		public static bool IsInitialized { get; private set; }
 
+		//サーフェス変更命令
+		public static Action<long> InsertSurfaceChange { get; set; }
+
 		public static JObject Serialize()
 		{
 			return JObject.FromObject(ProjectData.Instance);
@@ -74,6 +77,12 @@ namespace SatolistLegacyCompat.CompatCore
 
 				IsInitialized = true;
 			}
+		}
+
+		//サーフェス変更命令の挿入
+		public static void RequestInsertChangeSurface(long surfaceId)
+		{
+			InsertSurfaceChange?.Invoke(surfaceId);
 		}
 	}
 

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SatolistLegacyCompat.CompatCore;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -1006,6 +1007,18 @@ namespace Satolist
 
 
 			target.Select();//アクティブにする
+#else
+			if (text == null)
+				return;
+
+			string surface;
+			string[] sp = (text).Split(' ');
+			surface = sp[0];
+			long surfaceId;
+			if (long.TryParse(surface, out surfaceId))
+			{
+				ProjectCompat.RequestInsertChangeSurface(surfaceId);
+			}
 #endif
 		}
 

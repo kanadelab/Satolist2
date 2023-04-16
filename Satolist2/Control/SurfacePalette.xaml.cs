@@ -42,7 +42,7 @@ namespace Satolist2.Control
 		{
 			if(sender is ListViewItem listViewItem)
 			{
-				DataContext.InsertSurfaceToActiveEditor((SurfacePaletteItemViewModel)listViewItem.DataContext);
+				SurfacePaletteViewModel.InsertSurfaceToActiveEditor(((SurfacePaletteItemViewModel)listViewItem.DataContext).Id);
 			}
 			e.Handled = true;
 		}
@@ -121,28 +121,28 @@ namespace Satolist2.Control
 			}
 		}
 
-		public void InsertSurfaceToActiveEditor(SurfacePaletteItemViewModel item)
+		public static void InsertSurfaceToActiveEditor(long id)
 		{
 			if (MainViewModel.EditorSettings.GeneralSettings.IsSurfacePaletteInserTypeSakuraScript)
 			{
-				InsertSurfaceToActiveEditorSakuraScript(item);
+				InsertSurfaceToActiveEditorSakuraScript(id);
 			}
 			else
 			{
-				InsertSurfaceToActiveEditorSatori(item);
+				InsertSurfaceToActiveEditorSatori(id);
 			}
 		}
 
-		public void InsertSurfaceToActiveEditorSatori(SurfacePaletteItemViewModel item)
+		public static void InsertSurfaceToActiveEditorSatori(long id)
 		{
-			var insertStr = string.Format("（{0}）", DictionaryUtility.NumberZen2Han(item.Id.ToString()));
-			Main.InsertToActiveEditor(insertStr); ;
+			var insertStr = string.Format("（{0}）", DictionaryUtility.NumberZen2Han(id.ToString()));
+			MainWindow.Instance.InsertToActiveEditor(insertStr);
 		}
 
-		public void InsertSurfaceToActiveEditorSakuraScript(SurfacePaletteItemViewModel item)
+		public static void InsertSurfaceToActiveEditorSakuraScript(long id)
 		{
-			var insertStr = string.Format(@"\s[{0}]", item.Id.ToString());
-			Main.InsertToActiveEditor(insertStr);
+			var insertStr = string.Format(@"\s[{0}]", id.ToString());
+			MainWindow.Instance.InsertToActiveEditor(insertStr);
 		}
 
 		public void SendRuntimeChangeSurface(SurfacePaletteItemViewModel item)
@@ -308,14 +308,14 @@ namespace Satolist2.Control
 			InsertSurfaceCommand = new ActionCommand(
 				o =>
 				{
-					parent.InsertSurfaceToActiveEditorSatori(this);
+					SurfacePaletteViewModel.InsertSurfaceToActiveEditorSatori(this.Id);
 				}
 				);
 
 			InsertSurfaceCommandSakuraScript = new ActionCommand(
 				o =>
 				{
-					parent.InsertSurfaceToActiveEditorSakuraScript(this);
+					SurfacePaletteViewModel.InsertSurfaceToActiveEditorSakuraScript(this.Id);
 				}
 				);
 

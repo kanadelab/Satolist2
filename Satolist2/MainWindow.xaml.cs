@@ -127,6 +127,11 @@ namespace Satolist2
 				var isLegacyEnable = MainViewModel.EditorSettings.GeneralSettings.IsEnableLegacyCompat;
 				EditorSettings.LoadLegacySettings();
 				SatolistLegacyCompat.CompatCore.ProjectCompat.InitializeControls(isLegacyEnable);
+				SatolistLegacyCompat.CompatCore.ProjectCompat.InsertSurfaceChange = (surfaceId) =>
+				{
+					//SurfacePaletteのinsertを間借り
+					SurfacePaletteViewModel.InsertSurfaceToActiveEditor(surfaceId);
+				};
 			}
 			DockingManager.Theme = Themes.ApplicationTheme.GetDockingSystemTheme();
 
@@ -867,6 +872,20 @@ namespace Satolist2
 				else if(content is TextEditor te)
 				{
 					te.RequestFocus();
+				}
+			}
+		}
+
+		//アクティブなエディタに挿入
+		public void InsertToActiveEditor(string str, bool isActivate = true)
+		{
+			if (ActiveTextEditor != null)
+			{
+				ActiveTextEditor.PerformTextInput(str);
+
+				if (isActivate)
+				{
+					ActivateActiveEditor();
 				}
 			}
 		}
@@ -1848,20 +1867,6 @@ namespace Satolist2
 			if (result == MessageBoxResult.Yes)
 				return true;
 			return false;
-		}
-
-		//アクティブなエディタに挿入
-		public void InsertToActiveEditor(string str, bool isActivate = true)
-		{
-			if(MainWindow.ActiveTextEditor != null)
-			{
-				MainWindow.ActiveTextEditor.PerformTextInput(str);
-
-				if(isActivate)
-				{
-					MainWindow.ActivateActiveEditor();
-				}
-			}
 		}
 
 		public bool ValidateNewDictionaryPath(string fullName, bool requireSatoriFileName)
