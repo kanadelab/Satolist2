@@ -196,12 +196,12 @@ namespace Satolist2
 			DebugMainMenuVisibleMenu.Visibility = Visibility.Collapsed;
 			DebugMainMenuVisibleMenu.IsEnabled = false;
 			DebugMainMenu.Hide();
+#endif
 
 #if true
 			//サーフェスビューワv3も封じ
 			RuntimeBasedSurfaceViewerVisibleMenu.Visibility = Visibility.Collapsed;
 			RuntimeBasedSurfaceViewerVisibleMenu.IsEnabled = false;
-#endif
 #endif
 		}
 
