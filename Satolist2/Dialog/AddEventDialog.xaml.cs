@@ -37,6 +37,12 @@ namespace Satolist2.Dialog
 			DataContext = new AddEventDialogViewModel(main);
 			DataContext.AddTarget = DataContext.Main.Ghost.Dictionaries.FirstOrDefault();
 			InitialFocus = NameInputBox;
+
+			//入力ボックスを全選択にして直接編集しやすいように
+			Dispatcher.BeginInvoke(new Action(()=>
+			{
+				NameInputBox.SelectAll();
+			}), System.Windows.Threading.DispatcherPriority.Render);
 		}
 
 		private void OkButtonClick(object sender, RoutedEventArgs e)

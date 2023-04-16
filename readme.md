@@ -58,4 +58,7 @@ https://opensource.org/licenses/mit-license.php
   * https://materialdesignicons.com/
   * Satolist2/Icons.xaml に集約しています。
 
+* zlibライセンスのDLLを使用しています
+  * Azuki https://azuki.osdn.jp/
+
 * 月波 清火 (@tukinami_seika@fedibird.com) 様がアイコンを作ってくださいました。

@@ -77,39 +77,15 @@ namespace Satolist2.Control
 		private const int TabIndexList = 0;
 
 		private ObservableCollection<UpdateIgnoreListItemViewModel> items;
-
-		private TextDocument developerOptionsText;
-		private TextDocument deleteText;
 		private MainViewModel main;
 		private int currentTabIndex;
 		private List<string> deleteCommonLine;  //コメントリスト行？
 		private List<string> developerOptionsCommonLine;
+		private ListEditorSerializingScope serializingScope;
 
 		public UpdateIgnoreList Control { get; private set; }
-
 		public GhostModel Ghost => main.Ghost;
-
 		public ReadOnlyObservableCollection<UpdateIgnoreListItemViewModel> Items => new ReadOnlyObservableCollection<UpdateIgnoreListItemViewModel>(items);
-
-		public TextDocument DeveloperOptionsText
-		{
-			get => developerOptionsText;
-			set
-			{
-				developerOptionsText = value;
-				NotifyChanged();
-			}
-		}
-
-		public TextDocument DeleteText
-		{
-			get => deleteText;
-			set
-			{
-				deleteText = value;
-				NotifyChanged();
-			}
-		}
 
 		public int CurrentTabIndex
 		{
@@ -151,6 +127,7 @@ namespace Satolist2.Control
 			items = new ObservableCollection<UpdateIgnoreListItemViewModel>();
 			developerOptionsCommonLine = new List<string>();
 			deleteCommonLine = new List<string>();
+			serializingScope = new ListEditorSerializingScope();
 
 			RemoveItemCommand = new ActionCommand(
 				(o) =>
@@ -296,7 +273,7 @@ namespace Satolist2.Control
 			else
 			{
 				//テキスト編集モードなのでDocumentを保存
-				saveText = DeveloperOptionsText.Text;
+				saveText = Control.DeveloperOptionsEditor.MainTextEditor.Text;
 			}
 
 			try
@@ -326,7 +303,7 @@ namespace Satolist2.Control
 			else
 			{
 				//テキスト編集モードなのでDocumentを保存
-				saveText = DeleteText.Text;
+				saveText = Control.DeleteTextEditor.MainTextEditor.Text;
 			}
 
 			try
@@ -466,50 +443,55 @@ namespace Satolist2.Control
 
 		public void ListToText()
 		{
-			if (DeveloperOptionsText != null)
-				DeveloperOptionsText.TextChanged -= DeveloperOptionsText_TextChanged;
-			if (DeleteText != null)
-				DeleteText.TextChanged -= DeleteText_TextChanged;
-
 			//シリアライズ操作
-			DeveloperOptionsText = new TextDocument(SerializeDeveloperOptions());
-			DeleteText = new TextDocument(SerializeDelete());
-			DeveloperOptionsText.TextChanged += DeveloperOptionsText_TextChanged;
-			deleteText.TextChanged += DeleteText_TextChanged;
+			using (serializingScope.NotifySerialize())
+			{
+				Control.DeveloperOptionsEditor.MainTextEditor.Text = SerializeDeveloperOptions();
+				Control.DeleteTextEditor.MainTextEditor.Text = SerializeDelete();
+			}
 		}
 
 		private void DeleteText_TextChanged(object sender, EventArgs e)
 		{
-			DeleteSaveObject.Changed();
+			if (!serializingScope.IsSerializing)
+			{
+				DeleteSaveObject.Changed();
+			}
 		}
 
 		private void DeveloperOptionsText_TextChanged(object sender, EventArgs e)
 		{
-			DeveloperOptionsSaveObject.Changed();
+			if (!serializingScope.IsSerializing)
+			{
+				DeveloperOptionsSaveObject.Changed();
+			}
 		}
 
 		public void TextToList()
 		{
 			//デシリアライズ操作
-			items.Clear();
-			DeserializeDeveloperOptions(DeveloperOptionsText.Text);
-			DeserializeDelete(DeleteText.Text);
+			using (serializingScope.NotifySerialize())	//操作上書き換えフラグが立ってしまうのでオフにしておく
+			{
+				items.Clear();
+				DeserializeDeveloperOptions(Control.DeveloperOptionsEditor.MainTextEditor.Text);
+				DeserializeDelete(Control.DeleteTextEditor.MainTextEditor.Text);
+			}
 		}
 
 		//ViewModelが外されたときに破棄として呼ばれる
 		public void Dispose()
 		{
 			Control.OnFileDrop -= Control_OnFileDrop;
-			if (DeveloperOptionsText != null)
-				DeveloperOptionsText.TextChanged -= DeveloperOptionsText_TextChanged;
-			if (DeleteText != null)
-				DeleteText.TextChanged -= DeleteText_TextChanged;
+			Control.DeleteTextEditor.MainTextEditor.OnTextChanged -= DeleteText_TextChanged;
+			Control.DeveloperOptionsEditor.MainTextEditor.OnTextChanged -= DeveloperOptionsText_TextChanged;
 		}
 
 		public void ControlBind(System.Windows.Controls.Control control)
 		{
 			this.Control = (UpdateIgnoreList)control;
 			this.Control.OnFileDrop += Control_OnFileDrop;
+			this.Control.DeleteTextEditor.MainTextEditor.OnTextChanged += DeleteText_TextChanged;
+			this.Control.DeveloperOptionsEditor.MainTextEditor.OnTextChanged += DeveloperOptionsText_TextChanged;
 		}
 	}
 

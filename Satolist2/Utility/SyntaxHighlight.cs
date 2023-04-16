@@ -40,13 +40,11 @@ namespace Satolist2.Utility
 		
 	}
 
-	class SatoriSyntaxRuleSet : HighlightingRuleSet
+	class SatoriSyntaxDictionary
 	{
-		private static bool customHilighterLoaded = false;
-		private static CustomSyntaxHilightRecord[] customHilighter = null;
-		private const string CustomHilighterPath = "settings/hilighter.json";
+		public static List<SyntaxDefinition> Definitions { get; }
 
-		static SatoriSyntaxRuleSet()
+		static SatoriSyntaxDictionary()
 		{
 			//基本ルールセットを作成
 			Definitions = new List<SyntaxDefinition>()
@@ -110,16 +108,47 @@ namespace Satolist2.Utility
 			Definitions.Add(new SyntaxDefinition(string.Format("\\b({0})\\b", string.Join("|", satoriFunctions)), ScriptSyntax.Function));
 		}
 
-		private static List<SyntaxDefinition> Definitions { get; }
+		public static System.Windows.Media.Color GetHilightColor(ScriptSyntax def)
+		{
+			//設定を問い合わせる
+			if (MainViewModel.EditorSettings.GeneralSettings.TextEditorColors.ContainsKey(Enum.GetName(typeof(ScriptSyntax), def)))
+			{
+				var col = Themes.ApplicationTheme.UintToColorRGB(
+					MainViewModel.EditorSettings.GeneralSettings.TextEditorColors[Enum.GetName(typeof(ScriptSyntax), def)]
+					);
+				return col;
+			}
+			return Themes.ApplicationTheme.UintToColorRGB(Themes.ApplicationTheme.GetEditorHilight(def));
+		}
+
+		public static System.Drawing.Color GetHilightDrawingColor(ScriptSyntax def)
+		{
+			//設定を問い合わせる
+			if (MainViewModel.EditorSettings.GeneralSettings.TextEditorColors.ContainsKey(Enum.GetName(typeof(ScriptSyntax), def)))
+			{
+				var col = Themes.ApplicationTheme.UintToDrawingColorRGB(
+					MainViewModel.EditorSettings.GeneralSettings.TextEditorColors[Enum.GetName(typeof(ScriptSyntax), def)]
+					);
+				return col;
+			}
+			return Themes.ApplicationTheme.UintToDrawingColorRGB(Themes.ApplicationTheme.GetEditorHilight(def));
+		}
+	}
+
+	class SatoriSyntaxRuleSet : HighlightingRuleSet
+	{
+		private static bool customHilighterLoaded = false;
+		private const string CustomHilighterPath = "settings/hilighter.json";
+		private static CustomSyntaxHilightRecord[] customHilighter = null;
 
 		public SatoriSyntaxRuleSet()
 		{
 			Name = "Satori";
 
-			foreach (var def in Definitions)
+			foreach (var def in SatoriSyntaxDictionary.Definitions)
 			{
 				var rule = new HighlightingRule();
-				var col = GetHilightColor(def.syntaxType);
+				var col = SatoriSyntaxDictionary.GetHilightColor(def.syntaxType);
 				var brush = new SimpleHighlightingBrush(col);
 
 				rule.Color = new HighlightingColor();
@@ -185,18 +214,7 @@ namespace Satolist2.Utility
 #endif
 		}
 
-		public static System.Windows.Media.Color GetHilightColor(ScriptSyntax def)
-		{
-			//設定を問い合わせる
-			if(MainViewModel.EditorSettings.GeneralSettings.TextEditorColors.ContainsKey(Enum.GetName(typeof(ScriptSyntax), def)))
-			{
-				var col = Themes.ApplicationTheme.UintToColorRGB(
-					MainViewModel.EditorSettings.GeneralSettings.TextEditorColors[Enum.GetName(typeof(ScriptSyntax), def)]
-					);
-				return col;
-			}
-			return Themes.ApplicationTheme.UintToColorRGB(Themes.ApplicationTheme.GetEditorHilight(def));
-		}
+		
 	}
 
 	class SatoriSyntaxHilighter : IHighlightingDefinition
@@ -210,7 +228,8 @@ namespace Satolist2.Utility
 
 		public IDictionary<string, string> Properties => throw new NotImplementedException();
 
-		public SolidColorBrush MainForegroundColor => new SolidColorBrush(SatoriSyntaxRuleSet.GetHilightColor(ScriptSyntax.Default));
+		public SolidColorBrush MainForegroundColor => new SolidColorBrush(SatoriSyntaxDictionary.GetHilightColor(ScriptSyntax.Default));
+		public SolidColorBrush MainBackgroundColor => new SolidColorBrush(SatoriSyntaxDictionary.GetHilightColor(ScriptSyntax.Background));
 
 		public HighlightingColor GetNamedColor(string name)
 		{

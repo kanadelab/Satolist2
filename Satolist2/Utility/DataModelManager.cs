@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace Satolist2.Utility
 {
@@ -52,13 +53,23 @@ namespace Satolist2.Utility
 		public const string DescriptPath = "data/descript.json";
 		public const string InstallPath = "data/install.json";
 
+		//データモデルでエラー担ってる場合は致命的なので注意
+		public static bool HasError = false;
+
 		public static DescriptItemModel[] DescriptItems { get; private set; }
 		public static DescriptItemModel[] InstallItems { get; private set; }
 
 		public static void Load()
 		{
-			DescriptItems = LoadDescript(DescriptPath);
-			InstallItems = LoadDescript(InstallPath);
+			try
+			{
+				DescriptItems = LoadDescript(DescriptPath);
+				InstallItems = LoadDescript(InstallPath);
+			}
+			catch
+			{
+				HasError = true;
+			}
 		}
 
 		private static DescriptItemModel[] LoadDescript(string path)

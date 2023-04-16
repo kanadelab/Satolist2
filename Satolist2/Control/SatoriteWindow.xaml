@@ -3,6 +3,7 @@
 			 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 			 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
 			 xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+			 xmlns:module="clr-namespace:Satolist2.Module.TextEditor"
 			 xmlns:local="clr-namespace:Satolist2.Control"
 			 mc:Ignorable="d" 
 			 xmlns:avalonEdit="http://icsharpcode.net/sharpdevelop/avalonedit"
@@ -19,9 +20,7 @@
 		<Menu Grid.Row="0">
 			<MenuItem Header="ゴーストに送信 (Alt+Q)" Command="{Binding SendToGhostCommand}" />
 		</Menu>
-		
-		<avalonEdit:TextEditor Grid.Row="1" x:Name="MainTextEditor" Document="{Binding Document, Mode=OneWay}">
-			
-		</avalonEdit:TextEditor>
+
+		<module:TextEditorModuleSelector Grid.Row="1" x:Name="MainTextEditor" />
 	</Grid>
 </UserControl>

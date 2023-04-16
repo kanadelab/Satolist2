@@ -14,10 +14,6 @@
 	<SolidColorBrush x:Key="ThemePeachPuff">Darkred</SolidColorBrush>
 	<SolidColorBrush x:Key="TextEditorBackgroundColor">#1e1e1e</SolidColorBrush>
 
-	<Style TargetType="avalonEdit:TextEditor" BasedOn="{StaticResource {x:Type avalonEdit:TextEditor}}">
-		<Setter Property="Background" Value="#1e1e1e" />
-		<Setter Property="Foreground" Value="#dcdcdc" />
-	</Style>
 	<Style TargetType="avalonEditCodeComp:CompletionWindow">
 		<Setter Property="Foreground" Value="#dcdcdc" />
 	</Style>

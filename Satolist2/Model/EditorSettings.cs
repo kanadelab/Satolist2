@@ -342,6 +342,8 @@ namespace Satolist2.Model
 		public double TextEditorOffsetY { get; set; }
 		[JsonProperty]
 		public bool IsEnableLegacyCompat { get; set; }
+		[JsonProperty]
+		public string OverrideTextEditorEngine { get; set; }
 
 		public GeneralSettings()
 		{
@@ -356,6 +358,14 @@ namespace Satolist2.Model
 
 			TextEditorFontName = EditorSettings.DefaultFont;
 			TextEditorFontSize = EditorSettings.DefaultFontSize;
+
+#if true
+			OverrideTextEditorEngine = "AvalonEdit";
+#else
+			//レガシー機能をデフォルトで有効化。評価版につき。
+			OverrideTextEditorEngine = "Azuki";
+			IsEnableLegacyCompat = true;
+#endif
 		}
 
 		public GeneralSettings Clone()

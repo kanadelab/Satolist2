@@ -5,6 +5,7 @@
 			 xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
 			 xmlns:local="clr-namespace:Satolist2.Control"
 			 xmlns:avalonEdit="http://icsharpcode.net/sharpdevelop/avalonedit"
+			 xmlns:module="clr-namespace:Satolist2.Module.TextEditor"
 			 mc:Ignorable="d" 
 			 d:DesignHeight="450" d:DesignWidth="800">
 	<Grid>
@@ -80,7 +81,7 @@
 			</TabItem>
 
 			<TabItem Header="＊初期化">
-				<avalonEdit:TextEditor Document="{Binding Document, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+				<module:TextEditorModuleSelector x:Name="MainTextEditor"/>
 			</TabItem>
 		</TabControl>
 	</Grid>

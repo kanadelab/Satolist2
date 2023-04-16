@@ -163,6 +163,16 @@ namespace Satolist2.Themes
 						);
 		}
 
+		public static System.Drawing.Color UintToDrawingColorRGB(uint color)
+		{
+			return System.Drawing.Color.FromArgb(
+					0xff,
+					(byte)((color & 0x00ff0000) >> 16),
+					(byte)((color & 0x0000ff00) >> 8),
+					(byte)((color & 0x000000ff) >> 0)
+					);
+		}
+
 		public static uint ColorToUintRGB(Color color)
 		{
 			return (uint)0xff << 24 | (uint)color.R << 16 | (uint)color.G << 8 | (uint)color.B;

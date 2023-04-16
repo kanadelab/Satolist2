@@ -203,11 +203,13 @@ namespace Satolist2.Utility
 		public string GhostPath { get; private set; }
 		public string ExecutablePath { get; private set; }
 		public IntPtr HWnd { get; private set; }
+		public IntPtr[] HWndList { get; private set; }
 		
 
 		public SakuraFMORecord(string id)
 		{
 			ID = id;
+			HWndList = Array.Empty<IntPtr>();
 		}
 
 		public void Parse(string key, string value)
@@ -231,6 +233,9 @@ namespace Satolist2.Utility
 					break;
 				case "path":
 					ExecutablePath = DictionaryUtility.ConbinePath(value, "ssp.exe");
+					break;
+				case "hwndlist":
+					HWndList = value.Split(Constants.CommaSeparator, StringSplitOptions.RemoveEmptyEntries).Select(o => (IntPtr)ulong.Parse(o)).ToArray();
 					break;
 			}
 		}

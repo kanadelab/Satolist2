@@ -115,11 +115,8 @@ namespace Satolist
 			}
 
 
-#if LEGACY
 			//このタイミングでサーフェスパレットの設定を行う
 			mRoot.surfacePalette.UpdateData();
-#endif
-
 		}
 
 		private void ResetTimers()
@@ -1100,7 +1097,7 @@ namespace Satolist
 				}
 				else
 				{
-					MessageBox.Show(mRoot.owner, "フォルダがみつかりません。", "エラー");
+					System.Windows.MessageBox.Show(System.Windows.Application.Current.MainWindow, "フォルダがみつかりません。", "エラー");
 				}
 				
 

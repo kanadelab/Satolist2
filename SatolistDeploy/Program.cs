@@ -71,7 +71,8 @@ namespace SatolistDeploy
 				"System.Memory.dll",
 				"System.Numerics.Vectors.dll",
 				"System.Runtime.CompilerServices.Unsafe.dll",
-				"System.Text.Encoding.CodePages.dll"
+				"System.Text.Encoding.CodePages.dll",
+				"Azuki.dll"
 			};
 
 			foreach(var item in copyItems )

@@ -5,8 +5,10 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.ServiceModel.Configuration;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web.UI.WebControls;
 using System.Windows.Forms;
 
 namespace Satolist2.Core
@@ -76,7 +78,7 @@ namespace Satolist2.Core
 				throw new Win32Exception(Marshal.GetLastWin32Error());
 
 			//ウインドウの生成
-			hWnd = Win32Import.CreateWindow(0, WindowClassName, WindowName, 0, 0, 0, 100, 100, parent, IntPtr.Zero, Win32Import.GetModuleHandle(IntPtr.Zero), IntPtr.Zero);
+			hWnd = Win32Import.CreateWindowEx(0, WindowClassName, WindowName, 0, 0, 0, 100, 100, parent, IntPtr.Zero, Win32Import.GetModuleHandle(IntPtr.Zero), IntPtr.Zero);
 			if (Marshal.GetLastWin32Error() != 0)
 				throw new Win32Exception(Marshal.GetLastWin32Error());
 		}
@@ -118,6 +120,21 @@ namespace Satolist2.Core
 
 		public static readonly UIntPtr SSTP_DWDATA = (UIntPtr)9801;
 		public static readonly UIntPtr RECV_DWDATA = (UIntPtr)0;
+
+		public const int CS_HREDRAW = 0x0002;
+		public const int CS_VREDRAW = 0x0001;
+
+		public const int GWL_STYLE = -16;
+		public const int GWL_EXSTYLE = -20;
+
+		public const int SWP_NOZORDER = 0x0004;
+		public const int SWP_NOSIZE = 0x0001;
+
+		public const int WS_EX_LAYERED = 0x00080000;
+		public const int WS_CHILD = 0x40000000;
+
+		public const int JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE = 0x00002000;
+		public const int JobObjectExtendedLimitInformation = 9;
 
 		public delegate IntPtr WndProcDelegate(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam);
 		public struct NativeWindowClassEx
@@ -234,13 +251,46 @@ namespace Satolist2.Core
 			return body;
 		}
 
+		public struct JOBOBJECT_BASIC_LIMIT_INFORMATION
+		{
+			public long PerProcessUserTimeLimit;
+			public long PerJobUserTimeLimit;
+			public uint LimitFlags;
+			public ulong MinimumWorkingSetSize;
+			public ulong MaximumWorkingSetSize;
+			public uint ActiveProcessLimit;
+			public UIntPtr Affinity;
+			public uint PriorityClass;
+			public uint SchedulingClass;
+		}
+
+		public struct IO_COUNTERS
+		{
+			public ulong ReadOperationCount;
+			public ulong WriteOperationCount;
+			public ulong OtherOperationCount;
+			public ulong ReadTransferCount;
+			public ulong WriteTransferCount;
+			public ulong OtherTransferCount;
+		}
+
+		public struct JOBOBJECT_EXTENDED_LIMIT_INFORMATION
+		{
+			public JOBOBJECT_BASIC_LIMIT_INFORMATION BasicLimitInformation;
+			public IO_COUNTERS IoInfo;
+			public ulong ProcessMemoryLimit;
+			public ulong JobMemoryLimit;
+			public ulong PeakProcessMemoryUsed;
+			public ulong PeakJobMemoryUsed;
+		}
+
 		//れしばとしてやりとりするためのウインドウ操作系API
 		[DllImport("user32.dll", EntryPoint = "RegisterClassExA", SetLastError = true)]
 		public static extern ushort RegisterClassEx(ref NativeWindowClassEx classEx);
 		[DllImport("kernel32.dll", EntryPoint = "GetModuleHandle", SetLastError = true)]
 		public static extern IntPtr GetModuleHandle(IntPtr name);
 		[DllImport("user32.dll", EntryPoint = "CreateWindowExA", SetLastError = true)]
-		public static extern IntPtr CreateWindow(int exstyle, [MarshalAs(UnmanagedType.LPStr)] string className, [MarshalAs(UnmanagedType.LPStr)] string windowName, int style, int x, int y, int width, int height, IntPtr parent, IntPtr menu, IntPtr hInstance, IntPtr param);
+		public static extern IntPtr CreateWindowEx(int exstyle, [MarshalAs(UnmanagedType.LPStr)] string className, [MarshalAs(UnmanagedType.LPStr)] string windowName, int style, int x, int y, int width, int height, IntPtr parent, IntPtr menu, IntPtr hInstance, IntPtr param);
 		[DllImport("user32.dll", EntryPoint = "DefWindowProc", SetLastError = true)]
 		public static extern IntPtr DefWindowProc(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam);
 		[DllImport("user32.dll", EntryPoint = "UnregisterClassA", SetLastError = true)]
@@ -256,5 +306,48 @@ namespace Satolist2.Core
 		[DllImport("user32.dll")]
 		public static extern int GetWindowPlacement(IntPtr hwnd, ref WindowPlacement placement);
 
+		[DllImport("user32.dll")]
+		public static extern int ShowWindow(IntPtr hwnd, int nCmdShow);
+
+		[DllImport("user32.dll")]
+		public static extern IntPtr GetWindowLongPtr(IntPtr hwnd, int index);
+		[DllImport("user32.dll")]
+		public static extern IntPtr SetWindowLongPtr(IntPtr hwnd, int index, IntPtr newLong);
+		[DllImport("user32.dll")]
+		public static extern IntPtr SetParent(IntPtr child, IntPtr parent);
+		[DllImport("user32.dll")]
+		public static extern int GetClientRect(IntPtr hwnd, ref RECT rect);
+		[DllImport("user32.dll")]
+		public static extern int SetWindowPos(IntPtr hwmd, IntPtr hwndInsertAfter, int x, int y, int cx, int cy, uint flags);
+
+		public delegate bool EnumWindowsDelegate(IntPtr hWnd, IntPtr lparam);
+
+		[DllImport("user32.dll")]
+		[return: MarshalAs(UnmanagedType.Bool)]
+		public extern static bool EnumWindows(EnumWindowsDelegate lpEnumFunc,
+			IntPtr lparam);
+
+		[DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+		public static extern int GetWindowText(IntPtr hWnd,
+			StringBuilder lpString, int nMaxCount);
+
+		[DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+		public static extern int GetWindowTextLength(IntPtr hWnd);
+
+		[DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+		public static extern int GetClassName(IntPtr hWnd,
+			StringBuilder lpClassName, int nMaxCount);
+
+		[DllImport("kernel32.dll", EntryPoint = "CreateJobObjectA")]
+		public static extern IntPtr CreateJobObject(IntPtr jobAttributes, string name);
+
+		[DllImport("kernel32.dll")]
+		public static extern int SetInformationJobObject(IntPtr hJob, int jobInfoClass, ref JOBOBJECT_EXTENDED_LIMIT_INFORMATION info, uint jobInfoLength);
+
+		[DllImport("kernel32.dll")]
+		public static extern int AssignProcessToJobObject(IntPtr hJob, IntPtr hProcess);
+
+		[DllImport("kernel32.dll")]
+		public static extern int CloseHandle(IntPtr handle);
 	}
 }

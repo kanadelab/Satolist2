@@ -83,28 +83,22 @@ namespace Satolist2.Utility
 			catch { }
 			return null;
 		}
-		
-		//SEND SSTPの送信
-		public static void SendSSTP(GhostModel ghost, string script, bool useOwnedSSTP, bool noTranslate, IntPtr hWnd = default(IntPtr))
-		{
-			var fmoRecord = SakuraFMOReader.Read(ghost);
-			if (fmoRecord == null)
-			{
-				throw new GhostNotFoundException();
-			}
 
+		//SEND SSTPの送信
+		public static void SendSSTP(SakuraFMORecord fmoRecord, string script, bool useOwnedSSTP, bool noTranslate, IntPtr hWnd = default(IntPtr))
+		{
 			var sstpBuilder = new ProtocolBuilder();
 			sstpBuilder.Command = "SEND SSTP/1.0";
 			sstpBuilder.Parameters["Script"] = script;
 			sstpBuilder.Parameters["Charset"] = "Shift_JIS";
 			sstpBuilder.Parameters["Sender"] = "さとりすと";
 
-			if(hWnd != default(IntPtr))
+			if (hWnd != default(IntPtr))
 			{
 				sstpBuilder.Parameters["HWnd"] = hWnd.ToString();
 			}
 
-			if(noTranslate)
+			if (noTranslate)
 			{
 				sstpBuilder.Parameters["Option"] = "notranslate";
 			}
@@ -115,6 +109,18 @@ namespace Satolist2.Utility
 			}
 
 			RaiseSSTP(sstpBuilder, fmoRecord);
+		}
+
+		//SEND SSTPの送信
+		public static void SendSSTP(GhostModel ghost, string script, bool useOwnedSSTP, bool noTranslate, IntPtr hWnd = default(IntPtr))
+		{
+			var fmoRecord = SakuraFMOReader.Read(ghost);
+			if (fmoRecord == null)
+			{
+				throw new GhostNotFoundException();
+			}
+
+			SendSSTP(fmoRecord, script, useOwnedSSTP, noTranslate, hWnd);
 		}
 
 		//EXECUTE SSTPの送信

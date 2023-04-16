@@ -8,6 +8,7 @@ using Satolist2.Control;
 using Satolist2.Core;
 using Satolist2.Dialog;
 using Satolist2.Model;
+using Satolist2.Module.TextEditor;
 using Satolist2.Properties;
 using Satolist2.Utility;
 using SatolistLegacyCompat.CompatControls;
@@ -20,6 +21,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Web.SessionState;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -40,6 +42,30 @@ namespace Satolist2
 	/// </summary>
 	public partial class MainWindow : UserControl
 	{
+		public static MainWindow Instance { get; private set; }
+
+		internal new MainViewModel DataContext
+		{
+			get => (MainViewModel)base.DataContext;
+			set
+			{
+				if (DataContext != null)
+					DataContext.PropertyChanged -= DataContext_PropertyChanged;
+				base.DataContext = value;
+				DataContext.PropertyChanged += DataContext_PropertyChanged;
+			}
+		}
+
+		//MainViewModelのプロパティ変更
+		private void DataContext_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+		{
+			if(e.PropertyName == nameof(MainViewModel.InsertPalette))
+			{
+				//挿入パレットの更新
+				OnInsertPaletteChanged?.Invoke(this, new EventArgs());
+			}
+		}
+
 		private List<DockingWindow> EventEditors { get; }
 		private List<DockingWindow> TextEditors { get; }
 		private MainViewModel mainViewModel;
@@ -49,7 +75,10 @@ namespace Satolist2
 		private string DefaultWindowLayout { get; set; }
 		public Window RootWindow { get; set; }
 
-		public ICSharpCode.AvalonEdit.TextEditor ActiveTextEditor
+		public event EventHandler OnTextEditorSettingsChanged;
+		public event EventHandler OnInsertPaletteChanged;
+
+		public TextEditorModuleBase ActiveTextEditor
 		{
 			get
 			{
@@ -85,11 +114,17 @@ namespace Satolist2
 
 		public MainWindow()
 		{
+			//ウインドウはViewModelと違って１個と確定しているのでstaticメンバとしてのアクセスを許容してしまう
+			Instance = this;
+
+			//設定の読み込み
+			MainViewModel.StaticInitialize();
+
 			InitializeComponent();
 
 			//互換システムの初期化
 			{
-				var isLegacyEnable = Model.EditorSettings.TemporaryLoadGeneralSettings()?.IsEnableLegacyCompat ?? false;
+				var isLegacyEnable = MainViewModel.EditorSettings.GeneralSettings.IsEnableLegacyCompat;
 				EditorSettings.LoadLegacySettings();
 				SatolistLegacyCompat.CompatCore.ProjectCompat.InitializeControls(isLegacyEnable);
 			}
@@ -110,6 +145,8 @@ namespace Satolist2
 			UkadocEventReference.IsVisible = false;
 			HelpViewer.IsVisible = false;
 			LegacySurfaceViewer.IsVisible = false;
+			LegacySurfacePalette.IsVisible = false;
+			RuntimeBasedSurfaceViewer.IsVisible = false;
 
 			AllowDrop = true;
 			EventEditors = new List<DockingWindow>();
@@ -134,10 +171,6 @@ namespace Satolist2
 			//スタートメニューは自動で閉じるので復活する
 			StartMenu.Show();
 
-			//さとりてウインドウのシンタックスハイライトを設定
-			((SatoriteWindow)Satorite.Content).UpdateHilighting();
-			((SatoriteWindow)Satorite.Content).UpdateFontSettings();
-
 			//Ukadocリソースのダウンロード
 			UkadocDownloader.DownloadAsync().ContinueWith(
 				o =>
@@ -158,11 +191,17 @@ namespace Satolist2
 					}
 				});
 
-#if DEPLOY
+#if !DEPLOY
 			//公開時はデバッグメニューを封じておく。今のところ根本に消すわけではないけど
 			DebugMainMenuVisibleMenu.Visibility = Visibility.Collapsed;
 			DebugMainMenuVisibleMenu.IsEnabled = false;
 			DebugMainMenu.Hide();
+
+#if false
+			//サーフェスビューワv3も封じ
+			RuntimeBasedSurfaceViewerVisibleMenu.Visibility = Visibility.Collapsed;
+			RuntimeBasedSurfaceViewerVisibleMenu.IsEnabled = false;
+#endif
 #endif
 		}
 
@@ -176,7 +215,11 @@ namespace Satolist2
 			
 			//ハンドルのとりだし
 			var hwnd = (new System.Windows.Interop.WindowInteropHelper(RootWindow)).Handle;
-			Core.SSTPCallBackNativeWindow.Create(hwnd);
+			try
+			{
+				Core.SSTPCallBackNativeWindow.Create(hwnd);
+			}
+			catch { }	//??
 			HWnd = hwnd;
 
 			//ここでhwndが確定するのでさとりすとの起動イベントを発生する
@@ -260,7 +303,6 @@ namespace Satolist2
 				ev.OnRemove += OpendEventRemoved;
 				ev.PropertyChanged += Text_PropertyChanged;
 
-				viewModel.UpdateFontSettings();
 				EventEditors.Add(newWindow);
 				DocumentPane.Children.Insert(0, newWindow);
 				currentWindow = newWindow;
@@ -361,7 +403,6 @@ namespace Satolist2
 				newWindow.IsActiveChanged += NewWindow_IsActiveChanged;
 				text.OnDelete += TextFileDeleted;
 				text.PropertyChanged += Text_PropertyChanged;
-				viewModel.UpdateFontSettings();
 
 				TextEditors.Add(newWindow);
 				DocumentPane.Children.Add(newWindow);
@@ -422,7 +463,6 @@ namespace Satolist2
 			var newWindow = new DockingWindow(editor, viewModel);
 			newWindow.CanClose = true;
 			newWindow.CanHide = false;
-			viewModel.UpdateFontSettings();
 
 			DocumentPane.Children.Add(newWindow);
 
@@ -435,45 +475,13 @@ namespace Satolist2
 		//テキストエディタのフォントを更新
 		internal void UpdateTextEditorFonts()
 		{
-			foreach(var item in EventEditors)
-			{
-				if( item.ViewModel is TextEditorViewModelBase vm)
-				{
-					vm.UpdateFontSettings();
-				}
-			}
-
-			foreach (var item in TextEditors)
-			{
-				if (item.ViewModel is TextEditorViewModelBase vm)
-				{
-					vm.UpdateFontSettings();
-				}
-			}
-
-			((SatoriteWindow)Satorite.Content).UpdateFontSettings();
-			//NOTE: テンポラリエディタはすぐ閉じるだろうし一旦は考えてない
+			OnTextEditorSettingsChanged?.Invoke(this, new EventArgs());
 		}
 
 		internal void UpdateTextEditorHilights()
 		{
-			foreach (var item in EventEditors)
-			{
-				if (item.ViewModel is TextEditorViewModelBase vm)
-				{
-					vm.UpdateGeneralSettings();
-				}
-			}
-
-			foreach (var item in TextEditors)
-			{
-				if (item.ViewModel is TextEditorViewModelBase vm)
-				{
-					vm.UpdateGeneralSettings();
-				}
-			}
-
-			((SatoriteWindow)Satorite.Content).UpdateHilighting();
+			//TODO: 同じタイミングで問題ない？
+			OnTextEditorSettingsChanged?.Invoke(this, new EventArgs());
 		}
 
 		internal void OpenGhost(string ghostPath, string shellDirectoryName = "master", string executablePath = null)
@@ -545,7 +553,9 @@ namespace Satolist2
 			Satorite.ViewModel = mainVm.SatoriteViewModel;
 			UkadocEventReference.ViewModel = mainVm.UkadocEventReferenceViewModel;
 			HelpViewer.ViewModel = mainVm.HelpViewerViewModel;
+			RuntimeBasedSurfaceViewer.ViewModel = mainViewModel.RuntimeBasedSurfaceViewerViewModel;
 			LegacySurfaceViewer.ViewModel = mainVm.LegacySurfaceViewerViewModel;
+			LegacySurfacePalette.ViewModel = mainVm.LegacySurfacePaletteViewModel;
 		}
 
 		private void ReflectVisibleMenuDataContext()
@@ -571,8 +581,9 @@ namespace Satolist2
 			SatoriteVisibleMenu.DataContext = Satorite;
 			UkadocEventReferenceVisibleMenu.DataContext = UkadocEventReference;
 			HelpViewerVisibleMenu.DataContext = HelpViewer;
+			RuntimeBasedSurfaceViewerVisibleMenu.DataContext = RuntimeBasedSurfaceViewer;
 			LegacySurfaceViewerVisibleMenu.DataContext = LegacySurfaceViewer;
-			//
+			LegacySurfacePaletteVisibleMenu.DataContext = LegacySurfacePalette;
 			
 		}
 
@@ -710,7 +721,9 @@ namespace Satolist2
 			yield return InsertPalette;
 			yield return Satorite;
 			yield return UkadocEventReference;
+			yield return RuntimeBasedSurfaceViewer;
 			yield return LegacySurfaceViewer;
+			yield return LegacySurfacePalette;
 		}
 
 		//中央のドキュメント領域に設定したいウインドウ類
@@ -790,8 +803,14 @@ namespace Satolist2
 				case HelpViewerViewModel.ContentId:
 					HelpViewer = (DockingWindow)e.Model;
 					break;
-				case "LegacyCompat.SurfaceViewer":
-					LegacySurfaceViewer = (DockingWindow)e.Model;	//TODO: なんか考える
+				case RuntimeBasedSurfaceViewerViewModel.ContentId:
+					RuntimeBasedSurfaceViewer = (DockingWindow)e.Model;
+					break;
+				case SatolistLegacyCompat.CompatControls.LegacySurfaceViewer.ContentId:
+					LegacySurfaceViewer = (DockingWindow)e.Model;
+					break;
+				case SatolistLegacyCompat.CompatControls.LegacySurfacePalette.ContentId:
+					LegacySurfacePalette = (DockingWindow)e.Model;
 					break;
 				default:
 					//イベントエディタ等一時的なモノはデシリアライズする必要はない
@@ -898,7 +917,9 @@ namespace Satolist2
 		public SatoriteViewModel SatoriteViewModel { get; }
 		public ShioriEventReferenceViewModel UkadocEventReferenceViewModel { get; }
 		public HelpViewerViewModel HelpViewerViewModel { get; }
+		public RuntimeBasedSurfaceViewerViewModel RuntimeBasedSurfaceViewerViewModel { get; }
 		public LegacyControlViewModel LegacySurfaceViewerViewModel { get; }
+		public LegacyControlViewModel LegacySurfacePaletteViewModel { get; }
 		
 
 		public List<EventEditorViewModel> EventEditors { get; }
@@ -933,6 +954,13 @@ namespace Satolist2
 		public ActionCommand ClearLogMessageCommand { get; }
 		public ActionCommand NetworkUpdateCommand { get; }
 		public ActionCommand ResetDockingLayoutCommand { get; }
+
+		public static void StaticInitialize()
+		{
+			DataModelManager.Load();
+			if (EditorSettings == null)
+				EditorSettings = new EditorSettings();
+		}
 
 		//設定情報
 		public InsertItemPaletteModel InsertPalette
@@ -1017,11 +1045,8 @@ namespace Satolist2
 			//サーフェスプレビューデータを読込
 			SurfacePreview = new SurfacePreviewViewModel(this);
 
-			//エディタ設定のロード
-			if (EditorSettings == null)
+			//エディタ設定のエラーチェック
 			{
-				EditorSettings = new EditorSettings();
-
 				if (EditorSettings.LoadErrors.Count > 0)
 				{
 					var errDialog = new ErrorListDialog(null, true);
@@ -1032,16 +1057,15 @@ namespace Satolist2
 					{
 						Environment.Exit(1);
 					}
+
+					//警告をリセット
+					EditorSettings.LoadErrors.Clear();
 				}
 
 				//同じタイミングでリストデータ周辺をロード
-				try
+				if(DataModelManager.HasError)
 				{
-					DataModelManager.Load();
-				}
-				catch(Exception ex)
-				{
-					MessageBox.Show("さとりすとの起動に必要な設定ファイルのロードに失敗したため起動できません。\r\nさとりすとを上書き再インストールすると解決するかもしれません。\r\n\r\n" + ex, "エラー");
+					MessageBox.Show("さとりすとの起動に必要なファイルのロードに失敗したため起動できません。\r\nさとりすとを上書き再インストールすると解決するかもしれません。", "エラー");
 					Environment.Exit(1);
 				}
 
@@ -1092,7 +1116,9 @@ namespace Satolist2
 			SatoriteViewModel = new SatoriteViewModel(this);
 			UkadocEventReferenceViewModel = new ShioriEventReferenceViewModel();
 			HelpViewerViewModel = new HelpViewerViewModel();
+			RuntimeBasedSurfaceViewerViewModel = new RuntimeBasedSurfaceViewerViewModel(this);
 			LegacySurfaceViewerViewModel = new LegacyControlViewModel(SatolistLegacyCompat.CompatCore.ProjectCompat.SurfaceViewerControl);
+			LegacySurfacePaletteViewModel = new LegacyControlViewModel(SatolistLegacyCompat.CompatCore.ProjectCompat.SurfacePaletteControl);
 
 			SaveFileCommand = new ActionCommand(
 				o => AskSave(false),
@@ -1402,7 +1428,6 @@ namespace Satolist2
 					if(AskSave(true))
 					{
 						//ファイル保存先の選択
-						//TODO: developer_options.txt を実装してのテストはできてないので要確認
 						var saveDialog = new SaveFileDialog();
 						saveDialog.Filter = "narゴーストアーカイブ(*.nar)|*.nar|zip圧縮ファイル(*.zip)|*.zip|すべてのファイル|*.*";
 						saveDialog.InitialDirectory = DictionaryUtility.NormalizeWindowsPath(Ghost.FullPath);
@@ -1555,6 +1580,7 @@ namespace Satolist2
 					SurfacePreview.ReloadPreviewData();
 					SurfacePaletteViewModel.UpdateSurfacePreviewData();
 					SurfaceViewerViewModel.UpdateSurfacePreviewData();
+					RuntimeBasedSurfaceViewerViewModel.UpdateSurfacePreviewData();
 				},
 				o => SurfacePreview.SelectedShell != null
 				);
@@ -1568,6 +1594,7 @@ namespace Satolist2
 					//再読み込み
 					SurfacePaletteViewModel.UpdateSurfacePreviewData();
 					SurfaceViewerViewModel.UpdateSurfacePreviewData();
+					RuntimeBasedSurfaceViewerViewModel.UpdateSurfacePreviewData();
 					GenerateSurfacePreviewCommand.NotifyCanExecuteChanged();
 				}
 				);
@@ -1583,6 +1610,7 @@ namespace Satolist2
 					//再読み込み
 					SurfacePaletteViewModel.UpdateSurfacePreviewData();
 					SurfaceViewerViewModel.UpdateSurfacePreviewData();
+					RuntimeBasedSurfaceViewerViewModel.UpdateSurfacePreviewData();
 					GenerateSurfacePreviewCommand.NotifyCanExecuteChanged();
 				}
 				);
@@ -1827,7 +1855,7 @@ namespace Satolist2
 		{
 			if(MainWindow.ActiveTextEditor != null)
 			{
-				MainWindow.ActiveTextEditor.TextArea.PerformTextInput(str);
+				MainWindow.ActiveTextEditor.PerformTextInput(str);
 
 				if(isActivate)
 				{
@@ -1940,6 +1968,7 @@ namespace Satolist2
 		//サーフェスシェルフォルダ列挙とか
 		public MainViewModel Main { get; }
 		private Core.SurfacePreviewMetaData surfacePreviewData;
+		private RuntimeBasedSurfacePreviewMetaData runtimeBasedSurfacePreviewData;
 		private ObservableCollection<SurfacePreviewViewModelShellItem> shells;
 		private SurfacePreviewViewModelShellItem selectedShell;
 		private ShellImageCache imageCache;
@@ -1998,6 +2027,17 @@ namespace Satolist2
 			set
 			{
 				surfacePreviewData = value;
+				NotifyChanged();
+			}
+		}
+
+		//v3サーフェスプレビューデータ
+		public RuntimeBasedSurfacePreviewMetaData RuntimeBasedSurfacePreviewData
+		{
+			get => runtimeBasedSurfacePreviewData;
+			set
+			{
+				runtimeBasedSurfacePreviewData = value;
 				NotifyChanged();
 			}
 		}
@@ -2111,11 +2151,24 @@ namespace Satolist2
 				{
 					SurfacePreviewData = null;
 				}
+
+#if DEPLOY && false
+				try
+				{
+					RuntimeBasedSurfacePreviewData = new RuntimeBasedSurfacePreviewMetaData();
+					RuntimeBasedSurfacePreviewData.Load(item.DirectoryFullPath);
+				}
+				catch
+				{
+					RuntimeBasedSurfacePreviewData = null;
+				}
+#endif
 			}
 			else
 			{
 				imageCache = null;
 				SurfacePreviewData = null;
+				RuntimeBasedSurfacePreviewData = null;
 			}
 		}
 
@@ -2138,6 +2191,25 @@ namespace Satolist2
 					isSelected = value;
 					NotifyChanged();
 				}
+			}
+		}
+
+		//v3サーフェスビューワ用のその場で解析するタイプのプレビューモデル
+		internal class RuntimeBasedSurfacePreviewMetaData
+		{
+			public LiteSurfaceAnalyzer Surfaces { get; }
+			public ShellDescriptAnalyzer Descript { get; }
+
+			public RuntimeBasedSurfacePreviewMetaData()
+			{
+				Surfaces = new LiteSurfaceAnalyzer();
+				Descript = new ShellDescriptAnalyzer();
+			}
+
+			public void Load(string shellDirectory)
+			{
+				Surfaces.Load(shellDirectory);
+				Descript.Load(DictionaryUtility.ConbinePath(shellDirectory, "descript.txt"));
 			}
 		}
 	}

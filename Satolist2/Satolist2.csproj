@@ -51,6 +51,7 @@
   <PropertyGroup>
     <ApplicationIcon>Resource\satolist.ico</ApplicationIcon>
   </PropertyGroup>
+  <PropertyGroup />
   <ItemGroup>
     <Reference Include="AngleSharp, Version=0.17.1.0, Culture=neutral, PublicKeyToken=e83494dcdc6d31ea, processorArchitecture=MSIL">
       <HintPath>..\packages\AngleSharp.0.17.1\lib\net472\AngleSharp.dll</HintPath>
@@ -60,6 +61,9 @@
     </Reference>
     <Reference Include="AvalonDock.Themes.VS2013, Version=4.70.1.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
       <HintPath>..\packages\Dirkster.AvalonDock.Themes.VS2013.4.70.1\lib\net40\AvalonDock.Themes.VS2013.dll</HintPath>
+    </Reference>
+    <Reference Include="Azuki">
+      <HintPath>..\refs\Azuki-1.7.13-bin\Azuki.dll</HintPath>
     </Reference>
     <Reference Include="ControlzEx, Version=4.0.0.0, Culture=neutral, PublicKeyToken=69f1c32f803d307e, processorArchitecture=MSIL">
       <HintPath>..\packages\ControlzEx.4.4.0\lib\net462\ControlzEx.dll</HintPath>
@@ -159,6 +163,9 @@
     <Compile Include="Control\ReplaceList.xaml.cs">
       <DependentUpon>ReplaceList.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Control\RuntimeBasedSurfaceViewer.xaml.cs">
+      <DependentUpon>RuntimeBasedSurfaceViewer.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Control\SaoriList.xaml.cs">
       <DependentUpon>SaoriList.xaml</DependentUpon>
     </Compile>
@@ -221,6 +228,7 @@
     <Compile Include="Core\SSTPCallBackNativeWindow.cs" />
     <Compile Include="Core\SurfacePreviewImageGenerator.cs" />
     <Compile Include="Core\TemporaryGhostRuntime.cs" />
+    <Compile Include="Core\TemporaryGhostRuntimeEx.cs" />
     <Compile Include="DarkDialogHostWindow.xaml.cs">
       <DependentUpon>DarkDialogHostWindow.xaml</DependentUpon>
     </Compile>
@@ -279,7 +287,18 @@
     <Compile Include="Model\GhostTemplate.cs" />
     <Compile Include="Model\TextEditor.cs" />
     <Compile Include="Model\UploadSettings.cs" />
+    <Compile Include="Module\TextEditor\AvalonEditModule.xaml.cs">
+      <DependentUpon>AvalonEditModule.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Module\TextEditor\AzukiEditModule.xaml.cs">
+      <DependentUpon>AzukiEditModule.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Module\TextEditor\TextEditorModuleBase.cs" />
+    <Compile Include="Module\TextEditor\TextEditorModuleSelector.xaml.cs">
+      <DependentUpon>TextEditorModuleSelector.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Theme\ApplicationTheme.cs" />
+    <Compile Include="Utility\ChildProcess.cs" />
     <Compile Include="Utility\CompletionManager.cs" />
     <Compile Include="Utility\Converter.cs" />
     <Compile Include="Utility\DataModelManager.cs" />
@@ -290,6 +309,7 @@
     <Compile Include="Utility\GhostRuntimeRequest.cs" />
     <Compile Include="Utility\JsonUtility.cs" />
     <Compile Include="Utility\JumpListClient.cs" />
+    <Compile Include="Utility\ListEditorSerializingScope.cs" />
     <Compile Include="Utility\LiteSurfaceAnalyzer.cs" />
     <Compile Include="Utility\NarUtility.cs" />
     <Compile Include="Utility\NotificaionObject.cs" />
@@ -297,6 +317,7 @@
     <Compile Include="Utility\SakuraFMOReader.cs" />
     <Compile Include="Utility\Satorite.cs" />
     <Compile Include="Utility\SatoriUpdator.cs" />
+    <Compile Include="Utility\ShellDescriptAnalyzer.cs" />
     <Compile Include="Utility\SSPBootUtility.cs" />
     <Compile Include="Utility\Surfaces.cs" />
     <Compile Include="Utility\SyntaxHighlight.cs" />
@@ -345,6 +366,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Control\ReplaceList.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Control\RuntimeBasedSurfaceViewer.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -488,6 +513,18 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Module\TextEditor\AvalonEditModule.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Module\TextEditor\AzukiEditModule.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Module\TextEditor\TextEditorModuleSelector.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Theme\DarkTheme.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

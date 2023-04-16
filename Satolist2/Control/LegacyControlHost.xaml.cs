@@ -32,7 +32,7 @@ namespace Satolist2.Control
 
 		public string DockingTitle => compatControl.Label;
 
-		public string DockingContentId => string.Concat("LegacyCompat.", compatControl.Id);
+		public string DockingContentId => compatControl.Id;
 
 		public LegacyControlViewModel(SatolistLegacyCompat.CompatCore.CompatContol compatControl)
 		{

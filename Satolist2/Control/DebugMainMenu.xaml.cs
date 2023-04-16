@@ -1,7 +1,13 @@
-﻿using Satolist2.Utility;
+﻿using ControlzEx.Standard;
+using Satolist2.Core;
+using Satolist2.Utility;
+using Sgry.Azuki.WinForms;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Drawing;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -11,8 +17,10 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Media.Media3D;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using static Satolist2.Core.Win32Import;
 
 namespace Satolist2.Control
 {
@@ -24,8 +32,6 @@ namespace Satolist2.Control
 		public DebugMainMenu()
 		{
 			InitializeComponent();
-			
-			
 		}
 	}
 

@@ -1,6 +1,7 @@
 ﻿using ICSharpCode.AvalonEdit.Document;
 using ICSharpCode.AvalonEdit.Editing;
 using ICSharpCode.AvalonEdit.Rendering;
+using Satolist2.Module.TextEditor;
 using Satolist2.Utility;
 using System;
 using System.Collections.Generic;
@@ -26,21 +27,7 @@ namespace Satolist2.Control
 	/// </summary>
 	public partial class TextEditorSearchBox : UserControl
 	{
-		public static readonly DependencyProperty AttachEditorProperty = DependencyProperty.Register(nameof(AttachEditor), typeof(ICSharpCode.AvalonEdit.TextEditor), typeof(TextEditorSearchBox),
-			new PropertyMetadata( (d,e) =>
-			{
-				if (d is TextEditorSearchBox ctl)
-				{
-					if (e.OldValue is ICSharpCode.AvalonEdit.TextEditor oldEditor)
-					{
-						oldEditor.TextChanged -= ctl.TextChanged;
-					}
-					if (e.NewValue is ICSharpCode.AvalonEdit.TextEditor newEditor)
-					{
-						newEditor.TextChanged += ctl.TextChanged;
-					}
-				}
-			}));
+		public static readonly DependencyProperty AttachEditorProperty = DependencyProperty.Register(nameof(AttachEditor), typeof(TextEditorModuleBase), typeof(TextEditorSearchBox));
 
 		//フォーカストリガー。trueするとフォーカスする
 		public static readonly DependencyProperty FocusTriggerProperty = DependencyProperty.Register(nameof(FocusTrigger), typeof(bool), typeof(TextEditorSearchBox),
@@ -55,23 +42,15 @@ namespace Satolist2.Control
 				}
 			}));
 
-		private TextEditorSearchBoxViewModel viewModel;
-
-		private void TextChanged(object sender, EventArgs e)
-		{
-			viewModel.RefleshSearch();
-			MainTextBox.LostFocus += MainTextBox_LostFocus;
-		}
-
 		private void MainTextBox_LostFocus(object sender, RoutedEventArgs e)
 		{
 			//フォーカスを失った
 			FocusTrigger = false;
 		}
 
-		public ICSharpCode.AvalonEdit.TextEditor AttachEditor
+		public TextEditorModuleBase AttachEditor
 		{
-			get => (ICSharpCode.AvalonEdit.TextEditor)GetValue(AttachEditorProperty);
+			get => (TextEditorModuleBase)GetValue(AttachEditorProperty);
 			set => SetValue(AttachEditorProperty, value);
 		}
 
@@ -84,9 +63,8 @@ namespace Satolist2.Control
 		public TextEditorSearchBox()
 		{
 			InitializeComponent();
-			viewModel = new TextEditorSearchBoxViewModel(this);
-			MainPanel.DataContext = viewModel;
 			IsVisibleChanged += TextEditorSearchBox_IsVisibleChanged;
+			MainTextBox.LostFocus += MainTextBox_LostFocus;
 		}
 
 		private void TextEditorSearchBox_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
@@ -98,7 +76,7 @@ namespace Satolist2.Control
 			else
 			{
 				//閉じられたら、エディタを有効化する
-				Dispatcher.BeginInvoke(new Action(() => { AttachEditor.Focus(); }), DispatcherPriority.Render);
+				Dispatcher.BeginInvoke(new Action(() => { AttachEditor.RequestFocusToEditor(); }), DispatcherPriority.Render);
 			}
 		}
 	}
@@ -108,8 +86,8 @@ namespace Satolist2.Control
 		private TextEditorSearchBox control;
 		private string searchString;
 		private string searchInformation;
-		private MatchCollection currentMatches;
-		private SearchHilighter searchHilighter_;
+		private bool isShowSearchBox;
+		private bool searchBoxFocusTrigger;
 
 		public ActionCommand CloseSearchBoxCommand { get; }
 		public ActionCommand SearchNextCommand { get; }
@@ -123,7 +101,6 @@ namespace Satolist2.Control
 				if (searchString != value)
 				{
 					searchString = value;
-					searchHilighter_.SearchString = searchString;
 					NotifyChanged();
 					UpdateSearchString();
 				}
@@ -140,17 +117,39 @@ namespace Satolist2.Control
 			}
 		}
 
+		//検索ボックスの表示
+		public bool IsShowSearchBox
+		{
+			get => isShowSearchBox;
+			set
+			{
+				isShowSearchBox = value;
+				NotifyChanged();
+			}
+		}
+
+		//検索ボックス表示用のトリガー
+		public bool SearchBoxFocusTrigger
+		{
+			get => searchBoxFocusTrigger;
+			set
+			{
+				searchBoxFocusTrigger = value;
+				NotifyChanged();
+			}
+		}
+
 		private void SetSearchInformation(int selectionIndex = -1)
 		{
-			if (currentMatches != null)
+			if (!string.IsNullOrEmpty(SearchString))
 			{
-				if (currentMatches.Count == 0)
+				if (control.AttachEditor.CurrentMatchCount == 0)
 				{
 					SearchInformation = "一致なし";
 				}
 				else
 				{
-					SearchInformation = string.Format("{0}/{1}", selectionIndex + 1, currentMatches.Count);
+					SearchInformation = string.Format("{0}/{1}", selectionIndex + 1, control.AttachEditor.CurrentMatchCount);
 				}
 			}
 			else
@@ -162,107 +161,31 @@ namespace Satolist2.Control
 		//検索文字列が更新された
 		private void UpdateSearchString()
 		{
-			//検索
-			var pattern = new Regex(Regex.Escape(SearchString));
-			if (!string.IsNullOrEmpty(pattern.ToString()))
-			{
-				currentMatches = pattern.Matches(control.AttachEditor.Text);
-			}
-			else
-			{
-				currentMatches = null;
-			}
+			control.AttachEditor.UpdateSearchString(SearchString);
 
-			//結果表示
+			//結果をリセット
 			SetSearchInformation();
-
-			//検索ハイライタを再設定
-			control.AttachEditor.TextArea.TextView.LineTransformers.Remove(searchHilighter_);
-			control.AttachEditor.TextArea.TextView.LineTransformers.Add(searchHilighter_);
 		}
 
 		//検索対象の更新
 		public void RefleshSearch()
 		{
-			var pattern = new Regex(Regex.Escape(SearchString));
-			if (!string.IsNullOrEmpty(pattern.ToString()))
-			{
-				currentMatches = pattern.Matches(control.AttachEditor.Text);
-			}
-			else
-			{
-				currentMatches = null;
-			}
+			//TODO: ハイライタの更新など不要な処理は省略できるとよい
+			UpdateSearchString();
 		}
 
+		//次検索
 		public void MoveSearch(bool directionIsNext)
 		{
-			if ((currentMatches?.Count ?? 0) == 0)
-				return;
-
-			//現在のカレットの位置から次の一致を取りに行く
-			var currentCaret = control.AttachEditor.CaretOffset;
-			if (directionIsNext && !control.AttachEditor.TextArea.Selection.IsEmpty)
-			{
-				//選択中の内容があればそちらを優先
-				currentCaret = control.AttachEditor.Document.GetOffset(control.AttachEditor.TextArea.Selection.EndPosition.Location);
-			}
-
-			//次検索処理
-			bool found = false;
-			if (directionIsNext)
-			{
-				for (int i = 0; i < currentMatches.Count; i++)
-				{
-					var item = currentMatches[i];
-					if (item.Index >= currentCaret)
-					{
-						//決定
-						control.AttachEditor.TextArea.Selection = Selection.Create(control.AttachEditor.TextArea, item.Index, item.Index + item.Length);
-						control.AttachEditor.CaretOffset = item.Index;
-						control.AttachEditor.ScrollTo(control.AttachEditor.TextArea.Caret.Line, control.AttachEditor.TextArea.Caret.Column);
-						SetSearchInformation(i);
-						found = true;
-						break;
-					}
-				}
-			}
-			else
-			{
-				for (int i = currentMatches.Count - 1; i >= 0; i--)
-				{
-					var item = currentMatches[i];
-					if (item.Index < currentCaret)
-					{
-						//決定
-						control.AttachEditor.TextArea.Selection = Selection.Create(control.AttachEditor.TextArea, item.Index, item.Index + item.Length);
-						control.AttachEditor.CaretOffset = item.Index;
-						control.AttachEditor.ScrollTo(control.AttachEditor.TextArea.Caret.Line, control.AttachEditor.TextArea.Caret.Column);
-						SetSearchInformation(i);
-						found = true;
-						break;
-					}
-				}
-			}
-
-			if (!found)
-			{
-				var targetIndex = directionIsNext ? 0 : currentMatches.Count - 1;
-				SetSearchInformation(targetIndex);
-
-				//先頭に戻る
-				Match item = currentMatches[targetIndex];
-				control.AttachEditor.TextArea.Selection = Selection.Create(control.AttachEditor.TextArea, item.Index, item.Index + item.Length);
-				control.AttachEditor.CaretOffset = item.Index;
-				control.AttachEditor.ScrollTo(control.AttachEditor.TextArea.Caret.Line, control.AttachEditor.TextArea.Caret.Column);
-			}
+			var selectionIndex = control.AttachEditor.MoveSearch(directionIsNext);
+			SetSearchInformation(selectionIndex);
+			
 		}
 
 		public TextEditorSearchBoxViewModel(TextEditorSearchBox control)
 		{
 			this.control = control;
 			searchString = string.Empty;
-			searchHilighter_ = new SearchHilighter();
 
 			CloseSearchBoxCommand = new ActionCommand(
 				o =>
@@ -288,27 +211,5 @@ namespace Satolist2.Control
 		}
 	}
 
-	//検索色付け用の機能
-	internal class SearchHilighter : DocumentColorizingTransformer
-	{
-		public string SearchString { get; set; }
-
-		protected override void ColorizeLine(DocumentLine line)
-		{
-			var lineStr = CurrentContext.Document.GetText(line.Offset, line.Length);
-			var pattern = new Regex(Regex.Escape(SearchString));
-			if (!string.IsNullOrEmpty(pattern.ToString()))
-			{
-				var matches = pattern.Matches(lineStr);
-				foreach(Match m in matches)
-				{
-					ChangeLinePart(line.Offset + m.Index, line.Offset + m.Index + SearchString.Length,
-						(elem) =>
-						{
-							elem.BackgroundBrush = Brushes.Yellow;
-						});
-				}
-			}
-		}
-	}
+	
 }

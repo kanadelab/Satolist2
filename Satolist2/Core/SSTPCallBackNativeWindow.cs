@@ -80,7 +80,7 @@ namespace Satolist2.Core
 				throw new Win32Exception(Marshal.GetLastWin32Error());
 
 			//ウインドウの生成
-			HWnd = Win32Import.CreateWindow(0, WindowClassName, WindowName, 0, 0, 0, 100, 100, parent, IntPtr.Zero, windowClass.hInstance, IntPtr.Zero);
+			HWnd = Win32Import.CreateWindowEx(0, WindowClassName, WindowName, 0, 0, 0, 100, 100, parent, IntPtr.Zero, windowClass.hInstance, IntPtr.Zero);
 			if (Marshal.GetLastWin32Error() != 0)
 				throw new Win32Exception(Marshal.GetLastWin32Error());
 		}
