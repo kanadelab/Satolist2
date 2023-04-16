@@ -104,7 +104,7 @@
 				<StackPanel Margin="3">
 					<TextBlock Text="おためしに付けてみた機能の設定。" Margin="3"/>
 					<Separator Margin="3" />
-					<GroupBox Header="テキストエディタ拡張(新たに開くテキストエディタから有効)" Margin="3">
+					<GroupBox Header="テキストエディタ拡張(AvalonEditのみ)" Margin="3">
 						<StackPanel>
 							<StackPanel Margin="3">
 								<TextBlock Text="背景画像を設定" />
