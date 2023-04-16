@@ -197,9 +197,11 @@ namespace Satolist2
 			DebugMainMenuVisibleMenu.IsEnabled = false;
 			DebugMainMenu.Hide();
 
+#if false
 			//サーフェスビューワv3も封じ
 			RuntimeBasedSurfaceViewerVisibleMenu.Visibility = Visibility.Collapsed;
 			RuntimeBasedSurfaceViewerVisibleMenu.IsEnabled = false;
+#endif
 #endif
 		}
 
@@ -2150,7 +2152,7 @@ namespace Satolist2
 					SurfacePreviewData = null;
 				}
 
-#if DEPLOY
+#if DEPLOY && false
 				try
 				{
 					RuntimeBasedSurfacePreviewData = new RuntimeBasedSurfacePreviewMetaData();

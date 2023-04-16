@@ -129,7 +129,7 @@ namespace Satolist2.Control
 
 		public void UpdateSurfacePreviewData()
 		{
-#if !DEPLOY
+#if !DEPLOY && false
 			if (Main.SurfacePreview.RuntimeBasedSurfacePreviewData != null)
 			{
 				IsPreviewDataEnable = true;
