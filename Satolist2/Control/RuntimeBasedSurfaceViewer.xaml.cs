@@ -129,7 +129,6 @@ namespace Satolist2.Control
 
 		public void UpdateSurfacePreviewData()
 		{
-#if !DEPLOY && false
 			if (Main.SurfacePreview.RuntimeBasedSurfacePreviewData != null)
 			{
 				IsPreviewDataEnable = true;
@@ -182,7 +181,6 @@ namespace Satolist2.Control
 					item.FormsHost.Visibility = Visibility.Collapsed;
 				}
 			}
-#endif
 		}
 
 		private void BindGhostWindow(IntPtr hostHwnd, IntPtr childHwnd)
