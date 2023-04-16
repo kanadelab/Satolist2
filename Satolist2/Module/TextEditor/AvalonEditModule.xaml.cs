@@ -8,7 +8,9 @@ using Satolist2.Model;
 using Satolist2.Utility;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -184,8 +186,11 @@ namespace Satolist2.Module.TextEditor
 				{
 					MainTextEditor.SyntaxHighlighting = highlighter;
 				}
-				MainTextEditor.Background = highlighter.MainBackgroundColor;	//TODO: Background設定できると困るかもしれない
+				MainTextEditor.Background = Brushes.Transparent;
 				MainTextEditor.Foreground = highlighter.MainForegroundColor;
+				DataContext.TextEditorBackgroundColor = highlighter.MainBackgroundColor;
+				DataContext.BackgroundImagePath = MainViewModel.EditorSettings.GeneralSettings.TextEditorBackgroundImagePath;
+				DataContext.TextEditorMargin = new Thickness(MainViewModel.EditorSettings.GeneralSettings.TextEditorOffsetX, MainViewModel.EditorSettings.GeneralSettings.TextEditorOffsetY, 0.0, 0.0);
 			}
 			), DispatcherPriority.Render);
 		}
@@ -276,6 +281,10 @@ namespace Satolist2.Module.TextEditor
 	internal class AvalonEditModuleViewModel : NotificationObject
 	{
 		private AvalonEditModule Module { get; }
+		private Brush backgroundColor;
+		private string backgroundImagePath;
+		private Thickness textEditorMargin;
+
 		public ICommand SendToGhostCommand { get; }
 		public ICommand ShowSearchBoxCommand { get; }
 		public ICommand ShowGlobalSearchCommand { get; }
@@ -286,9 +295,12 @@ namespace Satolist2.Module.TextEditor
 		//背景画像パス
 		public string BackgroundImagePath
 		{
-			get
+			get => backgroundImagePath;
+			set
 			{
-				return MainViewModel.EditorSettings.GeneralSettings.TextEditorBackgroundImagePath;
+				backgroundImagePath = value;
+				NotifyChanged();
+				NotifyChanged(nameof(IsEnableBackgroundImage));
 			}
 		}
 
@@ -297,7 +309,7 @@ namespace Satolist2.Module.TextEditor
 		{
 			get
 			{
-				return !string.IsNullOrEmpty(MainViewModel.EditorSettings.GeneralSettings.TextEditorBackgroundImagePath);
+				return !string.IsNullOrEmpty(backgroundImagePath);
 			}
 		}
 
@@ -306,13 +318,32 @@ namespace Satolist2.Module.TextEditor
 		{
 			get
 			{
-				return new Thickness(MainViewModel.EditorSettings.GeneralSettings.TextEditorOffsetX, MainViewModel.EditorSettings.GeneralSettings.TextEditorOffsetY, 0.0, 0.0);
+				return textEditorMargin;
+			}
+
+			set
+			{
+				textEditorMargin = value;
+				NotifyChanged();
+			}
+		}
+
+		//背景色
+		public Brush TextEditorBackgroundColor
+		{
+			get => backgroundColor;
+			set
+			{
+				backgroundColor = value;
+				NotifyChanged();
 			}
 		}
 
 		public AvalonEditModuleViewModel(AvalonEditModule module)
 		{
 			Module = module;
+			textEditorMargin = new Thickness();
+
 			SendToGhostCommand = new ActionCommand(o =>
 			{
 				module.SendToGhost();

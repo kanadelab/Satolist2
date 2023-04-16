@@ -21,7 +21,7 @@
 			<RowDefinition Height="auto" />
 			<RowDefinition Height="*" />
 		</Grid.RowDefinitions>
-		<Grid Grid.Row="1" Background="{Binding TextEditorBackgroundColor, Converter={StaticResource ColorToBrushConverter}}">
+		<Grid Grid.Row="1" Background="{Binding TextEditorBackgroundColor}">
 			<Image Source="{Binding BackgroundImagePath}" Visibility="{Binding IsEnableBackgroundImage, Converter={StaticResource BoolToVisibilityConverter}}" Stretch="None" HorizontalAlignment="Left" VerticalAlignment="Top" />
 			<avalonEdit:TextEditor x:Name="MainTextEditor"
 								   SnapsToDevicePixels="True" Margin="{Binding TextEditorMargin}"
