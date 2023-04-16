@@ -51,6 +51,7 @@
   <PropertyGroup>
     <ApplicationIcon>Resource\satolist.ico</ApplicationIcon>
   </PropertyGroup>
+  <PropertyGroup />
   <ItemGroup>
     <Reference Include="AngleSharp, Version=0.17.1.0, Culture=neutral, PublicKeyToken=e83494dcdc6d31ea, processorArchitecture=MSIL">
       <HintPath>..\packages\AngleSharp.0.17.1\lib\net472\AngleSharp.dll</HintPath>
@@ -162,6 +163,9 @@
     <Compile Include="Control\ReplaceList.xaml.cs">
       <DependentUpon>ReplaceList.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Control\RuntimeBasedSurfaceViewer.xaml.cs">
+      <DependentUpon>RuntimeBasedSurfaceViewer.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Control\SaoriList.xaml.cs">
       <DependentUpon>SaoriList.xaml</DependentUpon>
     </Compile>
@@ -224,6 +228,7 @@
     <Compile Include="Core\SSTPCallBackNativeWindow.cs" />
     <Compile Include="Core\SurfacePreviewImageGenerator.cs" />
     <Compile Include="Core\TemporaryGhostRuntime.cs" />
+    <Compile Include="Core\TemporaryGhostRuntimeEx.cs" />
     <Compile Include="DarkDialogHostWindow.xaml.cs">
       <DependentUpon>DarkDialogHostWindow.xaml</DependentUpon>
     </Compile>
@@ -293,6 +298,7 @@
       <DependentUpon>TextEditorModuleSelector.xaml</DependentUpon>
     </Compile>
     <Compile Include="Theme\ApplicationTheme.cs" />
+    <Compile Include="Utility\ChildProcess.cs" />
     <Compile Include="Utility\CompletionManager.cs" />
     <Compile Include="Utility\Converter.cs" />
     <Compile Include="Utility\DataModelManager.cs" />
@@ -311,6 +317,7 @@
     <Compile Include="Utility\SakuraFMOReader.cs" />
     <Compile Include="Utility\Satorite.cs" />
     <Compile Include="Utility\SatoriUpdator.cs" />
+    <Compile Include="Utility\ShellDescriptAnalyzer.cs" />
     <Compile Include="Utility\SSPBootUtility.cs" />
     <Compile Include="Utility\Surfaces.cs" />
     <Compile Include="Utility\SyntaxHighlight.cs" />
@@ -359,6 +366,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Control\ReplaceList.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Control\RuntimeBasedSurfaceViewer.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

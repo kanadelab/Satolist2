@@ -21,6 +21,8 @@ namespace SatolistLegacyCompat.CompatControls
 	/// </summary>
 	public partial class LegacySurfaceViewer : UserControl
 	{
+		public const string ContentId = "LegacyCompat.SurfaceViewer";
+
 		public Satolist.SurfaceViewer SurfaceViewer { get; }
 		public LegacySurfaceViewer(RootWindow compatRoot)
 		{

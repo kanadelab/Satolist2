@@ -117,14 +117,14 @@ namespace Satolist2
 			//ウインドウはViewModelと違って１個と確定しているのでstaticメンバとしてのアクセスを許容してしまう
 			Instance = this;
 
-			//テンポラリロード不要？
+			//設定の読み込み
 			MainViewModel.StaticInitialize();
 
 			InitializeComponent();
 
 			//互換システムの初期化
 			{
-				var isLegacyEnable = Model.EditorSettings.TemporaryLoadGeneralSettings()?.IsEnableLegacyCompat ?? true;	//テストとしてデフォルトtrue
+				var isLegacyEnable = MainViewModel.EditorSettings.GeneralSettings.IsEnableLegacyCompat;
 				EditorSettings.LoadLegacySettings();
 				SatolistLegacyCompat.CompatCore.ProjectCompat.InitializeControls(isLegacyEnable);
 			}
@@ -146,6 +146,7 @@ namespace Satolist2
 			HelpViewer.IsVisible = false;
 			LegacySurfaceViewer.IsVisible = false;
 			LegacySurfacePalette.IsVisible = false;
+			RuntimeBasedSurfaceViewer.IsVisible = false;
 
 			AllowDrop = true;
 			EventEditors = new List<DockingWindow>();
@@ -190,11 +191,15 @@ namespace Satolist2
 					}
 				});
 
-#if DEPLOY
+#if !DEPLOY
 			//公開時はデバッグメニューを封じておく。今のところ根本に消すわけではないけど
 			DebugMainMenuVisibleMenu.Visibility = Visibility.Collapsed;
 			DebugMainMenuVisibleMenu.IsEnabled = false;
 			DebugMainMenu.Hide();
+
+			//サーフェスビューワv3も封じ
+			RuntimeBasedSurfaceViewerVisibleMenu.Visibility = Visibility.Collapsed;
+			RuntimeBasedSurfaceViewerVisibleMenu.IsEnabled = false;
 #endif
 		}
 
@@ -546,6 +551,7 @@ namespace Satolist2
 			Satorite.ViewModel = mainVm.SatoriteViewModel;
 			UkadocEventReference.ViewModel = mainVm.UkadocEventReferenceViewModel;
 			HelpViewer.ViewModel = mainVm.HelpViewerViewModel;
+			RuntimeBasedSurfaceViewer.ViewModel = mainViewModel.RuntimeBasedSurfaceViewerViewModel;
 			LegacySurfaceViewer.ViewModel = mainVm.LegacySurfaceViewerViewModel;
 			LegacySurfacePalette.ViewModel = mainVm.LegacySurfacePaletteViewModel;
 		}
@@ -573,6 +579,7 @@ namespace Satolist2
 			SatoriteVisibleMenu.DataContext = Satorite;
 			UkadocEventReferenceVisibleMenu.DataContext = UkadocEventReference;
 			HelpViewerVisibleMenu.DataContext = HelpViewer;
+			RuntimeBasedSurfaceViewerVisibleMenu.DataContext = RuntimeBasedSurfaceViewer;
 			LegacySurfaceViewerVisibleMenu.DataContext = LegacySurfaceViewer;
 			LegacySurfacePaletteVisibleMenu.DataContext = LegacySurfacePalette;
 			
@@ -712,6 +719,7 @@ namespace Satolist2
 			yield return InsertPalette;
 			yield return Satorite;
 			yield return UkadocEventReference;
+			yield return RuntimeBasedSurfaceViewer;
 			yield return LegacySurfaceViewer;
 			yield return LegacySurfacePalette;
 		}
@@ -793,10 +801,13 @@ namespace Satolist2
 				case HelpViewerViewModel.ContentId:
 					HelpViewer = (DockingWindow)e.Model;
 					break;
-				case "LegacyCompat.SurfaceViewer":
-					LegacySurfaceViewer = (DockingWindow)e.Model;	//TODO: なんか考える
+				case RuntimeBasedSurfaceViewerViewModel.ContentId:
+					RuntimeBasedSurfaceViewer = (DockingWindow)e.Model;
 					break;
-				case "LegacyCompat.SurfacePalette":
+				case SatolistLegacyCompat.CompatControls.LegacySurfaceViewer.ContentId:
+					LegacySurfaceViewer = (DockingWindow)e.Model;
+					break;
+				case SatolistLegacyCompat.CompatControls.LegacySurfacePalette.ContentId:
 					LegacySurfacePalette = (DockingWindow)e.Model;
 					break;
 				default:
@@ -904,6 +915,7 @@ namespace Satolist2
 		public SatoriteViewModel SatoriteViewModel { get; }
 		public ShioriEventReferenceViewModel UkadocEventReferenceViewModel { get; }
 		public HelpViewerViewModel HelpViewerViewModel { get; }
+		public RuntimeBasedSurfaceViewerViewModel RuntimeBasedSurfaceViewerViewModel { get; }
 		public LegacyControlViewModel LegacySurfaceViewerViewModel { get; }
 		public LegacyControlViewModel LegacySurfacePaletteViewModel { get; }
 		
@@ -943,7 +955,8 @@ namespace Satolist2
 
 		public static void StaticInitialize()
 		{
-			if(EditorSettings == null)
+			DataModelManager.Load();
+			if (EditorSettings == null)
 				EditorSettings = new EditorSettings();
 		}
 
@@ -1030,11 +1043,8 @@ namespace Satolist2
 			//サーフェスプレビューデータを読込
 			SurfacePreview = new SurfacePreviewViewModel(this);
 
-			//エディタ設定のロード
-			//if (EditorSettings == null)
+			//エディタ設定のエラーチェック
 			{
-				EditorSettings = new EditorSettings();
-
 				if (EditorSettings.LoadErrors.Count > 0)
 				{
 					var errDialog = new ErrorListDialog(null, true);
@@ -1045,16 +1055,15 @@ namespace Satolist2
 					{
 						Environment.Exit(1);
 					}
+
+					//警告をリセット
+					EditorSettings.LoadErrors.Clear();
 				}
 
 				//同じタイミングでリストデータ周辺をロード
-				try
+				if(DataModelManager.HasError)
 				{
-					DataModelManager.Load();
-				}
-				catch(Exception ex)
-				{
-					MessageBox.Show("さとりすとの起動に必要な設定ファイルのロードに失敗したため起動できません。\r\nさとりすとを上書き再インストールすると解決するかもしれません。\r\n\r\n" + ex, "エラー");
+					MessageBox.Show("さとりすとの起動に必要なファイルのロードに失敗したため起動できません。\r\nさとりすとを上書き再インストールすると解決するかもしれません。", "エラー");
 					Environment.Exit(1);
 				}
 
@@ -1105,6 +1114,7 @@ namespace Satolist2
 			SatoriteViewModel = new SatoriteViewModel(this);
 			UkadocEventReferenceViewModel = new ShioriEventReferenceViewModel();
 			HelpViewerViewModel = new HelpViewerViewModel();
+			RuntimeBasedSurfaceViewerViewModel = new RuntimeBasedSurfaceViewerViewModel(this);
 			LegacySurfaceViewerViewModel = new LegacyControlViewModel(SatolistLegacyCompat.CompatCore.ProjectCompat.SurfaceViewerControl);
 			LegacySurfacePaletteViewModel = new LegacyControlViewModel(SatolistLegacyCompat.CompatCore.ProjectCompat.SurfacePaletteControl);
 
@@ -1416,7 +1426,6 @@ namespace Satolist2
 					if(AskSave(true))
 					{
 						//ファイル保存先の選択
-						//TODO: developer_options.txt を実装してのテストはできてないので要確認
 						var saveDialog = new SaveFileDialog();
 						saveDialog.Filter = "narゴーストアーカイブ(*.nar)|*.nar|zip圧縮ファイル(*.zip)|*.zip|すべてのファイル|*.*";
 						saveDialog.InitialDirectory = DictionaryUtility.NormalizeWindowsPath(Ghost.FullPath);
@@ -1569,6 +1578,7 @@ namespace Satolist2
 					SurfacePreview.ReloadPreviewData();
 					SurfacePaletteViewModel.UpdateSurfacePreviewData();
 					SurfaceViewerViewModel.UpdateSurfacePreviewData();
+					RuntimeBasedSurfaceViewerViewModel.UpdateSurfacePreviewData();
 				},
 				o => SurfacePreview.SelectedShell != null
 				);
@@ -1582,6 +1592,7 @@ namespace Satolist2
 					//再読み込み
 					SurfacePaletteViewModel.UpdateSurfacePreviewData();
 					SurfaceViewerViewModel.UpdateSurfacePreviewData();
+					RuntimeBasedSurfaceViewerViewModel.UpdateSurfacePreviewData();
 					GenerateSurfacePreviewCommand.NotifyCanExecuteChanged();
 				}
 				);
@@ -1597,6 +1608,7 @@ namespace Satolist2
 					//再読み込み
 					SurfacePaletteViewModel.UpdateSurfacePreviewData();
 					SurfaceViewerViewModel.UpdateSurfacePreviewData();
+					RuntimeBasedSurfaceViewerViewModel.UpdateSurfacePreviewData();
 					GenerateSurfacePreviewCommand.NotifyCanExecuteChanged();
 				}
 				);
@@ -1954,6 +1966,7 @@ namespace Satolist2
 		//サーフェスシェルフォルダ列挙とか
 		public MainViewModel Main { get; }
 		private Core.SurfacePreviewMetaData surfacePreviewData;
+		private RuntimeBasedSurfacePreviewMetaData runtimeBasedSurfacePreviewData;
 		private ObservableCollection<SurfacePreviewViewModelShellItem> shells;
 		private SurfacePreviewViewModelShellItem selectedShell;
 		private ShellImageCache imageCache;
@@ -2012,6 +2025,17 @@ namespace Satolist2
 			set
 			{
 				surfacePreviewData = value;
+				NotifyChanged();
+			}
+		}
+
+		//v3サーフェスプレビューデータ
+		public RuntimeBasedSurfacePreviewMetaData RuntimeBasedSurfacePreviewData
+		{
+			get => runtimeBasedSurfacePreviewData;
+			set
+			{
+				runtimeBasedSurfacePreviewData = value;
 				NotifyChanged();
 			}
 		}
@@ -2125,11 +2149,24 @@ namespace Satolist2
 				{
 					SurfacePreviewData = null;
 				}
+
+#if DEPLOY
+				try
+				{
+					RuntimeBasedSurfacePreviewData = new RuntimeBasedSurfacePreviewMetaData();
+					RuntimeBasedSurfacePreviewData.Load(item.DirectoryFullPath);
+				}
+				catch
+				{
+					RuntimeBasedSurfacePreviewData = null;
+				}
+#endif
 			}
 			else
 			{
 				imageCache = null;
 				SurfacePreviewData = null;
+				RuntimeBasedSurfacePreviewData = null;
 			}
 		}
 
@@ -2152,6 +2189,25 @@ namespace Satolist2
 					isSelected = value;
 					NotifyChanged();
 				}
+			}
+		}
+
+		//v3サーフェスビューワ用のその場で解析するタイプのプレビューモデル
+		internal class RuntimeBasedSurfacePreviewMetaData
+		{
+			public LiteSurfaceAnalyzer Surfaces { get; }
+			public ShellDescriptAnalyzer Descript { get; }
+
+			public RuntimeBasedSurfacePreviewMetaData()
+			{
+				Surfaces = new LiteSurfaceAnalyzer();
+				Descript = new ShellDescriptAnalyzer();
+			}
+
+			public void Load(string shellDirectory)
+			{
+				Surfaces.Load(shellDirectory);
+				Descript.Load(DictionaryUtility.ConbinePath(shellDirectory, "descript.txt"));
 			}
 		}
 	}

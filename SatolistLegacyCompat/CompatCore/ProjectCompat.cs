@@ -58,12 +58,12 @@ namespace SatolistLegacyCompat.CompatCore
 			CompatRoot = new RootWindow();
 
 			SurfaceViewerControl = new CompatContol();
-			SurfaceViewerControl.Id = "SurfaceViewer";
-			SurfaceViewerControl.Label = "サーフェスビューワ(さとりすと 1.x)";
+			SurfaceViewerControl.Id = LegacySurfaceViewer.ContentId;
+			SurfaceViewerControl.Label = "サーフェスビューワv1";
 
 			SurfacePaletteControl = new CompatContol();
-			SurfacePaletteControl.Id = "SurfacePalette";
-			SurfacePaletteControl.Label = "サーフェスパレット(さとりすと 1.x)";
+			SurfacePaletteControl.Id = LegacySurfacePalette.ContentId;
+			SurfacePaletteControl.Label = "サーフェスパレットv1";
 
 			//有効な場合に限り、実体のコントロールの生成を行う
 			//有効でない場合はドッキングコンテンツの識別むけに最低限の生成となる

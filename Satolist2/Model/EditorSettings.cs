@@ -359,7 +359,7 @@ namespace Satolist2.Model
 			TextEditorFontName = EditorSettings.DefaultFont;
 			TextEditorFontSize = EditorSettings.DefaultFontSize;
 
-#if false
+#if true
 			OverrideTextEditorEngine = "AvalonEdit";
 #else
 			//レガシー機能をデフォルトで有効化。評価版につき。

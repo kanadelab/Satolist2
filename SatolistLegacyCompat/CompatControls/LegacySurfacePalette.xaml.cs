@@ -21,6 +21,8 @@ namespace SatolistLegacyCompat.CompatControls
 	/// </summary>
 	public partial class LegacySurfacePalette : UserControl
 	{
+		public const string ContentId = "LegacyCompat.SurfacePalette";
+
 		public Satolist.SurfacePalette SurfacePalette { get; }
 		public LegacySurfacePalette(RootWindow compatRoot)
 		{
