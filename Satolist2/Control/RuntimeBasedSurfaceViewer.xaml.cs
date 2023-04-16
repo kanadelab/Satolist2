@@ -175,42 +175,10 @@ namespace Satolist2.Control
 				//立ち絵のウインドウを取得
 				for (int i = 0; i < CaptureScopeCount; i++)
 				{
-					var item = new WindowItem(Control.FormsHostGrid);
-					BindGhostWindow(item.FormsPanel.Handle, runtimeGhostFMORecord.HWndList[i]);
+					var item = new WindowItem(Control.FormsHostGrid, runtimeGhostFMORecord.HWndList[i]);
 					windowItems.Add(i, item);
 					item.FormsHost.Visibility = Visibility.Collapsed;
 				}
-			}
-		}
-
-		private void BindGhostWindow(IntPtr hostHwnd, IntPtr childHwnd)
-		{
-			//レイヤードウインドウのフラグを付け外ししないとうまくいかないので注意
-			{
-				IntPtr es = Win32Import.GetWindowLongPtr(childHwnd, Win32Import.GWL_EXSTYLE);
-				es = new IntPtr((long)es & ~Win32Import.WS_EX_LAYERED);
-				var rees = Win32Import.SetWindowLongPtr(childHwnd, Win32Import.GWL_EXSTYLE, es);
-			}
-
-			IntPtr result = Win32Import.SetParent(childHwnd, hostHwnd);
-
-			Win32Import.RECT rc = new Win32Import.RECT();
-			Win32Import.GetClientRect(childHwnd, ref rc);
-			int width = rc.right - rc.left;
-			int height = rc.bottom - rc.top;
-
-			var arr = Win32Import.SetWindowPos(childHwnd, hostHwnd, 0, 0, 0, 0, Win32Import.SWP_NOSIZE | Win32Import.SWP_NOZORDER);
-
-			{
-				IntPtr es = Win32Import.GetWindowLongPtr(childHwnd, Win32Import.GWL_EXSTYLE);
-				es = new IntPtr((long)es | Win32Import.WS_EX_LAYERED);
-				var rees = Win32Import.SetWindowLongPtr(childHwnd, Win32Import.GWL_EXSTYLE, es);
-			}
-
-			{
-				IntPtr ws = Win32Import.GetWindowLongPtr(childHwnd, Win32Import.GWL_STYLE);
-				ws = new IntPtr((long)ws | Win32Import.WS_CHILD);
-				var res = Win32Import.SetWindowLongPtr(childHwnd, Win32Import.GWL_STYLE, ws);
 			}
 		}
 
@@ -286,16 +254,56 @@ namespace Satolist2.Control
 
 		private class WindowItem
 		{
-			public WindowsFormsHost FormsHost { get; set; }
-			public System.Windows.Forms.Panel FormsPanel { get; set; }
-			public IntPtr RuntimeHwnd { get; set; }
+			public WindowsFormsHost FormsHost { get; }
+			public System.Windows.Forms.Panel FormsPanel { get; }
+			public IntPtr RuntimeHwnd { get; }
 
-			public WindowItem(Grid parentGrid)
+			public WindowItem(Grid parentGrid, IntPtr runtimeHwnd)
 			{
+				RuntimeHwnd = runtimeHwnd;
 				FormsHost = new WindowsFormsHost();
 				FormsPanel = new System.Windows.Forms.Panel();
 				parentGrid.Children.Add(FormsHost);
 				FormsHost.Child = FormsPanel;
+
+				FormsHost.Loaded += FormsHost_Loaded;
+			}
+
+			private void FormsHost_Loaded(object sender, RoutedEventArgs e)
+			{
+				//WPF側がロードされたタイミングで設定する
+				BindGhostWindow(FormsHost.Handle, RuntimeHwnd);
+			}
+
+			private static void BindGhostWindow(IntPtr hostHwnd, IntPtr childHwnd)
+			{
+				//レイヤードウインドウのフラグを付け外ししないとうまくいかないので注意
+				{
+					IntPtr es = Win32Import.GetWindowLongPtr(childHwnd, Win32Import.GWL_EXSTYLE);
+					es = new IntPtr((long)es & ~Win32Import.WS_EX_LAYERED);
+					var rees = Win32Import.SetWindowLongPtr(childHwnd, Win32Import.GWL_EXSTYLE, es);
+				}
+
+				IntPtr result = Win32Import.SetParent(childHwnd, hostHwnd);
+
+				Win32Import.RECT rc = new Win32Import.RECT();
+				Win32Import.GetClientRect(childHwnd, ref rc);
+				int width = rc.right - rc.left;
+				int height = rc.bottom - rc.top;
+
+				var arr = Win32Import.SetWindowPos(childHwnd, IntPtr.Zero, 0, 0, 0, 0, Win32Import.SWP_NOSIZE | Win32Import.SWP_NOZORDER);
+
+				{
+					IntPtr es = Win32Import.GetWindowLongPtr(childHwnd, Win32Import.GWL_EXSTYLE);
+					es = new IntPtr((long)es | Win32Import.WS_EX_LAYERED);
+					var rees = Win32Import.SetWindowLongPtr(childHwnd, Win32Import.GWL_EXSTYLE, es);
+				}
+
+				{
+					IntPtr ws = Win32Import.GetWindowLongPtr(childHwnd, Win32Import.GWL_STYLE);
+					ws = new IntPtr((long)ws | Win32Import.WS_CHILD);
+					var res = Win32Import.SetWindowLongPtr(childHwnd, Win32Import.GWL_STYLE, ws);
+				}
 			}
 		}
 	}
