@@ -196,7 +196,7 @@ namespace Satolist2
 					}
 				});
 
-#if !DEPLOY
+#if DEPLOY
 			//公開時はデバッグメニューを封じておく。今のところ根本に消すわけではないけど
 			DebugMainMenuVisibleMenu.Visibility = Visibility.Collapsed;
 			DebugMainMenuVisibleMenu.IsEnabled = false;
