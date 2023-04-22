@@ -72,10 +72,14 @@ namespace Satolist2.Module.TextEditor
 
 		private void TextEditorModuleSelector_Loaded(object sender, RoutedEventArgs e)
 		{
-			MainTextEditor.OnShowSearchBoxRequested += MainTextEditor_OnShowSearchBoxRequested;
-			MainTextEditor.OnTextChanged += MainTextEditor_OnTextChanged;
-			MainTextEditor.OnShowGlobalSearchBox += MainTextEditor_OnShowGlobalSearchBox;
-			MainTextEditor.OnSendToGhost += MainTextEditor_OnSendToGhost;
+			if (!MainTextEditor.IsEventRegistered)
+			{
+				MainTextEditor.OnShowSearchBoxRequested += MainTextEditor_OnShowSearchBoxRequested;
+				MainTextEditor.OnTextChanged += MainTextEditor_OnTextChanged;
+				MainTextEditor.OnShowGlobalSearchBox += MainTextEditor_OnShowGlobalSearchBox;
+				MainTextEditor.OnSendToGhost += MainTextEditor_OnSendToGhost;
+				MainTextEditor.IsEventRegistered = true;
+			}
 		}
 
 		private void TextEditorModuleSelector_Unloaded(object sender, RoutedEventArgs e)

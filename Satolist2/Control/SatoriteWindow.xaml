@@ -21,6 +21,6 @@
 			<MenuItem Header="ゴーストに送信 (Alt+Q)" Command="{Binding SendToGhostCommand}" />
 		</Menu>
 
-		<module:TextEditorModuleSelector Grid.Row="1" x:Name="MainTextEditor" />
+		<module:TextEditorModuleSelector Grid.Row="1" SendToGhostCommand="{Binding SendToGhostCommand}" x:Name="MainTextEditor" />
 	</Grid>
 </UserControl>

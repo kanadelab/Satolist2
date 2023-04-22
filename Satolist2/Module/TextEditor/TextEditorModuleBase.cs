@@ -34,6 +34,7 @@ namespace Satolist2.Module.TextEditor
 			}
 		}
 
+		internal bool IsEventRegistered { get; set; }
 		public virtual int CurrentMatchCount => CurrentMatches?.Count ?? 0;
 
 		//行数
