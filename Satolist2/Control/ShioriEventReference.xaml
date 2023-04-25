@@ -41,7 +41,7 @@
 				</TreeView.ItemContainerStyle>
 			</TreeView>
 
-			<GridSplitter Grid.Column="1" Width="5" />
+			<GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Center" />
 
 			<ScrollViewer Grid.Column="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
 				<StackPanel DataContext="{Binding SelectedItem, ElementName=EventTree}" Visibility="{Binding IsEventNode, FallbackValue=Collapsed, Converter={StaticResource BooleanToVisibilityConverter}}">
