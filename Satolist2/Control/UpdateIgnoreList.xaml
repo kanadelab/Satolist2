@@ -82,8 +82,8 @@
 												</Button>
 												<Popup IsOpen="{Binding IsContextMenuOpen, Mode=TwoWay}" StaysOpen="False" Placement="Right">
 													<StackPanel>
-														<MenuItem Header="ファイルを選択" Command="{Binding SelectFileCommand}" />
-														<MenuItem Header="フォルダを選択" Command="{Binding SelectDirectoryCommand}" />
+														<Button Content="ファイルを選択" Command="{Binding SelectFileCommand}" MinWidth="100" Padding="3"/>
+														<Button Content="フォルダを選択" Command="{Binding SelectDirectoryCommand}" MinWidth="100" Padding="3"/>
 													</StackPanel>
 												</Popup>
 											</Grid>
