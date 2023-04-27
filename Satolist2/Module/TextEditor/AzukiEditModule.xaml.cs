@@ -66,9 +66,12 @@ namespace Satolist2.Module.TextEditor
 
 		private void MainTextEditor_SizeChanged(object sender, EventArgs e)
 		{
-			//改行位置基準を設定する必要あり
-			//値はさとりすとv1より
-			MainTextEditor.ViewWidth = MainTextEditor.Width - 30;
+			//コントロール開始時に呼ぶと初期状態の改行位置が正しくないので、BeginInvokeでタイミング調整
+			Dispatcher.BeginInvoke(new Action(() => {
+				//改行位置基準を設定する必要あり
+				//値はさとりすとv1より
+				MainTextEditor.ViewWidth = MainTextEditor.Width - 30;
+			}), System.Windows.Threading.DispatcherPriority.Render);
 		}
 
 		private void RequestCopy(object sender, EventArgs args)
