@@ -78,6 +78,7 @@
 				<MenuItem Header="挿入パレット" x:Name="InsertPaletteVisibleMenu" IsCheckable="True" IsChecked="{Binding IsVisible, Mode=TwoWay}" />
 				<MenuItem Header="さとりて" x:Name="SatoriteVisibleMenu" IsCheckable="True" IsChecked="{Binding IsVisible, Mode=TwoWay}" />
 				<MenuItem Header="Ukadocイベントリファレンス" x:Name="UkadocEventReferenceVisibleMenu" IsCheckable="True" IsChecked="{Binding IsVisible, Mode=TwoWay}" />
+				<MenuItem Header="Ukadocスクリプトリファレンス" x:Name="UkadocScriptReferenceVisibleMenu" IsCheckable="True" IsChecked="{Binding IsVisible, Mode=TwoWay}" />
 				<MenuItem Header="ヘルプ(試験的)" x:Name="HelpViewerVisibleMenu" IsCheckable="True" IsChecked="{Binding IsVisible, Mode=TwoWay}" />
 				<Separator />
 				<MenuItem Header="さとりすと1.x互換機能" Visibility="{Binding IsEnabledLegacyCompat, Converter={StaticResource BoolToVisibilityConverter}}">
@@ -248,6 +249,10 @@
 						<!--Ukadocイベントリファレンス-->
 						<util:DockingWindow x:Name="UkadocEventReference">
 							<ctl:ShioriEventReference />
+						</util:DockingWindow>
+
+						<util:DockingWindow x:Name="UkadocScriptReference">
+							<ctl:UkadocScriptReference />
 						</util:DockingWindow>
 
 					</avalonDock:LayoutAnchorablePane>

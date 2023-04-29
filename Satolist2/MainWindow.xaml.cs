@@ -148,6 +148,7 @@ namespace Satolist2
 			Satorite.IsVisible = false;
 			DebugMainMenu.IsVisible = false;
 			UkadocEventReference.IsVisible = false;
+			UkadocScriptReference.IsVisible = false;
 			HelpViewer.IsVisible = false;
 			LegacySurfaceViewer.IsVisible = false;
 			LegacySurfacePalette.IsVisible = false;
@@ -192,6 +193,7 @@ namespace Satolist2
 
 							//ビューモデルをリフレッシュ
 							mainViewModel.UkadocEventReferenceViewModel.RefleshView();
+							mainViewModel.UkadocScriptReferenceViewModel.RefleshView();
 						});
 					}
 				});
@@ -557,6 +559,7 @@ namespace Satolist2
 			InsertPalette.ViewModel = mainVm.InsertPaletteViewModel;
 			Satorite.ViewModel = mainVm.SatoriteViewModel;
 			UkadocEventReference.ViewModel = mainVm.UkadocEventReferenceViewModel;
+			UkadocScriptReference.ViewModel = mainVm.UkadocScriptReferenceViewModel;
 			HelpViewer.ViewModel = mainVm.HelpViewerViewModel;
 			RuntimeBasedSurfaceViewer.ViewModel = mainViewModel.RuntimeBasedSurfaceViewerViewModel;
 			LegacySurfaceViewer.ViewModel = mainVm.LegacySurfaceViewerViewModel;
@@ -585,6 +588,7 @@ namespace Satolist2
 			InsertPaletteVisibleMenu.DataContext = InsertPalette;
 			SatoriteVisibleMenu.DataContext = Satorite;
 			UkadocEventReferenceVisibleMenu.DataContext = UkadocEventReference;
+			UkadocScriptReferenceVisibleMenu.DataContext = UkadocScriptReference;
 			HelpViewerVisibleMenu.DataContext = HelpViewer;
 			RuntimeBasedSurfaceViewerVisibleMenu.DataContext = RuntimeBasedSurfaceViewer;
 			LegacySurfaceViewerVisibleMenu.DataContext = LegacySurfaceViewer;
@@ -726,6 +730,7 @@ namespace Satolist2
 			yield return InsertPalette;
 			yield return Satorite;
 			yield return UkadocEventReference;
+			yield return UkadocScriptReference;
 			yield return RuntimeBasedSurfaceViewer;
 			yield return LegacySurfaceViewer;
 			yield return LegacySurfacePalette;
@@ -804,6 +809,9 @@ namespace Satolist2
 					break;
 				case ShioriEventReferenceViewModel.ContentId:
 					UkadocEventReference = (DockingWindow)e.Model;
+					break;
+				case UkadocScriptReferenceViewModel.ContentId:
+					UkadocScriptReference = (DockingWindow)e.Model;
 					break;
 				case HelpViewerViewModel.ContentId:
 					HelpViewer = (DockingWindow)e.Model;
@@ -935,6 +943,7 @@ namespace Satolist2
 		public InsertPaletteViewModel InsertPaletteViewModel { get; }
 		public SatoriteViewModel SatoriteViewModel { get; }
 		public ShioriEventReferenceViewModel UkadocEventReferenceViewModel { get; }
+		public UkadocScriptReferenceViewModel UkadocScriptReferenceViewModel { get; }
 		public HelpViewerViewModel HelpViewerViewModel { get; }
 		public RuntimeBasedSurfaceViewerViewModel RuntimeBasedSurfaceViewerViewModel { get; }
 		public LegacyControlViewModel LegacySurfaceViewerViewModel { get; }
@@ -1134,6 +1143,7 @@ namespace Satolist2
 			InsertPaletteViewModel = new InsertPaletteViewModel(this);
 			SatoriteViewModel = new SatoriteViewModel(this);
 			UkadocEventReferenceViewModel = new ShioriEventReferenceViewModel();
+			UkadocScriptReferenceViewModel = new UkadocScriptReferenceViewModel();
 			HelpViewerViewModel = new HelpViewerViewModel();
 			RuntimeBasedSurfaceViewerViewModel = new RuntimeBasedSurfaceViewerViewModel(this);
 			LegacySurfaceViewerViewModel = new LegacyControlViewModel(SatolistLegacyCompat.CompatCore.ProjectCompat.SurfaceViewerControl);

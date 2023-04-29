@@ -3,6 +3,7 @@ using AngleSharp.Html.Parser;
 using FluentFTP.Servers.Handlers;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using Newtonsoft.Json;
+using Satolist2.Model;
 using Satolist2.Utility;
 using System;
 using System.Collections.Generic;
@@ -13,6 +14,7 @@ using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Web.UI.WebControls;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -34,6 +36,19 @@ namespace Satolist2.Control
 		{
 			InitializeComponent();
 		}
+
+		//スクリプトツリーアイテムのダブルクリック
+		private void ScriptTreeViewItem_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+		{
+			if(sender is FrameworkElement elem)
+			{
+				if(elem.DataContext is UkadocSakuraScriptViewModel vm)
+				{
+					vm.InsertCommand?.Execute(null);
+					e.Handled = true;
+				}
+			}
+		}
 	}
 
 	public class ShioriEventReferenceViewModel : NotificationObject, IDockingWindowContent, IControlBindedReceiver
@@ -44,10 +59,12 @@ namespace Satolist2.Control
 
 		private bool isLoaded_;
 		private UkadocCategoryViewModel[] items;
+		private UkadocSakuraScriptCategoryViewModel[] scriptItems;
 		private Dictionary<string, UkadocEventViewModel> events;
 
 		private ShioriEventReference Control { get; set; }
 		public ReadOnlyCollection<UkadocCategoryViewModel> Items => new ReadOnlyCollection<UkadocCategoryViewModel>(items);
+		public ReadOnlyCollection<UkadocSakuraScriptCategoryViewModel> ScriptItems => new ReadOnlyCollection<UkadocSakuraScriptCategoryViewModel>(scriptItems);
 
 		//ukadocデータを読み込めているか
 		public bool IsLoaded
@@ -60,7 +77,6 @@ namespace Satolist2.Control
 			}
 		}
 		
-
 		public ShioriEventReferenceViewModel()
 		{
 			events = new Dictionary<string, UkadocEventViewModel>();
@@ -108,6 +124,7 @@ namespace Satolist2.Control
 			{
 				var categories = MainViewModel.EditorSettings.TemporarySettings.UkadocCache.EventReferenceCategories.ToArray();
 				items = categories.Select(o => new UkadocCategoryViewModel(o)).ToArray();
+				scriptItems = MainViewModel.EditorSettings.TemporarySettings.UkadocCache.SakuraScriptReferenceCategories.Select(o => new UkadocSakuraScriptCategoryViewModel(o)).ToArray();
 
 				//検索用にまとめる
 				events.Clear();
@@ -123,9 +140,11 @@ namespace Satolist2.Control
 			else
 			{
 				items = Array.Empty<UkadocCategoryViewModel>();
+				scriptItems = Array.Empty<UkadocSakuraScriptCategoryViewModel>();
 				IsLoaded = false;
 			}
 			NotifyChanged(nameof(Items));
+			NotifyChanged(nameof(ScriptItems));
 		}
 	}
 
@@ -134,7 +153,7 @@ namespace Satolist2.Control
 	{
 		private static readonly Regex HtmlTagPattern = new Regex(@"<(""[^""]*""|'[^']*'|[^'"">])*>");
 		private static readonly Regex HtmlIndentPattern = new Regex(@"[\r\n]+[\t 　]+");
-		private static readonly Regex HtmlNewLinePattern = new Regex(@"(<br[ 　]*/?>|</li>|</p>)");
+		private static readonly Regex HtmlNewLinePattern = new Regex(@"(<br[ 　]*/?>|</li>|</p>|</dd>|</dt>)");
 		private static readonly Regex HtmlTextNewLinePattern = new Regex(@"[\r\n]+");
 
 		private static string EscapeHtml(string rawString)
@@ -162,90 +181,163 @@ namespace Satolist2.Control
 			{
 				try
 				{
+					//イベントリストの取得
 					List<UkadocCategoryModel> categories = new List<UkadocCategoryModel>();
-
-					WebClient webClient = new WebClient();
-					webClient.Encoding = System.Text.Encoding.UTF8;
-					var str = webClient.DownloadString(@"http://ssp.shillest.net/ukadoc/manual/list_shiori_event.html");
-					var parser = new HtmlParser();
-					var document = parser.ParseDocument(str);
-					var categoryItems = document.GetElementsByClassName("navigation-category");
-					foreach (var item in categoryItems)
 					{
-						//1つはヘッダ、1つはリスト
-						var ul = item.Children.FirstOrDefault(o => o is AngleSharp.Html.Dom.IHtmlUnorderedListElement);
-						var head = item.Children.FirstOrDefault(o => o is AngleSharp.Html.Dom.IHtmlHeadingElement);
-
-						if (head == null || ul == null)
-							continue;
-						var category = new UkadocCategoryModel();
-						category.Name = head.InnerHtml;
-						categories.Add(category);
-
-						if (ul != null)
+						WebClient webClient = new WebClient();
+						webClient.Encoding = System.Text.Encoding.UTF8;
+						var str = webClient.DownloadString(@"http://ssp.shillest.net/ukadoc/manual/list_shiori_event.html");
+						var parser = new HtmlParser();
+						var document = parser.ParseDocument(str);
+						var categoryItems = document.GetElementsByClassName("navigation-category");
+						foreach (var item in categoryItems)
 						{
-							foreach (var listitem in ul.Children)
+							//1つはヘッダ、1つはリスト
+							var ul = item.Children.FirstOrDefault(o => o is AngleSharp.Html.Dom.IHtmlUnorderedListElement);
+							var head = item.Children.FirstOrDefault(o => o is AngleSharp.Html.Dom.IHtmlHeadingElement);
+
+							if (head == null || ul == null)
+								continue;
+							var category = new UkadocCategoryModel();
+							category.Name = head.InnerHtml;
+							categories.Add(category);
+
+							if (ul != null)
 							{
-								//リストアイテムをリストアップする
-								if (listitem is AngleSharp.Html.Dom.IHtmlListItemElement itemElem)
+								foreach (var listitem in ul.Children)
 								{
-									var anchor = (AngleSharp.Html.Dom.IHtmlAnchorElement)itemElem.Children.FirstOrDefault(o => o is AngleSharp.Html.Dom.IHtmlAnchorElement);
-									if (anchor != null)
+									//リストアイテムをリストアップする
+									if (listitem is AngleSharp.Html.Dom.IHtmlListItemElement itemElem)
 									{
-										var eventId = anchor.Hash.Substring(1);
-										var ev = document.GetElementById(eventId);
-
-										if (ev == null)
-											continue;
-
-										var evHead = ev.Children[0];
-										var evDetail = ev.Children[1];
-
-										var eventNode = new UkadocEventModel();
-										eventNode.Name = eventId;
-										category.Events.Add(eventNode);
-
-										//evDetailのクラス設定無しの子が本文
-										//リファレンス類はreference,ベースウェアはsupported-baseware
-										foreach (var detailItem in evDetail.Children)
+										var anchor = (AngleSharp.Html.Dom.IHtmlAnchorElement)itemElem.Children.FirstOrDefault(o => o is AngleSharp.Html.Dom.IHtmlAnchorElement);
+										if (anchor != null)
 										{
-											if (!string.IsNullOrEmpty(detailItem.ClassName))
+											var eventId = anchor.Hash.Substring(1);
+											var ev = document.GetElementById(eventId);
+
+											if (ev == null)
 												continue;
-											eventNode.Details.Add(EscapeHtml(detailItem.InnerHtml));
-										}
 
-										var evReference = evDetail.GetElementsByClassName("reference").FirstOrDefault();
-										var evReferenceItems = evReference?.Children;
-										var supportedBaseware = evDetail.GetElementsByClassName("supported-baseware").FirstOrDefault();
-										var supportedBasewareItems = supportedBaseware?.Children;
+											var evHead = ev.Children[0];
+											var evDetail = ev.Children[1];
 
-										if (evReferenceItems != null)
-										{
-											for (int i = 0; i + 1 < evReferenceItems.Length; i += 2)
+											var eventNode = new UkadocEventModel();
+											eventNode.Name = eventId;
+											category.Events.Add(eventNode);
+
+											//evDetailのクラス設定無しの子が本文
+											//リファレンス類はreference,ベースウェアはsupported-baseware
+											foreach (var detailItem in evDetail.Children)
 											{
-												eventNode.References.Add(new Tuple<string, string>(
-													EscapeHtml(evReferenceItems[i].InnerHtml),
-													EscapeHtml(evReferenceItems[i + 1].InnerHtml)
-													));
+												if (!string.IsNullOrEmpty(detailItem.ClassName))
+													continue;
+												eventNode.Details.Add(EscapeHtml(detailItem.InnerHtml));
 											}
-										}
 
-										if (supportedBasewareItems != null)
-										{
-											foreach (var bw in supportedBasewareItems)
+											var evReference = evDetail.GetElementsByClassName("reference").FirstOrDefault();
+											var evReferenceItems = evReference?.Children;
+											var supportedBaseware = evDetail.GetElementsByClassName("supported-baseware").FirstOrDefault();
+											var supportedBasewareItems = supportedBaseware?.Children;
+
+											if (evReferenceItems != null)
 											{
-												if (bw.Children.FirstOrDefault() is AngleSharp.Html.Dom.IHtmlImageElement img && !string.IsNullOrEmpty(img.AlternativeText))
-													eventNode.SupportedBasewares.Add(EscapeHtml(img.AlternativeText));
+												for (int i = 0; i + 1 < evReferenceItems.Length; i += 2)
+												{
+													eventNode.References.Add(new Tuple<string, string>(
+														EscapeHtml(evReferenceItems[i].InnerHtml),
+														EscapeHtml(evReferenceItems[i + 1].InnerHtml)
+														));
+												}
+											}
+
+											if (supportedBasewareItems != null)
+											{
+												foreach (var bw in supportedBasewareItems)
+												{
+													if (bw.Children.FirstOrDefault() is AngleSharp.Html.Dom.IHtmlImageElement img && !string.IsNullOrEmpty(img.AlternativeText))
+														eventNode.SupportedBasewares.Add(EscapeHtml(img.AlternativeText));
+												}
 											}
 										}
 									}
 								}
 							}
 						}
+						/*
+						return new UkadocCacheData()
+						{
+							EventReferenceCategories = categories
+						};
+						*/
 					}
+
+					//さくらスクリプトリストの取得
+					List<UkadocSakuraScriptCategoryModel> sakuraScriptCategories = new List<UkadocSakuraScriptCategoryModel>();
+					{
+						WebClient webClient = new WebClient();
+						webClient.Encoding = System.Text.Encoding.UTF8;
+						var str = webClient.DownloadString(@"http://ssp.shillest.net/ukadoc/manual/list_sakura_script.html");
+						var parser = new HtmlParser();
+						var document = parser.ParseDocument(str);
+						var categoryItems = document.GetElementsByClassName("navigation-category");
+
+						foreach(var item in categoryItems)
+						{
+							var ul = item.Children.FirstOrDefault(o => o is AngleSharp.Html.Dom.IHtmlUnorderedListElement);
+							var head = item.Children.FirstOrDefault(o => o is AngleSharp.Html.Dom.IHtmlHeadingElement);
+
+							if (head == null || ul == null)
+								continue;
+							var category = new UkadocSakuraScriptCategoryModel();
+							category.Name = head.InnerHtml;
+							sakuraScriptCategories.Add(category);
+
+							foreach (var listItem in ul.Children)
+							{
+								//リストアイテムのリストアップ
+								if (listItem is AngleSharp.Html.Dom.IHtmlListItemElement itemElem)
+								{
+									var anchor = (AngleSharp.Html.Dom.IHtmlAnchorElement)itemElem.Children.FirstOrDefault(o => o is AngleSharp.Html.Dom.IHtmlAnchorElement);
+									if (anchor != null)
+									{
+										var eventId = anchor.Hash.Substring(1);
+										var ev = document.GetElementById(eventId);
+										var name = anchor.InnerHtml.ToString();
+
+										//さくらスクリプト形式の "\" から始まらない場合は無視して読み飛ばす
+										if (ev == null || !name.StartsWith(@"\"))
+											continue;
+
+										var evHead = ev.Children[0];
+										var evDetail = ev.Children[1];
+
+										var scriptNode = new UkadocSakuraScriptModel();
+										scriptNode.Name = name;
+										category.Scripts.Add(scriptNode);
+
+										//説明を追加
+										foreach (var detailItem in evDetail.Children)
+										{
+											if (!string.IsNullOrEmpty(detailItem.ClassName))
+												continue;
+											scriptNode.Details.Add(EscapeHtml(detailItem.InnerHtml));
+										}
+									}
+								}
+							}
+
+							if(!category.Scripts.Any())
+							{
+								//からっぽなら削除
+								sakuraScriptCategories.Remove(category);
+							}
+						}
+					}
+
 					return new UkadocCacheData()
 					{
-						EventReferenceCategories = categories
+						EventReferenceCategories = categories,
+						SakuraScriptReferenceCategories = sakuraScriptCategories
 					};
 				}
 				catch
@@ -265,12 +357,45 @@ namespace Satolist2.Control
 		[JsonProperty]
 		public List<UkadocCategoryModel> EventReferenceCategories { get; set; }
 		[JsonProperty]
+		public List<UkadocSakuraScriptCategoryModel> SakuraScriptReferenceCategories { get; set; }
+		[JsonProperty]
 		public int Version { get; set; }
 
 		public UkadocCacheData()
 		{
 			EventReferenceCategories = new List<UkadocCategoryModel>();
+			SakuraScriptReferenceCategories = new List<UkadocSakuraScriptCategoryModel>();
 			Version = CurrentUkadocCacheVersion;
+		}
+	}
+
+	//さくらスクリプトカテゴリモデル
+	public class UkadocSakuraScriptCategoryModel
+	{
+		[JsonProperty]
+		public string Name { get; set; }
+		[JsonProperty]
+		public List<UkadocSakuraScriptModel> Scripts { get; }
+
+		public UkadocSakuraScriptCategoryModel()
+		{
+			Name = string.Empty;
+			Scripts = new List<UkadocSakuraScriptModel>();
+		}
+	}
+
+	//さくらスクリプトのモデル
+	public class UkadocSakuraScriptModel
+	{
+		[JsonProperty]
+		public string Name { get; set; }
+		//説明
+		[JsonProperty]
+		public List<string> Details { get; set; }
+
+		public UkadocSakuraScriptModel()
+		{
+			Details = new List<string>();
 		}
 	}
 
