@@ -9,6 +9,7 @@
 
 	<SolidColorBrush x:Key="ThemeRed">IndianRed</SolidColorBrush>
 	<SolidColorBrush x:Key="ThemeGreen">Lime</SolidColorBrush>
+	<SolidColorBrush x:Key="ThemeDarkGreen">Green</SolidColorBrush>
 	<SolidColorBrush x:Key="ThemeBlue">DodgerBlue</SolidColorBrush>
 	<SolidColorBrush x:Key="ThemeDarkRed">Red</SolidColorBrush>
 	<SolidColorBrush x:Key="ThemePeachPuff">Darkred</SolidColorBrush>

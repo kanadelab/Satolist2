@@ -2,6 +2,7 @@
 					xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 	<SolidColorBrush x:Key="ThemeRed">Red</SolidColorBrush>
 	<SolidColorBrush x:Key="ThemeGreen">Green</SolidColorBrush>
+	<SolidColorBrush x:Key="ThemeDarkGreen">Green</SolidColorBrush>
 	<SolidColorBrush x:Key="ThemeBlue">Blue</SolidColorBrush>
 	<SolidColorBrush x:Key="ThemeDarkRed">DarkRed</SolidColorBrush>
 	<SolidColorBrush x:Key="ThemePeachPuff">#444400</SolidColorBrush>

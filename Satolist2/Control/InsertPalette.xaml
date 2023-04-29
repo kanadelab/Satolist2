@@ -39,7 +39,7 @@
 										<Path Stretch="Fill" Margin="0" x:Name="ListPath" VerticalAlignment="Center" HorizontalAlignment="Center">
 											<Path.Style>
 												<Style TargetType="Path">
-													<Setter Property="Fill" Value="{StaticResource ThemeGreen}"/>
+													<Setter Property="Fill" Value="{StaticResource ThemeDarkGreen}"/>
 
 													<Style.Triggers>
 														<DataTrigger Binding="{Binding Type}" Value="Group">
