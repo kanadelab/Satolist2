@@ -188,6 +188,9 @@
     <Compile Include="Control\TextEditorSearchBox.xaml.cs">
       <DependentUpon>TextEditorSearchBox.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Control\UkadocScriptReference.xaml.cs">
+      <DependentUpon>UkadocScriptReference.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Control\UpdateIgnoreList.xaml.cs">
       <DependentUpon>UpdateIgnoreList.xaml</DependentUpon>
     </Compile>
@@ -419,6 +422,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Control\TextEditorSearchBox.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Control\UkadocScriptReference.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
