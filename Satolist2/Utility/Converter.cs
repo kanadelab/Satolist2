@@ -3,6 +3,7 @@ using ICSharpCode.AvalonEdit.Document;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Configuration.Internal;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Globalization;
@@ -144,6 +145,39 @@ namespace Satolist2.Utility
 		}
 
 		public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+		{
+			throw new NotImplementedException();
+		}
+	}
+
+	//検索フィルタのヒット有無でVisibilityを切り替えるコンバータ
+	//[0] フィルタ対象
+	//[1] 検索ボックス側の文字列
+	internal class SearchFilterConverter : IMultiValueConverter
+	{
+		public interface IFilter
+		{
+			bool Filter(string filterString);
+		}
+
+		public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+		{
+			if (values[0] is IFilter filter && values[1] is string filterString)
+			{
+				if(string.IsNullOrWhiteSpace(filterString))
+				{
+					//空白なら強制的に許容される
+					return Visibility.Visible;
+				}
+				return filter.Filter(filterString) ? Visibility.Visible : Visibility.Collapsed;
+			}
+			else
+			{
+				return Visibility.Visible;
+			}
+		}
+
+		public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
 		{
 			throw new NotImplementedException();
 		}

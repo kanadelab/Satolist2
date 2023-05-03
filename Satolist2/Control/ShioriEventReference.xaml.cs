@@ -9,11 +9,13 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Web;
 using System.Web.UI.WebControls;
 using System.Windows;
 using System.Windows.Controls;
@@ -42,7 +44,7 @@ namespace Satolist2.Control
 		{
 			if(sender is FrameworkElement elem)
 			{
-				if(elem.DataContext is UkadocSakuraScriptViewModel vm)
+				if(elem.DataContext is UkadocEventViewModel vm)
 				{
 					vm.InsertCommand?.Execute(null);
 					e.Handled = true;
@@ -57,10 +59,11 @@ namespace Satolist2.Control
 		public string DockingTitle => "Ukadocイベントリファレンス";
 		public string DockingContentId => ContentId;
 
-		private bool isLoaded_;
+		private bool isLoaded;
 		private UkadocCategoryViewModel[] items;
 		private UkadocSakuraScriptCategoryViewModel[] scriptItems;
 		private Dictionary<string, UkadocEventViewModel> events;
+		private string searchString;
 
 		private ShioriEventReference Control { get; set; }
 		public ReadOnlyCollection<UkadocCategoryViewModel> Items => new ReadOnlyCollection<UkadocCategoryViewModel>(items);
@@ -69,10 +72,21 @@ namespace Satolist2.Control
 		//ukadocデータを読み込めているか
 		public bool IsLoaded
 		{
-			get => isLoaded_;
+			get => isLoaded;
 			set
 			{
-				isLoaded_ = value;
+				isLoaded = value;
+				NotifyChanged();
+			}
+		}
+
+		//検索ボックス
+		public string SearchString
+		{
+			get => searchString;
+			set
+			{
+				searchString = value;
 				NotifyChanged();
 			}
 		}
@@ -86,6 +100,10 @@ namespace Satolist2.Control
 		//イベントが存在していれば選択する
 		public void TrySelectEvent(string eventName)
 		{
+			//検索ボックスで検索が指定されていたた、無視してみる
+			if (!string.IsNullOrWhiteSpace(SearchString))
+				return;
+
 			//イベントを検索して、見つけたものに移動する
 			UkadocEventViewModel ev;
 			if(events.TryGetValue(eventName, out ev))
@@ -156,6 +174,9 @@ namespace Satolist2.Control
 		private static readonly Regex HtmlNewLinePattern = new Regex(@"(<br[ 　]*/?>|</li>|</p>|</dd>|</dt>)");
 		private static readonly Regex HtmlTextNewLinePattern = new Regex(@"[\r\n]+");
 
+		public const string ScriptReferenceUrl = @"http://ssp.shillest.net/ukadoc/manual/list_sakura_script.html";
+		public const string EventReferenceUrl = @"http://ssp.shillest.net/ukadoc/manual/list_shiori_event.html";
+
 		private static string EscapeHtml(string rawString)
 		{
 			var str = rawString;
@@ -172,7 +193,7 @@ namespace Satolist2.Control
 			//htmlタグの除去
 			str = HtmlTagPattern.Replace(str, "");
 
-			return str;
+			return HttpUtility.HtmlDecode(str);
 		}
 
 		public static Task<UkadocCacheData> DownloadAsync()
@@ -186,7 +207,7 @@ namespace Satolist2.Control
 					{
 						WebClient webClient = new WebClient();
 						webClient.Encoding = System.Text.Encoding.UTF8;
-						var str = webClient.DownloadString(@"http://ssp.shillest.net/ukadoc/manual/list_shiori_event.html");
+						var str = webClient.DownloadString(EventReferenceUrl);
 						var parser = new HtmlParser();
 						var document = parser.ParseDocument(str);
 						var categoryItems = document.GetElementsByClassName("navigation-category");
@@ -223,6 +244,7 @@ namespace Satolist2.Control
 
 											var eventNode = new UkadocEventModel();
 											eventNode.Name = eventId;
+											eventNode.DocumentId = eventId;
 											category.Events.Add(eventNode);
 
 											//evDetailのクラス設定無しの子が本文
@@ -276,7 +298,7 @@ namespace Satolist2.Control
 					{
 						WebClient webClient = new WebClient();
 						webClient.Encoding = System.Text.Encoding.UTF8;
-						var str = webClient.DownloadString(@"http://ssp.shillest.net/ukadoc/manual/list_sakura_script.html");
+						var str = webClient.DownloadString(ScriptReferenceUrl);
 						var parser = new HtmlParser();
 						var document = parser.ParseDocument(str);
 						var categoryItems = document.GetElementsByClassName("navigation-category");
@@ -310,9 +332,12 @@ namespace Satolist2.Control
 
 										var evHead = ev.Children[0];
 										var evDetail = ev.Children[1];
+										var supportedBaseware = evDetail.GetElementsByClassName("supported-baseware").FirstOrDefault();
+										var supportedBasewareItems = supportedBaseware?.Children;
 
 										var scriptNode = new UkadocSakuraScriptModel();
 										scriptNode.Name = name;
+										scriptNode.DocumentId = eventId;
 										category.Scripts.Add(scriptNode);
 
 										//説明を追加
@@ -321,6 +346,16 @@ namespace Satolist2.Control
 											if (!string.IsNullOrEmpty(detailItem.ClassName))
 												continue;
 											scriptNode.Details.Add(EscapeHtml(detailItem.InnerHtml));
+										}
+
+										//ベースウェア指定を追加
+										if (supportedBasewareItems != null)
+										{
+											foreach (var bw in supportedBasewareItems)
+											{
+												if (bw.Children.FirstOrDefault() is AngleSharp.Html.Dom.IHtmlImageElement img && !string.IsNullOrEmpty(img.AlternativeText))
+													scriptNode.SupportedBasewares.Add(EscapeHtml(img.AlternativeText));
+											}
 										}
 									}
 								}
@@ -387,8 +422,15 @@ namespace Satolist2.Control
 	//さくらスクリプトのモデル
 	public class UkadocSakuraScriptModel
 	{
+		//名前
 		[JsonProperty]
 		public string Name { get; set; }
+		//html上のID(ブラウザで開く際に使用)
+		[JsonProperty]
+		public string DocumentId { get; set; }
+		//使えるベースウェア
+		[JsonProperty]
+		public List<string> SupportedBasewares { get; set; }
 		//説明
 		[JsonProperty]
 		public List<string> Details { get; set; }
@@ -396,6 +438,7 @@ namespace Satolist2.Control
 		public UkadocSakuraScriptModel()
 		{
 			Details = new List<string>();
+			SupportedBasewares = new List<string>();
 		}
 	}
 
@@ -422,6 +465,9 @@ namespace Satolist2.Control
 		//イベント名
 		[JsonProperty]
 		public string Name { get; set; }
+		//html側ID
+		[JsonProperty]
+		public string DocumentId { get; set; }
 		//サポートベースウェア
 		[JsonProperty]
 		public List<string> SupportedBasewares { get; set; }
@@ -442,7 +488,7 @@ namespace Satolist2.Control
 	}
 
 	//Ukadocのカテゴリビューモデル
-	public class UkadocCategoryViewModel : NotificationObject
+	public class UkadocCategoryViewModel : NotificationObject, Utility.SearchFilterConverter.IFilter
 	{
 		private UkadocCategoryModel model;
 		private bool isExpanded;
@@ -464,10 +510,15 @@ namespace Satolist2.Control
 			this.model = model;
 			Events = model.Events.Select(o => new UkadocEventViewModel(o)).ToArray();
 		}
+
+		public bool Filter(string filterString)
+		{
+			return Events.Any(o => o.Filter(filterString));
+		}
 	}
 
 	//ukadocイベントリファレンスのイベントノード
-	public class UkadocEventViewModel
+	public class UkadocEventViewModel : NotificationObject, Utility.SearchFilterConverter.IFilter
 	{
 		private UkadocEventModel model;
 
@@ -490,9 +541,50 @@ namespace Satolist2.Control
 		public ReadOnlyCollection<Tuple<string, string>> References => new ReadOnlyCollection<Tuple<string, string>>(model.References);
 		public ReadOnlyCollection<string> SupportedBasewares => new ReadOnlyCollection<string>(model.SupportedBasewares);
 
+		//イベント名称の挿入
+		public ICommand InsertCommand { get; }
+		public ICommand CopyToClipboardCommand { get; }
+		public ICommand OpenInUkadocCommand { get; }
+
 		public UkadocEventViewModel(UkadocEventModel model)
 		{
 			this.model = model;
+
+			InsertCommand = new ActionCommand(
+				o =>
+				{
+					//開いているやつに挿入
+					MainWindow.Instance.InsertToActiveEditor(Name);
+				});
+
+			CopyToClipboardCommand = new ActionCommand(
+				o =>
+				{
+					//クリップボードにコピー
+					try
+					{
+						Clipboard.SetText(Name);
+					}
+					catch { }
+				});
+
+			OpenInUkadocCommand = new ActionCommand(
+				o =>
+				{
+					try
+					{
+						if (string.IsNullOrEmpty(model.DocumentId))
+							Process.Start(UkadocDownloader.EventReferenceUrl);
+						else
+							Process.Start(string.Format("{0}#{1}", UkadocDownloader.EventReferenceUrl, model.DocumentId));
+					}
+					catch { }
+				});
+		}
+
+		public bool Filter(string filterString)
+		{
+			return Name.ToLower().Contains(filterString.ToLower());
 		}
 	}
 }

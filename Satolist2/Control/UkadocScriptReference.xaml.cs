@@ -1,8 +1,10 @@
 ﻿using AngleSharp.Dom.Events;
 using Satolist2.Utility;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -48,18 +50,30 @@ namespace Satolist2.Control
 		public string DockingTitle => "Ukadocスクリプトリファレンス";
 		public string DockingContentId => ContentId;
 
-		private bool isLoaded_;
+		private bool isLoaded;
 		private UkadocSakuraScriptCategoryViewModel[] scriptItems;
+		private string searchString;
 
 		public ReadOnlyCollection<UkadocSakuraScriptCategoryViewModel> ScriptItems => new ReadOnlyCollection<UkadocSakuraScriptCategoryViewModel>(scriptItems);
 
 		//ukadocデータが読み込めているか
 		public bool IsLoaded
 		{
-			get => isLoaded_;
+			get => isLoaded;
 			set
 			{
-				isLoaded_ = value;
+				isLoaded = value;
+				NotifyChanged();
+			}
+		}
+
+		//検索文字列
+		public string SearchString
+		{
+			get => searchString;
+			set
+			{
+				searchString = value;
 				NotifyChanged();
 			}
 		}
@@ -87,7 +101,7 @@ namespace Satolist2.Control
 	}
 
 	//Ukadocさくらスクリプトのカテゴリビューモデル
-	public class UkadocSakuraScriptCategoryViewModel : NotificationObject
+	public class UkadocSakuraScriptCategoryViewModel : NotificationObject, SearchFilterConverter.IFilter
 	{
 		private UkadocSakuraScriptCategoryModel model;
 		private bool isExpanded;
@@ -110,10 +124,15 @@ namespace Satolist2.Control
 			this.model = model;
 			Scripts = model.Scripts.Select(o => new UkadocSakuraScriptViewModel(o)).ToArray();
 		}
+
+		public bool Filter(string filterString)
+		{
+			return Scripts.Any(o => o.Filter(filterString));
+		}
 	}
 
 	//さくらスクリプトのビューモデル
-	public class UkadocSakuraScriptViewModel : NotificationObject
+	public class UkadocSakuraScriptViewModel : NotificationObject, SearchFilterConverter.IFilter
 	{
 		private UkadocSakuraScriptModel model;
 
@@ -123,12 +142,18 @@ namespace Satolist2.Control
 			set { }
 		}
 
+		//ダミー子
+		public object Scripts => Array.Empty<object>();
+
 		public bool IsScriptNode => true;
 		public string Name => model.Name;
 		public string Detail => string.Join("\r\n", model.Details);
+		public ReadOnlyCollection<string> SupportedBasewares => new ReadOnlyCollection<string>(model.SupportedBasewares);
 
 		//さくらスクリプトの挿入
-		public ICommand InsertCommand;
+		public ICommand InsertCommand { get; }
+		public ICommand CopyToClipboardCommand { get; }
+		public ICommand OpenInUkadocCommand { get; }
 
 		public UkadocSakuraScriptViewModel(UkadocSakuraScriptModel model)
 		{
@@ -140,6 +165,35 @@ namespace Satolist2.Control
 					//開いているやつに挿入
 					MainWindow.Instance.InsertToActiveEditor(Name);
 				});
+
+			CopyToClipboardCommand = new ActionCommand(
+				o =>
+				{
+					//クリップボードにコピー
+					try
+					{
+						Clipboard.SetText(Name);
+					}
+					catch { }
+				});
+
+			OpenInUkadocCommand = new ActionCommand(
+				o =>
+				{
+					try
+					{
+						if (string.IsNullOrEmpty(model.DocumentId))
+							Process.Start(UkadocDownloader.ScriptReferenceUrl);
+						else
+							Process.Start(string.Format("{0}#{1}", UkadocDownloader.ScriptReferenceUrl, model.DocumentId));
+					}
+					catch { }
+				});
+		}
+
+		public bool Filter(string filterString)
+		{
+			return Name.ToLower().Contains(filterString.ToLower());
 		}
 	}
 }

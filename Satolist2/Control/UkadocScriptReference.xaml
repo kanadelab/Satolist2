@@ -4,10 +4,18 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Satolist2.Control"
+			 xmlns:util="clr-namespace:Satolist2.Utility"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
 	<UserControl.Resources>
-		<BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+		<ResourceDictionary>
+			<ResourceDictionary.MergedDictionaries>
+				<ResourceDictionary Source="/Control/StrechedListViewItemStyle.xaml" />
+			</ResourceDictionary.MergedDictionaries>
+			
+			<BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+			<util:SearchFilterConverter x:Key="SearchFilterConverter" />
+		</ResourceDictionary>
 	</UserControl.Resources>
     <Grid>
 
@@ -17,29 +25,91 @@
 				<ColumnDefinition Width="auto" />
 				<ColumnDefinition Width="5*" />
 			</Grid.ColumnDefinitions>
-			<TreeView x:Name="ScriptTree" Grid.Column="0" ItemsSource="{Binding ScriptItems}">
-				<TreeView.ItemTemplate>
-					<HierarchicalDataTemplate ItemsSource="{Binding Scripts}">
-						<Label Content="{Binding Name}" Padding="0" />
-					</HierarchicalDataTemplate>
-				</TreeView.ItemTemplate>
-				<TreeView.ItemContainerStyle>
-					<Style TargetType="TreeViewItem" BasedOn="{StaticResource {x:Type TreeViewItem}}">
-						<Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
-						<Setter Property="Padding" Value="0" />
-						<EventSetter Event="MouseDoubleClick" Handler="ScriptTreeViewItem_MouseDoubleClick" />
-					</Style>
-				</TreeView.ItemContainerStyle>
-			</TreeView>
+
+			<Grid Grid.Column="0">
+				<Grid.RowDefinitions>
+					<RowDefinition Height="auto" />
+					<RowDefinition Height="*" />
+				</Grid.RowDefinitions>
+
+				<local:CommonSearchBox Text="{Binding SearchString, Mode=TwoWay}" Grid.Row="0" Margin="3" />
+
+				<TreeView x:Name="ScriptTree" Grid.Row="1" ItemsSource="{Binding ScriptItems}">
+					<TreeView.ItemTemplate>
+						<HierarchicalDataTemplate ItemsSource="{Binding Scripts}">
+							<TextBlock Text="{Binding Name}" Padding="0" />
+						</HierarchicalDataTemplate>
+					</TreeView.ItemTemplate>
+					<TreeView.ItemContainerStyle>
+						<Style TargetType="TreeViewItem" BasedOn="{StaticResource {x:Type TreeViewItem}}">
+							<Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
+							<Setter Property="Padding" Value="0" />
+							<Setter Property="Visibility">
+								<Setter.Value>
+									<MultiBinding Converter="{StaticResource SearchFilterConverter}">
+										<Binding />
+										<Binding Path="DataContext.SearchString" RelativeSource="{RelativeSource AncestorType=TreeView}" />
+									</MultiBinding>
+								</Setter.Value>
+							</Setter>
+							<EventSetter Event="MouseDoubleClick" Handler="ScriptTreeViewItem_MouseDoubleClick" />
+						</Style>
+					</TreeView.ItemContainerStyle>
+				</TreeView>
+			</Grid>
 
 			<GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Center" />
 
-			<ScrollViewer Grid.Column="2">
-				<StackPanel DataContext="{Binding SelectedItem, ElementName=ScriptTree}" Visibility="{Binding IsScriptNode, FallbackValue=Collapsed, Converter={StaticResource BooleanToVisibilityConverter}}">
-					<TextBox Text="{Binding Name, Mode=OneWay}" Margin="3" FontWeight="Bold" BorderThickness="0" IsReadOnly="True" Background="Transparent" />
-					<TextBox Text="{Binding Detail, Mode=OneWay}" Margin="5" BorderThickness="0" IsReadOnly="True" TextWrapping="Wrap" Background="Transparent" />
+			<Grid Grid.Column="2">
+				<Grid.RowDefinitions>
+					<RowDefinition Height="*" />
+					<RowDefinition Height="auto" />
+				</Grid.RowDefinitions>
+				<ScrollViewer Grid.Row="0">
+					<StackPanel DataContext="{Binding SelectedItem, ElementName=ScriptTree}" Visibility="{Binding IsScriptNode, FallbackValue=Collapsed, Converter={StaticResource BooleanToVisibilityConverter}}">
+						<TextBox Text="{Binding Name, Mode=OneWay}" Margin="3" FontWeight="Bold" BorderThickness="0" IsReadOnly="True" Background="Transparent" />
+						<TextBox Text="{Binding Detail, Mode=OneWay}" Margin="5" BorderThickness="0" IsReadOnly="True" TextWrapping="Wrap" Background="Transparent" />
+						<Separator />
+						<StackPanel Orientation="Horizontal">
+							<Label Content="使えるベースウェア: " />
+							<ItemsControl ItemsSource="{Binding SupportedBasewares}">
+								<ItemsControl.ItemsPanel>
+									<ItemsPanelTemplate>
+										<StackPanel Orientation="Horizontal" />
+									</ItemsPanelTemplate>
+								</ItemsControl.ItemsPanel>
+								<ItemsControl.ItemTemplate>
+									<DataTemplate>
+										<Label Content="{Binding .}" />
+									</DataTemplate>
+								</ItemsControl.ItemTemplate>
+							</ItemsControl>
+						</StackPanel>
+					</StackPanel>
+				</ScrollViewer>
+				<StackPanel Grid.Row="1" Orientation="Horizontal" DataContext="{Binding SelectedItem, ElementName=ScriptTree}" Visibility="{Binding IsScriptNode, FallbackValue=Collapsed, Converter={StaticResource BooleanToVisibilityConverter}}">
+					<Button Command="{Binding InsertCommand}" HorizontalAlignment="Left" Padding="2" Margin="2">
+						<StackPanel Orientation="Horizontal">
+							<Path Height="15" Stretch="Uniform" Data="{StaticResource PenPlus}" Fill="Gray" Margin="0 0 3 0"/>
+							<TextBlock Text="テキストエディタに挿入" />
+						</StackPanel>
+					</Button>
+
+					<Button Command="{Binding CopyToClipboardCommand}" HorizontalAlignment="Left" Padding="2" Margin="2">
+						<StackPanel Orientation="Horizontal">
+							<Path Height="15" Stretch="Uniform" Data="{StaticResource Copy}" Fill="Gray" Margin="0 0 3 0"/>
+							<TextBlock Text="クリップボードにコピー" />
+						</StackPanel>
+					</Button>
+
+					<Button Command="{Binding OpenInUkadocCommand}" HorizontalAlignment="Left" Padding="2" Margin="2">
+						<StackPanel Orientation="Horizontal">
+							<Path Height="15" Stretch="Uniform" Data="{StaticResource OpenInNew}" Fill="Gray" Margin="0 0 3 0"/>
+							<TextBlock Text="Ukadocで開く" />
+						</StackPanel>
+					</Button>
 				</StackPanel>
-			</ScrollViewer>
+			</Grid>
 
 		</Grid>
 

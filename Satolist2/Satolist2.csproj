@@ -149,6 +149,9 @@
     <Compile Include="Control\BindablePasswordBox.xaml.cs">
       <DependentUpon>BindablePasswordBox.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Control\CommonSearchBox.xaml.cs">
+      <DependentUpon>CommonSearchBox.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Control\HelpViewer.xaml.cs">
       <DependentUpon>HelpViewer.xaml</DependentUpon>
     </Compile>
@@ -330,6 +333,10 @@
     <Compile Include="Utility\UpdateChecker.cs" />
     <Compile Include="Version.cs" />
     <Page Include="Control\BindablePasswordBox.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Control\CommonSearchBox.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
