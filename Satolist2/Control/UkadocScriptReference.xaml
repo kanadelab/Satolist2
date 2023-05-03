@@ -41,7 +41,7 @@
 						</HierarchicalDataTemplate>
 					</TreeView.ItemTemplate>
 					<TreeView.ItemContainerStyle>
-						<Style TargetType="TreeViewItem" BasedOn="{StaticResource {x:Type TreeViewItem}}">
+						<Style TargetType="TreeViewItem" BasedOn="{StaticResource StrechedListViewItemStyle}">
 							<Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
 							<Setter Property="Padding" Value="0" />
 							<Setter Property="Visibility">
