@@ -74,6 +74,16 @@ namespace Satolist2.Control
 							}), System.Windows.Threading.DispatcherPriority.Render);
 						e.Handled = true;
 					}
+					else
+					{
+						//イベントリストをアクティブ化
+						Dispatcher.BeginInvoke(
+							new Action(() =>
+							{
+								MainWindow.Instance.EventList.IsActive = true;
+							}), System.Windows.Threading.DispatcherPriority.Render);
+						e.Handled = true;
+					}
 				}
 				else if(item.DataContext is FileEventTreeItemInlineEventViewModel inlineEv)
 				{
@@ -87,6 +97,11 @@ namespace Satolist2.Control
 			}
 		}
 
+		//勝手な横スクロールを抑制
+		private void TreeViewItem_RequestBringIntoView(object sender, RequestBringIntoViewEventArgs e)
+		{
+			e.Handled = true;
+		}
 	}
 
 	internal class FileEventTreeViewModel : NotificationObject, IDockingWindowContent, IDisposable

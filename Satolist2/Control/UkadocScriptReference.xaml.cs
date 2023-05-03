@@ -42,6 +42,12 @@ namespace Satolist2.Control
 				}
 			}
 		}
+
+		//勝手に横スクロールしないための
+		private void TreeViewItem_RequestBringIntoView(object sender, RequestBringIntoViewEventArgs e)
+		{
+			e.Handled = true;
+		}
 	}
 
 	public class UkadocScriptReferenceViewModel : NotificationObject, IDockingWindowContent
@@ -119,6 +125,8 @@ namespace Satolist2.Control
 			}
 		}
 
+		public string Tooltip => Name;
+
 		public UkadocSakuraScriptCategoryViewModel(UkadocSakuraScriptCategoryModel model)
 		{
 			this.model = model;
@@ -149,6 +157,22 @@ namespace Satolist2.Control
 		public string Name => model.Name;
 		public string Detail => string.Join("\r\n", model.Details);
 		public ReadOnlyCollection<string> SupportedBasewares => new ReadOnlyCollection<string>(model.SupportedBasewares);
+
+		public string Tooltip
+		{
+			get
+			{
+				var d = Detail.Split(Constants.NewLineSeparator, StringSplitOptions.RemoveEmptyEntries);
+				if (d.FirstOrDefault() == null)
+				{
+					return Name;
+				}
+				else
+				{
+					return string.Format("{0}\r\n{1}", Name, d.FirstOrDefault());
+				}
+			}
+		}
 
 		//さくらスクリプトの挿入
 		public ICommand InsertCommand { get; }

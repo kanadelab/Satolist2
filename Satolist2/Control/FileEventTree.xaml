@@ -52,6 +52,8 @@
 			<TreeView.ItemContainerStyle>
 				<Style TargetType="TreeViewItem" BasedOn="{StaticResource StrechedListViewItemStyle}" >
 					<EventSetter Event="MouseDoubleClick" Handler="TreeViewItem_MouseDoubleClick" />
+					<EventSetter Event="RequestBringIntoView" Handler="TreeViewItem_RequestBringIntoView" />
+					<Setter Property="ToolTip" Value="{Binding Label}" />
 					<Style.Triggers>
 
 						<DataTrigger Binding="{Binding NodeType}" Value="Dictionary">

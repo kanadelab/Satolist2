@@ -34,7 +34,7 @@
 
 				<local:CommonSearchBox Text="{Binding SearchString, Mode=TwoWay}" Grid.Row="0" Margin="3" />
 
-				<TreeView x:Name="ScriptTree" Grid.Row="1" ItemsSource="{Binding ScriptItems}">
+				<TreeView x:Name="ScriptTree" Grid.Row="1" ItemsSource="{Binding ScriptItems}" >
 					<TreeView.ItemTemplate>
 						<HierarchicalDataTemplate ItemsSource="{Binding Scripts}">
 							<TextBlock Text="{Binding Name}" Padding="0" />
@@ -52,7 +52,9 @@
 									</MultiBinding>
 								</Setter.Value>
 							</Setter>
+							<Setter Property="ToolTip" Value="{Binding Tooltip}" />
 							<EventSetter Event="MouseDoubleClick" Handler="ScriptTreeViewItem_MouseDoubleClick" />
+							<EventSetter Event="RequestBringIntoView" Handler="TreeViewItem_RequestBringIntoView" />
 						</Style>
 					</TreeView.ItemContainerStyle>
 				</TreeView>

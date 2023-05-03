@@ -16,8 +16,12 @@
 		</ResourceDictionary>
 	</UserControl.Resources>
 	<Grid>
-		<TreeView x:Name="MainTreeView" ItemsSource="{Binding Items}"
-				  ItemContainerStyle="{StaticResource StrechedListViewItemStyle}">
+		<TreeView x:Name="MainTreeView" ItemsSource="{Binding Items}">
+			<TreeView.ItemContainerStyle>
+				<Style TargetType="TreeViewItem" BasedOn="{StaticResource StrechedListViewItemStyle}">
+					<EventSetter Event="RequestBringIntoView" Handler="TreeViewItem_RequestBringIntoView" />
+				</Style>
+			</TreeView.ItemContainerStyle>
 			<TreeView.ItemTemplate>
 				<HierarchicalDataTemplate ItemsSource="{Binding Items}">
 					<StackPanel Orientation="Horizontal">

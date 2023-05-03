@@ -505,6 +505,8 @@ namespace Satolist2.Control
 			}
 		}
 
+		public string Tooltip => Name;
+
 		public UkadocCategoryViewModel(UkadocCategoryModel model)
 		{
 			this.model = model;
@@ -545,6 +547,22 @@ namespace Satolist2.Control
 		public ICommand InsertCommand { get; }
 		public ICommand CopyToClipboardCommand { get; }
 		public ICommand OpenInUkadocCommand { get; }
+
+		public string Tooltip
+		{
+			get
+			{
+				var d = Detail.Split(Constants.NewLineSeparator, StringSplitOptions.RemoveEmptyEntries);
+				if (d.FirstOrDefault() == null)
+				{
+					return Name;
+				}
+				else
+				{
+					return string.Format("{0}\r\n{1}", Name, d.FirstOrDefault());
+				}
+			}
+		}
 
 		public UkadocEventViewModel(UkadocEventModel model)
 		{

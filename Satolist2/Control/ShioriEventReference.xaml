@@ -43,7 +43,7 @@
 
 				<local:CommonSearchBox Text="{Binding SearchString, Mode=TwoWay}" Grid.Row="0" Margin="3" />
 
-				<TreeView x:Name="EventTree" Grid.Row="1" ItemsSource="{Binding Items}">
+				<TreeView x:Name="EventTree" Grid.Row="1" ItemsSource="{Binding Items}" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
 					<TreeView.ItemTemplate>
 						<HierarchicalDataTemplate ItemsSource="{Binding Events}">
 							<TextBlock Text="{Binding Name}" Padding="0"/>
@@ -53,6 +53,7 @@
 						<Style TargetType="TreeViewItem" BasedOn="{StaticResource StrechedListViewItemStyle}">
 							<Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
 							<Setter Property="Padding" Value="0" />
+							<Setter Property="ToolTip" Value="{Binding Tooltip}" />
 							<Setter Property="Visibility">
 								<Setter.Value>
 									<MultiBinding Converter="{StaticResource SearchFilterConverter}">

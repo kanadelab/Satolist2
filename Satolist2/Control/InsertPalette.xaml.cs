@@ -48,6 +48,12 @@ namespace Satolist2.Control
 			}
 			e.Handled = true;
 		}
+
+		private void TreeViewItem_RequestBringIntoView(object sender, RequestBringIntoViewEventArgs e)
+		{
+			//自動スクロールの抑制
+			e.Handled = true;
+		}
 	}
 
 	internal class InsertPaletteViewModel : NotificationObject, IDockingWindowContent
