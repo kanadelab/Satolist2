@@ -40,5 +40,14 @@ namespace Satolist2.Control
 		{
 			Text = string.Empty;
 		}
+
+		private void WartermarkedTextBox_KeyDown(object sender, KeyEventArgs e)
+		{
+			if(e.Key == Key.Escape)
+			{
+				//リセット
+				Text = string.Empty;
+			}
+		}
 	}
 }

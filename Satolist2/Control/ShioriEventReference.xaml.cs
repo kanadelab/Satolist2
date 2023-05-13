@@ -513,9 +513,9 @@ namespace Satolist2.Control
 			Events = model.Events.Select(o => new UkadocEventViewModel(o)).ToArray();
 		}
 
-		public bool Filter(string filterString)
+		public bool Filter(string filterString, object[] args)
 		{
-			return Events.Any(o => o.Filter(filterString));
+			return Events.Any(o => o.Filter(filterString, args));
 		}
 	}
 
@@ -600,7 +600,7 @@ namespace Satolist2.Control
 				});
 		}
 
-		public bool Filter(string filterString)
+		public bool Filter(string filterString, object[] args)
 		{
 			return Name.ToLower().Contains(filterString.ToLower());
 		}

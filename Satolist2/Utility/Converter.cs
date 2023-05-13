@@ -157,7 +157,7 @@ namespace Satolist2.Utility
 	{
 		public interface IFilter
 		{
-			bool Filter(string filterString);
+			bool Filter(string filterString, object[] args);
 		}
 
 		public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
@@ -169,7 +169,7 @@ namespace Satolist2.Utility
 					//空白なら強制的に許容される
 					return Visibility.Visible;
 				}
-				return filter.Filter(filterString) ? Visibility.Visible : Visibility.Collapsed;
+				return filter.Filter(filterString, values.Skip(2).ToArray()) ? Visibility.Visible : Visibility.Collapsed;
 			}
 			else
 			{

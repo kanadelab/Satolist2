@@ -107,36 +107,59 @@ namespace Satolist2.Control
 	internal class FileEventTreeViewModel : NotificationObject, IDockingWindowContent, IDisposable
 	{
 		public const string ContentId = "FileEventTree";
-		//private ObservableCollection<FileEventTreeItemDictionaryViewModel> dictionaries;
 		private ObservableCollection<FileEventTreeItemDirectoryViewModel> directories;
+		private string searchString;
+		private bool isEventItemSearch;
 
 		public MainViewModel Main { get; }
+		public ActionCommand ToggleSearchModeCommand { get; }
+
 		public GhostModel Ghost
 		{
 			get => Main.Ghost;
 		}
-
-		/*
-		public ReadOnlyObservableCollection<FileEventTreeItemDictionaryViewModel> Dictionaries
-		{
-			get => new ReadOnlyObservableCollection<FileEventTreeItemDictionaryViewModel>(dictionaries);
-		}
-		*/
 
 		public ReadOnlyObservableCollection<FileEventTreeItemDirectoryViewModel> Directories
 		{
 			get => new ReadOnlyObservableCollection<FileEventTreeItemDirectoryViewModel>(directories);
 		}
 
-		public string DockingTitle => "ファイルイベントツリー";
+		//検索文字列
+		public string SearchString
+		{
+			get => searchString;
+			set
+			{
+				searchString = value;
+				NotifyChanged();
+			}
+		}
 
+		//検索モード:項目検索かどうか
+		public bool IsEventItemSearch
+		{
+			get => isEventItemSearch;
+			set
+			{
+				isEventItemSearch = value;
+				NotifyChanged();
+			}
+		}
+
+		public string DockingTitle => "ファイルイベントツリー";
 		public string DockingContentId => ContentId;
 
 		public FileEventTreeViewModel(MainViewModel main)
 		{
 			Main = main;
-			//dictionaries = new ObservableCollection<FileEventTreeItemDictionaryViewModel>();
 			directories = new ObservableCollection<FileEventTreeItemDirectoryViewModel>();
+
+			ToggleSearchModeCommand = new ActionCommand(
+				o =>
+				{
+					//検索モードの切り替え
+					IsEventItemSearch = !isEventItemSearch;
+				});
 
 			if (Ghost != null)
 			{
@@ -268,8 +291,8 @@ namespace Satolist2.Control
 		}
 	}
 
-	//辞書ファイルディレクトリ階層
-	internal class FileEventTreeItemDirectoryViewModel : NotificationObject
+	//辞書ファイルディレクトリのViewModel
+	internal class FileEventTreeItemDirectoryViewModel : NotificationObject, Utility.SearchFilterConverter.IFilter
 	{
 		private ObservableCollection<FileEventTreeItemDictionaryViewModel> items;
 
@@ -299,10 +322,16 @@ namespace Satolist2.Control
 		{
 			items.Remove(dic);
 		}
+
+		public bool Filter(string filterString, object[] args)
+		{
+			//ヒットする子があるもののみ表示
+			return items.Any(o => o.Filter(filterString, args));
+		}
 	}
 
-	//辞書ファイルにあたる
-	internal class FileEventTreeItemDictionaryViewModel : NotificationObject
+	//辞書ファイルにあたるViewModel
+	internal class FileEventTreeItemDictionaryViewModel : NotificationObject, Utility.SearchFilterConverter.IFilter
 	{
 		private ObservableCollection<FileEventTreeItemEventViewModel> items;
 		private Dictionary<string, FileEventTreeItemEventViewModel> itemsDictionary;
@@ -616,11 +645,25 @@ namespace Satolist2.Control
 			}
 			return false;
 		}
-		
+
+		//表示するかどうかのフィルタ関数
+		public bool Filter(string filterString, object[] args)
+		{
+			if ((bool)args[0])
+			{
+				//イベント検索モード。ヒットする子があれば表示。
+				return items.Any(o => o.Filter(filterString, args));
+			}
+			else
+			{
+				//ファイル名検索モード
+				return Label.ToLower().Contains(filterString.ToLower());
+			}
+		}
 	}
 
-	//イベントにあたる
-	internal class FileEventTreeItemEventViewModel : NotificationObject
+	//イベントにあたるViewModel
+	internal class FileEventTreeItemEventViewModel : NotificationObject, Utility.SearchFilterConverter.IFilter
 	{
 		//ノードに所属するイベント
 		private ObservableCollection<EventModel> events;
@@ -664,7 +707,6 @@ namespace Satolist2.Control
 		{
 			get => new ReadOnlyObservableCollection<FileEventTreeItemInlineEventViewModel>(inlineEventViewModels);
 		}
-
 
 		public FileEventTreeItemEventViewModel(FileEventTreeItemDictionaryViewModel dict)
 		{
@@ -840,11 +882,23 @@ namespace Satolist2.Control
 			if(Items.Count > 0)
 				Dictionary.FileEventTree.Main.OpenEventEditor(Items.First());
 		}
+
+		public bool Filter(string filterString, object[] args)
+		{
+			if ((bool)args[0])
+			{
+				return Label.ToLower().Contains(filterString.ToLower()) || inlineEventViewModels.Any(o => o.Filter(filterString, args));
+			}
+			else
+			{
+				return true;
+			}
+		}
 	}
 
 	//インラインイベントにあたる
 	//末端なので簡易なつくり
-	internal class FileEventTreeItemInlineEventViewModel : NotificationObject
+	internal class FileEventTreeItemInlineEventViewModel : NotificationObject, Utility.SearchFilterConverter.IFilter
 	{
 		private FileEventTreeItemEventViewModel parentViewModel;
 		public string NodeType => "InlineEvent";
@@ -864,6 +918,18 @@ namespace Satolist2.Control
 		{
 			if (EventList.Count > 0)
 				parentViewModel.Dictionary.FileEventTree.Main.OpenEventEditor(EventList.First());
+		}
+
+		public bool Filter(string filterString, object[] args)
+		{
+			if ((bool)args[0])
+			{
+				return Label.ToLower().Contains(filterString.ToLower());
+			}
+			else
+			{
+				return true;	//イベント検索モードではないので全ヒット
+			}
 		}
 	}
 }

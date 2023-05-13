@@ -10,6 +10,7 @@
 	<UserControl.Resources>
 		<ResourceDictionary>
 			<util:InvertBoolToVisibilityConverter x:Key="InvertBoolToVisibilityConverter" />
+			<util:SearchFilterConverter x:Key="SearchFilterConverter" />
 			<ResourceDictionary.MergedDictionaries>
 				<ResourceDictionary Source="/Control/StrechedListViewItemStyle.xaml" />
 			</ResourceDictionary.MergedDictionaries>
@@ -17,7 +18,46 @@
 		
 	</UserControl.Resources>
 	<Grid>
-		<TreeView ItemsSource="{Binding Directories}" SelectedItemChanged="TreeView_SelectedItemChanged">
+		<Grid.RowDefinitions>
+			<RowDefinition Height="auto" />
+			<RowDefinition Height="*" />
+		</Grid.RowDefinitions>
+
+		<Grid Grid.Row="0">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="auto" />
+				<ColumnDefinition Width="*" />
+			</Grid.ColumnDefinitions>
+			<Button Command="{Binding ToggleSearchModeCommand}" Grid.Column="0" Padding="2" Margin="3">
+				<Button.Style>
+					<Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+						<Setter Property="ToolTip" Value="リスト化項目名検索モード: クリックで切り替え" />
+						<Style.Triggers>
+							<DataTrigger Binding="{Binding IsEventItemSearch}" Value="False">
+								<Setter Property="ToolTip" Value="ファイル名検索モード: クリックで切り替え" />
+							</DataTrigger>
+						</Style.Triggers>
+					</Style>
+				</Button.Style>
+				<Path Fill="Gray" Stretch="Uniform" Height="16" Width="16" HorizontalAlignment="Center" VerticalAlignment="Center">
+					<Path.Style>
+						<Style TargetType="Path">
+							<Setter Property="Data" Value="{StaticResource EventItem}" />
+							<Style.Triggers>
+								<DataTrigger Binding="{Binding IsEventItemSearch}" Value="False">
+									<Setter Property="Data" Value="{StaticResource ListDictionaryIcon}" />
+									<Setter Property="ToolTip" Value="ファイル名検索モード: クリックで切り替え" />
+								</DataTrigger>
+							</Style.Triggers>
+						</Style>
+					</Path.Style>
+				</Path>
+			</Button>
+			<local:CommonSearchBox Text="{Binding SearchString, Mode=TwoWay}" Grid.Column="1" Margin="3" />
+		</Grid>
+		
+
+		<TreeView Grid.Row="1" ItemsSource="{Binding Directories}" SelectedItemChanged="TreeView_SelectedItemChanged">
 			<TreeView.ItemTemplate>
 				<HierarchicalDataTemplate ItemsSource="{Binding ChildItems}">
 					<StackPanel Orientation="Horizontal">
@@ -40,7 +80,6 @@
 										<DataTrigger Binding="{Binding Dictionary.IsSatoriDictionary}" Value="False">
 											<Setter Property="Data" Value="{StaticResource TextFileIcon}" />
 										</DataTrigger>
-										
 									</Style.Triggers>
 								</Style>
 							</Path.Style>
@@ -54,6 +93,18 @@
 					<EventSetter Event="PreviewMouseDoubleClick" Handler="TreeViewItem_MouseDoubleClick" />
 					<EventSetter Event="RequestBringIntoView" Handler="TreeViewItem_RequestBringIntoView" />
 					<Setter Property="ToolTip" Value="{Binding Label}" />
+					<Setter Property="Visibility">
+						<Setter.Value>
+							<MultiBinding Converter="{StaticResource SearchFilterConverter}">
+								<!--検索対象-->
+								<Binding />
+								<!--文字列-->
+								<Binding Path="DataContext.SearchString" RelativeSource="{RelativeSource AncestorType=TreeView}" />
+								<!--検索モード-->
+								<Binding Path="DataContext.IsEventItemSearch" RelativeSource="{RelativeSource AncestorType=TreeView}"/>
+							</MultiBinding>
+						</Setter.Value>
+					</Setter>
 					<Style.Triggers>
 
 						<DataTrigger Binding="{Binding NodeType}" Value="Dictionary">

@@ -12,7 +12,8 @@
 			<ColumnDefinition Width="auto" />
 		</Grid.ColumnDefinitions>
 		<local:WartermarkedTextBox Grid.Column="0" Wartermark="検索" VerticalAlignment="Center" Margin="0 0 3 0"
-								   Text="{Binding Text, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, RelativeSource={RelativeSource AncestorType=local:CommonSearchBox}}"  />
+								   Text="{Binding Text, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, RelativeSource={RelativeSource AncestorType=local:CommonSearchBox}}"
+								   KeyDown="WartermarkedTextBox_KeyDown"/>
 		<Button Grid.Column="1" Click="Button_Click" Padding="2">
 			<Path Fill="Gray" Stretch="UniformToFill" Data="{StaticResource RemoveIcon}" />
 		</Button>

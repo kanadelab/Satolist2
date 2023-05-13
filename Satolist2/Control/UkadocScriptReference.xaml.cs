@@ -133,9 +133,9 @@ namespace Satolist2.Control
 			Scripts = model.Scripts.Select(o => new UkadocSakuraScriptViewModel(o)).ToArray();
 		}
 
-		public bool Filter(string filterString)
+		public bool Filter(string filterString, object[] args)
 		{
-			return Scripts.Any(o => o.Filter(filterString));
+			return Scripts.Any(o => o.Filter(filterString, args));
 		}
 	}
 
@@ -215,7 +215,7 @@ namespace Satolist2.Control
 				});
 		}
 
-		public bool Filter(string filterString)
+		public bool Filter(string filterString, object[] args)
 		{
 			return Name.ToLower().Contains(filterString.ToLower());
 		}
