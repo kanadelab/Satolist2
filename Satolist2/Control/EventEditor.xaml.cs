@@ -59,7 +59,7 @@ namespace Satolist2.Control
 				if (lastForcusTextBox != null)
 					lastForcusTextBox.Focus();
 				else
-					MainTextEditor.Focus();
+					MainTextEditor.MainTextEditor.RequestFocusToEditor();
 
 			}), System.Windows.Threading.DispatcherPriority.Render);
 		}

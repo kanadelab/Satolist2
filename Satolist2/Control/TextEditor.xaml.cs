@@ -59,7 +59,10 @@ namespace Satolist2.Control
 
 		public void RequestFocus()
 		{
-			Dispatcher.BeginInvoke(new Action(() => { MainTextEditor.Focus(); }), System.Windows.Threading.DispatcherPriority.Render);
+			Dispatcher.BeginInvoke(new Action(() =>
+			{
+				MainTextEditor.MainTextEditor.RequestFocusToEditor();
+			}), System.Windows.Threading.DispatcherPriority.Render);
 		}
 	}
 
