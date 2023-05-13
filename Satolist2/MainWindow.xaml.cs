@@ -837,7 +837,7 @@ namespace Satolist2
 			//保存するかを尋ねる
 			if(DataContext is MainViewModel vm)
 			{
-				if(!vm.AskSave(true))
+				if(!vm.AskSave(true, true))
 				{
 					e.Cancel = true;
 					return;
@@ -1794,7 +1794,7 @@ namespace Satolist2
 		}
 
 		//保存ダイアログを呼ぶ
-		public bool AskSave(bool isAutomaticSaveDialog)
+		public bool AskSave(bool isAutomaticSaveDialog, bool isClosing = false)
 		{
 			//ゴーストを開いてない
 			if (Ghost == null)
@@ -1841,9 +1841,6 @@ namespace Satolist2
 					}
 				}
 
-				if(isSaved && !isAutomaticSaveDialog)
-					Satorite.NotifySSTPBroadcast("OnSatolistSaved");
-
 				if(errorList.Count > 0)
 				{
 					var errDialog = new ErrorListDialog(this, false);
@@ -1853,8 +1850,16 @@ namespace Satolist2
 					errDialog.ShowDialog();
 					return false;
 				}
+
+				if (isSaved)
+				{
+					if(!isClosing)
+						Satorite.NotifySSTPBroadcast("OnSatolistSaved", "edit");
+					else
+						Satorite.NotifySSTPBroadcast("OnSatolistSaved", "closing");
+				}
+
 				return true;
-				
 			}
 			else if(dialog.Result == MessageBoxResult.No)
 			{
