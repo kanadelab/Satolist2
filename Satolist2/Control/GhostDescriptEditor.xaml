@@ -35,7 +35,7 @@
 					</Grid.RowDefinitions>
 
 					<!--検索ボックス-->
-					<local:WartermarkedTextBox Grid.Row="0" Margin="3" Wartermark="検索" Text="{Binding SearchString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+					<local:CommonSearchBox Grid.Row="0" Margin="3" Text="{Binding SearchString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
 					<ListView x:Name="SettingsList" Grid.Row="1" ItemsSource="{Binding Items}" SelectedIndex="{Binding SelectedIndex, Mode=TwoWay}" HorizontalContentAlignment="Stretch" SelectionMode="Single">
 						<ListView.ItemTemplate>
