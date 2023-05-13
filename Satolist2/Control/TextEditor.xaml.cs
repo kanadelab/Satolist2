@@ -57,12 +57,19 @@ namespace Satolist2.Control
 			}
 		}
 
+		//フォーカスリクエスト
 		public void RequestFocus()
 		{
 			Dispatcher.BeginInvoke(new Action(() =>
 			{
 				MainTextEditor.MainTextEditor.RequestFocusToEditor();
 			}), System.Windows.Threading.DispatcherPriority.Render);
+		}
+
+		//文字列挿入リクエスト
+		public void PerformTextInput(string str)
+		{
+			MainTextEditor.MainTextEditor.PerformTextInput(str);
 		}
 	}
 

@@ -53,7 +53,7 @@
 								</Setter.Value>
 							</Setter>
 							<Setter Property="ToolTip" Value="{Binding Tooltip}" />
-							<EventSetter Event="MouseDoubleClick" Handler="ScriptTreeViewItem_MouseDoubleClick" />
+							<EventSetter Event="PreviewMouseDoubleClick" Handler="ScriptTreeViewItem_MouseDoubleClick" />
 							<EventSetter Event="RequestBringIntoView" Handler="TreeViewItem_RequestBringIntoView" />
 						</Style>
 					</TreeView.ItemContainerStyle>

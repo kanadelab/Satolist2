@@ -64,7 +64,7 @@
 									</MultiBinding>
 								</Setter.Value>
 							</Setter>
-							<EventSetter Event="MouseDoubleClick" Handler="ScriptTreeViewItem_MouseDoubleClick" />
+							<EventSetter Event="PreviewMouseDoubleClick" Handler="ScriptTreeViewItem_MouseDoubleClick" />
 						</Style>
 					</TreeView.ItemContainerStyle>
 				</TreeView>

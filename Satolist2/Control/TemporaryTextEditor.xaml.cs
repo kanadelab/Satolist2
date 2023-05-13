@@ -33,6 +33,12 @@ namespace Satolist2.Control
 		{
 			Dispatcher.BeginInvoke(new Action(() => { MainTextEditor.Focus(); }), System.Windows.Threading.DispatcherPriority.Render);
 		}
+
+		//文字列挿入リクエスト
+		public void PerformTextInput(string str)
+		{
+			MainTextEditor.MainTextEditor.PerformTextInput(str);
+		}
 	}
 
 	internal class TemporaryTextEditorViewModel : TextEditorViewModelBase, IControlBindedReceiver

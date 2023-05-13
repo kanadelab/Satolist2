@@ -860,6 +860,7 @@ namespace Satolist2
 
 		//アクティブなテキストエディタをアクティブにする
 		//挿入機能等で別のコントロールをアクティブにしている想定で、テキストエディタをアクティブにに戻す
+		//引数がtrueならイベントエディタ等複数のボックスがある場合に最後にフォーカスしたボックスに遷移。falseなら必ずメイン領域に遷移。
 		public void ActivateActiveEditor()
 		{
 			if (ActiveEditor == null)
@@ -887,15 +888,24 @@ namespace Satolist2
 		//アクティブなエディタに挿入
 		public void InsertToActiveEditor(string str, bool isActivate = true)
 		{
-			if (ActiveTextEditor != null)
-			{
-				ActiveTextEditor.PerformTextInput(str);
+			if (ActiveEditor == null)
+				return;
 
-				if (isActivate)
-				{
-					ActivateActiveEditor();
-				}
+			var content = ActiveEditor.Content;
+			if (content is EventEditor ev)
+			{
+				ev.PerformTextInput(str);
 			}
+			else if (content is TemporaryTextEditor tte)
+			{
+				tte.PerformTextInput(str);
+			}
+			else if (content is TextEditor te)
+			{
+				te.PerformTextInput(str);
+			}
+			//アクティブ化
+			ActivateActiveEditor();
 		}
 	}
 

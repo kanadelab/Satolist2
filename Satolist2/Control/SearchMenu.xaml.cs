@@ -154,7 +154,6 @@ namespace Satolist2.Control
 				{
 					//閉じる
 					Main.MainWindow.IsShowSearchMenu = false;
-
 					Main.MainWindow.ActivateActiveEditor();
 				});
 		}

@@ -56,12 +56,46 @@ namespace Satolist2.Control
 			Dispatcher.Invoke(new Action(() => {
 
 				//最後にフォーカスがあったものを基準
-				if (lastForcusTextBox != null)
+				if (lastForcusTextBox != null )
 					lastForcusTextBox.Focus();
 				else
 					MainTextEditor.MainTextEditor.RequestFocusToEditor();
 
 			}), System.Windows.Threading.DispatcherPriority.Render);
+		}
+
+		public void PerformTextInput(string str)
+		{
+			//最後にフォーカスがあったものを基準
+			if (lastForcusTextBox != null)
+			{
+				if (lastForcusTextBox is TextBox tb)
+				{
+					if(tb.SelectionLength > 0)
+					{
+						//選択削除
+						var caretIndex = tb.SelectionStart;
+						var result = tb.Text.Remove(caretIndex, tb.SelectionLength);
+						tb.Text = result.Insert(caretIndex, str);
+						tb.CaretIndex = caretIndex + str.Length;
+					}
+					else
+					{
+						var caretIndex = tb.CaretIndex;
+						tb.Text = tb.Text.Insert(caretIndex, str);
+						tb.CaretIndex = caretIndex + str.Length;
+					}
+					
+				}
+				else if (lastForcusTextBox is TextEditorModuleSelector tms)
+				{
+					tms.MainTextEditor.PerformTextInput(str);
+				}
+			}
+			else
+			{
+				MainTextEditor.MainTextEditor.PerformTextInput(str);
+			}
 		}
 	}
 
