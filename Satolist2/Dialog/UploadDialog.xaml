@@ -328,7 +328,7 @@
 				<GroupBox Header="アップロード設定" Margin="3 10 3 3">
 					<StackPanel>
 						<CheckBox Content="更新ファイルをアップロード" IsChecked="{Binding IsUploadFiles, Mode=TwoWay}" Margin="3 10 3 3" />
-						<CheckBox Content="差分アップロード(サーバ上の updates2.dau との比較を使用)" IsChecked="{Binding IsDiffUpload, Mode=TwoWay}" Margin="20 3 3 3"/>
+						<CheckBox Content="サーバ側のupdates2.dauを使用して差分アップロード (エラーが起きる場合やキャンセルした後は使用せず全アップロードを推奨)" IsChecked="{Binding IsDiffUpload, Mode=TwoWay}" Margin="20 3 3 3"/>
 						<CheckBox Content="narファイルをアップロード" IsChecked="{Binding IsUploadNar, Mode=TwoWay}" Margin="3 10 3 3" />
 					</StackPanel>
 					<GroupBox.Style>
