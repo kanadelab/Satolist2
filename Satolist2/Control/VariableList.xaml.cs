@@ -125,7 +125,7 @@ namespace Satolist2.Control
 		public void ControlBind(System.Windows.Controls.Control control)
 		{
 			this.control = (VariableList)control;
-			this.control.MainTextEditor.MainTextEditor.OnTextChanged -= Document_TextChanged;
+			this.control.MainTextEditor.MainTextEditor.OnTextChanged += Document_TextChanged;
 		}
 
 		public void RemoveItem(VariableListItemViewModel item)
