@@ -44,7 +44,7 @@ namespace GhostDeploy
 			{
 				if (e.Data.GetData(DataFormats.FileDrop) is string[] items)
 				{
-					DataContext.DirectoryPath = items.FirstOrDefault();
+					DataContext.DirectoryPath = DictionaryUtility.NormalizePath(items.FirstOrDefault());
 					e.Effects = DragDropEffects.Copy;
 				}
 			}
@@ -73,11 +73,15 @@ namespace GhostDeploy
 				directoryPath = value;
 				NotifyChanged();
 				UploadCommand.NotifyCanExecuteChanged();
+				ExportNarCommand.NotifyCanExecuteChanged();
+				MakeUpdateFileCommand.NotifyCanExecuteChanged();
 			}
 		}
 
 		public ActionCommand UploadCommand { get; }
 		public ActionCommand UploadSettingCommand { get; }
+		public ActionCommand ExportNarCommand { get; }
+		public ActionCommand MakeUpdateFileCommand { get; }
 
 		public MainViewModel(MainWindow mainWindow)
 		{
@@ -86,6 +90,9 @@ namespace GhostDeploy
 			UploadCommand = new ActionCommand(
 				o =>
 				{
+					if (!AskOtherFilePossibilities())
+						return;
+
 					UploadServerSettingModelBase[] settings = null;
 					try
 					{
@@ -175,6 +182,30 @@ namespace GhostDeploy
 						UploadSetting.Save(settings);
 					}
 				});
+
+			ExportNarCommand = new ActionCommand(
+				o =>
+				{
+					if (!AskOtherFilePossibilities())
+						return;
+					Satolist2.CommonDialog.ShowExportNarDialog(DirectoryPath, window);
+				},
+				o =>
+				{
+					return !string.IsNullOrEmpty(DirectoryPath);
+				});
+
+			MakeUpdateFileCommand = new ActionCommand(
+				o =>
+				{
+					if (!AskOtherFilePossibilities())
+						return;
+					Satolist2.CommonDialog.ShowMakeUpdateDialog(DirectoryPath, window);
+				},
+				o =>
+				{
+					return !string.IsNullOrEmpty(DirectoryPath);
+				});
 		}
 
 		//profileを置くフォルダを検出
@@ -186,6 +217,30 @@ namespace GhostDeploy
 				return ghostMasterPath;
 			else
 				return path;
+		}
+
+		//関係ないファイルがある場合に念のため尋ねる機能
+		private bool AskOtherFilePossibilities()
+		{
+			if(
+				!System.IO.File.Exists(DictionaryUtility.ConbinePath(DirectoryPath, "descript.txt")) &&
+				!System.IO.File.Exists(DictionaryUtility.ConbinePath(DirectoryPath, "install.txt"))
+				)
+			{
+				if(MessageBox.Show("選択されているフォルダにはゴースト関係のフォルダによくある「descript.txt」や「install.txt」が見つかりません。\r\n関係ないフォルダを選んでいるかもしれませんが、そのまま進めてもいいですか？",
+					"GhostDeploy", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+				{
+					return true;
+				}
+				else
+				{
+					return false;
+				}
+			}
+			else
+			{
+				return true;
+			}
 		}
 	}
 }

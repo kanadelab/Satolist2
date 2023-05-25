@@ -1485,44 +1485,7 @@ namespace Satolist2
 					//保存ダイアログを出す
 					if(AskSave(true))
 					{
-						//ファイル保存先の選択
-						var saveDialog = new SaveFileDialog();
-						saveDialog.Filter = "narゴーストアーカイブ(*.nar)|*.nar|zip圧縮ファイル(*.zip)|*.zip|すべてのファイル|*.*";
-						saveDialog.InitialDirectory = DictionaryUtility.NormalizeWindowsPath(Ghost.FullPath);
-						saveDialog.AddExtension = true;
-						saveDialog.OverwritePrompt = true;
-						saveDialog.FileName = "ghost.nar";
-
-						if(saveDialog.ShowDialog() == true)
-						{
-							var progressDialog = new ProgressDialog(this);
-							progressDialog.DataContext.Title = "narファイルの作成";
-							progressDialog.DataContext.SetMessage("narファイルを作成します。");
-
-							var task = Task.Run(() =>
-							{
-								try
-								{
-									NarUtility.CreateNar(Ghost.FullPath, saveDialog.FileName);
-
-									MainWindow.Dispatcher.Invoke(() =>
-									{
-										progressDialog.DataContext.SetMessage("作成完了しました。", 100.0);
-									});
-								}
-								catch
-								{
-									//TODO: エラー内容表示？ 折角ログ領域ある
-									MainWindow.Dispatcher.Invoke(() =>
-									{
-										progressDialog.DataContext.SetMessage("失敗しました。");
-									});
-								}
-							});
-							progressDialog.SetTask(task);
-							progressDialog.ShowDialog();
-							
-						}
+						CommonDialog.ShowExportNarDialog(Ghost.FullPath, MainWindow.RootWindow);
 					}
 				},
 				o => Ghost != null
@@ -1533,29 +1496,7 @@ namespace Satolist2
 				{
 					if(AskSave(true))
 					{
-						var progressDialog = new ProgressDialog(this);
-						progressDialog.DataContext.Title = "更新ファイルの作成";
-						progressDialog.DataContext.SetMessage("更新ファイルを作成します。");
-						var task = Task.Run(() =>
-					   {
-						   try
-						   {
-							   NarUtility.CreateUpdateFile(Ghost.FullPath);
-							   MainWindow.Dispatcher.Invoke(() =>
-							   {
-								   progressDialog.DataContext.SetMessage("作成完了しました。", 100.0);
-							   });
-						   }
-						   catch
-						   {
-							   MainWindow.Dispatcher.Invoke(() =>
-							   {
-								   progressDialog.DataContext.SetMessage("失敗しました。");
-							   });
-						   }
-					   });
-						progressDialog.SetTask(task);
-						progressDialog.ShowDialog();
+						CommonDialog.ShowMakeUpdateDialog(Ghost.FullPath, MainWindow.RootWindow);
 					}
 				},
 				o => Ghost != null
@@ -1624,7 +1565,8 @@ namespace Satolist2
 					}
 
 					var gen = new Core.SurfacePreviewImageGenerator();
-					var dialog = new ProgressDialog(this);
+					var dialog = new ProgressDialog();
+					dialog.Owner = MainWindow.RootWindow;
 					dialog.DataContext.Title = "サーフェスプレビューの作成中";
 					dialog.DataContext.StableMessage = "SSPと通信しています。処理中はゴーストを操作しないでください。";
 
@@ -1704,7 +1646,8 @@ namespace Satolist2
 					dialog.Owner = MainWindow.RootWindow;
 					if (dialog.ShowDialog() == true)
 					{
-						var updateProgress = new ProgressDialog(this);
+						var updateProgress = new ProgressDialog();
+						dialog.Owner = MainWindow.RootWindow;
 						updateProgress.DataContext.IsIndeterminate = true;
 						updateProgress.Title = "里々のアップデート";
 						updateProgress.SetTask(SatoriUpdator.UpdateSatori(updateProgress.DataContext, dialog.DataContext.SelectedItem.Release, Ghost));
@@ -1772,7 +1715,7 @@ namespace Satolist2
 			}
 		}
 
-
+		
 		//イベントエディタのオープン
 		public void OpenEventEditor(EventModel ev)
 		{
@@ -2233,8 +2176,6 @@ namespace Satolist2
 			}
 		}
 
-		
-
 		internal class SurfacePreviewViewModelShellItem : NotificationObject
 		{
 			private bool isSelected;
@@ -2275,6 +2216,79 @@ namespace Satolist2
 		}
 	}
 
+	public class CommonDialog
+	{
+		public static void ShowExportNarDialog(string fullPath, Window dialogOwner)
+		{
+			//ファイル保存先の選択
+			var saveDialog = new SaveFileDialog();
+			saveDialog.Filter = "narゴーストアーカイブ(*.nar)|*.nar|zip圧縮ファイル(*.zip)|*.zip|すべてのファイル|*.*";
+			saveDialog.InitialDirectory = DictionaryUtility.NormalizeWindowsPath(fullPath);
+			saveDialog.AddExtension = true;
+			saveDialog.OverwritePrompt = true;
+			saveDialog.FileName = "ghost.nar";
 
-	
+			if (saveDialog.ShowDialog() == true)
+			{
+				var progressDialog = new ProgressDialog();
+				progressDialog.Owner = dialogOwner;
+				progressDialog.DataContext.Title = "narファイルの作成";
+				progressDialog.DataContext.SetMessage("narファイルを作成します。");
+
+				var task = Task.Run(() =>
+				{
+					try
+					{
+						NarUtility.CreateNar(fullPath, saveDialog.FileName);
+
+						Application.Current.Dispatcher.Invoke(() =>
+						{
+							progressDialog.DataContext.SetMessage("作成完了しました。", 100.0);
+						});
+					}
+					catch
+					{
+						//TODO: エラー内容表示？ 折角ログ領域ある
+						Application.Current.Dispatcher.Invoke(() =>
+						{
+							progressDialog.DataContext.SetMessage("失敗しました。");
+						});
+					}
+				});
+				progressDialog.SetTask(task);
+				progressDialog.ShowDialog();
+
+			}
+		}
+
+		public static void ShowMakeUpdateDialog(string fullPath, Window dialogOwner)
+		{
+			var progressDialog = new ProgressDialog();
+			progressDialog.Owner = dialogOwner;
+			progressDialog.DataContext.Title = "更新ファイルの作成";
+			progressDialog.DataContext.SetMessage("更新ファイルを作成します。");
+			var task = Task.Run(() =>
+			{
+				try
+				{
+					NarUtility.CreateUpdateFile(fullPath);
+					Application.Current.Dispatcher.Invoke(() =>
+					{
+						progressDialog.DataContext.SetMessage("作成完了しました。", 100.0);
+					});
+				}
+				catch
+				{
+					Application.Current.Dispatcher.Invoke(() =>
+					{
+						progressDialog.DataContext.SetMessage("失敗しました。");
+					});
+				}
+			});
+			progressDialog.SetTask(task);
+			progressDialog.ShowDialog();
+		}
+
+	}
+
 }

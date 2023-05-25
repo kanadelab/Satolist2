@@ -35,11 +35,10 @@ namespace Satolist2.Dialog
 			}
 		}
 
-		internal ProgressDialog(MainViewModel main)
+		internal ProgressDialog()
 		{
 			InitializeComponent();
 			Cancellation = new CancellationTokenSource();
-			Owner = main.MainWindow.RootWindow;
 			DataContext = new ProgressDialogViewModel(this);
 			
 		}

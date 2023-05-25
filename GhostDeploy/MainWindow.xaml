@@ -16,6 +16,12 @@
 			<MenuItem Header="設定">
 				<MenuItem Header="アップロード設定" Command="{Binding UploadSettingCommand}"/>
 			</MenuItem>
+			<MenuItem Header="更新">
+				<MenuItem Header="narファイル作成" Command="{Binding ExportNarCommand}" />
+				<MenuItem Header="更新ファイル作成" Command="{Binding MakeUpdateFileCommand}"/>
+				<Separator />
+				<MenuItem Header="サーバにファイルをアップロード" Command="{Binding UploadCommand}" />
+			</MenuItem>
 		</Menu>
 		
 		<StackPanel Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center">
