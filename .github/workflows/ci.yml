@@ -32,7 +32,7 @@ jobs:
         shell: cmd
         run: |
           mkdir deploy
-          copy GhostDeploy\bin\Deploy\GhostDeploy.exe Satolist2\bin\GhostDeploy.exe
+          copy GhostDeploy\bin\Deploy\GhostDeploy.exe Satolist2\bin\Deploy\GhostDeploy.exe
           SatolistDeploy\bin\Deploy\SatolistDeploy.exe Satolist2\bin\Deploy deploy
 
       - name: make filelist
