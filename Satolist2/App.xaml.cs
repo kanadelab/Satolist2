@@ -21,9 +21,7 @@ namespace Satolist2
 		{
 			//アセンブリ位置をカレントに設定
 			Environment.CurrentDirectory = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-
-			//アセンブリを奥においやる為の
-			AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
+			PrepareEnvironment();
 
 			base.OnStartup(e);
 
@@ -35,8 +33,14 @@ namespace Satolist2
 			StartupUri = Themes.ApplicationTheme.GetBootWindowPath();
 		}
 
+		public static void PrepareEnvironment()
+		{
+			//アセンブリを奥においやる為の
+			AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
+		}
+
 		//アセンブリを奥におしやる
-		private System.Reflection.Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
+		private static System.Reflection.Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
 		{
 			var name = new AssemblyName(args.Name);
 			var path = string.Format(@"data\assembly\{0}", name.Name);

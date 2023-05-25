@@ -26,6 +26,7 @@ namespace SatolistDeploy
 			{
 				"data",
 				"Satolist2.exe",
+				"GhostDeploy.exe",
 				"readme.txt",
 				"licence.txt",
 				"MahApps.Metro.dll",

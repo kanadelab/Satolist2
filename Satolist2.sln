@@ -24,6 +24,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SatolistDocument", "Satolis
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SatolistLegacyCompat", "SatolistLegacyCompat\SatolistLegacyCompat.csproj", "{9EEBD3AD-95AC-45C9-AD60-E17C7AD7FC21}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GhostDeploy", "GhostDeploy\GhostDeploy.csproj", "{8D09267C-ABF1-4991-955C-A6437914A1C6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -180,6 +182,24 @@ Global
 		{9EEBD3AD-95AC-45C9-AD60-E17C7AD7FC21}.Release|x64.Build.0 = Release|Any CPU
 		{9EEBD3AD-95AC-45C9-AD60-E17C7AD7FC21}.Release|x86.ActiveCfg = Release|Any CPU
 		{9EEBD3AD-95AC-45C9-AD60-E17C7AD7FC21}.Release|x86.Build.0 = Release|Any CPU
+		{8D09267C-ABF1-4991-955C-A6437914A1C6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8D09267C-ABF1-4991-955C-A6437914A1C6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8D09267C-ABF1-4991-955C-A6437914A1C6}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{8D09267C-ABF1-4991-955C-A6437914A1C6}.Debug|x64.Build.0 = Debug|Any CPU
+		{8D09267C-ABF1-4991-955C-A6437914A1C6}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{8D09267C-ABF1-4991-955C-A6437914A1C6}.Debug|x86.Build.0 = Debug|Any CPU
+		{8D09267C-ABF1-4991-955C-A6437914A1C6}.Deploy|Any CPU.ActiveCfg = Deploy|Any CPU
+		{8D09267C-ABF1-4991-955C-A6437914A1C6}.Deploy|Any CPU.Build.0 = Deploy|Any CPU
+		{8D09267C-ABF1-4991-955C-A6437914A1C6}.Deploy|x64.ActiveCfg = Debug|Any CPU
+		{8D09267C-ABF1-4991-955C-A6437914A1C6}.Deploy|x64.Build.0 = Debug|Any CPU
+		{8D09267C-ABF1-4991-955C-A6437914A1C6}.Deploy|x86.ActiveCfg = Debug|Any CPU
+		{8D09267C-ABF1-4991-955C-A6437914A1C6}.Deploy|x86.Build.0 = Debug|Any CPU
+		{8D09267C-ABF1-4991-955C-A6437914A1C6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8D09267C-ABF1-4991-955C-A6437914A1C6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8D09267C-ABF1-4991-955C-A6437914A1C6}.Release|x64.ActiveCfg = Release|Any CPU
+		{8D09267C-ABF1-4991-955C-A6437914A1C6}.Release|x64.Build.0 = Release|Any CPU
+		{8D09267C-ABF1-4991-955C-A6437914A1C6}.Release|x86.ActiveCfg = Release|Any CPU
+		{8D09267C-ABF1-4991-955C-A6437914A1C6}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

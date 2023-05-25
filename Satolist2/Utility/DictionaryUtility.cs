@@ -11,7 +11,7 @@ using System.Text.RegularExpressions;
 namespace Satolist2.Utility
 {
 	//里々辞書ユーティリティ
-	internal static class DictionaryUtility
+	public static class DictionaryUtility
 	{
 		public static bool SplitEventHeader(string line, out EventType eventType, out string eventName, out string eventCondition)
 		{

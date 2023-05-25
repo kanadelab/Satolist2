@@ -20,7 +20,7 @@ namespace Satolist2.Themes
 			Dark
 		}
 
-		public static Themes CurrentTheme { get; set; } = Themes.Dark;
+		public static Themes CurrentTheme { get; set; } = Themes.Default;
 
 		public static void Setup(ResourceDictionary resourceDictionary)
 		{

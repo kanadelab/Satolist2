@@ -17,13 +17,9 @@ namespace Satolist2.Model
 	internal class EditorSettings
 	{
 		private const string InsertPaettePath = "settings/insertpalette.json";
-		private const string UploadSettingPath = "settings/accounts.json";
 		private const string TemporarySettingsPath = "settings/temporary.json";
 		private const string GeneralSettingPath = "settings/general.json";
 		private const string LegacySettingPath = "settings/legacy.json";
-
-		//ゴーストのprofile格納
-		private const string GhostLocalSettingPath = "profile/satolist/ghost.json";
 
 		//ロードエラー定型文
 		private const string LoadErrorMessage = "設定ファイルのロードに失敗しました。";
@@ -33,7 +29,6 @@ namespace Satolist2.Model
 		public const int DefaultFontSize = 14;
 
 		public InsertItemPaletteModel InsertPalette { get; set; }
-		public UploadServerSettingModelBase[] UploadSettings { get; set; }
 		public TemporarySettings TemporarySettings { get; set; }
 		public GhostLocalSettings GhostTemporarySettings { get; set; }
 		public GeneralSettings GeneralSettings { get; set; }
@@ -47,7 +42,6 @@ namespace Satolist2.Model
 			GhostTemporarySettings = new GhostLocalSettings();	//ゴースト設定のダミーを作成。サーフェスプレビュー設定とかゴースト側に設定するものがとりあえず動くような感じ
 			LoadTemporarySettings();
 			LoadInsertPalette();
-			LoadUploadSettings();
 			LoadGeneralSettings();
 		}
 
@@ -55,13 +49,9 @@ namespace Satolist2.Model
 		//基本的にはロードできてなくても初期状態にしてたいして差し支えない情報群
 		public void LoadGhostTemporarySettings(GhostModel ghost)
 		{
-			var path = Utility.DictionaryUtility.ConbinePath(ghost.FullDictionaryPath, GhostLocalSettingPath);
 			try
 			{
-				if (System.IO.File.Exists(path))
-				{
-					GhostTemporarySettings = JsonUtility.DeserializeFromFile<GhostLocalSettings>(path);
-				}
+				GhostTemporarySettings = GhostLocalSettings.Load(ghost.FullDictionaryPath);
 				if (GhostTemporarySettings == null)
 					throw new Exception();
 			}
@@ -78,9 +68,7 @@ namespace Satolist2.Model
 			//ゴーストを開いてなくてもダミーを用意するので保存だけキャンセルする方向
 			if (ghost != null)
 			{
-				var path = Utility.DictionaryUtility.ConbinePath(ghost.FullDictionaryPath, GhostLocalSettingPath);
-				System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(path));
-				JsonUtility.SerializeToFile(path, GhostTemporarySettings);
+				GhostLocalSettings.Save(ghost.FullDictionaryPath, GhostTemporarySettings);
 			}
 		}
 
@@ -114,51 +102,6 @@ namespace Satolist2.Model
 			catch
 			{
 			}
-		}
-
-		public void LoadUploadSettings()
-		{
-			try
-			{
-				if (System.IO.File.Exists(UploadSettingPath))
-				{
-					var itemArray = JsonUtility.DeserializeFromFile(UploadSettingPath) as JArray;
-					var uploadSettings = new List<UploadServerSettingModelBase>();
-					foreach (JObject item in itemArray)
-					{
-						var itemType = item["ItemType"].ToString();
-						switch (itemType)
-						{
-							case FtpServerSettingModel.Type:
-								uploadSettings.Add(item.ToObject<FtpServerSettingModel>());
-								break;
-							case NarnaloaderV2ServerSettingModel.Type:
-								uploadSettings.Add(item.ToObject<NarnaloaderV2ServerSettingModel>());
-								break;
-							default:
-								throw new Exception("アップロード設定に不明なエントリがあります");
-						}
-					}
-					UploadSettings = uploadSettings.ToArray();
-				}
-			}
-			catch
-			{
-				var err = new Dialog.ErrorListDialogItemViewModel();
-				err.Title = DictionaryUtility.NormalizeFullPath(UploadSettingPath);
-				err.Description = LoadErrorMessage;
-				LoadErrors.Add(err);
-			}
-		}
-
-		public void SaveUploadSettings()
-		{
-			try
-			{
-				System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(UploadSettingPath));
-				JsonUtility.SerializeToFile(UploadSettingPath, UploadSettings);
-			}
-			catch { }
 		}
 
 		private void LoadTemporarySettings()

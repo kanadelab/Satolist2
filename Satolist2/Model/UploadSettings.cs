@@ -1,4 +1,6 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using Satolist2.Utility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,8 +9,49 @@ using System.Threading.Tasks;
 
 namespace Satolist2.Model
 {
+	public class UploadSetting
+	{
+		public const string UploadSettingPath = "settings/accounts.json";
+
+		public static UploadServerSettingModelBase[] Load()
+		{
+			if (System.IO.File.Exists(UploadSettingPath))
+			{
+				var itemArray = JsonUtility.DeserializeFromFile(UploadSettingPath) as JArray;
+				var uploadSettings = new List<UploadServerSettingModelBase>();
+				foreach (JObject item in itemArray)
+				{
+					var itemType = item["ItemType"].ToString();
+					switch (itemType)
+					{
+						case FtpServerSettingModel.Type:
+							uploadSettings.Add(item.ToObject<FtpServerSettingModel>());
+							break;
+						case NarnaloaderV2ServerSettingModel.Type:
+							uploadSettings.Add(item.ToObject<NarnaloaderV2ServerSettingModel>());
+							break;
+						default:
+							throw new Exception("アップロード設定に不明なエントリがあります");
+					}
+				}
+				return uploadSettings.ToArray();
+			}
+			return Array.Empty<UploadServerSettingModelBase>();
+		}
+
+		public static void Save(UploadServerSettingModelBase[] items)
+		{
+			try
+			{
+				System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(UploadSettingPath));
+				JsonUtility.SerializeToFile(UploadSettingPath, items);
+			}
+			catch { }
+		}
+	}
+
 	[JsonObject]
-	internal abstract class UploadServerSettingModelBase
+	public abstract class UploadServerSettingModelBase
 	{
 		[JsonProperty]
 		public string Label { get; set; } = "";
@@ -20,7 +63,7 @@ namespace Satolist2.Model
 	}
 
 	[JsonObject]
-	internal class FtpServerSettingModel : UploadServerSettingModelBase
+	public class FtpServerSettingModel : UploadServerSettingModelBase
 	{
 		public const string Type = "FtpServer";
 		[JsonProperty]
@@ -88,7 +131,7 @@ namespace Satolist2.Model
 	}
 
 	[JsonObject]
-	internal class NarnaloaderV2ServerSettingModel : UploadServerSettingModelBase
+	public class NarnaloaderV2ServerSettingModel : UploadServerSettingModelBase
 	{
 		public const string Type = "NarnaloaderV2Server";
 		[JsonProperty]
@@ -158,7 +201,7 @@ namespace Satolist2.Model
 	}
 
 	[JsonObject]
-	internal class FtpItemSettingModel
+	public class FtpItemSettingModel
 	{
 		public const string Type = "FtpItem";
 		[JsonIgnore]
@@ -197,7 +240,7 @@ namespace Satolist2.Model
 	}
 
 	[JsonObject]
-	internal class NarnaloaderV2ItemSettingModel
+	public class NarnaloaderV2ItemSettingModel
 	{
 		public const string Type = "NarnaloaderV2Item";
 		[JsonIgnore]

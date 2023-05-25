@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace Satolist2.Model
 {
@@ -37,6 +38,30 @@ namespace Satolist2.Model
 	//sspに便乗してghost/master/profileにいれちゃう
 	public class GhostLocalSettings
 	{
+		//ゴーストのprofile格納
+		public const string GhostLocalSettingPath = "profile/satolist/ghost.json";
+
+		public static GhostLocalSettings Load(string itemPath)
+		{
+			var path = Utility.DictionaryUtility.ConbinePath(itemPath, GhostLocalSettingPath);
+			if (System.IO.File.Exists(path))
+			{
+				return JsonUtility.DeserializeFromFile<GhostLocalSettings>(path);
+			}
+			return null;
+		}
+
+		public static void Save(string itemPath, GhostLocalSettings setting)
+		{
+			try
+			{
+				var path = Utility.DictionaryUtility.ConbinePath(itemPath, GhostLocalSettingPath);
+				System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(path));
+				JsonUtility.SerializeToFile(path, setting);
+			}
+			catch { }
+		}
+
 		//前回アップロードに使用した設定
 		[JsonProperty]
 		public string LastUploadSettingId { get; set; }

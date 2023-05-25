@@ -96,10 +96,16 @@ namespace Satolist2.Core
 								}
 							}
 
-							//接続してなかったら接続する
-							if(!Implement.IsConnected)
+							try
 							{
-								Implement.Connect();
+								//接続してなかったら接続する
+								if (!Implement.IsConnected)
+								{
+									Implement.Connect();
+								}
+							}
+							catch
+							{
 							}
 
 							//コマンドの実行

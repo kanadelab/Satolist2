@@ -21,7 +21,7 @@ namespace Satolist2.Dialog
 	/// </summary>
 	public partial class UploadSettingDialog : DialogContentBase
 	{
-		internal new UploadSettingDialogViewModel DataContext
+		public new UploadSettingDialogViewModel DataContext
 		{
 			get => (UploadSettingDialogViewModel)base.DataContext;
 			set
@@ -30,10 +30,9 @@ namespace Satolist2.Dialog
 			}
 		}
 
-		internal UploadSettingDialog(Model.UploadServerSettingModelBase[] uploadSettings, MainViewModel main)
+		public UploadSettingDialog(Model.UploadServerSettingModelBase[] uploadSettings)
 		{
 			InitializeComponent();
-			Owner = main.MainWindow.RootWindow;
 			Closing += UploadSettingDialog_Closing;
 			DataContext = new UploadSettingDialogViewModel(uploadSettings, this);
 		}
@@ -156,7 +155,7 @@ namespace Satolist2.Dialog
 				items.Remove(item);
 			}
 
-			internal Model.UploadServerSettingModelBase[] GetItems()
+			public Model.UploadServerSettingModelBase[] GetItems()
 			{
 				return items.Select<UploadSettingItemViewModelBase, Model.UploadServerSettingModelBase>(o =>
 				{

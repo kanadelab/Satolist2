@@ -11,7 +11,7 @@
 	<local:DialogContentBase.Resources>
 		<ResourceDictionary>
 			<ResourceDictionary.MergedDictionaries>
-				<ResourceDictionary Source="/Control/StrechedListViewItemStyle.xaml" />
+				<ResourceDictionary Source="pack://application:,,,/Satolist2;component/Control/StrechedListViewItemStyle.xaml" />
 			</ResourceDictionary.MergedDictionaries>
 			<util:InvertBoolConverter x:Key="InvertBoolConverter" />
 		</ResourceDictionary>

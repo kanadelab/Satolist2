@@ -24,7 +24,7 @@ namespace Satolist2.Dialog
 	public partial class UploadDialog : DialogContentBase
 	{
 		private bool isUploading = false;
-		public Model.GhostModel Ghost { get; }
+		private string targetPath;
 		public CancellationTokenSource Cancellation { get; }
 		//アップロードするところまで進んだか（設定更新フラグ）
 		public bool IsUploadStarted { get; private set; }
@@ -34,12 +34,11 @@ namespace Satolist2.Dialog
 			set => base.DataContext = value;
 		}
 
-		internal UploadDialog(Model.UploadServerSettingModelBase[] servers, MainViewModel main, Model.GhostLocalSettings ghostSettings)
+		public UploadDialog(Model.UploadServerSettingModelBase[] servers, string targetPath, Model.GhostLocalSettings ghostSettings)
 		{
-			Ghost = main.Ghost;
+			this.targetPath = targetPath;
 			Cancellation = new CancellationTokenSource();
 			InitializeComponent();
-			Owner = main.MainWindow.RootWindow;
 			DataContext = new DialogViewModel();
 			Closing += UploadDialog_Closing;
 
@@ -421,7 +420,7 @@ namespace Satolist2.Dialog
 						   {
 							   AddLogFromTask("更新のアップロードを開始します。");
 							   //更新ファイルのアップロード
-							   Utility.NarUtility.UploadUpdates(ftpClient, Ghost.FullPath, ftp.UpdatePath, useDiff, AddProgressFromTask, Cancellation.Token);
+							   Utility.NarUtility.UploadUpdates(ftpClient, targetPath, ftp.UpdatePath, useDiff, AddProgressFromTask, Cancellation.Token);
 							   AddLogFromTask("更新のアップロードが完了しました。");
 						   }
 						   catch(OperationCanceledException)
@@ -442,7 +441,7 @@ namespace Satolist2.Dialog
 						   {
 							   AddLogFromTask("narのアップロードを開始します。");
 							   //narのアップロード
-							   Utility.NarUtility.UploadNar(Ghost.FullPath, ftp.NarPath, ftpClient, Cancellation.Token);
+							   Utility.NarUtility.UploadNar(targetPath, ftp.NarPath, ftpClient, Cancellation.Token);
 							   AddLogFromTask("narのアップロードが完了しました。");
 						   }
 						   catch (OperationCanceledException)
@@ -483,7 +482,7 @@ namespace Satolist2.Dialog
 
 					try
 					{
-						var result = Utility.NarUtility.UploadNar(Ghost.FullPath, account, nnl.ItemId, Cancellation.Token);
+						var result = Utility.NarUtility.UploadNar(targetPath, account, nnl.ItemId, Cancellation.Token);
 						if(result.success)
 						{
 							AddLogFromTask("アップロードに成功しました。");

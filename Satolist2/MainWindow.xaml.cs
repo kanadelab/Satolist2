@@ -1369,11 +1369,30 @@ namespace Satolist2
 			EditUploadSettingCommand = new ActionCommand(
 				o =>
 				{
-					var d = new Dialog.UploadSettingDialog(EditorSettings.UploadSettings, this);
+					UploadServerSettingModelBase[] settings = Array.Empty<UploadServerSettingModelBase>();
+					bool isContinue = true;
+					try
+					{
+						settings = UploadSetting.Load();
+					}
+					catch
+					{
+						if(MessageBox.Show("アップロードのロードに失敗しました。\r\n設定をクリアして再設定するようにしてもいいですか？", "さとりすと", MessageBoxButton.YesNo, MessageBoxImage.Warning)
+							== MessageBoxResult.No)
+						{
+							isContinue = false;
+						}
+					}
+
+					if (!isContinue)
+						return;
+
+					var d = new Dialog.UploadSettingDialog(settings);
+					d.Owner = mainWindow.RootWindow;
 					if( d.ShowDialog() == true)
 					{
-						EditorSettings.UploadSettings = d.DataContext.GetItems();
-						EditorSettings.SaveUploadSettings();
+						settings = d.DataContext.GetItems();
+						UploadSetting.Save(settings);
 					}
 				}
 				);
@@ -1545,7 +1564,18 @@ namespace Satolist2
 			UploadGhostCommand = new ActionCommand(
 				o =>
 				{
-					if(!(EditorSettings.UploadSettings?.Any() ?? false))
+					UploadServerSettingModelBase[] settings = null;
+					try
+					{
+						settings = UploadSetting.Load();
+					}
+					catch
+					{
+						MessageBox.Show("アップロードのロードに失敗しました。\r\n「設定」→「アップロード設定」でアップロード設定を構成してください。", "さとりすと");
+						return;
+					}
+
+					if(!(settings?.Any() ?? false))
 					{
 						MessageBox.Show("アップロード設定がありません。\r\n「設定」→「アップロード設定」でアップロード設定を構成してください。", "さとりすと");
 						return;
@@ -1554,7 +1584,8 @@ namespace Satolist2
 					if (AskSave(true))
 					{
 						//ゴーストアップロード
-						var dialog = new UploadDialog(EditorSettings.UploadSettings, this, EditorSettings.GhostTemporarySettings);
+						var dialog = new UploadDialog(settings, Ghost.FullPath, EditorSettings.GhostTemporarySettings);
+						dialog.Owner = this.MainWindow.RootWindow;
 						dialog.ShowDialog();
 						if(dialog.IsUploadStarted)
 						{
