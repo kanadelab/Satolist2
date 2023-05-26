@@ -3,6 +3,7 @@ using Satolist2.Model;
 using Satolist2.Utility;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -82,10 +83,12 @@ namespace GhostDeploy
 		public ActionCommand UploadSettingCommand { get; }
 		public ActionCommand ExportNarCommand { get; }
 		public ActionCommand MakeUpdateFileCommand { get; }
+		public ActionCommand OpenDirectoryCommand { get; }
 
 		public MainViewModel(MainWindow mainWindow)
 		{
 			window = mainWindow;
+			directoryPath = string.Empty;
 
 			UploadCommand = new ActionCommand(
 				o =>
@@ -205,6 +208,22 @@ namespace GhostDeploy
 				o =>
 				{
 					return !string.IsNullOrEmpty(DirectoryPath);
+				});
+
+			OpenDirectoryCommand = new ActionCommand(
+				o =>
+				{
+					try
+					{
+						if (!string.IsNullOrEmpty(DirectoryPath))
+						{
+							if (System.IO.Directory.Exists(DirectoryPath))
+							{
+								Process.Start(DirectoryPath);
+							}
+						}
+					}
+					catch { }
 				});
 		}
 
