@@ -591,14 +591,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resource\satolist.png" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="Resource\satolist.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resource\satolist.svg" />
-    <None Include="Resource\satolist_opt.svg" />
   </ItemGroup>
   <Import Project="..\SatolistResource\SatolistResource.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
