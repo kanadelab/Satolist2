@@ -26,6 +26,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SatolistLegacyCompat", "Sat
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GhostDeploy", "GhostDeploy\GhostDeploy.csproj", "{8D09267C-ABF1-4991-955C-A6437914A1C6}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BuildTools", "BuildTools", "{E6657482-AF2A-45B7-A04D-F585D582894E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -203,6 +205,10 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{F0956490-5632-437E-8243-0CCECE31A4D3} = {E6657482-AF2A-45B7-A04D-F585D582894E}
+		{5B7644AA-2E0F-4F45-80C0-01C50208EB22} = {E6657482-AF2A-45B7-A04D-F585D582894E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {ECD96FF8-04C8-4688-A4E8-02616B872ACD}
