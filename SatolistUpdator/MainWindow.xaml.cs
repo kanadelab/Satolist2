@@ -9,6 +9,7 @@ using System.Net;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -191,6 +192,15 @@ namespace SatolistUpdator
 				});
 		}
 
+		private void NotifyRetry()
+		{
+			//初期の表示に戻す
+			Message = "さとりすとを更新します。よろしいですか？";
+			ShowUpdateButton = true;
+			ShowCloseButton = true;
+			ShowProgressBar = false;
+		}
+
 		private void NotifyFailed()
 		{
 			//失敗の表示系に切り替える
@@ -239,19 +249,35 @@ namespace SatolistUpdator
 		//実際のアップデート
 		private void Step2_UpdateFiles()
 		{
-			if(IsRunningDuplecatedEditorProcess())
-			{
-				MessageBox.Show("アップデートするには起動中のさとりすとをすべて終了してください。", "さとりすと ネットワーク更新", MessageBoxButton.OK, MessageBoxImage.Information);
-				return;
-			}
-
 			ShowCloseButton = false;
 			ShowUpdateButton = false;
 			ShowProgressBar = true;
-			Message = "アップデート中...";
+			Message = "さとりすとが終了していることを確認中...";
 
 			Task.Run(() =>
 			{
+				try
+				{
+					Thread.Sleep(3000);	//ちょっと待つ
+					if (IsRunningDuplecatedEditorProcess())
+					{
+						MainWindow.Dispatcher.Invoke(() =>
+						{
+							MessageBox.Show("アップデートするには起動中の「さとりすと」と「GhostDeploy」をすべて終了してください。", "さとりすと ネットワーク更新", MessageBoxButton.OK, MessageBoxImage.Information);
+							NotifyRetry();
+						});
+						return;
+					}
+				}
+				catch
+				{
+				}
+
+				MainWindow.Dispatcher.Invoke(() =>
+				{
+					Message = "アップデート中...";
+				});
+
 				try
 				{
 					//バックアップをとる
@@ -298,12 +324,14 @@ namespace SatolistUpdator
 		//さとりすとのプロセスが実行されているかをチェック
 		public bool IsRunningDuplecatedEditorProcess()
 		{
+			var executableDirectory = Path.GetDirectoryName(RequestedImagePath);
+			
 			var process = Process.GetProcesses();
 			if (process.Any(o =>
 			{
 				try
 				{
-					return o.MainModule.FileName == RequestedImagePath;
+					return o.MainModule.FileName.StartsWith(executableDirectory);
 				}
 				catch
 				{
