@@ -117,4 +117,7 @@
     <Resource Include="Resource\GhostDeploy.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>copy $(TargetPath) $(SolutionDir)\Satolist2\bin\Debug\$(TargetFileName)</PostBuildEvent>
+  </PropertyGroup>
 </Project>
