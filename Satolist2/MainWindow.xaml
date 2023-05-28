@@ -98,6 +98,8 @@
 				<MenuItem Header="更新ファイル作成" Command="{Binding MakeUpdateFileCommand}" />
 				<Separator />
 				<MenuItem Header="サーバにファイルをアップロード" Command="{Binding UploadGhostCommand}" />
+				<Separator />
+				<MenuItem Header="nar作成・アップロードツールを起動(シェルやバルーンのnar作成はこちら)" Command="{Binding BootGhostDeployCommand}" />
 			</MenuItem>
 			<MenuItem Header="オプション">
 				<MenuItem Header="基本設定" Command="{Binding EditGeneralSettingsCommand}" />
@@ -110,12 +112,6 @@
 		</Menu>
 
 		<avalonDock:DockingManager Grid.Row="1" AllowMixedOrientation="True" x:Name="DockingManager" >
-
-			<!--
-			<avalonDock:DockingManager.Theme>
-				<avalonDock:Vs2013DarkTheme/>
-			</avalonDock:DockingManager.Theme>
-			-->
 
 			<avalonDock:LayoutRoot>
 

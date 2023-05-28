@@ -984,6 +984,7 @@ namespace Satolist2
 		public ActionCommand ExportNarCommand { get; }
 		public ActionCommand MakeUpdateFileCommand { get; }
 		public ActionCommand UploadGhostCommand { get; }
+		public ActionCommand BootGhostDeployCommand { get; }
 		public ActionCommand GenerateSurfacePreviewCommand { get; }
 		public ActionCommand SelectPreviewShellCommand { get; }
 		public ActionCommand SelectPreviewShellDirectoryCommand { get; }
@@ -1544,6 +1545,17 @@ namespace Satolist2
 				},
 				o => Ghost != null
 				);
+
+			BootGhostDeployCommand = new ActionCommand(
+				o =>
+				{
+					try
+					{
+						//GhostDeployを起動
+						Process.Start(System.IO.Path.Combine(Environment.CurrentDirectory, "GhostDeploy.exe"));
+					}
+					catch { }
+				});
 
 			GenerateSurfacePreviewCommand = new ActionCommand(
 				o =>
