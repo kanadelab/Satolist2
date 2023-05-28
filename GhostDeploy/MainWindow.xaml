@@ -28,7 +28,7 @@
 			<Border BorderBrush="DarkGray" BorderThickness="1" Padding="3" Margin="2" HorizontalAlignment="Left" VerticalAlignment="Top">
 				<StackPanel>
 					<StackPanel Orientation="Horizontal">
-						<Image Source="Resource/GhostDeploy.ico" Stretch="Uniform" Height="55" />
+						<Image Source="Resource/GhostDeploy.ico" Stretch="Uniform" Height="55" RenderOptions.BitmapScalingMode="HighQuality"/>
 						<StackPanel Margin="5">
 							<TextBlock Text="GhostDeploy" FontSize="30" Foreground="Black" Margin="0 -10 0 0"/>
 							<TextBlock Text="nar作成/アップロードツール" Foreground="Black"/>
