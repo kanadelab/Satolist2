@@ -326,7 +326,7 @@
 													<Button Grid.Column="1" Margin="3" Width="50" Content="参照" Command="{Binding UpdatePathBrowseCommand}" />
 												</Grid>
 
-												<TextBlock Text="narファイル配置フォルダ" Margin="3"/>
+												<TextBlock Text="narファイル配置箇所" Margin="3"/>
 												<Grid>
 													<Grid.ColumnDefinitions>
 														<ColumnDefinition Width="*" />
