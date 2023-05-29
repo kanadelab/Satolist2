@@ -33,6 +33,7 @@
 
 				<avalonEdit:TextEditor.InputBindings>
 					<KeyBinding Gesture="ALT+Q" Command="{Binding SendToGhostCommand}" />
+					<KeyBinding Gesture="ALT+SHIFT+Q" Command="{Binding SendToGhostSelectionRangeCommand}" />
 					<KeyBinding Gesture="CTRL+F" Command="{Binding ShowSearchBoxCommand}" />
 					<KeyBinding Gesture="CTRL+SHIFT+F" Command="{Binding ShowGlobalSearchCommand}" CommandParameter="{Binding .,RelativeSource={RelativeSource AncestorType=avalonEdit:TextEditor}}" />
 					<KeyBinding Gesture="CTRL+SPACE" Command="{Binding CompletionCommand}" />
@@ -45,6 +46,7 @@
 						<MenuItem Header="検索" Click="ShowSearchBox_Click" InputGestureText="Ctrl+F" />
 						<Separator />
 						<MenuItem Header="ゴーストに送信" x:Name="SendToGhostMenuItem" Command="{Binding SendToGhostCommand}" InputGestureText="Alt+Q" />
+						<MenuItem Header="選択範囲をゴーストに送信" x:Name="SelectedRangeSendToGhostMenuItem" Command="{Binding SendToGhostSelectionRangeCommand}" InputGestureText="Alt+Shift+Q" />
 						<MenuItem Header="挿入" ItemsSource="{Binding Main.InsertPalette.Items, FallbackValue={x:Null}}" IsEnabled="{Binding Main.InsertPalette, Converter={StaticResource ReferenceToBoolConverter}}">
 							<MenuItem.ItemContainerStyle>
 								<Style TargetType="MenuItem">

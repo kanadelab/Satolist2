@@ -21,6 +21,9 @@
 			<RowDefinition Height="*" />
 		</Grid.RowDefinitions>
 
-		<module:TextEditorModuleSelector Grid.Row="0" Margin="3" IsEnableSyntaxHighlighting="True" SendToGhostCommand="{Binding SendToGhostCommand}" x:Name="MainTextEditor"/>
+		<module:TextEditorModuleSelector x:Name="MainTextEditor" Grid.Row="0" Margin="3" IsEnableSyntaxHighlighting="True" 
+										 SendToGhostCommand="{Binding SendToGhostCommand}"
+										 SendToGhostSelectionRangeCommand="{Binding SendToGhostSelectionRangeCommand}"
+										 />
 	</Grid>
 </UserControl>

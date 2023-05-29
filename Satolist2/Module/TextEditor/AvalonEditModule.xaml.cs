@@ -48,6 +48,7 @@ namespace Satolist2.Module.TextEditor
 			DataContext = new AvalonEditModuleViewModel(this);
 
 			//
+			IsEnableSendToGhostSelectionRange = false;
 			IsEnableSendToGhost = false;	//デフォルトでオフ
 		}
 
@@ -136,6 +137,16 @@ namespace Satolist2.Module.TextEditor
 			}
 		}
 
+		public override bool IsEnableSendToGhostSelectionRange
+		{
+			get => SelectedRangeSendToGhostMenuItem.IsEnabled;
+			set
+			{
+				SelectedRangeSendToGhostMenuItem.IsEnabled = value;
+				SelectedRangeSendToGhostMenuItem.Visibility = value ? Visibility.Visible : Visibility.Collapsed;
+			}
+		}
+
 		public override event EventHandler OnCaretPositionChanged
 		{
 			add => MainTextEditor.TextArea.Caret.PositionChanged += value;
@@ -172,8 +183,8 @@ namespace Satolist2.Module.TextEditor
 
 		public override void SetFont(string fontFamilyName, int fontSize)
 		{
-			MainTextEditor.FontFamily = new FontFamily(fontFamilyName);
-			MainTextEditor.FontSize = fontSize;
+			MainTextEditor.TextArea.FontFamily = new FontFamily(fontFamilyName);
+			MainTextEditor.TextArea.FontSize = fontSize;
 		}
 
 		public override void UpdateHighlighter()
@@ -285,6 +296,7 @@ namespace Satolist2.Module.TextEditor
 		private string backgroundImagePath;
 		private Thickness textEditorMargin;
 
+		public ICommand SendToGhostSelectionRangeCommand { get; }
 		public ICommand SendToGhostCommand { get; }
 		public ICommand ShowSearchBoxCommand { get; }
 		public ICommand ShowGlobalSearchCommand { get; }
@@ -347,6 +359,11 @@ namespace Satolist2.Module.TextEditor
 			SendToGhostCommand = new ActionCommand(o =>
 			{
 				module.SendToGhost();
+			});
+
+			SendToGhostSelectionRangeCommand = new ActionCommand(o =>
+			{
+				module.SendToGhostSelectionRange();
 			});
 
 			ShowSearchBoxCommand = new ActionCommand(o =>

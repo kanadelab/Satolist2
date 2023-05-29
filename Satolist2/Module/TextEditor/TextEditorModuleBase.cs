@@ -73,8 +73,11 @@ namespace Satolist2.Module.TextEditor
 		//オートインデント
 		public abstract bool AutoIndent { get; set; }
 
-		//ゴーストに送信昨日を有効化
+		//ゴーストに送信機能を有効化
 		public abstract bool IsEnableSendToGhost { get; set; }
+
+		//ゴーストに選択範囲を送信する機能を有効化
+		public abstract bool IsEnableSendToGhostSelectionRange { get; set; }
 
 		//現在行へスクロール
 		public abstract void ScrollToCaret();
@@ -99,6 +102,9 @@ namespace Satolist2.Module.TextEditor
 
 		//ゴーストに送信
 		public event EventHandler OnSendToGhost;
+
+		//選択範囲をゴーストに送信
+		public event EventHandler OnSendToGhostSelectionRange;
 
 		//検索ボックス表示リクエスト
 		public event EventHandler OnShowSearchBoxRequested;
@@ -280,9 +286,16 @@ namespace Satolist2.Module.TextEditor
 			OnShowGlobalSearchBox?.Invoke(this, new EventArgs());
 		}
 
+		//ゴーストに送信
 		public void SendToGhost()
 		{
 			OnSendToGhost?.Invoke(this, new EventArgs());
+		}
+
+		//ゴーストに送信(選択範囲)
+		public void SendToGhostSelectionRange()
+		{
+			OnSendToGhostSelectionRange?.Invoke(this, new EventArgs());
 		}
 	}
 

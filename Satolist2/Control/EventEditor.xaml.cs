@@ -253,6 +253,23 @@ namespace Satolist2.Control
 			if (!string.IsNullOrEmpty(eventName))
 				Main.UkadocEventReferenceViewModel.TrySelectEvent(eventName);
 		}
+
+		//選択中の内容をゴーストに送信
+		public void SendToGhostSelectionRange()
+		{
+			if (!string.IsNullOrEmpty(MainTextEditor.SelectionString))
+			{
+				try
+				{
+					Satorite.SendSatori(Main.Ghost, MainTextEditor.SelectionString, EventType.Sentence);
+					Core.LogMessage.AddLog("ゴーストにトークを送信しました。");
+				}
+				catch (GhostNotFoundException ex)
+				{
+					ex.PrintErrorLog();
+				}
+			}
+		}
 	}
 
 	internal class EventEditorViewModel : TextEditorViewModelBase, IDisposable, IControlBindedReceiver
@@ -278,6 +295,7 @@ namespace Satolist2.Control
 		public override string DockingContentId => randomizedContentId;
 
 		public ActionCommand SendToGhostCommand {get;}
+		public ActionCommand SendToGhostSelectionRangeCommand { get; }
 		public ActionCommand InsertCommand { get; }
 
 		public override TextEditorModuleBase MainTextEditor => control.MainTextEditor.MainTextEditor;
@@ -297,6 +315,12 @@ namespace Satolist2.Control
 					SendToGhost();
 				}
 				);
+
+			SendToGhostSelectionRangeCommand = new ActionCommand(
+				o =>
+				{
+					SendToGhostSelectionRange();
+				});
 
 			InsertCommand = new ActionCommand(
 				o =>

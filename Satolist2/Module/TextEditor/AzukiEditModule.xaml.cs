@@ -37,6 +37,7 @@ namespace Satolist2.Module.TextEditor
 		private AzukiControl MainTextEditor { get; set; }
 		private MenuItem insertPaletteMenuItem;
 		private MenuItem sendToGhostMenuItem;
+		private MenuItem sendToGhostSelectionRangeMenuItem;
 
 		public AzukiEditModule()
 		{
@@ -49,8 +50,12 @@ namespace Satolist2.Module.TextEditor
 			contextmenu.MenuItems.Add(new MenuItem("コピー", RequestCopy, Shortcut.CtrlC));
 			contextmenu.MenuItems.Add(new MenuItem("切り取り", RequestCut, Shortcut.CtrlX));
 			contextmenu.MenuItems.Add(new MenuItem("貼り付け", RequestPaste, Shortcut.CtrlV));
+			contextmenu.MenuItems.Add("-");
 			sendToGhostMenuItem = new MenuItem("ゴーストに送信", RequestSendToGhost, (Shortcut)(Keys.Alt | Keys.Q));
 			contextmenu.MenuItems.Add(sendToGhostMenuItem);
+			sendToGhostSelectionRangeMenuItem = new MenuItem("選択範囲をゴーストに送信", RequestSendToGhostSelectionRange, (Shortcut)(Keys.Alt | Keys.Shift | Keys.Q));
+			contextmenu.MenuItems.Add(sendToGhostSelectionRangeMenuItem);
+			contextmenu.MenuItems.Add("-");
 			contextmenu.MenuItems.Add(new MenuItem("検索", RequestShowSearchBox, Shortcut.CtrlF));
 			insertPaletteMenuItem = new MenuItem("挿入");
 			insertPaletteMenuItem.Enabled = false;	//初期はアイテムが無いので無効
@@ -61,6 +66,8 @@ namespace Satolist2.Module.TextEditor
 			MainTextEditor.ShowsHRuler = true;
 
 			FormsHost.Child = MainTextEditor;
+
+			IsEnableSendToGhostSelectionRange = false;
 			IsEnableSendToGhost = false;    //デフォルトでオフ
 		}
 
@@ -92,6 +99,11 @@ namespace Satolist2.Module.TextEditor
 		private void RequestSendToGhost(object sender, EventArgs args)
 		{
 			SendToGhost();
+		}
+
+		private void RequestSendToGhostSelectionRange(object sender, EventArgs args)
+		{
+			SendToGhostSelectionRange();
 		}
 
 		private void RequestShowSearchBox(object sender, EventArgs args)
@@ -245,6 +257,16 @@ namespace Satolist2.Module.TextEditor
 			{
 				sendToGhostMenuItem.Enabled = value;
 				sendToGhostMenuItem.Visible = value;
+			}
+		}
+
+		public override bool IsEnableSendToGhostSelectionRange
+		{
+			get => sendToGhostSelectionRangeMenuItem.Enabled;
+			set
+			{
+				sendToGhostSelectionRangeMenuItem.Enabled = value;
+				sendToGhostSelectionRangeMenuItem.Visible = value;
 			}
 		}
 

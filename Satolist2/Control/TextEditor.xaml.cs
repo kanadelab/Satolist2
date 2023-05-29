@@ -1,4 +1,5 @@
-﻿using ICSharpCode.AvalonEdit.Document;
+﻿using FluentFTP.Servers.Handlers;
+using ICSharpCode.AvalonEdit.Document;
 using ICSharpCode.AvalonEdit.Editing;
 using Satolist2.Model;
 using Satolist2.Module.TextEditor;
@@ -83,6 +84,7 @@ namespace Satolist2.Control
 		
 		public DictionaryModel TextFile { get; }
 		public ActionCommand SendToGhostCommand { get; }
+		public ActionCommand SendToGhostSelectionRangeCommand { get; }
 		public ActionCommand InsertCommand { get; }
 
 		public override TextEditorModuleBase MainTextEditor => control.MainTextEditor.MainTextEditor;
@@ -100,6 +102,13 @@ namespace Satolist2.Control
 				{
 					//イベントのスコープを検出して送信する必要がある
 					SendToGhost();
+				}
+				);
+
+			SendToGhostSelectionRangeCommand = new ActionCommand(
+				o =>
+				{
+					SendToGhostSelectionRange();
 				}
 				);
 

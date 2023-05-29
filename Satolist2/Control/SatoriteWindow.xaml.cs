@@ -39,6 +39,7 @@ namespace Satolist2.Control
 		public string DockingContentId => ContentId;
 
 		public ActionCommand SendToGhostCommand { get; }
+		public ActionCommand SendToGhostSelectionRangeCommand { get; }
 
 		public SatoriteViewModel(MainViewModel main)
 		{
@@ -57,6 +58,23 @@ namespace Satolist2.Control
 				},
 				o => main.Ghost != null
 				);
+
+			SendToGhostSelectionRangeCommand = new ActionCommand(
+				o =>
+				{
+					try
+					{
+						if (!string.IsNullOrEmpty(control.MainTextEditor.MainTextEditor.SelectionString))
+						{
+							Satorite.SendSatori(main.Ghost, control.MainTextEditor.MainTextEditor.SelectionString, EventType.Sentence);
+							Core.LogMessage.AddLog("ゴーストにトークを送信しました。");
+						}
+					}
+					catch (GhostNotFoundException ex)
+					{
+						ex.PrintErrorLog();
+					}
+				});
 		}
 
 		public void ControlBind(System.Windows.Controls.Control control)

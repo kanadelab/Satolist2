@@ -22,9 +22,9 @@ namespace Satolist2.Module.TextEditor
 	public partial class TextEditorModuleSelector : UserControl
 	{
 		public static readonly DependencyProperty IsEnableSyntaxHighlightingProperty = DependencyProperty.Register(nameof(IsEnableSyntaxHighlighting), typeof(bool), typeof(TextEditorModuleSelector),
-			new PropertyMetadata((d,e) =>
+			new PropertyMetadata((d, e) =>
 			{
-				if(d is TextEditorModuleSelector ctrl)
+				if (d is TextEditorModuleSelector ctrl)
 				{
 					ctrl.MainTextEditor.IsEnableSyntaxHighlighting = (bool)e.NewValue;
 				}
@@ -39,6 +39,15 @@ namespace Satolist2.Module.TextEditor
 				}
 			}));
 
+		public static readonly DependencyProperty SendToGhostSelectionRangeCommandProperty = DependencyProperty.Register(nameof(SendToGhostSelectionRangeCommand), typeof(ICommand), typeof(TextEditorModuleSelector),
+			new PropertyMetadata((d, e) =>
+			{
+				if (d is TextEditorModuleSelector ctrl)
+				{
+					ctrl.MainTextEditor.IsEnableSendToGhostSelectionRange = e.NewValue != null;
+				}
+			}));
+		
 		private TextEditorSearchBoxViewModel searchBoxViewModel;
 		public TextEditorModuleBase MainTextEditor { get; }
 
@@ -52,6 +61,12 @@ namespace Satolist2.Module.TextEditor
 		{
 			get => (ICommand)GetValue(SendToGhostCommandProperty);
 			set => SetValue(SendToGhostCommandProperty, value);
+		}
+
+		public ICommand SendToGhostSelectionRangeCommand
+		{
+			get => (ICommand)GetValue(SendToGhostSelectionRangeCommandProperty);
+			set => SetValue(SendToGhostSelectionRangeCommandProperty, value);
 		}
 
 		public TextEditorModuleSelector()
@@ -78,6 +93,7 @@ namespace Satolist2.Module.TextEditor
 				MainTextEditor.OnTextChanged += MainTextEditor_OnTextChanged;
 				MainTextEditor.OnShowGlobalSearchBox += MainTextEditor_OnShowGlobalSearchBox;
 				MainTextEditor.OnSendToGhost += MainTextEditor_OnSendToGhost;
+				MainTextEditor.OnSendToGhostSelectionRange += MainTextEditor_OnSendToGhostSelectionRange;
 
 				//多重に発生することがあるようなので対策として
 				MainTextEditor.IsEventRegistered = true;
@@ -92,6 +108,7 @@ namespace Satolist2.Module.TextEditor
 				MainTextEditor.OnTextChanged -= MainTextEditor_OnTextChanged;
 				MainTextEditor.OnShowGlobalSearchBox -= MainTextEditor_OnShowGlobalSearchBox;
 				MainTextEditor.OnSendToGhost -= MainTextEditor_OnSendToGhost;
+				MainTextEditor.OnSendToGhostSelectionRange -= MainTextEditor_OnSendToGhostSelectionRange;
 				MainTextEditor.IsEventRegistered = false;
 			}
 		}
@@ -99,6 +116,11 @@ namespace Satolist2.Module.TextEditor
 		private void MainTextEditor_OnSendToGhost(object sender, EventArgs e)
 		{
 			SendToGhostCommand?.Execute(null);
+		}
+
+		private void MainTextEditor_OnSendToGhostSelectionRange(object sender, EventArgs e)
+		{
+			SendToGhostSelectionRangeCommand?.Execute(null);
 		}
 
 		private void MainTextEditor_OnShowGlobalSearchBox(object sender, EventArgs e)
@@ -128,11 +150,6 @@ namespace Satolist2.Module.TextEditor
 			if (MainViewModel.EditorSettings.GeneralSettings.OverrideTextEditorEngine == "Azuki")
 			{
 				AzukiEditModule module = new AzukiEditModule();
-				/*
-				module.SetBinding(AzukiEditModule.InsertPaletteItemsProperty, new Binding("Main.InsertPalette.Items") { FallbackValue = null });
-				module.SetBinding(AzukiEditModule.SendToGhostCommandProperty, new Binding("SendToGhostCommand"));
-				module.SetBinding(AzukiEditModule.InsertCommandProperty, new Binding("InsertCommand"));
-				*/
 				return module;
 			}
 			else
