@@ -1,4 +1,5 @@
-﻿using Microsoft.Win32;
+﻿using ICSharpCode.AvalonEdit.Utils;
+using Microsoft.Win32;
 using Satolist2.Dialog;
 using Satolist2.Model;
 using Satolist2.Utility;
@@ -19,6 +20,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
 
 
 namespace Satolist2.Control
@@ -28,6 +31,8 @@ namespace Satolist2.Control
 	/// </summary>
 	public partial class FileEventTree : UserControl
 	{
+		public bool isMouseDown;
+
 		public FileEventTree()
 		{
 			InitializeComponent();
@@ -101,6 +106,168 @@ namespace Satolist2.Control
 		private void TreeViewItem_RequestBringIntoView(object sender, RequestBringIntoViewEventArgs e)
 		{
 			e.Handled = true;
+		}
+
+		private void TreeViewItem_MouseDown(object sender, MouseButtonEventArgs e)
+		{
+			//マウス押下でドラッグ開始を許可
+			isMouseDown = true;
+		}
+
+		//ドロップ処理
+		private void TreeViewItem_Drop(object sender, DragEventArgs e)
+		{
+			TreeViewPopup.IsOpen = false;
+
+			if (e.Handled)
+				return;
+
+			if (!e.Data.GetDataPresent(typeof(FileEventTreeItemEventViewModel)))
+				return;
+
+			if (sender is FrameworkElement obj)
+			{ 
+				if (obj.DataContext is FileEventTreeItemEventViewModel ev)
+				{
+					var dropEv = (FileEventTreeItemEventViewModel)e.Data.GetData(typeof(FileEventTreeItemEventViewModel));
+
+					//自分どうし
+					if (ev == dropEv)
+						return;
+
+					if(ev.Dictionary == dropEv.Dictionary)
+					{
+						//同じ辞書ならインデックス上の移動のみを行う
+						ev.Dictionary.Dictionary.MoveIndexEvent(dropEv.Identifier, ev.Identifier);
+					}
+					else
+					{
+						//異なる辞書なら、同じシグネチャのイベントが有る場合は合成になる
+						if(ev.Dictionary.Dictionary.Containts(dropEv.Identifier))
+						{
+							//同じ内容があるなら移動(合成)するだけ
+							if(MessageBox.Show("移動先の辞書に同じ項目が存在しているため、ひとつにまとめます。\r\nよろしいですか？", "さとりすと", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+							{
+								dropEv.MoveTo(ev.Dictionary);
+							}
+						}
+						else
+						{
+							//異なる内容があれば移動したうえで位置指定
+							var identifier = dropEv.Identifier;
+							dropEv.MoveTo(ev.Dictionary);
+							ev.Dictionary.Dictionary.MoveIndexEvent(identifier, ev.Identifier);
+						}
+					}
+					
+					//辞書違い
+					e.Handled = true;
+				}
+			}
+		}
+
+		//マウス移動: 押下されていて、動いたらドラッグ開始扱い
+		private void TreeViewItem_PreviewMouseMove(object sender, MouseEventArgs e)
+		{
+			if (e.LeftButton != MouseButtonState.Pressed)
+			{
+				isMouseDown = false;
+				return;
+			}
+
+			if(!isMouseDown)
+			{
+				return;
+			}
+
+			if (e.Handled)
+				return;
+
+			if (sender is FrameworkElement obj)
+			{
+				if (obj.DataContext is FileEventTreeItemEventViewModel ev)
+				{
+					//里々辞書出ない場合やリスト化されてなければNG
+					if (ev.Dictionary.Dictionary.IsSerialized || !ev.Dictionary.Dictionary.IsSatoriDictionary)
+						return;
+
+
+					//ヘッダの移動不可
+					if (ev.Items.First().Type == EventType.Sentence || ev.Items.First().Type == EventType.Word)
+					{
+						Dispatcher.BeginInvoke(new Action(() =>
+						{
+							DragDrop.DoDragDrop(obj, ev, DragDropEffects.Move);
+						}), DispatcherPriority.Render);
+						e.Handled = true;
+					}
+				}
+			}
+		}
+
+		//マウスが上がった
+		private void TreeViewItem_PreviewMouseUp(object sender, MouseButtonEventArgs e)
+		{
+			isMouseDown = false;
+		}
+
+		private void TreeViewItem_MouseLeave(object sender, MouseEventArgs e)
+		{
+			isMouseDown = false;
+		}
+
+		private void TreeViewItem_DragLeave(object sender, DragEventArgs e)
+		{
+			//ポップアップをキャンセル
+			TreeViewPopup.IsOpen = false;
+		}
+
+		private void TreeViewItem_DragEnter(object sender, DragEventArgs e)
+		{
+			//ドラッグの入りなので位置を動かす
+			if (e.Handled)
+				return;
+
+			if (e.Data.GetDataPresent(typeof(FileEventTreeItemEventViewModel)))
+			{
+				if (sender is TreeViewItem obj)
+				{
+					if (obj.DataContext is FileEventTreeItemEventViewModel ev)
+					{
+						//リスト化された里々辞書が条件
+						if (!ev.Dictionary.Dictionary.IsSerialized && ev.Dictionary.Dictionary.IsSatoriDictionary)
+						{
+							var dropEv = (FileEventTreeItemEventViewModel)e.Data.GetData(typeof(FileEventTreeItemEventViewModel));
+							var point = obj.PointToScreen(default);
+
+							//MVVMではないけどポップアップを処理
+							TreeViewPopup.IsOpen = true;
+							TreeViewPopup.PlacementTarget = obj;
+							TreeViewPopup.Placement = System.Windows.Controls.Primitives.PlacementMode.Absolute;
+							TreeViewPopup.UpdateLayout();
+							TreeViewPopup.HorizontalOffset = point.X;
+							TreeViewPopup.VerticalOffset = point.Y;
+
+							if (ev.Dictionary != dropEv.Dictionary && ev.Dictionary.Dictionary.Containts(dropEv.Identifier))
+							{
+								//移動先が異なる辞書でかつ、同名が存在しているのでマージを示す
+								ArrowIcon.Visibility = Visibility.Collapsed;
+								MergeIcon.Visibility = Visibility.Visible;
+							}
+							else
+							{
+								ArrowIcon.Visibility = Visibility.Visible;
+								MergeIcon.Visibility = Visibility.Collapsed;
+							}
+							e.Handled = true;
+							return;
+						}
+					}
+				}
+			}
+
+			TreeViewPopup.IsOpen = false;
+			e.Effects = DragDropEffects.None;
 		}
 	}
 
@@ -494,7 +661,16 @@ namespace Satolist2.Control
 			{
 				item = new FileEventTreeItemEventViewModel(this);
 				itemsDictionary.Add(ev.Identifier, item);
-				items.Add(item);
+
+				//手前のアイテムを探す
+				var eventIndex = Dictionary.Events.IndexOf(ev);
+				var beforeIdentifierItem = Dictionary.Events.Take(eventIndex).Reverse().FirstOrDefault(o => o.Identifier != ev.Identifier);
+
+				//Model側の追加位置に基づいて設定する
+				if(beforeIdentifierItem != null)
+					items.Insert(items.IndexOf(itemsDictionary[beforeIdentifierItem.Identifier]) + 1,item);
+				else
+					items.Insert(0, item);
 			}
 
 			item.AddEvent(ev);
@@ -688,6 +864,11 @@ namespace Satolist2.Control
 			}
 		}
 
+		public string Identifier
+		{
+			get => identifier;
+		}
+
 		public bool IsHeader
 		{
 			get => (events.FirstOrDefault()?.Type ?? EventType.Sentence) == EventType.Header;
@@ -803,6 +984,15 @@ namespace Satolist2.Control
 			foreach (var inlineEv in ev.InlineEvents)
 				RemoveInlineEvent(inlineEv);
 			events.Remove(ev);
+		}
+
+		//イベントを移動
+		public void MoveTo(FileEventTreeItemDictionaryViewModel targetDic)
+		{
+			foreach (var item in events.ToArray())
+			{
+				item.MoveTo(targetDic.Dictionary);
+			}
 		}
 
 		//イベント名の更新

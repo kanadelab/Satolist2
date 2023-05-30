@@ -7,6 +7,7 @@
 	<SolidColorBrush x:Key="ThemeDarkRed">DarkRed</SolidColorBrush>
 	<SolidColorBrush x:Key="ThemePeachPuff">#444400</SolidColorBrush>
 	<SolidColorBrush x:Key="TextEditorBackgroundColor">#FFFFFF</SolidColorBrush>
+	<SolidColorBrush x:Key="ControlBaclGround">#FFFFFF</SolidColorBrush>
 
 	<Style TargetType="ListViewItem" />
 	<Style TargetType="ListView" />

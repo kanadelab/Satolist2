@@ -17,7 +17,7 @@
 		</ResourceDictionary>
 		
 	</UserControl.Resources>
-	<Grid>
+	<Grid x:Name="MainGrid">
 		<Grid.RowDefinitions>
 			<RowDefinition Height="auto" />
 			<RowDefinition Height="*" />
@@ -92,6 +92,14 @@
 				<Style TargetType="TreeViewItem" BasedOn="{StaticResource StrechedListViewItemStyle}" >
 					<EventSetter Event="PreviewMouseDoubleClick" Handler="TreeViewItem_MouseDoubleClick" />
 					<EventSetter Event="RequestBringIntoView" Handler="TreeViewItem_RequestBringIntoView" />
+					<Setter Property="AllowDrop" Value="True" />
+					<EventSetter Event="PreviewMouseDown" Handler="TreeViewItem_MouseDown" />
+					<EventSetter Event="PreviewMouseUp" Handler="TreeViewItem_PreviewMouseUp"/>
+					<EventSetter Event="MouseLeave" Handler="TreeViewItem_MouseLeave" />
+					<EventSetter Event="PreviewMouseMove" Handler="TreeViewItem_PreviewMouseMove" />
+					<EventSetter Event="DragEnter" Handler="TreeViewItem_DragEnter" />
+					<EventSetter Event="DragLeave" Handler="TreeViewItem_DragLeave" />
+					<EventSetter Event="Drop" Handler="TreeViewItem_Drop" />
 					<Setter Property="ToolTip" Value="{Binding Label}" />
 					<Setter Property="Visibility">
 						<Setter.Value>
@@ -122,6 +130,7 @@
 							</Setter>
 						</DataTrigger>
 						<DataTrigger Binding="{Binding NodeType}" Value="Event">
+							
 							<Setter Property="ContextMenu">
 								<Setter.Value>
 									<ContextMenu>
@@ -151,5 +160,15 @@
 				</Style>
 			</TreeView.ItemContainerStyle>
 		</TreeView>
+
+		<!--位置移動ポップアップ-->
+		<Popup x:Name="TreeViewPopup" IsHitTestVisible="False" StaysOpen="True" HorizontalAlignment="Left">
+			<Border BorderBrush="Gray" Background="{StaticResource ControlBaclGround}" BorderThickness="1" Padding="2">
+				<Grid>
+					<Path x:Name="ArrowIcon" Visibility="Collapsed" Fill="{StaticResource ThemeGreen}" Stretch="Uniform" Data="{StaticResource RightDownArrowIcon}" />
+					<Path x:Name="MergeIcon" Visibility="Collapsed" Fill="{StaticResource ThemeBlue}" Stretch="Uniform" Data="{StaticResource MergeIcon}" />
+				</Grid>
+			</Border>
+		</Popup>
 	</Grid>
 </UserControl>

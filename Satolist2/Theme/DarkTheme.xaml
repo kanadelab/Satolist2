@@ -14,6 +14,7 @@
 	<SolidColorBrush x:Key="ThemeDarkRed">Red</SolidColorBrush>
 	<SolidColorBrush x:Key="ThemePeachPuff">Darkred</SolidColorBrush>
 	<SolidColorBrush x:Key="TextEditorBackgroundColor">#1e1e1e</SolidColorBrush>
+	<SolidColorBrush x:Key="ControlBaclGround">#1e1e1e</SolidColorBrush>
 
 	<Style TargetType="avalonEditCodeComp:CompletionWindow">
 		<Setter Property="Foreground" Value="#dcdcdc" />

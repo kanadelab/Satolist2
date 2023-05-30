@@ -1,4 +1,5 @@
-﻿using Satolist2.Dialog;
+﻿using AngleSharp.Common;
+using Satolist2.Dialog;
 using Satolist2.Utility;
 using System;
 using System.Collections.Generic;
@@ -405,6 +406,47 @@ namespace Satolist2.Model
 				ev.Dictionary = null;
 			}
 			events.Clear();
+		}
+
+		//イベントの順番変更
+		public void MoveIndexEvent(string identifier, string beforeIdentifier)
+		{
+			{
+				if (!events.Any(o => o.Identifier == identifier))
+					return;
+				if (!events.Any(o => o.Identifier == beforeIdentifier))
+					return;
+
+				//位置が変わらないなら無効
+				var ids = events.Select(o => o.Identifier).Distinct().ToList();
+				if (ids.IndexOf(identifier) == ids.IndexOf(beforeIdentifier) + 1)
+					return;
+			}
+
+			var moves = events.Where(o => o.Identifier == identifier).ToArray();
+
+			//一時的に外すだけ
+			foreach(var item in moves)
+			{
+				events.Remove(item);
+			}
+
+			//挿入位置を決定
+			var beforeItem = events.FirstOrDefault(o => o.Identifier == beforeIdentifier);
+			var insertIndex = events.IndexOf(beforeItem) + 1;
+			
+			foreach(var item in moves.Reverse())
+			{
+				events.Insert(insertIndex, item);
+			}
+
+			Changed();
+		}
+
+		//存在確認
+		public bool Containts(string identifier)
+		{
+			return events.Any(o => o.Identifier == identifier);
 		}
 
 		//内部的なイベントの削除
