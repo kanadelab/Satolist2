@@ -251,7 +251,7 @@
 													<CheckBox Content="パスワードの毎回入力" Margin="3" IsChecked="{Binding AlwaysPasswordInput, Mode=TwoWay}" />
 
 												</StackPanel>
-												<TextBlock Grid.Row="2" DockPanel.Dock="Bottom" Text="パスワードを保存する場合、settings/account.json に保存されるので他人と共有することがないように注意してください。" TextWrapping="WrapWithOverflow" />
+												<TextBlock Grid.Row="2" DockPanel.Dock="Bottom" Text="パスワードを保存する場合、settings/accounts.json, settings/accounts.json.bak に保存されるので他人と共有することがないように注意してください。" TextWrapping="WrapWithOverflow" />
 											</Grid>
 										</ControlTemplate>
 									</Setter.Value>
@@ -294,7 +294,7 @@
 													<CheckBox Content="パスワードの毎回入力" Margin="3" IsChecked="{Binding AlwaysPasswordInput, Mode=TwoWay}" />
 
 												</StackPanel>
-												<TextBlock Grid.Row="2" DockPanel.Dock="Bottom" Text="パスワードを保存する場合、settings/account.json に保存されるので他人と共有することがないように注意してください。" TextWrapping="WrapWithOverflow" />
+												<TextBlock Grid.Row="2" DockPanel.Dock="Bottom" Text="パスワードを保存する場合、settings/accounts.json, settings/accounts.json.bak に保存されるので他人と共有することがないように注意してください。" TextWrapping="WrapWithOverflow" />
 											</Grid>
 										</ControlTemplate>
 									</Setter.Value>

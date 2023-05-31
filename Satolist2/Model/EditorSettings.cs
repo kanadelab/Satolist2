@@ -76,11 +76,11 @@ namespace Satolist2.Model
 		{
 			try
 			{
-				if (System.IO.File.Exists(InsertPaettePath))
+				if (JsonUtility.ExistsFileWithBackup(InsertPaettePath))
 				{
 					//TODO: エラー対応?
 					//エラーの場合は殆ど起動失敗と同じになるのが注意？強制終了でもいい？
-					InsertPalette = JsonUtility.DeserializeFromFile<InsertItemPaletteModel>(InsertPaettePath);
+					InsertPalette = JsonUtility.DeserializeFromFileWithBackup<InsertItemPaletteModel>(InsertPaettePath);
 				}
 			}
 			catch
@@ -97,7 +97,7 @@ namespace Satolist2.Model
 			try
 			{
 				System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(InsertPaettePath));
-				JsonUtility.SerializeToFile(InsertPaettePath, InsertPalette);
+				JsonUtility.SerializeToFileWithBackup(InsertPaettePath, InsertPalette);
 			}
 			catch
 			{
@@ -109,10 +109,9 @@ namespace Satolist2.Model
 			//ここは消えても対して気にしない方向
 			try
 			{
-				if (System.IO.File.Exists(TemporarySettingsPath))
+				if (JsonUtility.ExistsFileWithBackup(TemporarySettingsPath))
 				{
-					var jsonSerializer = new JsonSerializer();
-					TemporarySettings = jsonSerializer.Deserialize<TemporarySettings>(new JsonTextReader(new System.IO.StreamReader(TemporarySettingsPath)));
+					TemporarySettings = JsonUtility.DeserializeFromFileWithBackup<TemporarySettings>(TemporarySettingsPath);
 				}
 			}
 			catch
@@ -136,15 +135,7 @@ namespace Satolist2.Model
 				TemporarySettings.TruncateHistory();
 
 				System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(TemporarySettingsPath));
-				var jsonSerializer = new JsonSerializer();
-				using (var writer = new System.IO.StreamWriter(TemporarySettingsPath))
-				{
-					JsonTextWriter w = new JsonTextWriter(writer);
-					w.IndentChar = '\t';
-					w.Indentation = 1;
-					w.Formatting = Formatting.Indented;
-					jsonSerializer.Serialize(w, TemporarySettings);
-				}
+				JsonUtility.SerializeToFileWithBackup(TemporarySettingsPath, TemporarySettings);
 			}
 			catch
 			{
@@ -159,9 +150,9 @@ namespace Satolist2.Model
 		{
 			try
 			{
-				if (System.IO.File.Exists(GeneralSettingPath))
+				if (JsonUtility.ExistsFileWithBackup(GeneralSettingPath))
 				{
-					GeneralSettings = JsonUtility.DeserializeFromFile<GeneralSettings>(GeneralSettingPath);
+					GeneralSettings = JsonUtility.DeserializeFromFileWithBackup<GeneralSettings>(GeneralSettingPath);
 				}
 			}
 			catch
@@ -182,9 +173,9 @@ namespace Satolist2.Model
 		{
 			try
 			{
-				if (System.IO.File.Exists(GeneralSettingPath))
+				if (JsonUtility.ExistsFileWithBackup(GeneralSettingPath))
 				{
-					return JsonUtility.DeserializeFromFile<GeneralSettings>(GeneralSettingPath);
+					return JsonUtility.DeserializeFromFileWithBackup<GeneralSettings>(GeneralSettingPath);
 				}
 			}
 			catch
@@ -199,7 +190,7 @@ namespace Satolist2.Model
 			System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(GeneralSettingPath));
 			try
 			{
-				JsonUtility.SerializeToFile(GeneralSettingPath, GeneralSettings);
+				JsonUtility.SerializeToFileWithBackup(GeneralSettingPath, GeneralSettings);
 			}
 			catch { }
 		}
@@ -209,10 +200,10 @@ namespace Satolist2.Model
 		{
 			try
 			{
-				if(System.IO.File.Exists(LegacySettingPath))
+				if(JsonUtility.ExistsFileWithBackup(LegacySettingPath))
 				{
 					SatolistLegacyCompat.CompatCore.ProjectCompat.Deserialize(
-						JsonUtility.DeserializeFromFile(LegacySettingPath) as JObject ?? new JObject()
+						JsonUtility.DeserializeFromFileWithBackup<JObject>(LegacySettingPath) ?? new JObject()
 						);
 				}
 			}
@@ -230,7 +221,7 @@ namespace Satolist2.Model
 			System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(LegacySettingPath));
 			try
 			{
-				JsonUtility.SerializeToFile(LegacySettingPath, SatolistLegacyCompat.CompatCore.ProjectCompat.Serialize());
+				JsonUtility.SerializeToFileWithBackup(LegacySettingPath, SatolistLegacyCompat.CompatCore.ProjectCompat.Serialize());
 			}
 			catch { }
 		}

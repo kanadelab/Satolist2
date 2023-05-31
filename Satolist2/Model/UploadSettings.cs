@@ -15,9 +15,9 @@ namespace Satolist2.Model
 
 		public static UploadServerSettingModelBase[] Load()
 		{
-			if (System.IO.File.Exists(UploadSettingPath))
+			if (JsonUtility.ExistsFileWithBackup(UploadSettingPath))
 			{
-				var itemArray = JsonUtility.DeserializeFromFile(UploadSettingPath) as JArray;
+				var itemArray = JsonUtility.DeserializeFromFileWithBackup<JArray>(UploadSettingPath);
 				var uploadSettings = new List<UploadServerSettingModelBase>();
 				foreach (JObject item in itemArray)
 				{
@@ -44,7 +44,7 @@ namespace Satolist2.Model
 			try
 			{
 				System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(UploadSettingPath));
-				JsonUtility.SerializeToFile(UploadSettingPath, items);
+				JsonUtility.SerializeToFileWithBackup(UploadSettingPath, items);
 			}
 			catch { }
 		}
