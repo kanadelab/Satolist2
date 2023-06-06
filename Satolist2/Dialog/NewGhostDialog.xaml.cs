@@ -315,7 +315,6 @@ namespace Satolist2.Dialog
 
 		private string OpenFileSelectDialog(string currentPath, string fileFilterLabel, string fileFilterExtension, bool selectCreateDirectory = false, bool selectMasterShell = false)
 		{
-			//TODO: CommonOpenFileDialog にいれかえたいね
 			var fileDialog = new CommonOpenFileDialog();
 			
 
@@ -325,7 +324,7 @@ namespace Satolist2.Dialog
 			if (selectCreateDirectory || selectMasterShell)
 			{
 				fileDialog.IsFolderPicker = true;
-				fileDialog.DefaultFileName = string.Empty; ;
+				fileDialog.DefaultFileName = string.Empty;
 				fileDialog.InitialDirectory = DictionaryUtility.NormalizeWindowsPath(currentPath);
 			}
 			else

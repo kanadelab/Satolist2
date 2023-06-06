@@ -106,7 +106,10 @@
 				<ListView Grid.Row="1" Grid.Column="0" Margin="3" SelectedItem="{Binding SelectedTemplateDictionaryFile, Mode=OneWayToSource}" ItemsSource="{Binding SelectedTemplate.Dictionaries}">
 					<ListView.ItemTemplate>
 						<DataTemplate>
-							<CheckBox Content="{Binding Model.RelativePath, Converter={StaticResource EscapeUnderScoreConverter}}" IsChecked="{Binding IsChecked, Mode=TwoWay}"/>
+							<StackPanel Orientation="Horizontal">
+								<CheckBox IsChecked="{Binding IsChecked, Mode=TwoWay}"/>
+								<TextBlock Text="{Binding Model.RelativePath}"/>
+							</StackPanel>
 						</DataTemplate>
 					</ListView.ItemTemplate>
 				</ListView>
