@@ -183,6 +183,7 @@ namespace Satolist2.Dialog
 							IsSelected = true
 						};
 						items.Insert(0, newItem);
+						itemsView.Refresh();
 						dialog.MainList.ScrollIntoView(newItem);
 					}
 				}
