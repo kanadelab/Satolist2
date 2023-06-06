@@ -282,7 +282,7 @@ namespace Satolist2
 			if(e.Data.GetDataPresent(DataFormats.FileDrop))
 			{
 				var items = (string[])e.Data.GetData(DataFormats.FileDrop);
-				OpenGhost(items.First(), "master");
+				OpenGhost(items.First());
 			}
 		}
 
@@ -964,6 +964,7 @@ namespace Satolist2
 		public SatoriConfWrapper SatoriConfViewModel { get; }
 
 		//汎用コマンド
+		public ActionCommand OpenGhostCommand { get; }
 		public ActionCommand SaveFileCommand { get; }
 		public ActionCommand ReopenGhostCommand { get; }
 		public ActionCommand AddSatoriDictionaryFileCommand { get; }
@@ -1159,6 +1160,17 @@ namespace Satolist2
 			RuntimeBasedSurfaceViewerViewModel = new RuntimeBasedSurfaceViewerViewModel(this);
 			LegacySurfaceViewerViewModel = new LegacyControlViewModel(SatolistLegacyCompat.CompatCore.ProjectCompat.SurfaceViewerControl);
 			LegacySurfacePaletteViewModel = new LegacyControlViewModel(SatolistLegacyCompat.CompatCore.ProjectCompat.SurfacePaletteControl);
+
+			OpenGhostCommand = new ActionCommand(
+				o =>
+				{
+					var dialog = new CommonOpenFileDialog();
+					dialog.IsFolderPicker = true;
+					if(dialog.ShowDialog() == CommonFileDialogResult.Ok)
+					{
+						MainWindow.OpenGhost(dialog.FileName);
+					}
+				});
 
 			SaveFileCommand = new ActionCommand(
 				o => AskSave(false),

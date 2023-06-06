@@ -9,6 +9,7 @@
 		mc:Ignorable="d"
 		 DragEnter="MainWindow_DragEnter" Drop="MainWindow_Drop" >
 	<UserControl.InputBindings>
+		<KeyBinding Gesture="CTRL+O" Command="{Binding OpenGhostCommand}" />
 		<KeyBinding Gesture="CTRL+S" Command="{Binding SaveFileCommand}" />
 		<KeyBinding Gesture="CTRL+ALT+R" Command="{Binding ReloadShioriCommand}" />
 		<KeyBinding Gesture="CTRL+SHIFT+F" Command="{Binding ShowSearchBoxCommand}" />
@@ -28,6 +29,7 @@
 
 		<Menu Grid.Row="0">
 			<MenuItem Header="ファイル">
+				<MenuItem Header="ゴーストを開く" Command="{Binding OpenGhostCommand}" InputGestureText="Ctrl+O" />
 				<MenuItem Header="上書き保存" Command="{Binding SaveFileCommand}" InputGestureText="Ctrl+S"/>
 				<MenuItem Header="開き直す" Command="{Binding ReopenGhostCommand}" />
 				<Separator />
