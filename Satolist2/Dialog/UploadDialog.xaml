@@ -167,6 +167,9 @@
 														</StackPanel>
 													</Grid>
 
+													<Separator Margin="1 10" />
+													<TextBlock Text="これはサーバ設定です。アップロードするにはサーバに追加したアイテムを選択します。" />
+
 												</StackPanel>
 											</ControlTemplate>
 										</Setter.Value>
@@ -260,6 +263,10 @@
 															</TextBlock>
 														</StackPanel>
 													</Grid>
+
+													<Separator Margin="1 10" />
+													<TextBlock Text="これはサーバ設定です。アップロードするにはサーバに追加したアイテムを選択します。" />
+													
 												</StackPanel>
 											</ControlTemplate>
 										</Setter.Value>
