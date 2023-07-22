@@ -18,6 +18,49 @@
 	<UserControl.Resources>
 		<ResourceDictionary>
 			<BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+
+			<ContextMenu x:Key="DockingPaneContextMenu">
+				
+				<!--Ctrl+XのショートカットキーはDockingWindow側で直接設定してあるので注意-->
+				<MenuItem
+						x:Name="CloseMenu"
+						Command="{Binding Path=CloseCommand}"
+						Header="閉じる"
+						InputGestureText="Ctrl+W"
+						Visibility="{Binding Path=IsEnabled, RelativeSource={RelativeSource Self}, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+
+				<!--CloseかHideのどちらかしかできないはずなので、できる方だけが示される想定-->
+				<MenuItem
+						Command="{Binding Path=HideCommand}"
+						Header="閉じる"
+						Visibility="{Binding Path=IsEnabled, RelativeSource={RelativeSource Self}, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"/>
+
+				<MenuItem Command="{Binding Path=CloseAllButThisCommand}" Header="このドキュメント以外すべて閉じる"
+						  Visibility="{Binding Path=CanClose, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
+						  />
+				<MenuItem Command="{Binding Path=CloseAllCommand}" Header="すべてのドキュメントを閉じる"
+						  Visibility="{Binding Path=CanClose, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"/>
+				<Separator />
+				<MenuItem Command="{Binding Path=FloatCommand}" Header="フローティング" />
+				<MenuItem Command="{Binding Path=DockAsDocumentCommand}" Header="タブ付きドキュメントとしてドッキング" />
+				<MenuItem
+						Command="{Binding Path=NewHorizontalTabGroupCommand}"
+						Header="水平タブグループの新規作成"
+						Visibility="{Binding Path=IsEnabled, RelativeSource={RelativeSource Self}, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+				<MenuItem
+						Command="{Binding Path=NewVerticalTabGroupCommand}"
+						Header="垂直タブグループの新規作成"
+						Visibility="{Binding Path=IsEnabled, RelativeSource={RelativeSource Self}, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+				<MenuItem
+						Command="{Binding Path=MoveToNextTabGroupCommand}"
+						Header="次のタブグループへ移動"
+						Visibility="{Binding Path=IsEnabled, RelativeSource={RelativeSource Self}, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+				<MenuItem
+						Command="{Binding Path=MoveToPreviousTabGroupCommand}"
+						Header="前のタブグループへ移動"
+						Visibility="{Binding Path=IsEnabled, RelativeSource={RelativeSource Self}, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+			</ContextMenu>
+			
 		</ResourceDictionary>
 	</UserControl.Resources>
 	<Grid>
@@ -49,7 +92,7 @@
 				<MenuItem Header="プレビューに使用するシェル" ItemsSource="{Binding SurfacePreview.Shells}" IsEnabled="{Binding SurfacePreview.IsExistsShell,FallbackValue=False}" x:Name="PreviewShellSelector">
 					<MenuItem.ItemContainerStyle>
 						<Style TargetType="MenuItem">
-							<Setter Property="Header" Value="{Binding ShellName}" />
+							<Setter Property="Header" Value="{Binding Label}" />
 							<Setter Property="IsChecked" Value="{Binding IsSelected}" />
 							<Setter Property="Command" Value="{Binding DataContext.SelectPreviewShellCommand, ElementName=PreviewShellSelector}" />
 							<Setter Property="CommandParameter" Value="{Binding DataContext, RelativeSource={RelativeSource Self}}" />
@@ -113,8 +156,10 @@
 			</MenuItem>
 		</Menu>
 
-		<avalonDock:DockingManager Grid.Row="1" AllowMixedOrientation="True" x:Name="DockingManager" >
-
+		<avalonDock:DockingManager Grid.Row="1" AllowMixedOrientation="True" x:Name="DockingManager"
+								   DocumentContextMenu="{StaticResource DockingPaneContextMenu}"
+								   AnchorableContextMenu="{StaticResource DockingPaneContextMenu}">
+			
 			<avalonDock:LayoutRoot>
 
 				<avalonDock:LayoutPanel Orientation="Vertical">

@@ -7,6 +7,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Input;
 
 namespace Satolist2.Utility
 {
@@ -51,10 +53,25 @@ namespace Satolist2.Utility
 					Title = "No Title";
 					ContentId = string.Empty;
 				}
+
+				//Ctrl+Wのクローズ対応
+				//バインディングの再設定
+				var inputBindings = ((System.Windows.Controls.Control)Content).InputBindings;
+				var removeItems = new List<InternalCloseKeyBinding>();
+				foreach(var item in inputBindings)
+				{
+					if (item is InternalCloseKeyBinding bind)
+						removeItems.Add(bind);
+				}
+
+				foreach (var item in removeItems)
+					inputBindings.Remove(item);
+				inputBindings.Add(new InternalCloseKeyBinding(this));
 			}
 		}
 
-		public DockingWindow(System.Windows.Controls.Control control, INotifyPropertyChanged viewModel = null)
+
+		public DockingWindow(System.Windows.Controls.Control control, INotifyPropertyChanged viewModel = null):this()
 		{
 			Content = control;
 			ViewModel = viewModel;
@@ -62,7 +79,11 @@ namespace Satolist2.Utility
 
 		//デシリアライズ用
 		public DockingWindow()
-		{ }
+		{
+			//ツールウインドウは非表示のみ可能、ドキュメントは外部から逆の設定が入る
+			CanClose = false;
+			CanHide = true;
+		}
 
 		private void ViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
 		{
@@ -87,6 +108,23 @@ namespace Satolist2.Utility
 			if(ViewModel is IDisposable d)
 			{
 				d.Dispose();
+			}
+		}
+
+		// Ctrl+W による閉じるコマンド
+		private class InternalCloseKeyBinding : KeyBinding
+		{
+			public InternalCloseKeyBinding(DockingWindow window):base()
+			{
+				Key = Key.W;
+				Modifiers = ModifierKeys.Control;
+				Command = new ActionCommand(
+					o =>
+					{
+						//クローズできるもののみ
+						if (window.CanClose)
+							window.Close();
+					});
 			}
 		}
 	}

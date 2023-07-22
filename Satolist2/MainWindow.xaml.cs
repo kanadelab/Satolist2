@@ -163,6 +163,8 @@ namespace Satolist2
 			//カラのVM生成
 			mainViewModel = new MainViewModel(this);
 			DataContext = mainViewModel;
+
+			//ビューモデル設定
 			ReflectControlViewModel(mainViewModel);
 
 			//デフォルトレイアウトをバックアップ
@@ -170,6 +172,9 @@ namespace Satolist2
 
 			//レイアウトの復元
 			DeserializeLayout(MainViewModel.EditorSettings.TemporarySettings.SerializedDockingLayout);
+
+			//コマンド類がちゃんと動作するようにもう一度
+			ReflectControlViewModel(mainViewModel);
 
 			//DocumentPane探す
 			DocumentPane = FindDocumentPane(DockingManager.Layout);
