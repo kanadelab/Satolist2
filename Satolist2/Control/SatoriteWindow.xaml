@@ -24,6 +24,7 @@
 		<module:TextEditorModuleSelector x:Name="MainTextEditor" Grid.Row="1"
 										 SendToGhostCommand="{Binding SendToGhostCommand}"
 										 SendToGhostSelectionRangeCommand="{Binding SendToGhostSelectionRangeCommand}"
+										 IsEnableSyntaxHighlighting="True"
 										 />
 	</Grid>
 </UserControl>
