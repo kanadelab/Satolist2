@@ -2130,18 +2130,14 @@ namespace Satolist2
 					var parser = new CsvBuilder();
 					parser.Deserialize(System.IO.File.ReadAllText(descriptPath, Constants.EncodingShiftJis));
 
-					var type = parser.GetValue("type");
-					var name = parser.GetValue("name");
+					var name = parser.GetValue("name") ?? "(無名のシェル)";
 
-					if (type == "shell" && !string.IsNullOrEmpty(name))
-					{
-						var s = new SurfacePreviewViewModelShellItem();
-						s.DirectoryName = System.IO.Path.GetFileName(path);
-						s.DirectoryFullPath = nDir;
-						s.ShellName = name;
-						return s;
-					}
-				}
+					var s = new SurfacePreviewViewModelShellItem();
+					s.DirectoryName = System.IO.Path.GetFileName(path);
+					s.DirectoryFullPath = nDir;
+					s.ShellName = name;
+					return s;
+			}
 				catch { }
 			}
 			return null;
@@ -2223,6 +2219,9 @@ namespace Satolist2
 					NotifyChanged();
 				}
 			}
+
+			//フォルダ名も追加して識別しやすく
+			public string Label => string.Concat(ShellName, " - shell/", DirectoryName);
 		}
 
 		//v3サーフェスビューワ用のその場で解析するタイプのプレビューモデル
