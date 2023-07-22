@@ -317,13 +317,16 @@ namespace Satolist2.Dialog
 				AddItemCommand = new ActionCommand(
 					o =>
 					{
+						//展開
+						IsExpanded = true;
+
+						//追加
 						var itemModel = new Model.FtpItemSettingModel();
 						model.Items.Add(itemModel);
 
 						var item = new FtpUploadGhostSettingViewModel(itemModel, this);
 						item.Label = "新しいアップロード設定";
 						item.IsSelected = true;
-						IsExpanded = true;                          //追加が分かるように開く
 					items.Add(item);
 					}
 					);
@@ -533,14 +536,16 @@ namespace Satolist2.Dialog
 				AddItemCommand = new ActionCommand(
 					o =>
 					{
-					//modelの追加
-					var itemModel = new Model.NarnaloaderV2ItemSettingModel();
+						//展開
+						IsExpanded = true;
+
+						//modelの追加
+						var itemModel = new Model.NarnaloaderV2ItemSettingModel();
 						model.Items.Add(itemModel);
 
-					//viewModelの追加
-					var item = new NarnaloaderUploadGhostViewModel(itemModel, this);
+						//viewModelの追加
+						var item = new NarnaloaderUploadGhostViewModel(itemModel, this);
 						item.IsSelected = true;
-						item.IsExpanded = true;
 						item.Label = "新しいアップロード設定";
 						items.Add(item);
 					}
