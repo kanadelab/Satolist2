@@ -249,6 +249,20 @@
 
 													<!-- パスワードの毎回入力 -->
 													<CheckBox Content="パスワードの毎回入力" Margin="3" IsChecked="{Binding AlwaysPasswordInput, Mode=TwoWay}" />
+													
+													<!-- アイテムがない場合に警告を出す -->
+													<TextBlock Text="このサーバにはアイテム(ゴースト)が登録されていません。アップロードを行うにはサーバーの設定をした後で「アイテムを追加」でアップロードするアイテムごとの設定追加します。" Foreground="{StaticResource ThemeRed}" TextWrapping="WrapWithOverflow">
+														<TextBlock.Style>
+															<Style TargetType="TextBlock">
+																<Setter Property="Visibility" Value="Hidden" />
+																<Style.Triggers>
+																	<DataTrigger Binding="{Binding Items.Count}" Value="0">
+																		<Setter Property="Visibility" Value="Visible" />
+																	</DataTrigger>
+																</Style.Triggers>
+															</Style>
+														</TextBlock.Style>
+													</TextBlock>
 
 												</StackPanel>
 												<TextBlock Grid.Row="2" DockPanel.Dock="Bottom" Text="パスワードを保存する場合、settings/accounts.json, settings/accounts.json.bak に保存されるので他人と共有することがないように注意してください。" TextWrapping="WrapWithOverflow" />
@@ -292,6 +306,20 @@
 
 													<!-- パスワードの毎回入力 -->
 													<CheckBox Content="パスワードの毎回入力" Margin="3" IsChecked="{Binding AlwaysPasswordInput, Mode=TwoWay}" />
+
+													<!-- アイテムがない場合に警告を出す -->
+													<TextBlock Text="このサーバにはアイテム(ゴースト)が登録されていません。アップロードを行うにはサーバーの設定をした後で「アイテムを追加」でアップロードするアイテムごとの設定追加します。" Foreground="{StaticResource ThemeRed}" TextWrapping="WrapWithOverflow">
+														<TextBlock.Style>
+															<Style TargetType="TextBlock">
+																<Setter Property="Visibility" Value="Hidden" />
+																<Style.Triggers>
+																	<DataTrigger Binding="{Binding Items.Count}" Value="0">
+																		<Setter Property="Visibility" Value="Visible" />
+																	</DataTrigger>
+																</Style.Triggers>
+															</Style>
+														</TextBlock.Style>
+													</TextBlock>
 
 												</StackPanel>
 												<TextBlock Grid.Row="2" DockPanel.Dock="Bottom" Text="パスワードを保存する場合、settings/accounts.json, settings/accounts.json.bak に保存されるので他人と共有することがないように注意してください。" TextWrapping="WrapWithOverflow" />
