@@ -64,3 +64,7 @@ https://opensource.org/licenses/mit-license.php
 * 月波 清火 (@tukinami_seika@fedibird.com) 様がアイコンを作ってくださいました。
   * Satolist2
   * GhostDeploy
+
+* ツール上でデータを取得しています
+http://ssp.shillest.net/ukadoc/manual/
+  * ukadoc project
