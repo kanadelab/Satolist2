@@ -471,6 +471,10 @@ namespace Satolist2.Control
 		public string RelativeName { get; set; }
 
 		public string Label => string.IsNullOrEmpty(RelativeName) ? "<里々ルートフォルダ>" : RelativeName;
+		public bool IsHeader => false;
+		public bool IsSatoriDictionary => false;
+		public bool IsSerialized => false;
+		public object Dictionary => null;
 
 		public FileEventTreeItemDirectoryViewModel(string relativePath)
 		{
