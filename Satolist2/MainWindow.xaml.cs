@@ -66,8 +66,9 @@ namespace Satolist2
 			}
 		}
 
-		private List<DockingWindow> EventEditors { get; }
-		private List<DockingWindow> TextEditors { get; }
+		private HashSet<DockingWindow> EventEditors { get; }
+		private HashSet<DockingWindow> TextEditors { get; }
+		private HashSet<DockingWindow> TemporaryTextEditors { get; }
 		private MainViewModel mainViewModel;
 		private LayoutDocumentPane DocumentPane { get; set; }
 		private DockingWindow ActiveEditor { get; set; }
@@ -155,8 +156,9 @@ namespace Satolist2
 			RuntimeBasedSurfaceViewer.IsVisible = false;
 
 			AllowDrop = true;
-			EventEditors = new List<DockingWindow>();
-			TextEditors = new List<DockingWindow>();
+			EventEditors = new HashSet<DockingWindow>();
+			TextEditors = new HashSet<DockingWindow>();
+			TemporaryTextEditors = new HashSet<DockingWindow>();
 
 			ReflectVisibleMenuDataContext();
 
@@ -464,6 +466,7 @@ namespace Satolist2
 			}
 		}
 
+		//ファイルに由来しないログ等の一時的な表示用途のテキストエディタを開く
 		internal TemporaryTextEditor OpenTemporaryTextEditor(string body, string title)
 		{
 			var editor = new TemporaryTextEditor();
@@ -475,13 +478,51 @@ namespace Satolist2
 			var newWindow = new DockingWindow(editor, viewModel);
 			newWindow.CanClose = true;
 			newWindow.CanHide = false;
+			newWindow.Closing += TemporaryTextEditorClosing;
+			newWindow.IsActiveChanged += NewWindow_IsActiveChanged;
 
+			TemporaryTextEditors.Add(newWindow);
 			DocumentPane.Children.Add(newWindow);
 
 			//アクティベート
 			newWindow.IsActive = true;
 			editor.RequestFocus();
 			return editor;
+		}
+
+		private void TemporaryTextEditorClosing(object sender, System.ComponentModel.CancelEventArgs e)
+		{
+			if(sender is DockingWindow window)
+			{
+				TemporaryTextEditors.Remove(window);
+				window.Closing -= TemporaryTextEditorClosing;
+				window.IsActiveChanged -= NewWindow_IsActiveChanged;
+			}
+		}
+
+		//指定ドキュメント以外をすべて閉じる(nullを指定すれば除外無しですべて)
+		internal void CloseAllEventEditorAndTextEditor(DockingWindow withoutWindow )
+		{
+			foreach (var item in TextEditors.ToArray())
+			{
+				if (ReferenceEquals(item, withoutWindow))
+					continue;
+				item.Close();
+			}
+
+			foreach (var item in EventEditors.ToArray())
+			{
+				if (ReferenceEquals(item, withoutWindow))
+					continue;
+				item.Close();
+			}
+
+			foreach(var item in TemporaryTextEditors.ToArray())
+			{
+				if (ReferenceEquals(item, withoutWindow))
+					continue;
+				item.Close();
+			}
 		}
 
 		//テキストエディタのフォントを更新
@@ -912,6 +953,7 @@ namespace Satolist2
 			//アクティブ化
 			ActivateActiveEditor();
 		}
+
 	}
 
 	//MainViewModel起動オプション
@@ -920,6 +962,37 @@ namespace Satolist2
 		public GhostModel Ghost { get; set; }
 		public string ShellDirectoryName { get; set; }
 		public string RunningExecutablePath { get; set; }
+	}
+
+	//AvalonDockから全閉じ用のコマンド
+	internal class DocumentCloseAllCommand : ICommand
+	{
+		public event EventHandler CanExecuteChanged;
+
+		public bool CanExecute(object parameter)
+		{
+			return true;
+		}
+
+		public void Execute(object parameter)
+		{
+			MainWindow mw = MainWindow.Instance;    //あまりきれいじゃないけど…
+
+			if (parameter != null)
+			{
+				if (parameter is AvalonDock.Controls.LayoutItem layoutItem)
+				{
+					if (layoutItem.LayoutElement is DockingWindow dockingWindow)
+					{
+						mw.CloseAllEventEditorAndTextEditor(dockingWindow);
+					}
+				}
+			}
+			else
+			{
+				mw.CloseAllEventEditorAndTextEditor(null);
+			}
+		}
 	}
 
 	//ワークスペースは切り離せるのが望ましそう。Dockのビューモデルとかもくっついてそうだし
@@ -964,8 +1037,6 @@ namespace Satolist2
 		public LegacyControlViewModel LegacySurfaceViewerViewModel { get; }
 		public LegacyControlViewModel LegacySurfacePaletteViewModel { get; }
 		
-
-		public List<EventEditorViewModel> EventEditors { get; }
 		public SatoriConfWrapper SatoriConfViewModel { get; }
 
 		//汎用コマンド
@@ -999,6 +1070,10 @@ namespace Satolist2
 		public ActionCommand ClearLogMessageCommand { get; }
 		public ActionCommand NetworkUpdateCommand { get; }
 		public ActionCommand ResetDockingLayoutCommand { get; }
+		public ActionCommand CloseDocumentAllCommand { get; }
+		public ActionCommand CloseDocumentWithoutSelfCommand { get; }
+		public ActionCommand CommentOutSelectionRangeCommand { get; }
+		public ActionCommand RemoveCommentOutSelectionRangeCommand { get; }
 
 		public static void StaticInitialize()
 		{
@@ -1137,7 +1212,6 @@ namespace Satolist2
 				SatolistLegacyCompat.CompatCore.ProjectCompat.NotifyShellDirectory(SurfacePreview.SelectedShellPath);
 			}
 
-			EventEditors = new List<EventEditorViewModel>();
 			FileEventTreeViewModel = new FileEventTreeViewModel(this);
 			EventListViewModel = new EventListViewModel(this);
 			SearchMenuViewModel = new SearchMenuViewModel(this);
@@ -1714,6 +1788,32 @@ namespace Satolist2
 				{
 					mainWindow.ResetLayout();
 				});
+
+			CloseDocumentAllCommand = new ActionCommand(
+				o =>
+				{
+					MainWindow.CloseAllEventEditorAndTextEditor(null);
+				});
+
+			CloseDocumentWithoutSelfCommand = new ActionCommand(
+				o =>
+				{
+					mainWindow.CloseAllEventEditorAndTextEditor(null);
+				});
+
+			CommentOutSelectionRangeCommand = new ActionCommand(
+				o =>
+				{
+					mainWindow.ActiveTextEditorViewModel?.MainTextEditor?.CommentoutSelectionRange();
+				},
+				o => mainWindow.ActiveTextEditor != null);
+
+			RemoveCommentOutSelectionRangeCommand = new ActionCommand(
+				o =>
+				{
+					mainWindow.ActiveTextEditorViewModel?.MainTextEditor?.RemoveCommentoutSelectionRange();
+				},
+				o => mainWindow.ActiveTextEditor != null);
 
 			//読込エラーが発生している場合に通知
 			List<ErrorListDialogItemViewModel> errorItems = new List<ErrorListDialogItemViewModel>();

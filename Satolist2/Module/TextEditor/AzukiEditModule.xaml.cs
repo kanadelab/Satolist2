@@ -294,13 +294,36 @@ namespace Satolist2.Module.TextEditor
 
 			return new LineData(
 				sum,
-				MainTextEditor.GetLineLength(line)
+				MainTextEditor.GetLineLength(line),
+				line
 				);
+		}
+
+		public override LineData GetLineDataFromCharIndex(int charIndex)
+		{
+			//折返し有効時、GetLineIndexFromCharIndex() が折り返しベースで計算する問題がある
+			//仕方ないので数える
+			int sum = 0;
+			int lineIndex = 0;
+			for(int i = 0; i < MainTextEditor.LineCount; i++)
+			{
+				sum += MainTextEditor.GetLineLength(i) + Environment.NewLine.Length;
+				if (charIndex < sum)
+					break;
+				lineIndex++;
+			}
+
+			return GetLineData(lineIndex);
 		}
 
 		public override void PerformTextInput(string str)
 		{
 			MainTextEditor.HandleTextInput(str);
+		}
+
+		public override void Replace(string text, int position, int length)
+		{
+			MainTextEditor.Document.Replace(text, position, position + length);
 		}
 
 		public override void ScrollToCaret()
@@ -316,6 +339,18 @@ namespace Satolist2.Module.TextEditor
 		public override void SetFont(string fontFamilyName, int fontSize)
 		{
 			MainTextEditor.Font = new System.Drawing.Font(fontFamilyName, fontSize);
+		}
+
+		//Undoグループ化
+		public override void BeginUndoGroup()
+		{
+			MainTextEditor.Document.BeginUndo();
+		}
+
+		//Undoグループ化終了
+		public override void EndUndoGroup()
+		{
+			MainTextEditor.Document.EndUndo();
 		}
 
 		public override void RequestFocusToEditor()

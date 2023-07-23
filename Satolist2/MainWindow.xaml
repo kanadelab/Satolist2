@@ -5,6 +5,7 @@
 		xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 		xmlns:ctl="clr-namespace:Satolist2.Control"
 		xmlns:util="clr-namespace:Satolist2.Utility"
+		xmlns:local="clr-namespace:Satolist2"
 		xmlns:avalonDock="https://github.com/Dirkster99/AvalonDock"
 		mc:Ignorable="d"
 		 DragEnter="MainWindow_DragEnter" Drop="MainWindow_Drop" >
@@ -14,10 +15,14 @@
 		<KeyBinding Gesture="CTRL+ALT+R" Command="{Binding ReloadShioriCommand}" />
 		<KeyBinding Gesture="CTRL+SHIFT+F" Command="{Binding ShowSearchBoxCommand}" />
 		<KeyBinding Gesture="CTRL+ALT+G" Command="{Binding BootSSPCommand}" />
+		<KeyBinding Gesture="CTRL+ALT+C" Command="{Binding CommentOutSelectionRangeCommand}" />
+		<KeyBinding Gesture="CTRL+SHIFT+C" Command="{Binding RemoveCommentOutSelectionRangeCommand}" />
 	</UserControl.InputBindings>
 	<UserControl.Resources>
 		<ResourceDictionary>
 			<BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+
+			<local:DocumentCloseAllCommand x:Key="DocumentCloseAllCommand" />
 
 			<ContextMenu x:Key="DockingPaneContextMenu">
 				
@@ -35,10 +40,14 @@
 						Header="閉じる"
 						Visibility="{Binding Path=IsEnabled, RelativeSource={RelativeSource Self}, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"/>
 
-				<MenuItem Command="{Binding Path=CloseAllButThisCommand}" Header="このドキュメント以外すべて閉じる"
+				<MenuItem Command="{StaticResource DocumentCloseAllCommand}"
+						  CommandParameter="{Binding .}"
+						  Header="このドキュメント以外すべて閉じる"
 						  Visibility="{Binding Path=CanClose, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
 						  />
-				<MenuItem Command="{Binding Path=CloseAllCommand}" Header="すべてのドキュメントを閉じる"
+				<MenuItem Command="{StaticResource DocumentCloseAllCommand}"
+						  CommandParameter="{x:Null}"
+						  Header="すべてのドキュメントを閉じる"
 						  Visibility="{Binding Path=CanClose, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"/>
 				<Separator />
 				<MenuItem Command="{Binding Path=FloatCommand}" Header="フローティング" />
@@ -88,6 +97,9 @@
 				<MenuItem Header="ゴーストを新規作成" Command="{Binding NewGhostCommand}" />
 			</MenuItem>
 			<MenuItem Header="編集">
+				<MenuItem Header="選択範囲をコメントアウト" InputGestureText="Ctrl+Alt+C" Command="{Binding CommentOutSelectionRangeCommand}" />
+				<MenuItem Header="選択範囲をコメントアウト解除" InputGestureText="Ctrl+Shift+C" Command="{Binding RemoveCommentOutSelectionRangeCommand}" />
+				<Separator />
 				<MenuItem Header="サーフェスプレビュー画像を再生成" Command="{Binding GenerateSurfacePreviewCommand}" />
 				<MenuItem Header="プレビューに使用するシェル" ItemsSource="{Binding SurfacePreview.Shells}" IsEnabled="{Binding SurfacePreview.IsExistsShell,FallbackValue=False}" x:Name="PreviewShellSelector">
 					<MenuItem.ItemContainerStyle>

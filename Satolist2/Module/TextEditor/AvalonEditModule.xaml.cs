@@ -162,12 +162,22 @@ namespace Satolist2.Module.TextEditor
 		public override LineData GetLineData(int line)
 		{
 			var lineData = MainTextEditor.Document.Lines[line];
-			return new LineData(lineData.Offset, lineData.Length);
+			return new LineData(lineData.Offset, lineData.Length, line);
+		}
+
+		public override LineData GetLineDataFromCharIndex(int charIndex)
+		{
+			return GetLineData(MainTextEditor.Document.GetLineByOffset(charIndex).LineNumber-1);
 		}
 
 		public override void PerformTextInput(string str)
 		{
 			MainTextEditor.TextArea.PerformTextInput(str);
+		}
+
+		public override void Replace(string text, int position, int length)
+		{
+			MainTextEditor.TextArea.Document.Replace(position, length, text);
 		}
 
 		public override void ScrollToCaret()
@@ -185,6 +195,18 @@ namespace Satolist2.Module.TextEditor
 		{
 			MainTextEditor.TextArea.FontFamily = new FontFamily(fontFamilyName);
 			MainTextEditor.TextArea.FontSize = fontSize;
+		}
+
+		//Undoグループ化
+		public override void BeginUndoGroup()
+		{
+			MainTextEditor.Document.UndoStack.StartUndoGroup();
+		}
+
+		//Undoグループ化終了
+		public override void EndUndoGroup()
+		{
+			MainTextEditor.Document.UndoStack.EndUndoGroup();
 		}
 
 		public override void UpdateHighlighter()

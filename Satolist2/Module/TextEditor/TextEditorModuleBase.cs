@@ -10,12 +10,14 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace Satolist2.Module.TextEditor
 {
 	public abstract class TextEditorModuleBase : UserControl
 	{
 		private bool isEnableSyntaxHighlighting;
+		private bool isUndogrouping;
 		protected MatchCollection CurrentMatches { get; set; }
 
 		//シンタックスハイライトを使うかどうか
@@ -85,14 +87,26 @@ namespace Satolist2.Module.TextEditor
 		//行情報取得
 		public abstract LineData GetLineData(int line);
 
+		//オフセットから行情報取得
+		public abstract LineData GetLineDataFromCharIndex(int charIndex);
+
 		//テキスト入力
 		public abstract void PerformTextInput(string str);
+
+		//テキスト置換
+		public abstract void Replace(string text, int position, int length);
 
 		//範囲選択
 		public abstract void SetSelection(int anchor, int caret);
 
 		//フォント設定
 		public abstract void SetFont(string fontFamilyName, int fontSize);
+
+		//Undoグループ化
+		public abstract void BeginUndoGroup();
+
+		//Undoグループ化終了
+		public abstract void EndUndoGroup();
 
 		//カレット位置変更
 		public abstract event EventHandler OnCaretPositionChanged;
@@ -297,17 +311,148 @@ namespace Satolist2.Module.TextEditor
 		{
 			OnSendToGhostSelectionRange?.Invoke(this, new EventArgs());
 		}
+
+		//コメントアウト
+		public virtual void CommentoutSelectionRange()
+		{
+			try
+			{
+				using (new UndoGroupScope(this))
+				{
+					//endとbeginでindexが逆な場合もある
+					int beginIndex = SelectionBegin;
+					int endIndex = SelectionEnd;
+					if (beginIndex > endIndex)
+					{
+						int swp = beginIndex;
+						beginIndex = endIndex;
+						endIndex = swp;
+					}
+
+					int begin = beginIndex;
+					int end = endIndex;
+
+					if (begin == end)
+					{
+						//一文字
+						Replace("＃", begin, 0);
+					}
+					else
+					{
+						//複数
+						Replace("＃", begin, 0);
+						begin = beginIndex;
+
+						int lineIndex = GetLineDataFromCharIndex(begin).LineIndex;
+						lineIndex++;
+						if (LineCount <= lineIndex)
+						{
+							//最終行
+							return;
+						}
+						else
+						{
+							int lineHead;
+							while (true)
+							{
+								end = endIndex;
+
+								if (LineCount <= lineIndex)
+									break;
+
+								lineHead = GetLineData(lineIndex).Offset;
+
+								if (lineHead > end)
+								{
+									break;
+								}
+								Replace("＃", lineHead, 0);
+								lineIndex++;
+							}
+						}
+					}
+				}
+			}
+			catch { }	//インデックス関係で落ちると嫌なので念のため握りつぶす感じ
+		}
+
+		//コメントアウト解除
+		public virtual void RemoveCommentoutSelectionRange()
+		{
+			try
+			{
+				using (new UndoGroupScope(this))
+				{
+					//コメントアウト解除
+
+					//endとbeginでindexが逆な場合もある
+					int beginIndex = SelectionBegin;
+					int endIndex = SelectionEnd;
+					if (beginIndex > endIndex)
+					{
+						int swp = beginIndex;
+						beginIndex = endIndex;
+						endIndex = swp;
+					}
+
+					int begin = beginIndex;
+					int end = endIndex;
+
+					while (true)
+					{
+						int pos = Text.IndexOf('＃', begin);
+						if (pos == -1)
+							return;
+
+						//範囲外
+						if (pos > end)
+							return;
+						int lineIndex = GetLineDataFromCharIndex(pos).LineIndex + 1;
+						Replace("", pos, 1);
+						if (LineCount <= lineIndex)
+						{
+							//最終行
+							break;
+						}
+						begin = GetLineData(lineIndex).Offset;
+					}
+				}
+			}
+			catch { }
+		}
+
+		//Undoグループ
+		protected class UndoGroupScope : IDisposable
+		{
+			private TextEditorModuleBase module;
+			public UndoGroupScope(TextEditorModuleBase module)
+			{
+				this.module = module;
+				if (module.isUndogrouping)
+					throw new InvalidOperationException();
+				module.isUndogrouping = true;
+				module.BeginUndoGroup();
+			}
+
+			public void Dispose()
+			{
+				module.isUndogrouping = false;
+				module.EndUndoGroup();
+			}
+		}
 	}
 
 	public class LineData
 	{
 		public int Offset { get; }
 		public int Length { get; }
+		public int LineIndex { get; }
 
-		public LineData(int offset, int length)
+		public LineData(int offset, int length, int lineIndex)
 		{
 			Offset = offset;
 			Length = length;
+			LineIndex = lineIndex;
 		}
 	}
 }
