@@ -1,7 +1,7 @@
 charset,Shift_JIS
 
-craftman,
-craftmanw,
+craftman,ghostmaster
+craftmanw,ごーすとますたー
 craftmanurl,
 
 name,ゴーストキット改良版Plus（さとりすと用）

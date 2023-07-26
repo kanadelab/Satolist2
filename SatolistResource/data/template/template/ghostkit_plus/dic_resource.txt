@@ -117,20 +117,13 @@ https://wikiwiki.jp/feeshell/
 
 
 ＊sakura.portalsites
-ＳＳＰ　BUGTRAQ
+SSP BUGTRAQ
 http://ssp.shillest.net/
 
 ：SSPの配布ページだよ。
 
 ＊sakura.portalsites
 -
-
-＊sakura.portalsites
-Disc-2
-http://disc2.s56.xrea.com/
-
-：投稿型のポータルサイトだよ。\nユーザーさんからの情報登録はもちろん、作者さん自ら登録する事も可能だよ。
-：ゴーストの公開情報を始めとした、伺かに関する情報の共有がたくさん出来るといいね。
 
 ＊sakura.portalsites
 GHOST TOWN
@@ -161,5 +154,12 @@ http://ms.shillest.net/satoriya.xhtml
 http://soliton.sub.jp/satori/
 
 ：里々の扱いに困ったら覗いてみよう。
+
+
+＊sakura.portalsites
+伺的なフォーラム
+https://ghost-info.net/fluxbb/
+
+：ゴーストを作っていて困った事があったら、開発トピックで聞いてみると良いかもね。
 
 
