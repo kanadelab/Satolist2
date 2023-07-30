@@ -92,7 +92,7 @@ namespace Satolist2.Control
 			get => searchString;
 			set
 			{
-				searchString = value;
+				searchString = Constants.RemoveNewlineForSearchBox(value);
 				FilteredItems.Refresh();
 				NotifyChanged();
 			}

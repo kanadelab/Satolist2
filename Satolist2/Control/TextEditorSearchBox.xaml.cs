@@ -98,9 +98,10 @@ namespace Satolist2.Control
 			get => searchString ?? string.Empty;
 			set
 			{
-				if (searchString != value)
+				var str = Constants.RemoveNewlineForSearchBox(value);
+				if (searchString != str)
 				{
-					searchString = value;
+					searchString = str;
 					NotifyChanged();
 					UpdateSearchString();
 				}

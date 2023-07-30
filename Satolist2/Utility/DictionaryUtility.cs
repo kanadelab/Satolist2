@@ -308,6 +308,21 @@ namespace Satolist2.Utility
 			}
 			return string.Empty;
 		}
+
+		//検索ボックス用にnewlineを取り除く
+		public static string RemoveNewlineForSearchBox(string searchString)
+		{
+			//改行は受け付けられないので、最初の一行のみ
+			if (searchString.IndexOf(NewLine) >= 0)
+			{
+				var sp = searchString.Split(NewLineSeparator, StringSplitOptions.RemoveEmptyEntries);
+				if (sp.Length > 0)
+					searchString = sp[0];
+				else
+					searchString = string.Empty;
+			}
+			return searchString;
+		}
 	}
 
 	public enum EventType
