@@ -1074,6 +1074,7 @@ namespace Satolist2
 		public ActionCommand CloseDocumentWithoutSelfCommand { get; }
 		public ActionCommand CommentOutSelectionRangeCommand { get; }
 		public ActionCommand RemoveCommentOutSelectionRangeCommand { get; }
+		public ActionCommand OpenUrlCommand { get; }
 
 		public static void StaticInitialize()
 		{
@@ -1814,6 +1815,18 @@ namespace Satolist2
 					mainWindow.ActiveTextEditorViewModel?.MainTextEditor?.RemoveCommentoutSelectionRange();
 				},
 				o => mainWindow.ActiveTextEditor != null);
+
+			OpenUrlCommand = new ActionCommand(
+				o =>
+				{
+					//URLを開く
+					try
+					{
+						if (o is string url)
+							Process.Start(url);
+					}
+					catch { }
+				});
 
 			//読込エラーが発生している場合に通知
 			List<ErrorListDialogItemViewModel> errorItems = new List<ErrorListDialogItemViewModel>();

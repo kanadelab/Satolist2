@@ -166,6 +166,14 @@
 				<Separator />
 				<MenuItem Header="さとりすと本体フォルダを開く" Command="{Binding OpenSatolistDirectoryCommand}" />
 			</MenuItem>
+			<MenuItem Header="ヘルプ">
+				<MenuItem Header="さとりすと配布webページ" Command="{Binding OpenUrlCommand}" CommandParameter="https://nanachi.sakura.ne.jp/satolist.html" />
+				<MenuItem Header="ゴーストアップローダ「ななろだ」" Command="{Binding OpenUrlCommand}" CommandParameter="https://nanachi.sakura.ne.jp/narnaloader.html" />
+				<MenuItem Header="さとりすと＆ななろだフォーラムサイト(実験中)" Command="{Binding OpenUrlCommand}" CommandParameter="https://q2a.satolist.ukagaka.net/" />
+				<Separator />
+				<MenuItem Header="Ukadoc(SSP公式仕様書)" Command="{Binding OpenUrlCommand}" CommandParameter="http://ssp.shillest.net/ukadoc/manual/index.html" />
+				<MenuItem Header="里々wiki" Command="{Binding OpenUrlCommand}" CommandParameter="https://soliton.sub.jp/satori/" />
+			</MenuItem>
 		</Menu>
 
 		<avalonDock:DockingManager Grid.Row="1" AllowMixedOrientation="True" x:Name="DockingManager"
