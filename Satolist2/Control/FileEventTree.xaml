@@ -163,7 +163,7 @@
 
 		<!--位置移動ポップアップ-->
 		<Popup x:Name="TreeViewPopup" IsHitTestVisible="False" StaysOpen="True" HorizontalAlignment="Left">
-			<Border BorderBrush="Gray" Background="{StaticResource ControlBaclGround}" BorderThickness="1" Padding="2">
+			<Border BorderBrush="Gray" Background="{StaticResource ControlBackGround}" BorderThickness="1" Padding="2">
 				<Grid>
 					<Path x:Name="ArrowIcon" Visibility="Collapsed" Fill="{StaticResource ThemeGreen}" Stretch="Uniform" Data="{StaticResource RightDownArrowIcon}" />
 					<Path x:Name="MergeIcon" Visibility="Collapsed" Fill="{StaticResource ThemeBlue}" Stretch="Uniform" Data="{StaticResource MergeIcon}" />

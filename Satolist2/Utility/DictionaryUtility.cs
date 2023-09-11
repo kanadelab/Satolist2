@@ -238,7 +238,7 @@ namespace Satolist2.Utility
 
 			var result = number;
 			foreach (var item in replaceList)
-				result = result.Replace(item.Item1, item.Item2);
+				result = result.Replace(item.Item2, item.Item1);
 			return result;
 		}
 
@@ -322,6 +322,24 @@ namespace Satolist2.Utility
 					searchString = string.Empty;
 			}
 			return searchString;
+		}
+
+		//zen2han
+		public static String Zen2HanNum(String num)
+		{
+			String r = num;
+			r = r.Replace('０', '0');
+			r = r.Replace('１', '1');
+			r = r.Replace('２', '2');
+			r = r.Replace('３', '3');
+			r = r.Replace('４', '4');
+			r = r.Replace('５', '5');
+			r = r.Replace('６', '6');
+			r = r.Replace('７', '7');
+			r = r.Replace('８', '8');
+			r = r.Replace('９', '9');
+
+			return r;
 		}
 	}
 

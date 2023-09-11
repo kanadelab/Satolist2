@@ -15,6 +15,7 @@
 		<model:InsertItemPaletteShortCutGestureConverter x:Key="ShortCutGestureConverter" />
 		<BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
 		<util:ReferenceToBoolConverter x:Key="ReferenceToBoolConverter" />
+		<util:BitmapImageSourceConverter x:Key="BitmapConverter" />
 	</UserControl.Resources>
 	<Grid>
 		<Grid.RowDefinitions>
@@ -61,6 +62,42 @@
 					</ContextMenu>
 				</avalonEdit:TextEditor.ContextMenu>
 			</avalonEdit:TextEditor>
+
+			<Popup x:Name="TextEditorToolTip" Placement="Mouse" IsOpen="{Binding IsToolTipOpen}">
+				<Border Background="{StaticResource ControlBackGround}" Padding="3" BorderThickness="1" BorderBrush="DarkGray" SnapsToDevicePixels="True">
+					<StackPanel>
+						
+						<!--サーフェスパレット-->
+						<StackPanel>
+							<Image Source="{Binding ToolTipSurface.Image, Converter={StaticResource BitmapConverter}}" />
+							<TextBlock Text="{Binding ToolTipSurface.Label}" />
+							<StackPanel.Style>
+								<Style TargetType="StackPanel">
+									<Style.Triggers>
+										<DataTrigger Binding="{Binding ToolTipSurface}" Value="{x:Null}">
+											<Setter Property="Visibility" Value="Collapsed" />
+										</DataTrigger>
+									</Style.Triggers>
+								</Style>
+							</StackPanel.Style>
+						</StackPanel>
+
+						<!--テキスト-->
+						<StackPanel>
+							<TextBlock Text="{Binding DictionaryEvent}" />
+							<StackPanel.Style>
+								<Style TargetType="StackPanel">
+									<Style.Triggers>
+										<DataTrigger Binding="{Binding DictionaryEvent}" Value="{x:Null}">
+											<Setter Property="Visibility" Value="Collapsed" />
+										</DataTrigger>
+									</Style.Triggers>
+								</Style>
+							</StackPanel.Style>
+						</StackPanel>
+					</StackPanel>
+				</Border>
+			</Popup>
 		</Grid>
 
 	</Grid>

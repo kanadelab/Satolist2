@@ -262,6 +262,8 @@ namespace Satolist2.Model
 		public bool IsIndent { get; set; }
 		[JsonProperty]
 		public bool IsSurfacePaletteInserTypeSakuraScript { get; set; }
+		[JsonProperty]
+		public bool IsShowTextEditorToolTip { get; set; }
 
 		//カラー
 		[JsonProperty]
@@ -289,6 +291,7 @@ namespace Satolist2.Model
 
 			IsEnableUpdateCheck = true;
 			IsEnablePreReleaseUpdate = false;
+			IsShowTextEditorToolTip = true;
 
 			TextEditorFontName = EditorSettings.DefaultFont;
 			TextEditorFontSize = EditorSettings.DefaultFontSize;

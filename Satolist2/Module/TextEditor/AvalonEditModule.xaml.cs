@@ -1,4 +1,5 @@
-﻿using AngleSharp.Io;
+﻿using AngleSharp.Dom.Events;
+using AngleSharp.Io;
 using ICSharpCode.AvalonEdit.Document;
 using ICSharpCode.AvalonEdit.Editing;
 using ICSharpCode.AvalonEdit.Rendering;
@@ -9,6 +10,7 @@ using Satolist2.Utility;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
@@ -24,6 +26,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Satolist2.Module.TextEditor
 {
@@ -33,6 +36,8 @@ namespace Satolist2.Module.TextEditor
 	public partial class AvalonEditModule : TextEditorModuleBase
 	{
 		private SearchHilighter searchHilighter;
+		private DispatcherTimer tooltipTimer;
+		private string mouseOverWord;
 
 		internal new AvalonEditModuleViewModel DataContext
 		{
@@ -45,11 +50,108 @@ namespace Satolist2.Module.TextEditor
 			InitializeComponent();
 			MainTextEditor.Document = new ICSharpCode.AvalonEdit.Document.TextDocument();
 			searchHilighter = new SearchHilighter();
+			tooltipTimer = new DispatcherTimer();
+			tooltipTimer.Interval = TimeSpan.FromMilliseconds(200.0);
+			tooltipTimer.Tick += TooltipTimer_Tick;
 			DataContext = new AvalonEditModuleViewModel(this);
 
 			//
 			IsEnableSendToGhostSelectionRange = false;
-			IsEnableSendToGhost = false;	//デフォルトでオフ
+			IsEnableSendToGhost = false;    //デフォルトでオフ
+
+			MouseMove += AvalonEditModule_MouseMove;
+			MouseLeave += AvalonEditModule_MouseLeave;
+		}
+
+		private void AvalonEditModule_MouseLeave(object sender, MouseEventArgs e)
+		{
+			//リセット
+			mouseOverWord = null;
+			tooltipTimer.Stop();
+			TextEditorToolTip.IsOpen = false;
+		}
+
+		private void TooltipTimer_Tick(object sender, EventArgs e)
+		{
+			//タイマー停止
+			tooltipTimer.Stop();
+
+			//閉じている場合のみ
+			if (TextEditorToolTip.IsOpen)
+				return;
+
+			RequestOpenTooltip(mouseOverWord);
+		}
+
+		//選択内容からワードを取得
+		private string FindWord(int lineIndex, int colmnIndex)
+		{
+			var line = MainTextEditor.Document.Lines[lineIndex];
+
+			//カッコを検索して、その間の文字列を取得する
+			var offset = line.Offset + colmnIndex;
+			var endIndex = MainTextEditor.Document.Text.IndexOf("）", offset);
+			var startIndex = MainTextEditor.Document.Text.LastIndexOf("（", offset, offset + 1);
+
+			//見つからない
+			if (startIndex < 0 || endIndex < 0)
+				return null;
+
+			//内容を取得
+			return MainTextEditor.Document.GetText(startIndex + 1, endIndex - (startIndex + 1));
+		}
+
+		private void AvalonEditModule_MouseMove(object sender, MouseEventArgs e)
+		{
+			var point = Mouse.GetPosition(MainTextEditor);
+			var item = MainTextEditor.GetPositionFromPoint(point);
+			if (item.HasValue)
+			{
+				//それぞれ1オリジンなので１つ減らす
+				var lineIndex = item.Value.Line - 1;
+				var colmnIndex = item.Value.Column - 1;
+				var word = FindWord(lineIndex, colmnIndex);
+
+				if (!string.IsNullOrEmpty(word))
+				{
+					//変更されたら一旦タイマーとめる
+					if (word != mouseOverWord)
+					{
+						mouseOverWord = word;
+						tooltipTimer.Stop();
+						RequestCloseTooltip();
+					}
+					tooltipTimer.Start();
+				}
+				else
+				{
+					mouseOverWord = null;
+					tooltipTimer.Stop();
+					RequestCloseTooltip();
+				}
+			}
+			else
+			{
+				mouseOverWord = null;
+				tooltipTimer.Stop();
+				RequestCloseTooltip();
+			}
+		}
+
+		private void RequestCloseTooltip()
+		{
+			if (DataContext is AvalonEditModuleViewModel vm)
+			{
+				vm.CloseToolTip();
+			}
+		}
+
+		private void RequestOpenTooltip(string word)
+		{
+			if (DataContext is AvalonEditModuleViewModel vm)
+			{
+				vm.RequestTooltip(word);
+			}
 		}
 
 		public override int LineCount => MainTextEditor.LineCount;
@@ -317,6 +419,9 @@ namespace Satolist2.Module.TextEditor
 		private Brush backgroundColor;
 		private string backgroundImagePath;
 		private Thickness textEditorMargin;
+		private bool isToolTipOpen;
+		private SurfacePaletteItemViewModel toolTipSurface;
+		private string toolTipDictionaryEvent;
 
 		public ICommand SendToGhostSelectionRangeCommand { get; }
 		public ICommand SendToGhostCommand { get; }
@@ -370,6 +475,69 @@ namespace Satolist2.Module.TextEditor
 			{
 				backgroundColor = value;
 				NotifyChanged();
+			}
+		}
+
+		//ツールチップ開いているか
+		public bool IsToolTipOpen
+		{
+			get => isToolTipOpen;
+			set
+			{
+				isToolTipOpen = value;
+				NotifyChanged();
+			}
+		}
+
+		//ツールチップに表示するサーフェスパレット画像
+		public SurfacePaletteItemViewModel ToolTipSurface
+		{
+			get => toolTipSurface;
+			set
+			{
+				toolTipSurface = value;
+				NotifyChanged();
+			}
+		}
+
+		//ツールチップに表示する辞書情報
+		public string DictionaryEvent
+		{
+			get => toolTipDictionaryEvent;
+			set
+			{
+				toolTipDictionaryEvent = value;
+				NotifyChanged();
+			}
+		}
+
+		//ツールチップを開く
+		public void CloseToolTip()
+		{
+			IsToolTipOpen = false;
+		}
+
+		//wordに対応する内容をゴーストから検索してツールチップを表示
+		public void RequestTooltip(string word)
+		{
+			//リセット
+			DictionaryEvent = null;
+			ToolTipSurface = null;
+
+			if (!MainViewModel.EditorSettings.GeneralSettings.IsShowTextEditorToolTip)
+				return;
+			
+			//サーフェスパレットのプレビュー表示
+			var surfaceId = DictionaryUtility.NumberZen2Han(word);
+			if (int.TryParse(surfaceId, out int _))
+			{
+				var image = Main.SurfacePaletteViewModel.Items.FirstOrDefault(o => o.Id.ToString() == surfaceId);
+				if (image != null)
+				{
+					IsToolTipOpen = true;
+					ToolTipSurface = image;
+					return;
+				}
 			}
 		}
 
