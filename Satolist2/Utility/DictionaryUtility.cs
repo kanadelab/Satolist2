@@ -242,6 +242,29 @@ namespace Satolist2.Utility
 			return result;
 		}
 
+		//数値文字列を半角全角置換
+		public static string NumberHan2Zen(string number)
+		{
+			Tuple<char, char>[] replaceList =
+			{
+				new Tuple<char,char>('1','１'),
+				new Tuple<char,char>('2','２'),
+				new Tuple<char,char>('3','３'),
+				new Tuple<char,char>('4','４'),
+				new Tuple<char,char>('5','５'),
+				new Tuple<char,char>('6','６'),
+				new Tuple<char,char>('7','７'),
+				new Tuple<char,char>('8','８'),
+				new Tuple<char,char>('9','９'),
+				new Tuple<char,char>('0','０'),
+			};
+
+			var result = number;
+			foreach (var item in replaceList)
+				result = result.Replace(item.Item1, item.Item2);
+			return result;
+		}
+
 		public static bool IsSatoriDictionaryName(string path)
 		{
 			return Regex.IsMatch(System.IO.Path.GetFileName(path), "^dic.+\\.txt$");

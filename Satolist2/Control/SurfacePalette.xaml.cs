@@ -135,7 +135,7 @@ namespace Satolist2.Control
 
 		public static void InsertSurfaceToActiveEditorSatori(long id)
 		{
-			var insertStr = string.Format("（{0}）", DictionaryUtility.NumberZen2Han(id.ToString()));
+			var insertStr = string.Format("（{0}）", DictionaryUtility.NumberHan2Zen(id.ToString()));
 			MainWindow.Instance.InsertToActiveEditor(insertStr);
 		}
 
