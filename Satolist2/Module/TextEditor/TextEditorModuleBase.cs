@@ -1,5 +1,6 @@
 ﻿using FluentFTP.Servers.Handlers;
 using ICSharpCode.AvalonEdit.Editing;
+using Satolist2.Utility;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -125,6 +126,10 @@ namespace Satolist2.Module.TextEditor
 
 		//グローバル検索ボックス表示リクエスト
 		public event EventHandler OnShowGlobalSearchBox;
+
+		//編集中の項目リクエスト
+		public Func<string> RequestEditingEvent;
+
 
 		//コンストラクタ
 		public TextEditorModuleBase()
@@ -421,6 +426,45 @@ namespace Satolist2.Module.TextEditor
 			catch { }
 		}
 
+		//カレット位置の項目名を取得
+		public string FindEditingEventName()
+		{
+			return FindEditingEventName(CaretLine - 1);	//0オリジンにするために1引く
+		}
+
+		//選択行の＠または＊ではじまる項目名を取得
+		public string FindEditingEventName(int lineIndex)
+		{
+			//開始行の検索(＠または＊を含まない範囲)
+			for (int i = lineIndex; i >= 0; i--)
+			{
+				//ヘッダ行の上がエスケープされてないことが必要
+				if (i > 0)
+				{
+					var nextLineData = GetLineData(i - 1);
+					var nextLine = Text.Substring(nextLineData.Offset, nextLineData.Length);
+					if (DictionaryUtility.IsLineEndEscaped(nextLine))
+						continue;
+				}
+
+				var lineData = GetLineData(i);
+				var lineString = Text.Substring(lineData.Offset, lineData.Length);
+				if (lineString.IndexOf(Constants.SentenceHead) == 0)
+				{
+					//条件部と＠や＊を取り除く
+					return lineString.Substring(1).Split(new char[] { '\t' }).FirstOrDefault();
+				}
+				else if (lineString.IndexOf(Constants.WordHead) == 0)
+				{
+					return lineString.Substring(1).Split(new char[] { '\t' }).FirstOrDefault();
+				}
+			}
+
+			//見つからなかった場合はエディタ側にリクエストする
+			//イベントエディタの場合、項目名がテキストに存在してないため
+			return RequestEditingEvent?.Invoke();
+		}
+
 		//Undoグループ
 		protected class UndoGroupScope : IDisposable
 		{
@@ -440,6 +484,7 @@ namespace Satolist2.Module.TextEditor
 				module.EndUndoGroup();
 			}
 		}
+
 	}
 
 	public class LineData

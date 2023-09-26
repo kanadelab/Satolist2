@@ -95,6 +95,27 @@
 								</Style>
 							</StackPanel.Style>
 						</StackPanel>
+						
+						<!--ukadoc-->
+						<StackPanel>
+							<StackPanel Orientation="Horizontal">
+								<TextBlock Text="{Binding UkadocEventName}" FontWeight="Bold"/>
+								<TextBlock Text=" &gt; " />
+								<TextBlock Text="{Binding UkadocEventReferenceName}" />
+							</StackPanel>
+							<Separator />
+							<TextBlock Text="{Binding UkadocEventDescription}" />
+							<TextBlock Text="ukadocから取得したデータ" Foreground="Gray" FontSize="10" />
+							<StackPanel.Style>
+								<Style TargetType="StackPanel">
+									<Style.Triggers>
+										<DataTrigger Binding="{Binding UkadocEventName}" Value="{x:Null}">
+											<Setter Property="Visibility" Value="Collapsed" />
+										</DataTrigger>
+									</Style.Triggers>
+								</Style>
+							</StackPanel.Style>
+						</StackPanel>
 					</StackPanel>
 				</Border>
 			</Popup>

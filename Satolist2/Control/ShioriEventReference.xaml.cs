@@ -164,6 +164,13 @@ namespace Satolist2.Control
 			NotifyChanged(nameof(Items));
 			NotifyChanged(nameof(ScriptItems));
 		}
+
+		public UkadocEventViewModel FindEvent(string eventName)
+		{
+			if (events.TryGetValue(eventName, out var item))
+				return item;
+			return null;
+		}
 	}
 
 	//Ukadocイベントリファレンス ダウンローダ
@@ -217,7 +224,7 @@ namespace Satolist2.Control
 							var ul = item.Children.FirstOrDefault(o => o is AngleSharp.Html.Dom.IHtmlUnorderedListElement);
 							var head = item.Children.FirstOrDefault(o => o is AngleSharp.Html.Dom.IHtmlHeadingElement);
 
-							if (head == null || ul == null)
+							if (string.IsNullOrEmpty(head?.InnerHtml) || ul == null)
 								continue;
 							var category = new UkadocCategoryModel();
 							category.Name = head.InnerHtml;
@@ -308,7 +315,7 @@ namespace Satolist2.Control
 							var ul = item.Children.FirstOrDefault(o => o is AngleSharp.Html.Dom.IHtmlUnorderedListElement);
 							var head = item.Children.FirstOrDefault(o => o is AngleSharp.Html.Dom.IHtmlHeadingElement);
 
-							if (head == null || ul == null)
+							if (string.IsNullOrEmpty(head?.InnerHtml) || ul == null)
 								continue;
 							var category = new UkadocSakuraScriptCategoryModel();
 							category.Name = head.InnerHtml;
@@ -522,6 +529,8 @@ namespace Satolist2.Control
 	//ukadocイベントリファレンスのイベントノード
 	public class UkadocEventViewModel : NotificationObject, Utility.SearchFilterConverter.IFilter
 	{
+		private static Regex GtePattern = new Regex("^Reference([0-9]+)～$");
+
 		private UkadocEventModel model;
 
 		//子無しノードなので実装だけしておく
@@ -604,5 +613,49 @@ namespace Satolist2.Control
 		{
 			return Name.ToLower().Contains(filterString.ToLower());
 		}
+
+		//referenceIndexに一致するReferenceX を、Ukadocの表記に合わせて探す
+		public bool FindReference(int referenceIndex, out string key, out string value)
+		{
+			//まず完全一致を探す
+			var result = References.FirstOrDefault(o => o.Item1 == "Reference" + referenceIndex);
+			if (result != null)
+			{
+				key = result.Item1;
+				value = result.Item2;
+				return true;
+			}
+
+			//次に「～」を探す
+			foreach (var r in References)
+			{
+				var match = GtePattern.Match(r.Item1);
+				if (match.Success)
+				{
+					if (referenceIndex >= int.Parse(match.Groups[1].Value))
+					{
+						//決定
+						key = r.Item1;
+						value = r.Item2;
+						return true;
+					}
+				}
+			}
+
+			//最後に「*」を探す
+			result = References.FirstOrDefault(o => o.Item1 == "Reference*");
+			if (result != null)
+			{
+				key = result.Item1;
+				value = result.Item2;
+				return true;
+			}
+
+			//みつからなかった
+			key = null;
+			value = null;
+			return false;
+		}
+
 	}
 }

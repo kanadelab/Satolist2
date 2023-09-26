@@ -201,42 +201,6 @@ namespace Satolist2.Control
 			NotifyChanged(nameof(DockingTitle));
 		}
 
-		//カレットの位置から編集中のイベント名を取得する
-		public virtual string FindEditingEventName()
-		{
-			//if (MainTextEditor?.Document == null)
-			//	return null;
-
-			var currentLine = MainTextEditor.CaretLine - 1;   //indexにするので-1
-
-			//開始行の検索(＠または＊を含まない範囲)
-			for (int i = currentLine; i >= 0; i--)
-			{
-				//ヘッダ行の上がエスケープされてないことが必要
-				if (i > 0)
-				{
-					var nextLineData = MainTextEditor.GetLineData(i - 1);
-					var nextLine = MainTextEditor.Text.Substring(nextLineData.Offset, nextLineData.Length);
-					if (DictionaryUtility.IsLineEndEscaped(nextLine))
-						continue;
-				}
-
-				var lineData = MainTextEditor.GetLineData(i);
-				var lineString = MainTextEditor.Text.Substring(lineData.Offset, lineData.Length);
-				if (lineString.IndexOf(Constants.SentenceHead) == 0)
-				{
-					//条件部と＠や＊を取り除く
-					return lineString.Substring(1).Split(new char[] { '\t' }).FirstOrDefault();
-				}
-				else if (lineString.IndexOf(Constants.WordHead) == 0)
-				{
-					return lineString.Substring(1).Split(new char[] { '\t' }).FirstOrDefault();
-				}
-			}
-
-			//見つからなかった場合はnull
-			return null;
-		}
 
 		public void Caret_PositionChanged(object sender, EventArgs e)
 		{
@@ -249,7 +213,7 @@ namespace Satolist2.Control
 
 		protected void TrySelectEventOnUkadocViewer()
 		{
-			var eventName = FindEditingEventName();
+			var eventName = MainTextEditor.FindEditingEventName();
 			if (!string.IsNullOrEmpty(eventName))
 				Main.UkadocEventReferenceViewModel.TrySelectEvent(eventName);
 		}
@@ -443,21 +407,12 @@ namespace Satolist2.Control
 			}
 		}
 
-		//編集中のイベント名を取得
-		public override string FindEditingEventName()
-		{
-			var baseResult = base.FindEditingEventName();
-			if(baseResult == null)
-				return Event.Name;	//nullの場合はここで編集中のイベントを示す
-			else
-				return baseResult;
-		}
-
 		public void Dispose()
 		{
 			Event.PropertyChanged -= Event_PropertyChanged;
 			MainTextEditor.OnTextChanged -= Document_TextChanged;
 			MainTextEditor.OnCaretPositionChanged -= Caret_PositionChanged;
+			MainTextEditor.RequestEditingEvent = null;
 		}
 
 		public void ControlBind(System.Windows.Controls.Control ctrl)
@@ -468,7 +423,13 @@ namespace Satolist2.Control
 				MainTextEditor.Text = Event.Body;
 				MainTextEditor.OnTextChanged += Document_TextChanged;
 				MainTextEditor.OnCaretPositionChanged += Caret_PositionChanged;
+				MainTextEditor.RequestEditingEvent = GetEventName;
 			}
+		}
+
+		private string GetEventName()
+		{
+			return Event.Name;
 		}
 	}
 }

@@ -7,6 +7,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.ServiceModel.Channels;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -134,10 +135,11 @@ namespace Satolist2.Model
 	{
 		private string fullPath;
 		private string body;
-		private bool isChanged;     //変更検出
-		private ObservableCollection<EventModel> events;		//リスト化された辞書の内容一覧
-		private List<EventModel> instantDeserializedEvents;		//リスト化解除されているが、簡易解析された一覧
-		private bool isSerialized;								//リスト化解除されたか
+		private bool isChanged;														//変更検出
+		private ObservableCollection<EventModel> events;							//リスト化された辞書の内容一覧
+		private List<EventModel> instantDeserializedEvents;                         //リスト化解除されているが、簡易解析された一覧
+		private Dictionary<string, List<EventModel>> internalEventMap;				//リスト化情報または簡易解析のマップ情報
+		private bool isSerialized;													//リスト化解除されたか
 
 		public GhostModel Ghost { get; }
 		public bool IsInlineEventAnalyze { get; set; }
@@ -199,6 +201,7 @@ namespace Satolist2.Model
 
 				//解析データを無効にする
 				instantDeserializedEvents = null;
+				internalEventMap.Clear();
 			}
 		}
 
@@ -221,6 +224,7 @@ namespace Satolist2.Model
 			isSerialized = true;
 			body = string.Empty;
 			events = new ObservableCollection<EventModel>();
+			internalEventMap = new Dictionary<string, List<EventModel>>();
 			OnDelete += DictionaryModel_OnDelete;
 		}
 
@@ -234,8 +238,10 @@ namespace Satolist2.Model
 			body = string.Empty;
 
 			events = new ObservableCollection<EventModel>();
+			internalEventMap = new Dictionary<string, List<EventModel>>();
 			OnDelete += DictionaryModel_OnDelete;
 		}
+
 
 		//変更としてマーク
 		public void Changed()
@@ -268,6 +274,10 @@ namespace Satolist2.Model
 			if (!DictionaryUtility.IsSatoriDictionaryName(Name))
 			{
 				IsSerialized = true;
+
+				//解析データを無効にする
+				instantDeserializedEvents = null;
+				internalEventMap.Clear();
 			}
 		}
 	
@@ -300,6 +310,29 @@ namespace Satolist2.Model
 				}
 			}
 		}
+
+		//イベント名とイベントの対応リスト
+		public ReadOnlyDictionary<string, List<EventModel>> EventNameMap
+		{
+			get
+			{
+				if (IsSatoriDictionary)
+				{
+					if (isSerialized)
+					{
+						if(instantDeserializedEvents == null)
+							InstantDeserialize();
+					}
+					return new ReadOnlyDictionary<string, List<EventModel>>(internalEventMap);
+				}
+				else
+				{
+					//カラを返す
+					return new ReadOnlyDictionary<string, List<EventModel>>(new Dictionary<string, List<EventModel>>());
+				}
+			}
+		}
+
 
 		//リスト化解除されているか
 		public bool IsSerialized
@@ -369,7 +402,7 @@ namespace Satolist2.Model
 				//ObservableCollectionからは外れる
 				DetachEvent(ev);
 			}
-			events.Add(ev);
+			AddEventInternal(ev);
 			ev.Dictionary = this;
 			Changed();
 		}
@@ -403,9 +436,11 @@ namespace Satolist2.Model
 			foreach(var ev in events)
 			{
 				ev.RaiseRemoveEvent();
+				ev.NameChanged -= Ev_NameChanged;
 				ev.Dictionary = null;
 			}
 			events.Clear();
+			internalEventMap.Clear();
 		}
 
 		//イベントの順番変更
@@ -453,8 +488,48 @@ namespace Satolist2.Model
 		private void RemoveEventInternal(EventModel ev)
 		{
 			events.Remove(ev);
+			AddEventMap(ev.Name, ev);
+			ev.NameChanged -= Ev_NameChanged;
 			Changed();
 		}
+
+		//内部的なイベントの追加
+		private void AddEventInternal(EventModel ev)
+		{
+			events.Add(ev);
+			AddEventMap(ev.Name, ev);
+			ev.NameChanged += Ev_NameChanged;
+		}
+
+		private void Ev_NameChanged(object sender, EventNameChangeArgs e)
+		{
+			RemoveEventMap(e.OldName, (EventModel)sender);
+			AddEventMap(e.NewName, (EventModel)sender);
+		}
+
+		//参照マップ追加
+		private void AddEventMap(string name, EventModel ev)
+		{
+			List<EventModel> items;
+			if(!internalEventMap.TryGetValue(name, out items))
+			{
+				items = new List<EventModel>();
+				internalEventMap.Add(name, items);
+			}
+			items.Add(ev);
+		}
+
+		//参照マップ除去
+		private void RemoveEventMap(string name, EventModel ev)
+		{
+			if(internalEventMap.TryGetValue(name, out var items))
+			{
+				items.Remove(ev);
+				if (items.Any())
+					internalEventMap.Remove(name);
+			}
+		}
+
 
 		//辞書のシリアライズ
 		public string Serialize()
@@ -505,6 +580,7 @@ namespace Satolist2.Model
 		public void Deserialize(string text)
 		{
 			bool isChanged = IsChanged;
+			internalEventMap.Clear();
 
 			DeserializeInternal(text, (ev) => AddEvent(ev));
 
@@ -609,6 +685,12 @@ namespace Satolist2.Model
 		{
 			instantDeserializedEvents = new List<EventModel>();
 			DeserializeInternal(Body, (ev) => instantDeserializedEvents.Add(ev));
+
+			internalEventMap.Clear();
+			foreach(var ev in instantDeserializedEvents)
+			{
+				AddEventMap(ev.Name, ev);
+			}
 		}
 
 		//変更済みとしてマーク
@@ -658,6 +740,7 @@ namespace Satolist2.Model
 		private int analyzeLineIndex;
 
 		private ObservableCollection<InlineEventModel> inlineEvents = new ObservableCollection<InlineEventModel>();
+		public event EventHandler<EventNameChangeArgs> NameChanged;
 
 		//項目名
 		public string Name
@@ -665,11 +748,13 @@ namespace Satolist2.Model
 			get => name ?? string.Empty;
 			set
 			{
+				var oldName = name;
 				if (name != value)
 					MarkChanged();
 				name = value;
 				NotifyChanged();
 				NotifyChanged(nameof(Identifier));
+				NameChanged?.Invoke(this, new EventNameChangeArgs(name, oldName));
 			}
 		}
 
@@ -912,6 +997,20 @@ namespace Satolist2.Model
 		}
 	}
 
+	/// <summary>
+	/// 項目名の変更通知
+	/// </summary>
+	public class EventNameChangeArgs : EventArgs
+	{
+		public string NewName { get; set; }
+		public string OldName { get; set; }
+
+		public EventNameChangeArgs(string newName, string oldName)
+		{
+			NewName = newName;
+			OldName = oldName;
+		}
+	}
 	
 
 	

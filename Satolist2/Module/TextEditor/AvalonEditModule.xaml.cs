@@ -38,6 +38,7 @@ namespace Satolist2.Module.TextEditor
 		private SearchHilighter searchHilighter;
 		private DispatcherTimer tooltipTimer;
 		private string mouseOverWord;
+		private int mouseOverWordLineIndex;
 
 		internal new AvalonEditModuleViewModel DataContext
 		{
@@ -95,10 +96,14 @@ namespace Satolist2.Module.TextEditor
 
 			//見つからない
 			if (startIndex < 0 || endIndex < 0)
+			{
 				return null;
+			}
 
 			//内容を取得
-			return MainTextEditor.Document.GetText(startIndex + 1, endIndex - (startIndex + 1));
+			int wordOffset = startIndex + 1;
+			int wordLength = endIndex - (startIndex + 1);
+			return MainTextEditor.Document.GetText(wordOffset, wordLength);
 		}
 
 		private void AvalonEditModule_MouseMove(object sender, MouseEventArgs e)
@@ -111,6 +116,7 @@ namespace Satolist2.Module.TextEditor
 				var lineIndex = item.Value.Line - 1;
 				var colmnIndex = item.Value.Column - 1;
 				var word = FindWord(lineIndex, colmnIndex);
+				mouseOverWordLineIndex = lineIndex;
 
 				if (!string.IsNullOrEmpty(word))
 				{
@@ -150,7 +156,7 @@ namespace Satolist2.Module.TextEditor
 		{
 			if (DataContext is AvalonEditModuleViewModel vm)
 			{
-				vm.RequestTooltip(word);
+				vm.RequestTooltip(word, mouseOverWordLineIndex);
 			}
 		}
 
@@ -415,6 +421,8 @@ namespace Satolist2.Module.TextEditor
 	/// </summary>
 	internal class AvalonEditModuleViewModel : NotificationObject
 	{
+		private static readonly Regex EventReferencePattern = new Regex("^[ＲR]([0-9０-９]+)$");
+
 		private AvalonEditModule Module { get; }
 		private Brush backgroundColor;
 		private string backgroundImagePath;
@@ -422,6 +430,10 @@ namespace Satolist2.Module.TextEditor
 		private bool isToolTipOpen;
 		private SurfacePaletteItemViewModel toolTipSurface;
 		private string toolTipDictionaryEvent;
+
+		private string toolTipUkadocEventName;
+		private string toolTipUkaodcEventReferenceName;
+		private string toolTipUkadocEventDescription;
 
 		public ICommand SendToGhostSelectionRangeCommand { get; }
 		public ICommand SendToGhostCommand { get; }
@@ -511,6 +523,36 @@ namespace Satolist2.Module.TextEditor
 			}
 		}
 
+		public string UkadocEventName
+		{
+			get => toolTipUkadocEventName;
+			set
+			{
+				toolTipUkadocEventName = value;
+				NotifyChanged();
+			}
+		}
+
+		public string UkadocEventReferenceName
+		{
+			get => toolTipUkaodcEventReferenceName;
+			set
+			{
+				toolTipUkaodcEventReferenceName = value;
+				NotifyChanged();
+			}
+		}
+
+		public string UkadocEventDescription
+		{
+			get => toolTipUkadocEventDescription;
+			set
+			{
+				toolTipUkadocEventDescription = value;
+				NotifyChanged();
+			}
+		}
+
 		//ツールチップを開く
 		public void CloseToolTip()
 		{
@@ -518,13 +560,18 @@ namespace Satolist2.Module.TextEditor
 		}
 
 		//wordに対応する内容をゴーストから検索してツールチップを表示
-		public void RequestTooltip(string word)
+		public void RequestTooltip(string word, int wordLineIndex)
 		{
 			//リセット
 			DictionaryEvent = null;
 			ToolTipSurface = null;
+			UkadocEventDescription = null;
+			UkadocEventReferenceName = null;
+			UkadocEventName = null;
 
 			if (!MainViewModel.EditorSettings.GeneralSettings.IsShowTextEditorToolTip)
+				return;
+			if (Main.Ghost == null)
 				return;
 			
 			//サーフェスパレットのプレビュー表示
@@ -536,6 +583,65 @@ namespace Satolist2.Module.TextEditor
 				{
 					IsToolTipOpen = true;
 					ToolTipSurface = image;
+					return;
+				}
+			}
+
+			//ディクショナリを検索
+			int eventCount = 0;
+			foreach(var dic in Main.Ghost.Dictionaries)
+			{
+				if(dic.EventNameMap.TryGetValue(word, out List<EventModel> ev))
+				{
+					if (DictionaryEvent == null)
+					{
+						//文字列化、空白の除去
+						DictionaryEvent = ev.First().Serialize().Trim();
+					}
+					eventCount += ev.Count;
+				}
+			}
+
+			//見つかったら表示
+			if(DictionaryEvent != null)
+			{
+				IsToolTipOpen = true;
+				if (eventCount > 1)
+					DictionaryEvent = $"[{eventCount}個の項目]\r\n\r\n" + DictionaryEvent;
+				return;
+			}
+
+			//Reference検索
+			var referenceMatch = EventReferencePattern.Match(word);
+			if (referenceMatch != null)
+			{
+				var eventName = Module.FindEditingEventName(wordLineIndex);
+				if (!string.IsNullOrEmpty(eventName))
+				{
+					var ev = Main.UkadocEventReferenceViewModel.FindEvent(eventName);
+					var referenceId = DictionaryUtility.NumberZen2Han(referenceMatch.Groups[1].Value);
+
+					if(int.TryParse(referenceId, out int referenceIndex))
+					{
+						if(ev.FindReference(referenceIndex, out string key, out string value))
+						{
+							IsToolTipOpen = true;
+							UkadocEventName = ev.Name;
+							UkadocEventReferenceName = key;
+							UkadocEventDescription = value;
+							return;
+						}
+					}
+				}
+			}
+
+			//変数
+			foreach (var variable in Main.VariableListViewModel.Items)
+			{
+				if(variable.Name == word)
+				{
+					IsToolTipOpen = true;
+					DictionaryEvent = $"変数\r\n＄{variable.Name}";
 					return;
 				}
 			}
