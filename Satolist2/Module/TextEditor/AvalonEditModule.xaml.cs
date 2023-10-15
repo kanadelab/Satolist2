@@ -619,17 +619,19 @@ namespace Satolist2.Module.TextEditor
 				if (!string.IsNullOrEmpty(eventName))
 				{
 					var ev = Main.UkadocEventReferenceViewModel.FindEvent(eventName);
-					var referenceId = DictionaryUtility.NumberZen2Han(referenceMatch.Groups[1].Value);
-
-					if(int.TryParse(referenceId, out int referenceIndex))
+					if (ev != null)
 					{
-						if(ev.FindReference(referenceIndex, out string key, out string value))
+						var referenceId = DictionaryUtility.NumberZen2Han(referenceMatch.Groups[1].Value);
+						if (int.TryParse(referenceId, out int referenceIndex))
 						{
-							IsToolTipOpen = true;
-							UkadocEventName = ev.Name;
-							UkadocEventReferenceName = key;
-							UkadocEventDescription = value;
-							return;
+							if (ev.FindReference(referenceIndex, out string key, out string value))
+							{
+								IsToolTipOpen = true;
+								UkadocEventName = ev.Name;
+								UkadocEventReferenceName = key;
+								UkadocEventDescription = value;
+								return;
+							}
 						}
 					}
 				}
