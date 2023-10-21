@@ -401,7 +401,7 @@ namespace Satolist2.Utility
 		{
 			try
 			{
-				string[] lines = File.ReadAllLines(path);
+				string[] lines = File.ReadAllLines(path, Constants.EncodingShiftJis);
 				foreach (var line in lines)
 				{
 					if (line.IndexOf(Constants.VariableHead) == 0)

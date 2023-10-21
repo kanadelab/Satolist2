@@ -21,6 +21,9 @@ namespace Satolist2.Utility
 		//里々のスクリプトをゴーストに送信
 		public static void SendSatori(GhostModel ghost, string script, EventType type)
 		{
+			if (ghost == null)
+				return;
+
 			var sakuraScript = ExecuteSatori(ghost, script, type);
 			if (!string.IsNullOrEmpty(sakuraScript))
 			{

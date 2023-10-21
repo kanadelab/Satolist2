@@ -46,6 +46,8 @@ namespace Satolist2.Control
 			SendToGhostCommand = new ActionCommand(
 				o =>
 				{
+					if (main.Ghost == null)
+						return;
 					try
 					{
 						Satorite.SendSatori(main.Ghost, control.MainTextEditor.MainTextEditor.Text, EventType.Sentence);
