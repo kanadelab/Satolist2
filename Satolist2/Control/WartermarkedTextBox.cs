@@ -70,6 +70,7 @@ namespace Satolist2.Control
 		{
 			base.OnInitialized(e);
 			this.Loaded += InitializeAdorner;
+			this.Unloaded += DestroyAdoener;
 			this.IsVisibleChanged += WartermarkedTextBox_IsVisibleChanged;
 		}
 
@@ -94,6 +95,12 @@ namespace Satolist2.Control
 			wartermarkedAdorner.SetWartermark(Wartermark);
 			layer?.Add(wartermarkedAdorner);
 			OnTextChanged(null);	//初期状態
+		}
+
+		private void DestroyAdoener(object sender, RoutedEventArgs e)
+		{
+			var layer = AdornerLayer.GetAdornerLayer(this);
+			layer?.Remove(wartermarkedAdorner);
 		}
 
 		protected override void OnTextChanged(TextChangedEventArgs e)
