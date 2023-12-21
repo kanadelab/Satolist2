@@ -82,7 +82,9 @@ namespace Satolist2.Model
 			ignoreDictionaryFiles.Add("satori_savebackup.txt");
 
 			//ファイル巡回
-			var files = Directory.GetFiles(FullDictionaryPath, "*.*", SearchOption.AllDirectories);
+			var files = Directory.GetFiles(FullDictionaryPath, "*.*", SearchOption.AllDirectories).ToList();
+			files.Sort();
+			
 			foreach(var f in files)
 			{
 				if(Regex.IsMatch(Path.GetFileName(f), "^dic.*\\.txt$"))
