@@ -686,7 +686,12 @@ namespace Satolist2.Model
 		private void InstantDeserialize()
 		{
 			instantDeserializedEvents = new List<EventModel>();
-			DeserializeInternal(Body, (ev) => instantDeserializedEvents.Add(ev));
+			DeserializeInternal(Body, (ev) =>
+			{
+				//Dictionaryを設定するタイミングがないのでとりあえずここでやっちゃう
+				ev.Dictionary = this;
+				instantDeserializedEvents.Add(ev);
+			});
 
 			internalEventMap.Clear();
 			foreach(var ev in instantDeserializedEvents)

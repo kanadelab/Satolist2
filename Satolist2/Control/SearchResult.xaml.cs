@@ -56,11 +56,14 @@ namespace Satolist2.Control
 		//本文を検索対象にするか
 		public bool IsSearchBody { get; set; }
 
+		public bool IsStringPerfectMatch { get; set; }
+
 		public SearchQuery()
 		{
 			SearchString = string.Empty;
 			IsSearchTitle = true;
 			IsSearchBody = true;
+			IsStringPerfectMatch = false;
 		}
 	}
 
@@ -118,7 +121,7 @@ namespace Satolist2.Control
 						bool isHit = false;
 						if(query.IsSearchTitle)
 						{
-							if(QuerySearchHit(ev.Name, queryObj))
+							if(QuerySearchHit(ev.Name, queryObj, query.IsStringPerfectMatch))
 							{
 								isHit = true;
 							}
@@ -126,8 +129,8 @@ namespace Satolist2.Control
 
 						if(!isHit && query.IsSearchBody)
 						{
-							if(QuerySearchHit(ev.Body, queryObj) ||
-								QuerySearchHit(ev.Condition, queryObj))
+							if(QuerySearchHit(ev.Body, queryObj, query.IsStringPerfectMatch) ||
+								QuerySearchHit(ev.Condition, queryObj, query.IsStringPerfectMatch))
 							{
 								isHit = true;
 							}
@@ -160,7 +163,7 @@ namespace Satolist2.Control
 							//タイトルの一致
 							if (query.IsSearchTitle)
 							{
-								if (QuerySearchHit(sp[0], queryObj))
+								if (QuerySearchHit(sp[0].Substring(1), queryObj, query.IsStringPerfectMatch))
 								{
 									isHit = true;
 								}
@@ -169,7 +172,7 @@ namespace Satolist2.Control
 							//それ以外
 							if(!isHit && sp.Length>=2 && query.IsSearchBody)
 							{
-								if (QuerySearchHit(sp[1], queryObj))
+								if (QuerySearchHit(sp[1], queryObj, query.IsStringPerfectMatch))
 								{
 									isHit = true;
 								}
@@ -178,7 +181,7 @@ namespace Satolist2.Control
 						else if(query.IsSearchBody)
 						{
 							//本文
-							if (QuerySearchHit(line, queryObj))
+							if (QuerySearchHit(line, queryObj, query.IsStringPerfectMatch))
 							{
 								//hit
 								isHit = true;
@@ -201,7 +204,7 @@ namespace Satolist2.Control
 		}
 
 		//検索処理
-		private	bool QuerySearchHit(string target, object query)
+		private	bool QuerySearchHit(string target, object query, bool isStringPerfectMatch)
 		{
 			if(query is Regex regex)
 			{
@@ -209,7 +212,14 @@ namespace Satolist2.Control
 			}
 			else if(query is string searchString)
 			{
-				return target.Contains(searchString);
+				if (isStringPerfectMatch)
+				{
+					return (target == (string)query);
+				}
+				else
+				{
+					return target.Contains(searchString);
+				}
 			}
 			else
 			{

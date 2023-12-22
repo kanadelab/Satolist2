@@ -26,7 +26,8 @@
 			<Image Visibility="{Binding IsEnableBackgroundImage, Converter={StaticResource BoolToVisibilityConverter}}" Source="{Binding BackgroundImagePath}"  Stretch="None" HorizontalAlignment="Left" VerticalAlignment="Top" />
 			<avalonEdit:TextEditor x:Name="MainTextEditor"
 								   SnapsToDevicePixels="True" Margin="{Binding TextEditorMargin}"
-								   Background="Transparent">
+								   Background="Transparent"
+								   PreviewMouseDown="MainTextEditor_PreviewMouseDown">
 
 				<avalonEdit:TextEditor.Options>
 					<avalonEdit:TextEditorOptions ShowSpaces="False" ShowTabs="False"/>
@@ -84,7 +85,11 @@
 
 						<!--テキスト-->
 						<StackPanel>
-							<TextBlock Text="{Binding DictionaryEvent}" />
+							<StackPanel>
+								<TextBlock Text="{Binding DictionaryEvent}" />
+								<Separator />
+								<TextBlock Text="Ctrl + Click で項目を開く" Foreground="Gray" FontSize="10" />
+							</StackPanel>
 							<StackPanel.Style>
 								<Style TargetType="StackPanel">
 									<Style.Triggers>
@@ -95,7 +100,21 @@
 								</Style>
 							</StackPanel.Style>
 						</StackPanel>
-						
+
+						<!--その他の何かしらのテキスト-->
+						<StackPanel>
+							<TextBlock Text="{Binding OtherText}" />
+							<StackPanel.Style>
+								<Style TargetType="StackPanel">
+									<Style.Triggers>
+										<DataTrigger Binding="{Binding OtherText}" Value="{x:Null}">
+											<Setter Property="Visibility" Value="Collapsed" />
+										</DataTrigger>
+									</Style.Triggers>
+								</Style>
+							</StackPanel.Style>
+						</StackPanel>
+
 						<!--ukadoc-->
 						<StackPanel>
 							<StackPanel Orientation="Horizontal">

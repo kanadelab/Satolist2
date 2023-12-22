@@ -1857,11 +1857,18 @@ namespace Satolist2
 			}
 		}
 
-		
 		//イベントエディタのオープン
 		public void OpenEventEditor(EventModel ev)
 		{
-			MainWindow.OpenEventEditor(ev);
+			if (ev.Dictionary.IsSerialized)
+			{
+				//Serializedの場合は通常のエディタで開く
+				OpenTextEditor(ev.Dictionary, ev.AnalyzeLineIndex);
+			}
+			else
+			{
+				MainWindow.OpenEventEditor(ev);
+			}
 		}
 
 		public void OpenEventEditor(InlineEventModel ev)

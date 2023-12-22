@@ -84,6 +84,17 @@ namespace Satolist2.Module.TextEditor
 			RequestOpenTooltip(mouseOverWord);
 		}
 
+		private void MainTextEditor_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+		{
+			//Ctrl+Click
+			if ((Keyboard.Modifiers & ModifierKeys.Control) != 0)
+			{
+				//無効化したいのでHandledに
+				e.Handled = true;
+				RequestJumpToToolTipTarget(mouseOverWord);
+			}
+		}
+
 		//選択内容からワードを取得
 		private string FindWord(int lineIndex, int colmnIndex)
 		{
@@ -157,6 +168,14 @@ namespace Satolist2.Module.TextEditor
 			if (DataContext is AvalonEditModuleViewModel vm)
 			{
 				vm.RequestTooltip(word, mouseOverWordLineIndex);
+			}
+		}
+
+		private void RequestJumpToToolTipTarget(string word)
+		{
+			if(DataContext is AvalonEditModuleViewModel vm)
+			{
+				vm.JumpToToolTipTarget(word, mouseOverWordLineIndex);
 			}
 		}
 
@@ -430,10 +449,14 @@ namespace Satolist2.Module.TextEditor
 		private bool isToolTipOpen;
 		private SurfacePaletteItemViewModel toolTipSurface;
 		private string toolTipDictionaryEvent;
+		private string toolTipOtherText;
 
 		private string toolTipUkadocEventName;
 		private string toolTipUkaodcEventReferenceName;
 		private string toolTipUkadocEventDescription;
+
+		private EventModel toolTipEvent;
+		private int toolTipEventCount;
 
 		public ICommand SendToGhostSelectionRangeCommand { get; }
 		public ICommand SendToGhostCommand { get; }
@@ -523,6 +546,17 @@ namespace Satolist2.Module.TextEditor
 			}
 		}
 
+		//ツールチップに表示するその他何かしらのテキスト情報
+		public string OtherText
+		{
+			get => toolTipOtherText;
+			set
+			{
+				toolTipOtherText = value;
+				NotifyChanged();
+			}
+		}
+
 		public string UkadocEventName
 		{
 			get => toolTipUkadocEventName;
@@ -563,7 +597,9 @@ namespace Satolist2.Module.TextEditor
 		public void RequestTooltip(string word, int wordLineIndex)
 		{
 			//リセット
+			toolTipEvent = null;
 			DictionaryEvent = null;
+			OtherText = null;
 			ToolTipSurface = null;
 			UkadocEventDescription = null;
 			UkadocEventReferenceName = null;
@@ -596,11 +632,13 @@ namespace Satolist2.Module.TextEditor
 					if (DictionaryEvent == null)
 					{
 						//文字列化、空白の除去
-						DictionaryEvent = ev.First().Serialize().Trim();
+						toolTipEvent = ev.First();
+						DictionaryEvent = toolTipEvent.Serialize().Trim();
 					}
 					eventCount += ev.Count;
 				}
 			}
+			toolTipEventCount = eventCount;
 
 			//見つかったら表示
 			if(DictionaryEvent != null)
@@ -643,12 +681,44 @@ namespace Satolist2.Module.TextEditor
 				if(variable.Name == word)
 				{
 					IsToolTipOpen = true;
-					DictionaryEvent = $"変数\r\n＄{variable.Name}";
+					OtherText = $"変数\r\n＄{variable.Name}";
 					return;
 				}
 			}
 		}
 
+		public void JumpToToolTipTarget(string word, int wordLineIndex)
+		{
+			if (!IsToolTipOpen)
+			{
+				//ツールチップ開いてなかったら一旦検索しておく
+				RequestTooltip(word, wordLineIndex);
+			}
+
+			if(toolTipEvent == null)
+			{
+				return;
+			}
+
+			if(toolTipEventCount > 1)
+			{
+				//複数ある場合は検索ビューを開く、単体ならイベントエディタで直接開く
+				var query = new SearchQuery()
+				{
+					IsSearchTitle = true,
+					SearchRegex = null,
+					IsSearchBody = false,
+					SearchString = toolTipEvent.Name,
+					IsStringPerfectMatch = true
+				};
+				Main.SearchResultViewModel.RunSearch(query);
+			}
+			else
+			{
+				//シリアライズされているかを確認する必要がある?
+				Main.OpenEventEditor(toolTipEvent);
+			}
+		}
 		public AvalonEditModuleViewModel(AvalonEditModule module)
 		{
 			Module = module;
