@@ -51,9 +51,9 @@ namespace Satolist2.Dialog
 			private ObservableCollection<UploadSettingItemViewModelBase> items;
 			private Model.UploadServerSettingModelBase[] originalModel;
 
-			public ReadOnlyObservableCollection<UploadSettingItemViewModelBase> Items
+			public CustomizedReadOnlyObservableCollection<UploadSettingItemViewModelBase> Items
 			{
-				get => new ReadOnlyObservableCollection<UploadSettingItemViewModelBase>(items);
+				get => new CustomizedReadOnlyObservableCollection<UploadSettingItemViewModelBase>(items);
 			}
 
 			public UploadSettingDialog Dialog { get; private set; }
@@ -304,7 +304,7 @@ namespace Satolist2.Dialog
 			}
 
 
-			public ReadOnlyObservableCollection<FtpUploadGhostSettingViewModel> Items => new ReadOnlyObservableCollection<FtpUploadGhostSettingViewModel>(items);
+			public CustomizedReadOnlyObservableCollection<FtpUploadGhostSettingViewModel> Items => new CustomizedReadOnlyObservableCollection<FtpUploadGhostSettingViewModel>(items);
 			public ActionCommand AddItemCommand { get; }
 			public ActionCommand RemoveServerCommand { get; }
 
@@ -522,7 +522,7 @@ namespace Satolist2.Dialog
 				}
 			}
 
-			public ReadOnlyObservableCollection<NarnaloaderUploadGhostViewModel> Items => new ReadOnlyObservableCollection<NarnaloaderUploadGhostViewModel>(items);
+			public CustomizedReadOnlyObservableCollection<NarnaloaderUploadGhostViewModel> Items => new CustomizedReadOnlyObservableCollection<NarnaloaderUploadGhostViewModel>(items);
 
 			public ActionCommand AddItemCommand { get; }
 			public ActionCommand RemoveServerCommand { get; }

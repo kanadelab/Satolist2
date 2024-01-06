@@ -95,7 +95,7 @@ namespace Satolist2.Dialog
 		private TextEditorInsertPaletteSettingsDialogItemViewModel selectedItem;
 		private bool isChanged;
 
-		public ReadOnlyObservableCollection<TextEditorInsertPaletteSettingsDialogItemViewModel> Items => new ReadOnlyObservableCollection<TextEditorInsertPaletteSettingsDialogItemViewModel>(items);
+		public CustomizedReadOnlyObservableCollection<TextEditorInsertPaletteSettingsDialogItemViewModel> Items => new CustomizedReadOnlyObservableCollection<TextEditorInsertPaletteSettingsDialogItemViewModel>(items);
 		public TextEditorInsertPaletteSettingsDialogItemViewModel SelectedItem
 		{
 			get => selectedItem;
@@ -408,7 +408,7 @@ namespace Satolist2.Dialog
 		}
 
 
-		public ReadOnlyObservableCollection<TextEditorInsertPaletteSettingsDialogItemViewModel> Items => new ReadOnlyObservableCollection<TextEditorInsertPaletteSettingsDialogItemViewModel>(items);
+		public CustomizedReadOnlyObservableCollection<TextEditorInsertPaletteSettingsDialogItemViewModel> Items => new CustomizedReadOnlyObservableCollection<TextEditorInsertPaletteSettingsDialogItemViewModel>(items);
 
 		public TextEditorInsertPaletteSettingsDialogItemViewModel Parent => parent;
 

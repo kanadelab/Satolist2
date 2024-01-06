@@ -56,9 +56,9 @@ namespace Satolist2.Control
 		private Task surfaceCreatingTask;
 		private CancellationTokenSource cancelObject;
 
-		public ReadOnlyObservableCollection<SurfacePaletteItemViewModel> Items
+		public CustomizedReadOnlyObservableCollection<SurfacePaletteItemViewModel> Items
 		{
-			get => new ReadOnlyObservableCollection<SurfacePaletteItemViewModel>(items);
+			get => new CustomizedReadOnlyObservableCollection<SurfacePaletteItemViewModel>(items);
 		}
 		public MainViewModel Main { get; }
 		public ActionCommand GenerateSurfacePreviewCommand { get; }

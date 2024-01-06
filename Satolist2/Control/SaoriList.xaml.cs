@@ -42,7 +42,7 @@ namespace Satolist2.Control
 		private ListEditorSerializingScope serializingScope;
 		private ObservableCollection<SaoriListModuleViewModel> items;
 
-		public ReadOnlyObservableCollection<SaoriListModuleViewModel> Items => new ReadOnlyObservableCollection<SaoriListModuleViewModel>(items);
+		public CustomizedReadOnlyObservableCollection<SaoriListModuleViewModel> Items => new CustomizedReadOnlyObservableCollection<SaoriListModuleViewModel>(items);
 
 		public MainViewModel Main { get; }
 		public string DockingTitle => "SAORIリスト";
@@ -211,7 +211,7 @@ namespace Satolist2.Control
 		private SaoriListViewModel parent;
 
 		public SaoriListViewModel Parent => parent;
-		public ReadOnlyObservableCollection<SaoriListFunctionViewModel> Items => new ReadOnlyObservableCollection<SaoriListFunctionViewModel>(items);
+		public CustomizedReadOnlyObservableCollection<SaoriListFunctionViewModel> Items => new CustomizedReadOnlyObservableCollection<SaoriListFunctionViewModel>(items);
 		public string Type => "SaoriModule";
 		public ActionCommand SelectModuleCommand { get; }
 		public ActionCommand RemoveModuleCommand { get; }

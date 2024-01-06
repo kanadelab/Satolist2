@@ -42,7 +42,7 @@ namespace Satolist2.Control
 		private List<string> commonLines;
 		private ListEditorSerializingScope serializingScope;
 
-		public ReadOnlyObservableCollection<VariableListItemViewModel> Items => new ReadOnlyObservableCollection<VariableListItemViewModel>(items);
+		public CustomizedReadOnlyObservableCollection<VariableListItemViewModel> Items => new CustomizedReadOnlyObservableCollection<VariableListItemViewModel>(items);
 
 		public ActionCommand RemoveItemCommand { get; }
 		public ActionCommand AddItemCommand { get; }

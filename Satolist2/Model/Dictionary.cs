@@ -59,9 +59,9 @@ namespace Satolist2.Model
 		}
 
 		//ゴーストが持っている辞書データ
-		public ReadOnlyObservableCollection<DictionaryModel> Dictionaries
+		public CustomizedReadOnlyObservableCollection<DictionaryModel> Dictionaries
 		{
-			get => new ReadOnlyObservableCollection<DictionaryModel>(dictionaries);
+			get => new CustomizedReadOnlyObservableCollection<DictionaryModel>(dictionaries);
 		}
 
 		public GhostModel(string path)
@@ -283,9 +283,9 @@ namespace Satolist2.Model
 			}
 		}
 	
-		public ReadOnlyObservableCollection<EventModel> Events
+		public CustomizedReadOnlyObservableCollection<EventModel> Events
 		{
-			get => new ReadOnlyObservableCollection<EventModel>(events);
+			get => new CustomizedReadOnlyObservableCollection<EventModel>(events);
 		}
 
 		//解析用の一時的なデータを取得
@@ -910,9 +910,9 @@ namespace Satolist2.Model
 			}
 		}
 
-		public ReadOnlyObservableCollection<InlineEventModel> InlineEvents
+		public CustomizedReadOnlyObservableCollection<InlineEventModel> InlineEvents
 		{
-			get => new ReadOnlyObservableCollection<InlineEventModel>(inlineEvents);
+			get => new CustomizedReadOnlyObservableCollection<InlineEventModel>(inlineEvents);
 		}
 
 		public event Action<EventModel> OnRemove;

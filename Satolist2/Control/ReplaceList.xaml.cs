@@ -44,7 +44,7 @@ namespace Satolist2.Control
 		private int currentTabIndex;
 		private ListEditorSerializingScope serializingScope;
 
-		public ReadOnlyObservableCollection<ReplaceListItemViewModel> Items => new ReadOnlyObservableCollection<ReplaceListItemViewModel>(items);
+		public CustomizedReadOnlyObservableCollection<ReplaceListItemViewModel> Items => new CustomizedReadOnlyObservableCollection<ReplaceListItemViewModel>(items);
 
 		public int CurrentTabIndex
 		{

@@ -54,9 +54,9 @@ namespace Satolist2.Dialog
 		private string description;
 
 		public ErrorListDialog Dialog { get; }
-		public ReadOnlyObservableCollection<ErrorListDialogItemViewModel> Items
+		public CustomizedReadOnlyObservableCollection<ErrorListDialogItemViewModel> Items
 		{
-			get => new ReadOnlyObservableCollection<ErrorListDialogItemViewModel>(items);
+			get => new CustomizedReadOnlyObservableCollection<ErrorListDialogItemViewModel>(items);
 		}
 
 		public ActionCommand OkCommand { get; }

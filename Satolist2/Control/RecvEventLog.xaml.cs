@@ -77,9 +77,9 @@ namespace Satolist2.Control
 		public ActionCommand BootRecvCommand { get; }
 		public ActionCommand KillRecvCommand { get; }
 		public ActionCommand ClearLogCommand { get; }
-		public ReadOnlyObservableCollection<RecvEventLogListItemViewModel> Items
+		public CustomizedReadOnlyObservableCollection<RecvEventLogListItemViewModel> Items
 		{
-			get => new ReadOnlyObservableCollection<RecvEventLogListItemViewModel>(items);
+			get => new CustomizedReadOnlyObservableCollection<RecvEventLogListItemViewModel>(items);
 		}
 		public ICollectionView FilteredItems
 		{

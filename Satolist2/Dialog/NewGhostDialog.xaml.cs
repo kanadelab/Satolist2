@@ -150,9 +150,9 @@ namespace Satolist2.Dialog
 		public ActionCommand TemplateSelectorPageBackCommand { get; }
 		public ActionCommand CreateGhostCommand { get; }
 
-		public ReadOnlyObservableCollection<NewGhostDialogGhostTemplateViewModel> Templates
+		public CustomizedReadOnlyObservableCollection<NewGhostDialogGhostTemplateViewModel> Templates
 		{
-			get => new ReadOnlyObservableCollection<NewGhostDialogGhostTemplateViewModel>(templates);
+			get => new CustomizedReadOnlyObservableCollection<NewGhostDialogGhostTemplateViewModel>(templates);
 		}
 
 		//選択中のテンプレート
@@ -440,9 +440,9 @@ namespace Satolist2.Dialog
 		private ObservableCollection<NewGhostDialogDictionaryViewModel> dictionaries;
 
 		public Model.GhostTemplateModel Model { get; private set; }
-		public ReadOnlyObservableCollection<NewGhostDialogDictionaryViewModel> Dictionaries
+		public CustomizedReadOnlyObservableCollection<NewGhostDialogDictionaryViewModel> Dictionaries
 		{
-			get => new ReadOnlyObservableCollection<NewGhostDialogDictionaryViewModel>(dictionaries);
+			get => new CustomizedReadOnlyObservableCollection<NewGhostDialogDictionaryViewModel>(dictionaries);
 		}
 
 		public IEnumerable<Model.GhostTemplateModel.GhostTemplateFileModel> GenerateGhostFiles

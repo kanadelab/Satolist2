@@ -2126,9 +2126,9 @@ namespace Satolist2
 		private SurfacePreviewViewModelShellItem selectedShell;
 		private ShellImageCache imageCache;
 
-		public ReadOnlyObservableCollection<SurfacePreviewViewModelShellItem> Shells
+		public CustomizedReadOnlyObservableCollection<SurfacePreviewViewModelShellItem> Shells
 		{
-			get => new ReadOnlyObservableCollection<SurfacePreviewViewModelShellItem>(shells);
+			get => new CustomizedReadOnlyObservableCollection<SurfacePreviewViewModelShellItem>(shells);
 		}
 
 		//シェル読込用のキャッシュオブジェクト

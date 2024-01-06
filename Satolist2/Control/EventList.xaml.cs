@@ -66,9 +66,9 @@ namespace Satolist2.Control
 
 		//NOTE: ファイルイベントツリーのViewModelから直接受け取っているので、自動で削除が反映される
 		//分離したほうがいいのかもしれないけど・・・
-		public ReadOnlyObservableCollection<EventListItemViewModel> Items
+		public CustomizedReadOnlyObservableCollection<EventListItemViewModel> Items
 		{
-			get => new ReadOnlyObservableCollection<EventListItemViewModel>(items);
+			get => new CustomizedReadOnlyObservableCollection<EventListItemViewModel>(items);
 		}
 
 		public string DockingTitle
@@ -145,7 +145,7 @@ namespace Satolist2.Control
 
 		//表示するアイテムを投入
 		//ファイルイベントツリーがソースになっているので、そちらがわから変更は伝播してくる
-		public void SetItems(ReadOnlyObservableCollection<EventModel> events, string eventLabel, DictionaryModel dictionary)
+		public void SetItems(CustomizedReadOnlyObservableCollection<EventModel> events, string eventLabel, DictionaryModel dictionary)
 		{
 			//アイテムソースを保持
 			if(itemsSource != null)
@@ -191,7 +191,7 @@ namespace Satolist2.Control
 			}
 		}
 
-		public void SetItems(ReadOnlyObservableCollection<InlineEventModel> events, string eventLabel, DictionaryModel dictionary)
+		public void SetItems(CustomizedReadOnlyObservableCollection<InlineEventModel> events, string eventLabel, DictionaryModel dictionary)
 		{
 			//アイテムソースを保持
 			if(itemsSource != null)

@@ -85,7 +85,7 @@ namespace Satolist2.Control
 
 		public UpdateIgnoreList Control { get; private set; }
 		public GhostModel Ghost => main.Ghost;
-		public ReadOnlyObservableCollection<UpdateIgnoreListItemViewModel> Items => new ReadOnlyObservableCollection<UpdateIgnoreListItemViewModel>(items);
+		public CustomizedReadOnlyObservableCollection<UpdateIgnoreListItemViewModel> Items => new CustomizedReadOnlyObservableCollection<UpdateIgnoreListItemViewModel>(items);
 
 		public int CurrentTabIndex
 		{

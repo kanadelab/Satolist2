@@ -12,9 +12,9 @@ namespace Satolist2.Core
 	{
 		public static readonly LogMessage Instance = new LogMessage();
 		private ObservableCollection<LogMessageItemViewModel> logItems;
-		public ReadOnlyObservableCollection<LogMessageItemViewModel> LogItems
+		public CustomizedReadOnlyObservableCollection<LogMessageItemViewModel> LogItems
 		{
-			get => new ReadOnlyObservableCollection<LogMessageItemViewModel>(logItems);
+			get => new CustomizedReadOnlyObservableCollection<LogMessageItemViewModel>(logItems);
 		}
 		public LogMessageItemViewModel NewestLogMessage
 		{

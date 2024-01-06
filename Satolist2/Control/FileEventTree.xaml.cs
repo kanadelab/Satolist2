@@ -286,9 +286,9 @@ namespace Satolist2.Control
 			get => Main.Ghost;
 		}
 
-		public ReadOnlyObservableCollection<FileEventTreeItemDirectoryViewModel> Directories
+		public CustomizedReadOnlyObservableCollection<FileEventTreeItemDirectoryViewModel> Directories
 		{
-			get => new ReadOnlyObservableCollection<FileEventTreeItemDirectoryViewModel>(directories);
+			get => new CustomizedReadOnlyObservableCollection<FileEventTreeItemDirectoryViewModel>(directories);
 		}
 
 		//検索文字列
@@ -435,13 +435,6 @@ namespace Satolist2.Control
 
 		public void Dispose()
 		{
-			/*
-			foreach(var dic in dictionaries)
-			{
-				dic.Dictionary.PropertyChanged -= Dic_PropertyChanged;
-			}
-			*/
-
 			foreach(var dir in directories)
 			{
 				foreach(var dic in dir.ChildItems)
@@ -463,9 +456,9 @@ namespace Satolist2.Control
 	{
 		private ObservableCollection<FileEventTreeItemDictionaryViewModel> items;
 
-		public ReadOnlyObservableCollection<FileEventTreeItemDictionaryViewModel> ChildItems
+		public CustomizedReadOnlyObservableCollection<FileEventTreeItemDictionaryViewModel> ChildItems
 		{
-			get => new ReadOnlyObservableCollection<FileEventTreeItemDictionaryViewModel>(items);
+			get => new CustomizedReadOnlyObservableCollection<FileEventTreeItemDictionaryViewModel>(items);
 		}
 
 		public string RelativeName { get; set; }
@@ -512,9 +505,9 @@ namespace Satolist2.Control
 		public FileEventTreeViewModel FileEventTree { get; }
 		public DictionaryModel Dictionary { get; }
 
-		public ReadOnlyObservableCollection<FileEventTreeItemEventViewModel> ChildItems
+		public CustomizedReadOnlyObservableCollection<FileEventTreeItemEventViewModel> ChildItems
 		{
-			get => new ReadOnlyObservableCollection<FileEventTreeItemEventViewModel>(items);
+			get => new CustomizedReadOnlyObservableCollection<FileEventTreeItemEventViewModel>(items);
 		}
 
 		//ファイルイベントツリー上で表示する名前
@@ -883,14 +876,14 @@ namespace Satolist2.Control
 			get => events.Count;
 		}
 
-		public ReadOnlyObservableCollection<EventModel> Items
+		public CustomizedReadOnlyObservableCollection<EventModel> Items
 		{
-			get => new ReadOnlyObservableCollection<EventModel>(events);
+			get => new CustomizedReadOnlyObservableCollection<EventModel>(events);
 		}
 
 		public IList<FileEventTreeItemInlineEventViewModel> ChildItems
 		{
-			get => new ReadOnlyObservableCollection<FileEventTreeItemInlineEventViewModel>(inlineEventViewModels);
+			get => new CustomizedReadOnlyObservableCollection<FileEventTreeItemInlineEventViewModel>(inlineEventViewModels);
 		}
 
 		public FileEventTreeItemEventViewModel(FileEventTreeItemDictionaryViewModel dict)
@@ -1098,13 +1091,13 @@ namespace Satolist2.Control
 		public string NodeType => "InlineEvent";
 		public DictionaryModel Dictionary => parentViewModel.Dictionary.Dictionary;
 		public IEnumerable<object> ChildItems => Array.Empty<object>();
-		public ReadOnlyObservableCollection<InlineEventModel> EventList { get; }
+		public CustomizedReadOnlyObservableCollection<InlineEventModel> EventList { get; }
 		public string Label { get; }
 
 		public FileEventTreeItemInlineEventViewModel(FileEventTreeItemEventViewModel parent, ObservableCollection<InlineEventModel> events)
 		{
 			parentViewModel = parent;
-			EventList = new ReadOnlyObservableCollection<InlineEventModel>(events);
+			EventList = new CustomizedReadOnlyObservableCollection<InlineEventModel>(events);
 			Label = events.First().Identifier;
 		}
 

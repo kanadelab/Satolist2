@@ -86,9 +86,9 @@ namespace Satolist2.Control
 
 		public string DockingContentId => ContentId;
 
-		public ReadOnlyObservableCollection<SearchResultItemViewModel> Items
+		public CustomizedReadOnlyObservableCollection<SearchResultItemViewModel> Items
 		{
-			get => new ReadOnlyObservableCollection<SearchResultItemViewModel>(items);
+			get => new CustomizedReadOnlyObservableCollection<SearchResultItemViewModel>(items);
 		}
 
 		//
