@@ -52,4 +52,4 @@ using System.Windows;
 // 既定値にすることができます:
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("2.0.38.0")]
-[assembly: AssemblyFileVersion("2.0.37.0")]
+[assembly: AssemblyFileVersion("2.0.38.0")]
