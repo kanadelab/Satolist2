@@ -144,7 +144,7 @@ namespace Satolist2.Control
 			//ダブルクリックでスクリプト挿入
 			if (sender is ListViewItem listViewItem)
 			{
-				SurfaceViewerViewModel.InsertSurfaceToActiveEditor(((SurfaceViewerItemViewModel)listViewItem.DataContext).Id);
+				SurfacePaletteViewModel.InsertSurfaceToActiveEditor(((SurfaceViewerItemViewModel)listViewItem.DataContext).Id);
 			}
 			e.Handled = true;
 		}
@@ -664,26 +664,7 @@ namespace Satolist2.Control
 
 		public static void InsertSurfaceToActiveEditor(long id)
 		{
-			if (MainViewModel.EditorSettings.GeneralSettings.IsSurfacePaletteInserTypeSakuraScript)
-			{
-				InsertSurfaceToActiveEditorSakuraScript(id);
-			}
-			else
-			{
-				InsertSurfaceToActiveEditorSatori(id);
-			}
-		}
-
-		public static void InsertSurfaceToActiveEditorSatori(long id)
-		{
-			var insertStr = string.Format("（{0}）", DictionaryUtility.NumberHan2Zen(id.ToString()));
-			MainWindow.Instance.InsertToActiveEditor(insertStr);
-		}
-
-		public static void InsertSurfaceToActiveEditorSakuraScript(long id)
-		{
-			var insertStr = string.Format(@"\s[{0}]", id.ToString());
-			MainWindow.Instance.InsertToActiveEditor(insertStr);
+			MainWindow.Instance.InsertToActiveEditorSurfaceChange(id);
 		}
 
 		public void SendRuntimeChangeSurface(SurfaceViewerItemViewModel item)
@@ -708,7 +689,6 @@ namespace Satolist2.Control
 	{
 		public Core.SurfacePreviewMetaDataRecord Model { get; }
 		public ActionCommand InsertSurfaceCommand { get; }
-		public ActionCommand InsertSurfaceCommandSakuraScript { get; }
 		public ActionCommand RuntimeChangeSurfaceCommand { get; }
 
 		public long Id => Model.Id;
@@ -722,14 +702,7 @@ namespace Satolist2.Control
 			InsertSurfaceCommand = new ActionCommand(
 				o =>
 				{
-					SurfaceViewerViewModel.InsertSurfaceToActiveEditorSatori(Id);
-				}
-				);
-
-			InsertSurfaceCommandSakuraScript = new ActionCommand(
-				o =>
-				{
-					SurfaceViewerViewModel.InsertSurfaceToActiveEditorSakuraScript(Id);
+					SurfaceViewerViewModel.InsertSurfaceToActiveEditor(Id);
 				}
 				);
 

@@ -123,26 +123,7 @@ namespace Satolist2.Control
 
 		public static void InsertSurfaceToActiveEditor(long id)
 		{
-			if (MainViewModel.EditorSettings.GeneralSettings.IsSurfacePaletteInserTypeSakuraScript)
-			{
-				InsertSurfaceToActiveEditorSakuraScript(id);
-			}
-			else
-			{
-				InsertSurfaceToActiveEditorSatori(id);
-			}
-		}
-
-		public static void InsertSurfaceToActiveEditorSatori(long id)
-		{
-			var insertStr = string.Format("（{0}）", DictionaryUtility.NumberHan2Zen(id.ToString()));
-			MainWindow.Instance.InsertToActiveEditor(insertStr);
-		}
-
-		public static void InsertSurfaceToActiveEditorSakuraScript(long id)
-		{
-			var insertStr = string.Format(@"\s[{0}]", id.ToString());
-			MainWindow.Instance.InsertToActiveEditor(insertStr);
+			MainWindow.Instance.InsertToActiveEditorSurfaceChange(id);
 		}
 
 		public void SendRuntimeChangeSurface(SurfacePaletteItemViewModel item)
@@ -286,7 +267,6 @@ namespace Satolist2.Control
 		public ShellImageCache ImageCache => imageCache;
 
 		public ActionCommand InsertSurfaceCommand { get; }
-		public ActionCommand InsertSurfaceCommandSakuraScript { get; }
 		public ActionCommand RuntimeChangeSurfaceCommand { get; }
 
 		public SurfacePaletteItemViewModel(SurfacePaletteViewModel parent, Core.SurfacePreviewMetaDataRecord surface, ShellImageCache cache)
@@ -308,14 +288,7 @@ namespace Satolist2.Control
 			InsertSurfaceCommand = new ActionCommand(
 				o =>
 				{
-					SurfacePaletteViewModel.InsertSurfaceToActiveEditorSatori(this.Id);
-				}
-				);
-
-			InsertSurfaceCommandSakuraScript = new ActionCommand(
-				o =>
-				{
-					SurfacePaletteViewModel.InsertSurfaceToActiveEditorSakuraScript(this.Id);
+					SurfacePaletteViewModel.InsertSurfaceToActiveEditor(this.Id);
 				}
 				);
 

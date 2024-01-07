@@ -57,7 +57,10 @@
 					<CheckBox Content="自動インデント" IsChecked="{Binding Model.IsIndent}" Margin="3" />
 					<CheckBox Content="右端で折り返す" IsChecked="{Binding Model.IsWardWrap}" Margin="3" />
 					<CheckBox Content="改行を表示する" IsChecked="{Binding Model.IsShowEndOfLine}" Margin="3" />
-					<CheckBox Content="サーフェスビューワ・パレットのダブルクリック時に挿入するサーフェス変更をさくらスクリプト形式に変更" IsChecked="{Binding Model.IsSurfacePaletteInserTypeSakuraScript, Mode=TwoWay}" Margin="3" />
+					<TextBlock Text="サーフェスビューワ/パレットのダブルクリック・コンテキストメニューによるサーフェス変更の挿入形式" Margin="3 2 3 3"/>
+					<RadioButton Content="里々形式" IsChecked="{Binding IsSurfacePaletteInserTypeSatori, Mode=TwoWay}" Margin="20 2 3 2"/>
+					<RadioButton Content="里々形式(半角数字)" IsChecked="{Binding IsSurfacePaletteInsertTypeSatoriHalfWidth, Mode=TwoWay}" Margin="20 2 3 2"/>
+					<RadioButton Content="さくらスクリプト形式" IsChecked="{Binding IsSurfacePaletteInserTypeSakuraScript, Mode=TwoWay}" Margin="20 2 3 2"/>
 					<CheckBox Content="テキストエディタ上でマウスオーバーした箇所のヒントを表示（既定のエディタエンジン専用）" IsChecked="{Binding Model.IsShowTextEditorToolTip}" Margin="3" />
 				</StackPanel>
 			</TabItem>

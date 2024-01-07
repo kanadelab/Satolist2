@@ -931,6 +931,29 @@ namespace Satolist2
 			}
 		}
 
+		//アクティブなエディタにサーフェス変更を挿入
+		public void InsertToActiveEditorSurfaceChange(long surfaceId, bool isActivate = true)
+		{
+			if(MainViewModel.EditorSettings.GeneralSettings.IsSurfacePaletteInserTypeSakuraScript)
+			{
+				//さくらスクリプト
+				var insertStr = string.Format(@"\s[{0}]", surfaceId.ToString());
+				MainWindow.Instance.InsertToActiveEditor(insertStr, isActivate);
+			}
+			else if(MainViewModel.EditorSettings.GeneralSettings.IsSurfacePaletteInsertTypeSatoriHalfWidth)
+			{
+				//里々形式(半角)
+				var insertStr = string.Format("（{0}）", surfaceId.ToString());
+				MainWindow.Instance.InsertToActiveEditor(insertStr, isActivate);
+			}
+			else
+			{
+				//里々形式
+				var insertStr = string.Format("（{0}）", DictionaryUtility.NumberHan2Zen(surfaceId.ToString()));
+				MainWindow.Instance.InsertToActiveEditor(insertStr, isActivate);
+			}
+		}
+
 		//アクティブなエディタに挿入
 		public void InsertToActiveEditor(string str, bool isActivate = true)
 		{

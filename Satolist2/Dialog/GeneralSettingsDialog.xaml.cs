@@ -81,6 +81,58 @@ namespace Satolist2.Dialog
 			}
 		}
 
+		//サーフェスパレットダブルクリック時: 里々形式で挿入
+		public bool IsSurfacePaletteInserTypeSatori
+		{
+			get
+			{
+				//いずれの設定もされてなければtrueになる
+				return !Model.IsSurfacePaletteInsertTypeSatoriHalfWidth && !Model.IsSurfacePaletteInserTypeSakuraScript;
+			}
+			set
+			{
+				//trueのみ受付
+				if (!value)
+					return;
+				Model.IsSurfacePaletteInsertTypeSatoriHalfWidth = false;
+				Model.IsSurfacePaletteInserTypeSakuraScript = false;
+
+				NotifyUpdateSurfacePaletteInsertRadioButtons();
+			}
+		}
+
+		//サーフェスパレットダブルクリック時: 里々形式(半角)で挿入
+		public bool IsSurfacePaletteInsertTypeSatoriHalfWidth
+		{
+			get => Model.IsSurfacePaletteInsertTypeSatoriHalfWidth;
+			set
+			{
+				//tureのみ受付
+				if (!value)
+					return;
+				Model.IsSurfacePaletteInsertTypeSatoriHalfWidth = true;
+				Model.IsSurfacePaletteInserTypeSakuraScript = false;
+
+				NotifyUpdateSurfacePaletteInsertRadioButtons();
+			}
+		}
+
+		//サーフェスパレットのダブルクリック時: さくらスクリプト形式で挿入
+		public bool IsSurfacePaletteInserTypeSakuraScript
+		{
+			get => Model.IsSurfacePaletteInserTypeSakuraScript;
+			set
+			{
+				//trueのみ受付
+				if (!value)
+					return;
+				Model.IsSurfacePaletteInsertTypeSatoriHalfWidth = false;
+				Model.IsSurfacePaletteInserTypeSakuraScript = true;
+
+				NotifyUpdateSurfacePaletteInsertRadioButtons();
+			}
+		}
+
 		public GeneralSettingsDialogViewModel(MainViewModel main, GeneralSettingsDialog dialog)
 		{
 			Dialog = dialog;
@@ -263,6 +315,14 @@ namespace Satolist2.Dialog
 			}
 		}
 
+		//サーフェスパレットのダブルクリック時の関係の設定をまとめて更新
+		public void NotifyUpdateSurfacePaletteInsertRadioButtons()
+		{
+			NotifyChanged(nameof(IsSurfacePaletteInsertTypeSatoriHalfWidth));
+			NotifyChanged(nameof(IsSurfacePaletteInserTypeSakuraScript));
+			NotifyChanged(nameof(IsSurfacePaletteInserTypeSatori));
+		}
+		
 		private void Dialog_Closing(object sender, System.ComponentModel.CancelEventArgs e)
 		{
 			if (Dialog.DialogResult.HasValue)

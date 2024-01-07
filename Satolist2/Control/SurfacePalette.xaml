@@ -37,7 +37,6 @@
 							<Setter.Value>
 								<ContextMenu>
 									<MenuItem Header="サーフェス切り替えをトークに挿入" Command="{Binding InsertSurfaceCommand}" />
-									<MenuItem Header="サーフェス切り替えをトークに挿入(さくらスクリプト形式)" Command="{Binding InsertSurfaceCommandSakuraScript}" />
 									<Separator />
 									<MenuItem Header="サーフェス切り替えを起動中のゴーストに送信" Command="{Binding RuntimeChangeSurfaceCommand}" />
 								</ContextMenu>
