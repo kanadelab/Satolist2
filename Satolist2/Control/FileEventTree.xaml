@@ -159,6 +159,17 @@
 					</Style.Triggers>
 				</Style>
 			</TreeView.ItemContainerStyle>
+
+			<TreeView.ContextMenu>
+				<ContextMenu>
+					<MenuItem Header="ファイルの並び順">
+						<MenuItem Header="名前順" IsCheckable="True" IsChecked="{Binding IsNameSort, Mode=TwoWay}" />
+						<MenuItem Header="更新順" IsCheckable="True" IsChecked="{Binding IsTimestampSort, Mode=TwoWay}" />
+						<Separator />
+						<MenuItem Header="並び順を最新に更新" Command="{Binding ForceUpdateFileSortCommand}" />
+					</MenuItem>
+				</ContextMenu>
+			</TreeView.ContextMenu>
 		</TreeView>
 
 		<!--位置移動ポップアップ-->

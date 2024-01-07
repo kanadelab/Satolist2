@@ -63,6 +63,7 @@ namespace Satolist2
 		protected override void OnExit(ExitEventArgs e)
 		{
 			MainViewModel.EditorSettings?.SaveTemporarySettings();
+			MainViewModel.EditorSettings?.SaveGeneralSettings();
 			JumpListClient.ReflectHistoryToJumpList();
 			base.OnExit(e);
 		}

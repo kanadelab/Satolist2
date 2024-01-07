@@ -268,6 +268,11 @@ namespace Satolist2.Model
 		//カラー
 		[JsonProperty]
 		public Dictionary<string, uint> TextEditorColors { get; set; }
+
+		//ファイルイベントツリー
+		//タイムスタンプソート(そうでない場合は名前ソート)
+		[JsonProperty]
+		public bool IsFileEventTreeTimestampSort { get; set; }
 		
 		//試験的
 		[JsonProperty]

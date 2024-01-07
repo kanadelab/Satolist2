@@ -139,9 +139,10 @@ namespace Satolist2.Model
 		private string body;
 		private bool isChanged;														//変更検出
 		private ObservableCollection<EventModel> events;							//リスト化された辞書の内容一覧
-		private List<EventModel> instantDeserializedEvents;                         //リスト化解除されているが、簡易解析された一覧
+		private List<EventModel> instantDeserializedEvents;							//リスト化解除されているが、簡易解析された一覧
 		private Dictionary<string, List<EventModel>> internalEventMap;				//リスト化情報または簡易解析のマップ情報
 		private bool isSerialized;													//リスト化解除されたか
+		private DateTime lastUpdateTime;											//最終更新日時(UTC,大小比較目的なので問題ないはず)
 
 		public GhostModel Ghost { get; }
 		public bool IsInlineEventAnalyze { get; set; }
@@ -218,8 +219,12 @@ namespace Satolist2.Model
 			}
 		}
 
+		//最終更新日時
+		public DateTime LastUpdateTime => lastUpdateTime;
+
 		public DictionaryModel(GhostModel ghost, string fullPath)
 		{
+			lastUpdateTime = DateTime.UtcNow;			//新規作成を想定して現在時を設定
 			LoadState = EditorLoadState.Initialized;
 			Ghost = ghost;
 			FullPath = fullPath;
@@ -233,6 +238,7 @@ namespace Satolist2.Model
 
 		public DictionaryModel()
 		{
+			lastUpdateTime = DateTime.UtcNow;			//新規作成を想定して現在時を設定
 			LoadState = EditorLoadState.Initialized;
 			Ghost = null;
 			FullPath = null;
@@ -377,7 +383,7 @@ namespace Satolist2.Model
 
 		public void LoadDictionary()
 		{
-			//TODO: 辞書単体の設定を考慮する必要
+			//ファイルをロード
 			var text = File.ReadAllText(FullPath, Constants.EncodingShiftJis);
 			if (!MainViewModel.EditorSettings.GeneralSettings.IsTextModeDefault && IsSatoriDictionary)
 			{
@@ -392,6 +398,9 @@ namespace Satolist2.Model
 				IsChanged = false;
 				isSerialized = true;
 			}
+
+			//ソートのために更新日時を取得しておく
+			lastUpdateTime = File.GetLastWriteTimeUtc(FullPath);
 		}
 
 		//イベントを追加
@@ -722,7 +731,7 @@ namespace Satolist2.Model
 					saveText = Serialize();
 				}
 				File.WriteAllText(FullPath, saveText, Constants.EncodingShiftJis);
-
+				lastUpdateTime = File.GetLastWriteTimeUtc(FullPath);
 				IsChanged = false;
 				return true;
 			}

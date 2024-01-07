@@ -280,6 +280,7 @@ namespace Satolist2.Control
 
 		public MainViewModel Main { get; }
 		public ActionCommand ToggleSearchModeCommand { get; }
+		public ActionCommand ForceUpdateFileSortCommand { get; }
 
 		public GhostModel Ghost
 		{
@@ -313,6 +314,47 @@ namespace Satolist2.Control
 			}
 		}
 
+		//ソートモード: 名前順か
+		public bool IsNameSort
+		{
+			get => !MainViewModel.EditorSettings.GeneralSettings.IsFileEventTreeTimestampSort;
+			set
+			{
+				//チェックをつける方向にしか作用させない
+				if (!value)
+					return;
+
+				if (IsNameSort != value)
+				{
+					//タイムスタンプソートの逆を設定
+					MainViewModel.EditorSettings.GeneralSettings.IsFileEventTreeTimestampSort = !value;
+					NotifyChanged();
+					NotifyChanged(nameof(IsTimestampSort));
+					UpdateFileSort();
+				}
+			}
+		}
+
+		//ソートモード: タイムスタンプ順か
+		public bool IsTimestampSort
+		{
+			get => MainViewModel.EditorSettings.GeneralSettings.IsFileEventTreeTimestampSort;
+			set
+			{
+				//チェックをつける方向にしか作用させない
+				if (!value)
+					return;
+
+				if (IsTimestampSort != value)
+				{
+					MainViewModel.EditorSettings.GeneralSettings.IsFileEventTreeTimestampSort = value;
+					NotifyChanged();
+					NotifyChanged(nameof(IsNameSort));
+					UpdateFileSort();
+				}
+			}
+		}
+
 		public string DockingTitle => "ファイルイベントツリー";
 		public string DockingContentId => ContentId;
 
@@ -328,6 +370,12 @@ namespace Satolist2.Control
 					IsEventItemSearch = !isEventItemSearch;
 				});
 
+			ForceUpdateFileSortCommand = new ActionCommand(
+				o =>
+				{
+					UpdateFileSort();
+				});
+
 			if (Ghost != null)
 			{
 				//辞書生成
@@ -335,7 +383,6 @@ namespace Satolist2.Control
 				{
 					dic.PropertyChanged += Dic_PropertyChanged;
 					var dictViewModel = new FileEventTreeItemDictionaryViewModel(this, dic);
-					//dictionaries.Add(dictViewModel);
 
 					var dicDir = DictionaryUtility.NormalizePath(System.IO.Path.GetDirectoryName(dic.RelativeName));
 					var dir = directories.FirstOrDefault(o => o.RelativeName == dicDir);
@@ -347,9 +394,25 @@ namespace Satolist2.Control
 					dir.AddDictionary(dictViewModel);
 				}
 
+				//初回のソートをかける
+				foreach (var dir in directories)
+				{
+					dir.UpdateFileSort();
+				}
+
 				//辞書のコレクション変更ハンドラ
 				INotifyCollectionChanged dictionaryCollection = Ghost.Dictionaries;
 				dictionaryCollection.CollectionChanged += DictionaryCollection_CollectionChanged;
+			}
+		}
+
+		//ソートの更新
+		private void UpdateFileSort()
+		{
+			//各ディレクトリノードの並び順を更新
+			foreach (var dir in directories)
+			{
+				dir.UpdateFileSort();
 			}
 		}
 
@@ -492,6 +555,31 @@ namespace Satolist2.Control
 			//ヒットする子があるもののみ表示
 			return items.Any(o => o.Filter(filterString, args));
 		}
+
+		//ファイルソートを強制的に更新する
+		//Modelには手をつけずにビューだけ更新するで問題ないはず
+		public void UpdateFileSort()
+		{
+			//一旦クリアしてまとめて追加すればいいはず
+			FileEventTreeItemDictionaryViewModel[] records = null;
+
+			if(MainViewModel.EditorSettings.GeneralSettings.IsFileEventTreeTimestampSort)
+			{
+				//更新日時ソート
+				records = items.OrderByDescending(o => o.Dictionary.LastUpdateTime).ToArray();
+			}
+			else
+			{
+				//名前ソート
+				records = items.OrderBy(o => o.Dictionary.Name).ToArray();
+			}
+
+			items.Clear();
+			foreach(var r in records)
+			{
+				items.Add(r);
+			}
+		}
 	}
 
 	//辞書ファイルにあたるViewModel
@@ -518,6 +606,8 @@ namespace Satolist2.Control
 		public ActionCommand ChangeSerializeStatusCommand { get; }
 		public ActionCommand DeleteFileCommand { get; }
 		public ActionCommand MoveFileCommand { get; }
+
+		public bool IsHeader => false;	//バインドエラーよけ
 
 		public FileEventTreeItemDictionaryViewModel(FileEventTreeViewModel parent, DictionaryModel dictionary)
 		{
