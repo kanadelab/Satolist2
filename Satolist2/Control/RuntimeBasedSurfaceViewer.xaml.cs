@@ -494,7 +494,7 @@ namespace Satolist2.Control
 
 				{
 					IntPtr es = Win32Import.GetWindowLongPtr(childHwnd, Win32Import.GWL_EXSTYLE);
-					es = new IntPtr((long)es | Win32Import.WS_EX_LAYERED);
+					es = new IntPtr((long)es | Win32Import.WS_EX_LAYERED | Win32Import.WS_EX_NOACTIVATE);
 					var rees = Win32Import.SetWindowLongPtr(childHwnd, Win32Import.GWL_EXSTYLE, es);
 				}
 

@@ -134,6 +134,8 @@ namespace Satolist2.Core
 		public const int SWP_SHOWWINDOW = 0x0040;
 
 		public const int WS_EX_LAYERED = 0x00080000;
+		public const int WS_EX_NOACTIVATE = 0x08000000;
+
 		public const int WS_CHILD = 0x40000000;
 
 		public const int JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE = 0x00002000;
