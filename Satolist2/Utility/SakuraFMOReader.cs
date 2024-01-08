@@ -14,30 +14,36 @@ namespace Satolist2.Utility
 	public class SakuraFMOReader
 	{
 		private const int MutexTimeoutMs = 1000;
-		private const string MutexName = "SakuraFMO";
-		private const string FMOName = "Sakura";
+		public const string DefaultFMOName = "Sakura";
+		//private const string MutexName = "SakuraFMO";
+		//private const string FMOName = "Sakura";
+
 		private const string SSPFMOHeader = "ssp_fmo_header_";
 		private Dictionary<string, SakuraFMORecord> records;
+
+		public string FMOName { get; }
+		//public string MutexName => FMOName + "FMO";
 
 		public ReadOnlyDictionary<string, SakuraFMORecord> Records
 		{
 			get => new ReadOnlyDictionary<string, SakuraFMORecord>(records);
 		}
 
-		public SakuraFMOReader()
+		public SakuraFMOReader(string fmoName = DefaultFMOName)
 		{
+			FMOName = fmoName;
 			records = new Dictionary<string, SakuraFMORecord>();
 		}
 
-		public static void DumpToFile(string fileName)
+		public static void DumpToFile(string fileName, string fmoName = DefaultFMOName)
 		{
-			using (var mutex = new Mutex(false, MutexName))
+			using (var mutex = new Mutex(false, MakeMutexName(DefaultFMOName)))
 			{
 				if (mutex.WaitOne(MutexTimeoutMs))
 				{
 					try
 					{
-						using (var fmo = MemoryMappedFile.OpenExisting(FMOName))
+						using (var fmo = MemoryMappedFile.OpenExisting(fmoName))
 						{
 							using (var fmoStream = fmo.CreateViewStream())
 							{
@@ -64,13 +70,18 @@ namespace Satolist2.Utility
 			}
 		}
 
+		private static string MakeMutexName(string fmoName)
+		{
+			return fmoName + "FMO";
+		}
+
 		//場合によって同期待ちするので注意
 		public void Read()
 		{
 			records.Clear();
 			var lines = new List<string>();
 
-			using (var mutex = new Mutex(false, MutexName))
+			using (var mutex = new Mutex(false, MakeMutexName(FMOName)))
 			{
 				if (mutex.WaitOne(MutexTimeoutMs))
 				{
@@ -169,16 +180,16 @@ namespace Satolist2.Utility
 		}
 
 		//ヘルパ
-		public static SakuraFMORecord Read(GhostModel ghost)
+		public static SakuraFMORecord Read(GhostModel ghost, string fmoName = DefaultFMOName)
 		{
-			var reader = new SakuraFMOReader();
+			var reader = new SakuraFMOReader(fmoName);
 			reader.Read();
 			return reader.Find(ghost);
 		}
 
-		public static SakuraFMORecord Read(GhostModel ghost, string executablePath)
+		public static SakuraFMORecord Read(GhostModel ghost, string executablePath, string fmoName = DefaultFMOName)
 		{
-			var reader = new SakuraFMOReader();
+			var reader = new SakuraFMOReader(fmoName);
 			reader.Read();
 			return reader.Find(ghost, executablePath);
 		}

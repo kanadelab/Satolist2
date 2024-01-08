@@ -8,97 +8,77 @@ using System.Threading.Tasks;
 
 namespace Satolist2.Core
 {
-	internal class SSTPCallBackNativeWindow
+	internal class SSTPCallBackNativeWindow : IDisposable
 	{
 		private const string WindowName = "SatolistSSTPCallback";
 		private const string WindowClassName = "SatolistSSTPCallback";
-		private static readonly object LockObject = new object();
 
-		private Win32Import.WndProcDelegate wndProc;
+		private static readonly object staticLock = new object();
+		private static readonly Dictionary<IntPtr, SSTPCallBackNativeWindow> hWndDictionary = new Dictionary<IntPtr, SSTPCallBackNativeWindow>();
+		private static Win32Import.WndProcDelegate wndProc;
+
 		private Dictionary<int, Action<int, IntPtr, IntPtr>> callbackDictionary;
-
-		public const int OperationProgressMessage = 0x0401;
-		public static SSTPCallBackNativeWindow Instance { get; private set; }
 		public IntPtr HWnd { get; private set; }
-		public static void Create(IntPtr parent)
-		{
-			lock (LockObject)
-			{
-				if (Instance != null)
-					throw new InvalidOperationException();
-				Instance = new SSTPCallBackNativeWindow(parent);
-			}
-		}
 
-		public static void Destory()
+		public SSTPCallBackNativeWindow(IntPtr parent)
 		{
-			lock (LockObject)
+			lock (staticLock)
 			{
-				if (Instance == null)
-					throw new InvalidOperationException();
-				Instance.Dispose();
-				Instance = null;
-			}
-		}
+				var hInstance = Win32Import.GetModuleHandle(IntPtr.Zero);
 
-		public static bool IsCreated
-		{
-			get
-			{
-				lock (LockObject)
+				//ウインドウクラスの登録は一度だけ行う
+				if (wndProc == null)
 				{
-					return Instance != null;
+					//ウインドウプロシージャ関数をデリゲート化して保持
+					wndProc = new Win32Import.WndProcDelegate(WindowProc);
+
+					//ウインドウクラスの登録
+					var windowClass = new Win32Import.NativeWindowClassEx()
+					{
+						cbSize = (uint)Marshal.SizeOf(typeof(Win32Import.NativeWindowClassEx)),
+						style = 0,
+						lpfnWndProc = wndProc,
+						cbClsExtra = 0,
+						cbWndExtra = 0,
+						hInstance = hInstance,
+						hIcon = IntPtr.Zero,
+						hCursor = IntPtr.Zero,
+						hbrBackGround = IntPtr.Zero,
+						lpszMenuName = "",
+						lpszClassName = WindowClassName,
+						hIconSm = IntPtr.Zero
+					};
+					Win32Import.RegisterClassEx(ref windowClass);
+					if (Marshal.GetLastWin32Error() != 0)
+						throw new Win32Exception(Marshal.GetLastWin32Error());
 				}
+
+				callbackDictionary = new Dictionary<int, Action<int, IntPtr, IntPtr>>();
+
+				//ウインドウの生成
+				HWnd = Win32Import.CreateWindowEx(0, WindowClassName, WindowName, 0, 0, 0, 100, 100, parent, IntPtr.Zero, hInstance, IntPtr.Zero);
+				if (Marshal.GetLastWin32Error() != 0)
+					throw new Win32Exception(Marshal.GetLastWin32Error());
+
+				//クラスの登録
+				hWndDictionary.Add(HWnd, this);
 			}
-		}
-
-		private SSTPCallBackNativeWindow(IntPtr parent)
-		{
-			callbackDictionary = new Dictionary<int, Action<int, IntPtr, IntPtr>>();
-
-			//ウインドウプロシージャ関数をデリゲート化して保持
-			wndProc = new Win32Import.WndProcDelegate(WindowProc);
-
-			//ウインドウクラスの登録
-			var windowClass = new Win32Import.NativeWindowClassEx()
-			{
-				cbSize = (uint)Marshal.SizeOf(typeof(Win32Import.NativeWindowClassEx)),
-				style = 0,
-				lpfnWndProc = wndProc,
-				cbClsExtra = 0,
-				cbWndExtra = 0,
-				hInstance = Win32Import.GetModuleHandle(IntPtr.Zero),
-				hIcon = IntPtr.Zero,
-				hCursor = IntPtr.Zero,
-				hbrBackGround = IntPtr.Zero,
-				lpszMenuName = "",
-				lpszClassName = WindowClassName,
-				hIconSm = IntPtr.Zero
-			};
-			Win32Import.RegisterClassEx(ref windowClass);
-			if (Marshal.GetLastWin32Error() != 0)
-				throw new Win32Exception(Marshal.GetLastWin32Error());
-
-			//ウインドウの生成
-			HWnd = Win32Import.CreateWindowEx(0, WindowClassName, WindowName, 0, 0, 0, 100, 100, parent, IntPtr.Zero, windowClass.hInstance, IntPtr.Zero);
-			if (Marshal.GetLastWin32Error() != 0)
-				throw new Win32Exception(Marshal.GetLastWin32Error());
 		}
 
 		public RegisteredCallbackToken RegisterCallback(int msg, Action<int, IntPtr, IntPtr> action)
 		{
-			lock (LockObject)
+			lock (this)
 			{
 				if (callbackDictionary.ContainsKey(msg))
 					throw new InvalidOperationException();
 				callbackDictionary.Add(msg, action);
-				return new RegisteredCallbackToken(msg);
+				return new RegisteredCallbackToken(msg, this);
 			}
 		}
 
 		public void UnregisterCallback(int msg)
 		{
-			lock (LockObject)
+			lock (this)
 			{
 				if (!callbackDictionary.ContainsKey(msg))
 					throw new InvalidOperationException();
@@ -106,27 +86,40 @@ namespace Satolist2.Core
 			}
 		}
 
-		private void Dispose()
+		public void Dispose()
 		{
-			Win32Import.DestroyWindow(HWnd);
-			Win32Import.UnregisterClass(WindowClassName, Win32Import.GetModuleHandle(IntPtr.Zero));
-			wndProc = null;
+			lock (staticLock)
+			{
+				Win32Import.DestroyWindow(HWnd);
+				hWndDictionary.Remove(HWnd);
+
+				//すべての登録が解除されたら、ウインドウクラスを解放する
+				if (hWndDictionary.Count == 0)
+				{
+					Win32Import.UnregisterClass(WindowClassName, Win32Import.GetModuleHandle(IntPtr.Zero));
+					wndProc = null;
+				}
+			}
 		}
 
 		private static IntPtr WindowProc(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam)
 		{
 			//Instance登録前の呼び出しは無効
-			lock (LockObject)
+			SSTPCallBackNativeWindow callTarget;
+			lock (staticLock)
 			{
-				if (Instance != null)
+				hWndDictionary.TryGetValue(hWnd, out callTarget);
+			}
+
+			if (callTarget != null)
+			{
+				//登録したコールバックを呼び出し
+				if (callTarget.callbackDictionary.TryGetValue(msg, out var func))
 				{
-					//登録したコールバックを呼び出し
-					if (Instance.callbackDictionary.ContainsKey(msg))
-					{
-						Instance.callbackDictionary[msg]?.Invoke(msg, wParam, lParam);
-					}
+					func.Invoke(msg, wParam, lParam);
 				}
 			}
+
 			return Win32Import.DefWindowProc(hWnd, msg, wParam, lParam);
 		}
 
@@ -134,15 +127,17 @@ namespace Satolist2.Core
 		public class RegisteredCallbackToken : IDisposable
 		{
 			private int msg;
+			private SSTPCallBackNativeWindow target;
 
-			public RegisteredCallbackToken(int msg)
+			public RegisteredCallbackToken(int msg, SSTPCallBackNativeWindow target)
 			{
 				this.msg = msg;
+				this.target = target;
 			}
 
 			public void Dispose()
 			{
-				Instance.UnregisterCallback(msg);
+				target.UnregisterCallback(msg);
 			}
 		}
 	}

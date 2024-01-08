@@ -15,15 +15,17 @@ namespace Satolist2.Core
 	internal class TemporaryGhostRuntimeEx : IDisposable
 	{
 		private ChildProcess process;
+		public string FMOName { get; }
 		public Model.GhostModel Ghost { get; private set; }
 		public TemporaryDirectory RuntimeDirectory { get; private set; }
 
-		private TemporaryGhostRuntimeEx()
+		private TemporaryGhostRuntimeEx(string fmoName)
 		{
+			FMOName = fmoName;
 		}
 
 		//シェルをダミーゴーストで起動する準備
-		public static TemporaryGhostRuntimeEx PrepareShell(string shellPath)
+		public static TemporaryGhostRuntimeEx PrepareShell(string shellPath, string fmoName = SakuraFMOReader.DefaultFMOName)
 		{
 			try
 			{
@@ -47,7 +49,7 @@ namespace Satolist2.Core
 			//シェルを展開
 			FileSystem.CopyDirectory(shellPath, Path.Combine(runtimeDirectory.FullPath, "ssp/ghost/temporaryghost/shell/master"));
 
-			var obj = new TemporaryGhostRuntimeEx()
+			var obj = new TemporaryGhostRuntimeEx(fmoName)
 			{
 				Ghost = new Model.GhostModel(Path.Combine(runtimeDirectory.FullPath, "ssp/ghost/temporaryghost")),
 				RuntimeDirectory = runtimeDirectory
@@ -59,7 +61,7 @@ namespace Satolist2.Core
 		{
 			var startInfo = new ProcessStartInfo();
 			startInfo.FileName = Path.Combine( RuntimeDirectory.FullPath, @"ssp\ssp.exe");
-			startInfo.Arguments = "/o bootunlock,standalone /g temporaryghost";
+			startInfo.Arguments = $"/o bootunlock,standalone,kiosk,dpiaware /f {FMOName} /g temporaryghost";
 			startInfo.UseShellExecute = true;
 			startInfo.WorkingDirectory = Path.Combine(RuntimeDirectory.FullPath, @"ssp");
 

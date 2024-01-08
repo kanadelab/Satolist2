@@ -72,8 +72,9 @@ namespace Satolist2
 		private MainViewModel mainViewModel;
 		private LayoutDocumentPane DocumentPane { get; set; }
 		private DockingWindow ActiveEditor { get; set; }
-		private IntPtr HWnd { get; set; }
 		private string DefaultWindowLayout { get; set; }
+
+		public IntPtr HWnd { get; private set; }
 		public Window RootWindow { get; set; }
 
 		public event EventHandler OnTextEditorSettingsChanged;
@@ -212,7 +213,7 @@ namespace Satolist2
 			DebugMainMenu.Hide();
 #endif
 
-#if true
+#if DEPLOY || !SURFACE_VIEWER_V3
 			//サーフェスビューワv3も封じ
 			RuntimeBasedSurfaceViewerVisibleMenu.Visibility = Visibility.Collapsed;
 			RuntimeBasedSurfaceViewerVisibleMenu.IsEnabled = false;
@@ -228,22 +229,16 @@ namespace Satolist2
 			RootWindow.Closing += Window_Closing;
 			
 			//ハンドルのとりだし
-			var hwnd = (new System.Windows.Interop.WindowInteropHelper(RootWindow)).Handle;
-			try
-			{
-				Core.SSTPCallBackNativeWindow.Create(hwnd);
-			}
-			catch { }	//??
-			HWnd = hwnd;
+			HWnd = (new System.Windows.Interop.WindowInteropHelper(RootWindow)).Handle;
 
 			//ここでhwndが確定するのでさとりすとの起動イベントを発生する
-			Utility.Satorite.NotifySSTPBroadcast("OnSatolistBoot", hwnd.ToString(), string.Empty, System.Reflection.Assembly.GetExecutingAssembly().Location);
+			Utility.Satorite.NotifySSTPBroadcast("OnSatolistBoot", HWnd.ToString(), string.Empty, System.Reflection.Assembly.GetExecutingAssembly().Location);
 
 			if(MainViewModel.EditorSettings.TemporarySettings.WindowPlacement != null)
 			{
 				var placement = MainViewModel.EditorSettings.TemporarySettings.WindowPlacement.Value;
 				//ウインドウ設定
-				Win32Import.SetWindowPlacement(hwnd, ref placement);
+				Win32Import.SetWindowPlacement(HWnd, ref placement);
 			}
 
 			//指定ゴーストを開く
@@ -256,9 +251,6 @@ namespace Satolist2
 
 		private void MainWindow_Closed(object sender, EventArgs e)
 		{
-			//SSTPのウインドウ登録も消す
-			Core.SSTPCallBackNativeWindow.Destory();
-
 			//閉じるときのイベントを送信
 			Utility.Satorite.NotifySSTPBroadcast("OnSatolistClosed");
 		}
@@ -2324,7 +2316,7 @@ namespace Satolist2
 					SurfacePreviewData = null;
 				}
 
-#if DEPLOY && false
+#if !DEPLOY && SURFACE_VIEWER_V3
 				try
 				{
 					RuntimeBasedSurfacePreviewData = new RuntimeBasedSurfacePreviewMetaData();

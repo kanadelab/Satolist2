@@ -6,6 +6,9 @@
              xmlns:local="clr-namespace:Satolist2.Control"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
+	<UserControl.Resources>
+		<BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+	</UserControl.Resources>
 	<Grid>
 		<Grid.ColumnDefinitions>
 			<ColumnDefinition Width="auto" />
@@ -26,7 +29,11 @@
 		</ListView>
 		
 		<!--パネル本体-->
-		<Grid Grid.Column="2" x:Name="FormsHostGrid">
+		<Grid Grid.Column="2" x:Name="FormsHostGrid" SizeChanged="FormsHostGrid_SizeChanged">
+			<StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="{Binding IsRuntimeBooting, Converter={StaticResource BooleanToVisibilityConverter}}">
+				<TextBlock Text="レンダラ プロセスを起動中..." />
+				<ProgressBar IsIndeterminate="true" Height="10" Width="100" />
+			</StackPanel>
 		</Grid>
 	</Grid>
 </UserControl>

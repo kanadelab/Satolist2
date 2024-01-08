@@ -13,12 +13,14 @@ namespace Satolist2.Core
 	internal class SurfacePreviewImageGenerator
 	{
 		public const int CurrentVersion = 2;
+		public const int OperationProgressMessage = 0x0401;
 
 		private IntPtr sessionId;
 		private Mutex mutex;
 		private string shellPath;
 		private Action<bool> completedCallback;
 		private Action<Progress> progressCallback;
+		private SSTPCallBackNativeWindow callbackWindow;
 
 		public SurfacePreviewImageGenerator()
 		{
@@ -31,6 +33,7 @@ namespace Satolist2.Core
 		{
 			this.completedCallback = completedCallback;
 			this.progressCallback = progressCallback;
+
 			return Task.Run(() =>
 			{
 				var targetPath = DictionaryUtility.ConbinePath(main.Ghost.FullDictionaryPath, "profile/satolist/surfacepreview");
@@ -85,12 +88,17 @@ namespace Satolist2.Core
 			System.IO.Directory.CreateDirectory(temporaryDumpDirectory);
 			System.IO.Directory.CreateDirectory(outputPath);
 
+			main.MainWindow.Dispatcher.Invoke(() =>
+			{
+				callbackWindow = new SSTPCallBackNativeWindow(main.MainWindow.HWnd);
+			});
+
 			try
 			{
 				//SSTP登録
-				using (var operationProgress = SSTPCallBackNativeWindow.Instance.RegisterCallback(SSTPCallBackNativeWindow.OperationProgressMessage, OnProgress))
+				using (var operationProgress = callbackWindow.RegisterCallback(OperationProgressMessage, OnProgress))
 				{
-					using (var copyDataHandler = SSTPCallBackNativeWindow.Instance.RegisterCallback(Win32Import.WM_COPYDATA, OnCopyData))
+					using (var copyDataHandler = callbackWindow.RegisterCallback(Win32Import.WM_COPYDATA, OnCopyData))
 					{
 						main.MainWindow.Dispatcher.Invoke(() => { mutex.WaitOne(); });
 
@@ -109,7 +117,7 @@ namespace Satolist2.Core
 							Thread.Sleep(2000);
 							cancel.ThrowIfCancellationRequested();
 						}
-						RetryableAction(() => Satorite.ExecuteSSTP(ghost, "GetProperty[currentghost.shelllist.current.path]", SSTPCallBackNativeWindow.Instance.HWnd));
+						RetryableAction(() => Satorite.ExecuteSSTP(ghost, "GetProperty[currentghost.shelllist.current.path]", callbackWindow.HWnd));
 					}
 
 					//シェルデータを読み込んで、さとりすとが出力すべき情報をもってくる
@@ -174,10 +182,10 @@ namespace Satolist2.Core
 								temporaryDumpDirectory,
 								scope,
 								surfaceId,
-								SSTPCallBackNativeWindow.OperationProgressMessage,
+								OperationProgressMessage,
 								sessionId,
 								surfaceId);
-							RetryableAction(() => Satorite.SendSSTP(ghost, generateScript, true, true, SSTPCallBackNativeWindow.Instance.HWnd));
+							RetryableAction(() => Satorite.SendSSTP(ghost, generateScript, true, true, callbackWindow.HWnd));
 
 							//DispacherにMutexを取らせる
 							mutex.ReleaseMutex();
@@ -197,10 +205,10 @@ namespace Satolist2.Core
 								temporaryDumpDirectory,
 								scope,
 								surfaceId,
-								SSTPCallBackNativeWindow.OperationProgressMessage,
+								OperationProgressMessage,
 								sessionId,
 								surfaceId);
-							RetryableAction(() => Satorite.SendSSTP(ghost, generateScript, true, true, SSTPCallBackNativeWindow.Instance.HWnd));
+							RetryableAction(() => Satorite.SendSSTP(ghost, generateScript, true, true, callbackWindow.HWnd));
 
 							//画像サイズをロード
 							var zeroFileName = string.Format("surfacezero{0}.png", surfaceId);
@@ -288,6 +296,13 @@ namespace Satolist2.Core
 				}
 				catch { }
 				main.MainWindow.Dispatcher.Invoke(() => Complete(false));
+			}
+			finally
+			{
+				main.MainWindow.Dispatcher.Invoke(() =>
+				{
+					callbackWindow.Dispose();
+				});
 			}
 		}
 
