@@ -115,3 +115,5 @@
 2022/05/12 09:07:00	http://sakura.nanika.jp/	http://sakura.shillest.net/
 2022/05/12 09:07:00	http://emily.nanika.jp/	http://fa-x.shillest.net/
 2022/12/25 00:00:00	http://yusyuparo.sakura.ne.jp/ntwk/	https://yusyuparo.net/ntwk/
+2023/07/16 00:00:00	http://nanachi.sakura.ne.jp/narnaloader/	http://cherry.narnaloader.ukagaka.net/
+2023/07/16 00:00:01	https://nanachi.sakura.ne.jp/narnaloader/	https://cherry.narnaloader.ukagaka.net/
