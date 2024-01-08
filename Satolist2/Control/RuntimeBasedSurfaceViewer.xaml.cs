@@ -7,6 +7,7 @@ using System.IO;
 using System.IO.Packaging;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -244,7 +245,7 @@ namespace Satolist2.Control
 							{
 								var item = new WindowItem(Control.FormsHostGrid, runtimeGhostFMORecord.HWndList[i], this);
 								windowItems.Add(i, item);
-								item.FormsHost.Visibility = Visibility.Collapsed;
+								item.Visibility = Visibility.Collapsed;
 							}
 
 							//起動完了
@@ -275,13 +276,13 @@ namespace Satolist2.Control
 			//不要パネルを非表示
 			foreach(var item in windowItems)
 			{
-				item.Value.FormsHost.Visibility = Visibility.Collapsed;
+				item.Value.Visibility = Visibility.Collapsed;
 			}
 
 			if(selectedSurface != null && selectedSurface.Scope < CaptureScopeCount)
 			{
 				//現在のスコープのウインドウを表示
-				windowItems[selectedSurface.Scope].FormsHost.Visibility = Visibility.Visible;
+				windowItems[selectedSurface.Scope].Visibility = Visibility.Visible;
 
 				//きせかえリストを変更
 				bindItems = previewData.Descript.GetBindParts(selectedSurface.Scope).Select(o => new RuntimeBasedSurfaceViewerBindItemViewModel(this, o)).ToArray();
@@ -319,6 +320,7 @@ namespace Satolist2.Control
 
 				//scope
 				script.Append(string.Format(@"\p[{0}]", selectedSurface.Scope));
+				//script.Append(string.Format(@"\p[{0}]", 1));
 
 				//scale
 				script.Append(string.Format(@"\![set,scaling,{0}]", (int)(CurrentScale * 100.0)));
@@ -393,12 +395,25 @@ namespace Satolist2.Control
 
 		private class WindowItem
 		{
+			private WindowsFormsHost formsHost;
+
 			public RuntimeBasedSurfaceViewerViewModel Parent { get;}
 			public Grid ParentGrid { get; }
-
-			public WindowsFormsHost FormsHost { get; set; }
 			public System.Windows.Forms.Panel FormsPanel { get; set; }
 			public IntPtr RuntimeHwnd { get; set; }
+
+			public Visibility Visibility
+			{
+				get => formsHost.Visibility;
+				set
+				{
+					if(formsHost.Visibility != value)
+					{
+						formsHost.Visibility = value;
+						ResetWindowPosition();
+					}
+				}
+			}
 
 			public WindowItem(Grid parentGrid, IntPtr runtimeHwnd, RuntimeBasedSurfaceViewerViewModel parent)
 			{
@@ -406,12 +421,12 @@ namespace Satolist2.Control
 				ParentGrid = parentGrid;
 				RuntimeHwnd = runtimeHwnd;
 
-				FormsHost = new WindowsFormsHost();
+				formsHost = new WindowsFormsHost();
 				FormsPanel = new System.Windows.Forms.Panel();
-				parentGrid.Children.Add(FormsHost);
-				FormsHost.Child = FormsPanel;
+				parentGrid.Children.Add(formsHost);
+				formsHost.Child = FormsPanel;
 
-				FormsHost.Loaded += FormsHost_Loaded;
+				formsHost.Loaded += FormsHost_Loaded;
 			}
 
 			private void FormsHost_Loaded(object sender, RoutedEventArgs e)
@@ -422,27 +437,39 @@ namespace Satolist2.Control
 
 			public void ResetWindowPosition()
 			{
-				//サイズ調整
-				Win32Import.RECT rc = new Win32Import.RECT();
-				Win32Import.GetClientRect(RuntimeHwnd, ref rc);
+				//Visilibityを子ウインドウ側にも適用
+				if (Visibility == Visibility.Visible)
+				{
+					FormsPanel.Visible = true;
 
-				//dpiScale値を取得
-				var dpiScale = PresentationSource.FromVisual(Parent.Main.MainWindow).CompositionTarget.TransformToDevice.M11;
+					//サイズ調整
+					Win32Import.RECT rc = new Win32Import.RECT();
+					Win32Import.GetClientRect(RuntimeHwnd, ref rc);
 
-				//SSP側のウインドウサイズと描画ターゲットGridのサイズを比較してスケールを決定する
-				//このときSSP側は常にスケール1倍なので、さとりすと側でさとりすとのdpiスケールと一致するようにサイズを補正する
-				double surfaceHeight = (rc.bottom - rc.top) / Parent.CurrentScale;
-				double gridHeight = ParentGrid.ActualHeight * dpiScale;
-				
-				//dpiスケールを最大としてスケール
-				double requestScale = gridHeight / surfaceHeight;
-				requestScale = Math.Min(requestScale, dpiScale);
+					//dpiScale値を取得
+					var dpiScale = PresentationSource.FromVisual(Parent.Main.MainWindow).CompositionTarget.TransformToDevice.M11;
 
-				//一旦スケール合わせを優先する
-				if (Parent.UpdateScale(requestScale))
-					return;
+					//TODO: サイズがなんども更新されちゃうのでもうちょっといい決定方法を考えたい
+					//SSP側のウインドウサイズと描画ターゲットGridのサイズを比較してスケールを決定する
+					//このときSSP側は常にdpiスケール1倍の見た目なので、さとりすと側でさとりすとのdpiスケールと一致するようにサイズを補正する
+					int surfaceHeight = (int)((rc.bottom - rc.top) / Parent.CurrentScale);
+					int gridHeight = (int)(ParentGrid.ActualHeight * dpiScale);
 
-				var arr = Win32Import.SetWindowPos(RuntimeHwnd, IntPtr.Zero, 0, 0, 0, 0, Win32Import.SWP_NOSIZE | Win32Import.SWP_NOZORDER | Win32Import.SWP_NOACTIVE);
+					//dpiスケールを最大としてスケール
+					double requestScale = (double)gridHeight / (double)surfaceHeight;
+					requestScale = Math.Min(requestScale, dpiScale);
+
+					//一旦スケール合わせを優先する
+					if (Parent.UpdateScale(requestScale))
+						return;
+
+					var arr = Win32Import.SetWindowPos(RuntimeHwnd, IntPtr.Zero, 0, 0, 0, 0, Win32Import.SWP_NOSIZE | Win32Import.SWP_NOZORDER | Win32Import.SWP_NOACTIVE | Win32Import.SWP_SHOWWINDOW);
+				}
+				else
+				{
+					FormsPanel.Visible = false;
+					var arr = Win32Import.SetWindowPos(RuntimeHwnd, IntPtr.Zero, 0, 0, 0, 0, Win32Import.SWP_NOSIZE | Win32Import.SWP_NOZORDER | Win32Import.SWP_NOACTIVE | Win32Import.SWP_HIDEWINDOW);
+				}
 			}
 
 			private void BindGhostWindow(IntPtr hostHwnd, IntPtr childHwnd)

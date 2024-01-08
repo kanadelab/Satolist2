@@ -130,6 +130,8 @@ namespace Satolist2.Core
 		public const int SWP_NOZORDER = 0x0004;
 		public const int SWP_NOSIZE = 0x0001;
 		public const int SWP_NOACTIVE = 0x0010;
+		public const int SWP_HIDEWINDOW = 0x0080;
+		public const int SWP_SHOWWINDOW = 0x0040;
 
 		public const int WS_EX_LAYERED = 0x00080000;
 		public const int WS_CHILD = 0x40000000;
