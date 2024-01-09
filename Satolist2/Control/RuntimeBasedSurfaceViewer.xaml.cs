@@ -3,6 +3,7 @@ using Satolist2.Utility;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.IO.Packaging;
 using System.Linq;
@@ -44,7 +45,7 @@ namespace Satolist2.Control
 		}
 	}
 
-	internal class RuntimeBasedSurfaceViewerViewModel : NotificationObject, IDockingWindowContent, IControlBindedReceiver
+	internal class RuntimeBasedSurfaceViewerViewModel : NotificationObject, IDockingWindowContent, IControlBindedReceiver, IDisposable
 	{
 		public const string ContentId = "RuntimeBasedSurfaceViewer";
 		public const int CaptureScopeCount = 3; //\p[x] までのウインドウを確保するか
@@ -64,7 +65,7 @@ namespace Satolist2.Control
 		private RuntimeBasedSurfaceViewerItemViewModel[] items;
 
 		private ICollectionView bindList;
-		private RuntimeBasedSurfaceViewerBindItemViewModel[] bindItems;
+		private RuntimeBasedSurfaceViewerBindCategoryViewModel[] bindItems;
 
 		private bool isRuntimeBooting;
 		private bool isRuntimeAvailable;
@@ -77,7 +78,7 @@ namespace Satolist2.Control
 		public MainViewModel Main { get; private set; }
 		public double CurrentScale { get; private set; }
 
-		public string DockingTitle => "RuntimeBasedSurfaceViewer";
+		public string DockingTitle => "サーフェスビューワv3";
 		public string DockingContentId => ContentId;
 
 		public bool IsPreviewDataEnable
@@ -170,7 +171,7 @@ namespace Satolist2.Control
 
 		public void UpdateSurfacePreviewData()
 		{
-#if !DEPLOY && SURFACE_VIEWER_V3
+#if SURFACE_VIEWER_V3
 
 			if (callbackWindow == null)
 			{
@@ -281,17 +282,21 @@ namespace Satolist2.Control
 
 			if(selectedSurface != null && selectedSurface.Scope < CaptureScopeCount)
 			{
-				//現在のスコープのウインドウを表示
-				windowItems[selectedSurface.Scope].Visibility = Visibility.Visible;
+				if (windowItems.TryGetValue(selectedSurface.Scope, out var item))
+				{
+					//現在のスコープのウインドウを表示
+					item.Visibility = Visibility.Visible;
 
-				//きせかえリストを変更
-				bindItems = previewData.Descript.GetBindParts(selectedSurface.Scope).Select(o => new RuntimeBasedSurfaceViewerBindItemViewModel(this, o)).ToArray();
-				BindList = CollectionViewSource.GetDefaultView(bindItems);
+					//きせかえリストを変更
+					bindItems = previewData.Descript.GetBindCategories(selectedSurface.Scope)
+						.Select(o => new RuntimeBasedSurfaceViewerBindCategoryViewModel(this, o)).ToArray();
+					BindList = CollectionViewSource.GetDefaultView(bindItems);
+				}
 			}
 			else
 			{
 				//スコープ制限
-				bindItems = Array.Empty<RuntimeBasedSurfaceViewerBindItemViewModel>();
+				bindItems = Array.Empty<RuntimeBasedSurfaceViewerBindCategoryViewModel>();
 				BindList = CollectionViewSource.GetDefaultView(bindItems);
 			}
 		}
@@ -329,11 +334,14 @@ namespace Satolist2.Control
 				script.Append(string.Format(@"\s[{0}]", selectedSurface.Id));
 
 				//binds
-				foreach(var bind in bindItems)
+				foreach (var category in bindItems)
 				{
-					script.Append(
-						string.Format(@"\![bind,{0},{1},{2}]", bind.Category, bind.Name, bind.IsEnabled ? 1 : 0)
-						);
+					foreach (var bind in category.Items)
+					{
+						script.Append(
+							string.Format(@"\![bind,{0},{1},{2}]", bind.Category, bind.Name, bind.IsEnabled ? 1 : 0)
+							);
+					}
 				}
 
 				script.Append(string.Format(@"\m[{0},0,0]", ScriptExecutedMessage));
@@ -390,7 +398,18 @@ namespace Satolist2.Control
 		private void OnScriptExecuted(int msg, IntPtr wparam, IntPtr lparam)
 		{
 			//スクリプトの実行後、ウインドウのサイズが変更されている可能性があるので位置を更新する
+			//TODO: かならずしも表示が更新されたタイミングで呼ばれるわけではないようなので、再検討が必要そう
 			windowItems[selectedSurface.Scope].ResetWindowPosition();
+		}
+
+		public void Dispose()
+		{
+			runtime?.Dispose();
+
+			//起動中の処理があればキャンセル
+			runtimeBootCanceller?.Cancel();
+			runtimeBootCanceller?.Dispose();
+			runtimeBootTask?.Wait();
 		}
 
 		private class WindowItem
@@ -432,6 +451,7 @@ namespace Satolist2.Control
 			private void FormsHost_Loaded(object sender, RoutedEventArgs e)
 			{
 				//WPF側がロードされたタイミングで設定する
+				//ウインドウ切替時に発生するとSetParentが失敗するので要調査
 				BindGhostWindow(FormsPanel.Handle, RuntimeHwnd);
 			}
 
@@ -454,6 +474,9 @@ namespace Satolist2.Control
 					//このときSSP側は常にdpiスケール1倍の見た目なので、さとりすと側でさとりすとのdpiスケールと一致するようにサイズを補正する
 					int surfaceHeight = (int)((rc.bottom - rc.top) / Parent.CurrentScale);
 					int gridHeight = (int)(ParentGrid.ActualHeight * dpiScale);
+
+					Debug.WriteLine($"surfaceHeight: {surfaceHeight}");
+					//Debug.WriteLine($"surfaceHeight: {surfaceHeight}");
 
 					//dpiスケールを最大としてスケール
 					double requestScale = (double)gridHeight / (double)surfaceHeight;
@@ -537,16 +560,69 @@ namespace Satolist2.Control
 		}
 	}
 
+	//プレビューのきせかえカテゴリ
+	internal class RuntimeBasedSurfaceViewerBindCategoryViewModel : NotificationObject
+	{
+		private bool isBindChangedProcessing;
+
+		public RuntimeBasedSurfaceViewerViewModel Parent { get; }
+		public RuntimeBasedSurfaceViewerBindItemViewModel[] Items { get; }
+		public BindCategoryModel Model { get; }
+		public string Label { get; }
+		public string NodeType => "Category";
+
+		//きせかえの指定が変更
+		public void NotifyBindChanged(RuntimeBasedSurfaceViewerBindItemViewModel changedItem)
+		{
+			if (isBindChangedProcessing)
+				return;	//再入防止
+			isBindChangedProcessing = true;
+
+			//設定状態をチェック
+			if (!Model.IsMultiple && Items.Count(o => o.IsEnabled) >= 2)
+			{
+				//multipleではない場合に複数選択されていたら、今変更があったもの以外をはずす
+				foreach(var item in Items)
+				{
+					if(!ReferenceEquals(item, changedItem))
+					{
+						item.IsEnabled = false;
+					}
+				}
+			}
+
+			if (Model.IsMustSelect && !Items.Any(o => o.IsEnabled))
+			{
+				//mustselectで選択されてない場合は一番上の１つを選択状態にする
+				Items.First().IsEnabled = true;
+			}
+
+			//変更を送信
+			Parent.NotifyChangeSurface();
+
+			isBindChangedProcessing = false;
+		}
+
+		public RuntimeBasedSurfaceViewerBindCategoryViewModel(RuntimeBasedSurfaceViewerViewModel parent, BindCategoryModel category)
+		{
+			Model = category;
+			Parent = parent;
+			Items = category.Items.Select(o => new RuntimeBasedSurfaceViewerBindItemViewModel(this, o.Value)).ToArray();
+			Label = category.Name;
+		}
+	}
+
 	//プレビューのきせかえ情報
 	internal class RuntimeBasedSurfaceViewerBindItemViewModel : NotificationObject
 	{
 		private bool isEnabled;
 		public BindPartModel Model { get; }
-		public RuntimeBasedSurfaceViewerViewModel Parent { get; }
-
+		public RuntimeBasedSurfaceViewerBindCategoryViewModel Parent { get; }
+		public IEnumerable<object> Items => Array.Empty<object>();
 		public string Name => Model.Name;
 		public string Category => Model.Category.Name;
-		public string Label => string.Format("{0}/{1}", Category, Name);
+		public string Label => Name;
+		public string NodeType => "Item";
 
 		public bool IsEnabled
 		{
@@ -557,12 +633,12 @@ namespace Satolist2.Control
 				{
 					isEnabled = value;
 					NotifyChanged();
-					Parent.NotifyChangeSurface();
+					Parent.NotifyBindChanged(this);
 				}
 			}
 		}
 
-		public RuntimeBasedSurfaceViewerBindItemViewModel(RuntimeBasedSurfaceViewerViewModel parent, BindPartModel bindPart)
+		public RuntimeBasedSurfaceViewerBindItemViewModel(RuntimeBasedSurfaceViewerBindCategoryViewModel parent, BindPartModel bindPart)
 		{
 			Parent = parent;
 			Model = bindPart;

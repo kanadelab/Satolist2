@@ -20,6 +20,7 @@
 			
 		</ListView>
 		<!--きせかえ-->
+		<!--
 		<ListView Grid.Column="1" ItemsSource="{Binding BindList}">
 			<ListView.ItemTemplate>
 				<DataTemplate>
@@ -27,8 +28,29 @@
 				</DataTemplate>
 			</ListView.ItemTemplate>
 		</ListView>
-		
-		<!--パネル本体-->
+		-->
+		<TreeView Grid.Column="1" ItemsSource="{Binding BindList}">
+			<TreeView.ItemTemplate>
+				<HierarchicalDataTemplate ItemsSource="{Binding Items}">
+					<StackPanel Orientation="Horizontal">
+						<CheckBox IsChecked="{Binding IsEnabled}">
+							<CheckBox.Style>
+								<Style TargetType="CheckBox">
+									<Style.Triggers>
+										<DataTrigger Binding="{Binding NodeType}" Value="Category">
+											<Setter Property="Visibility" Value="Collapsed" />
+										</DataTrigger>
+									</Style.Triggers>
+								</Style>
+							</CheckBox.Style>
+						</CheckBox>
+						<TextBlock Text="{Binding Label}" />
+					</StackPanel>
+				</HierarchicalDataTemplate>
+			</TreeView.ItemTemplate>
+		</TreeView>
+
+			<!--パネル本体-->
 		<Grid Grid.Column="2" x:Name="FormsHostGrid" SizeChanged="FormsHostGrid_SizeChanged">
 			<StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="{Binding IsRuntimeBooting, Converter={StaticResource BooleanToVisibilityConverter}}">
 				<TextBlock Text="レンダラ プロセスを起動中..." />

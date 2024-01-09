@@ -38,6 +38,15 @@ namespace Satolist2.Utility
 			return items.ToArray();
 		}
 
+		//きせかえカテゴリ一覧
+		public BindCategoryModel[] GetBindCategories(int scopeId)
+		{
+			var scope = Model.GetScope(scopeId);
+			if (scope == null)
+				return Array.Empty<BindCategoryModel>();
+			return scope.Categories.Values.ToArray();
+		}
+
 		public void Load(string path)
 		{
 			var lines = System.IO.File.ReadAllLines(path, Constants.EncodingShiftJis);
