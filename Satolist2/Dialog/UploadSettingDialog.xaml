@@ -240,7 +240,7 @@
 													<ctl:WartermarkedTextBox Text="{Binding Url, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Wartermark="例: example.ne.jp" Margin="3" />
 
 													<!-- ユーザ名 -->
-													<TextBlock Text="ユーザ名" Margin="3"/>
+													<TextBlock Text="ユーザID" Margin="3"/>
 													<ctl:WartermarkedTextBox Text="{Binding UserName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Wartermark="user" Margin="3"/>
 
 													<!-- パスワード -->
@@ -297,7 +297,7 @@
 													<ctl:WartermarkedTextBox Text="{Binding Url, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Wartermark="例: https://nanachi.sakura.ne.jp/narnaloader/upload.php" Margin="3" />
 
 													<!-- ユーザ名 -->
-													<TextBlock Text="ユーザ名" Margin="3"/>
+													<TextBlock Text="ユーザID" Margin="3"/>
 													<ctl:WartermarkedTextBox Text="{Binding UserName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Wartermark="user" Margin="3"/>
 
 													<!-- パスワード -->
@@ -384,8 +384,8 @@
 
 												<Separator Margin="5" />
 
-												<!--ゴーストID-->
-												<TextBlock Text="ゴーストID" Margin="3" />
+												<!--アイテムID-->
+												<TextBlock Text="アイテムID" Margin="3" />
 												<TextBox Margin="3" Text="{Binding GhostId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
 											</StackPanel>
