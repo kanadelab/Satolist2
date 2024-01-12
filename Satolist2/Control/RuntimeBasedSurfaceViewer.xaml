@@ -50,12 +50,23 @@
 			</TreeView.ItemTemplate>
 		</TreeView>
 
-			<!--パネル本体-->
-		<Grid Grid.Column="2" x:Name="FormsHostGrid" SizeChanged="FormsHostGrid_SizeChanged">
+		<!--パネル本体-->
+		<Grid Grid.Column="2">
 			<StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="{Binding IsRuntimeBooting, Converter={StaticResource BooleanToVisibilityConverter}}">
 				<TextBlock Text="レンダラ プロセスを起動中..." />
 				<ProgressBar IsIndeterminate="true" Height="10" Width="100" />
 			</StackPanel>
+
+			<Grid x:Name="FormsHostGrid" SizeChanged="FormsHostGrid_SizeChanged">
+			</Grid>
+
+			<!--上にコントロールを被せるのは難しいかも-->
+			<!--
+			<Grid Background="Red" Opacity="0.5">
+
+			</Grid>
+			-->
+
 		</Grid>
 	</Grid>
 </UserControl>

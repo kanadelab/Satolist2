@@ -202,8 +202,16 @@ namespace Satolist2.Control
 				BindList = CollectionViewSource.GetDefaultView(Array.Empty<RuntimeBasedSurfaceViewerBindItemViewModel>());
 			}
 
+			//ランタイムをクローズ
 			runtime?.Dispose();
 			runtime = null;
+
+			//初期化
+			foreach(var item in windowItems)
+			{
+				item.Value.Dispose();
+			}
+			windowItems.Clear();
 
 			//起動中の処理があればキャンセル
 			runtimeBootCanceller?.Cancel();
@@ -412,15 +420,16 @@ namespace Satolist2.Control
 			runtimeBootTask?.Wait();
 		}
 
-		private class WindowItem
+		private class WindowItem : IDisposable
 		{
 			private WindowsFormsHost formsHost;
+			public bool isWindowConnected;
 
 			public RuntimeBasedSurfaceViewerViewModel Parent { get;}
 			public Grid ParentGrid { get; }
 			public System.Windows.Forms.Panel FormsPanel { get; set; }
 			public IntPtr RuntimeHwnd { get; set; }
-
+			
 			public Visibility Visibility
 			{
 				get => formsHost.Visibility;
@@ -442,17 +451,29 @@ namespace Satolist2.Control
 
 				formsHost = new WindowsFormsHost();
 				FormsPanel = new System.Windows.Forms.Panel();
-				parentGrid.Children.Add(formsHost);
+				ParentGrid.Children.Add(formsHost);
 				formsHost.Child = FormsPanel;
 
 				formsHost.Loaded += FormsHost_Loaded;
 			}
 
+			public void Dispose()
+			{
+				formsHost.Loaded -= FormsHost_Loaded;
+				formsHost.Child = null;
+				ParentGrid.Children.Remove(formsHost);
+			}
+
 			private void FormsHost_Loaded(object sender, RoutedEventArgs e)
 			{
+				if(isWindowConnected)
+				{
+					return;
+				}
 				//WPF側がロードされたタイミングで設定する
 				//ウインドウ切替時に発生するとSetParentが失敗するので要調査
 				BindGhostWindow(FormsPanel.Handle, RuntimeHwnd);
+				isWindowConnected = true;
 			}
 
 			public void ResetWindowPosition()
@@ -503,6 +524,9 @@ namespace Satolist2.Control
 					es = new IntPtr((long)es & ~Win32Import.WS_EX_LAYERED);
 					var rees = Win32Import.SetWindowLongPtr(childHwnd, Win32Import.GWL_EXSTYLE, es);
 				}
+
+				int a = Win32Import.IsWindow(childHwnd);
+				int b = Win32Import.IsWindow(hostHwnd);
 
 				IntPtr result = Win32Import.SetParent(childHwnd, hostHwnd);
 				if (System.Runtime.InteropServices.Marshal.GetLastWin32Error() != 0)
