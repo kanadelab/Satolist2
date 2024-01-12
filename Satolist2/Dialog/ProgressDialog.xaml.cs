@@ -21,6 +21,9 @@ namespace Satolist2.Dialog
 	/// </summary>
 	public partial class ProgressDialog : DialogContentBase
 	{
+		//閉じるを許容する
+		private bool allowClose;
+
 		//ダイアログのキャンセル機能
 		public CancellationTokenSource Cancellation { get; }
 		//キャンセル可能かどうか
@@ -40,7 +43,16 @@ namespace Satolist2.Dialog
 			InitializeComponent();
 			Cancellation = new CancellationTokenSource();
 			DataContext = new ProgressDialogViewModel(this);
+			Closing += ProgressDialog_Closing;
 			
+		}
+
+		private void ProgressDialog_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+		{
+			if(!allowClose)
+			{
+				e.Cancel = true;
+			}
 		}
 
 		public void SetTask(Task progressTask, bool isCancellable = false)
@@ -74,6 +86,7 @@ namespace Satolist2.Dialog
 		private void Button_Click(object sender, RoutedEventArgs e)
 		{
 			//処理終了。
+			allowClose = true;
 			Close();
 		}
 
@@ -158,6 +171,7 @@ namespace Satolist2.Dialog
 
 		public ProgressDialogViewModel(ProgressDialog dialog)
 		{
+			this.title = "さとりすと";	//default title
 			this.dialog = dialog;
 		}
 

@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Satolist2.Dialog"
         mc:Ignorable="d"
-        Title="{Binding Title}" Height="300" Width="400" WindowStartupLocation="CenterOwner">
+        Title="{Binding Title, FallbackValue=さとりすと}" Height="300" Width="400" WindowStartupLocation="CenterOwner">
     <Grid>
 		<Grid.RowDefinitions>
 			<RowDefinition Height="auto" />
