@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace Satolist2.Core
 {
@@ -29,18 +30,6 @@ namespace Satolist2.Core
 			mutex = new Mutex();
 		}
 
-		public Task Generate(MainViewModel main, Action<bool> completedCallback, Action<Progress> progressCallback, CancellationToken cancel)
-		{
-			this.completedCallback = completedCallback;
-			this.progressCallback = progressCallback;
-
-			return Task.Run(() =>
-			{
-				var targetPath = DictionaryUtility.ConbinePath(main.Ghost.FullDictionaryPath, "profile/satolist/surfacepreview");
-				GenerateSurfaceTask(targetPath, main.Ghost, main, cancel);
-			});
-		}
-
 		public Task GenerateShellOnly(MainViewModel main, string shellPath, Action<bool> completedCallback, Action<Progress> progressCallback, CancellationToken cancel)
 		{
 			this.completedCallback = completedCallback;
@@ -48,15 +37,30 @@ namespace Satolist2.Core
 
 			return Task.Run(() =>
 			{
-				var targetPath = DictionaryUtility.ConbinePath(shellPath, "profile/satolist/surfacepreview");
-				using (var temporaryRuntime = TemporaryGhostRuntime.PrepareShell(shellPath))
+				try
 				{
-					try
+					main.MainWindow.Dispatcher.Invoke(() =>
+					progressCallback(new Progress()
+					{
+						Message = "準備中です...",
+						UseProgress = false
+					}));
+
+					var targetPath = DictionaryUtility.ConbinePath(shellPath, "profile/satolist/surfacepreview");
+					using (var temporaryRuntime = TemporaryGhostRuntimeEx.PrepareShell(shellPath))
 					{
 						temporaryRuntime.Boot();
 						GenerateSurfaceTask(targetPath, temporaryRuntime.Ghost, main, cancel);
 					}
-					catch { }	//temporaryRuntime中は落ちないように保護
+				}
+				catch
+				{
+					main.MainWindow.Dispatcher.Invoke(() =>
+					progressCallback(new Progress()
+					{
+						Message = "起動処理に失敗しました。",
+						UseProgress = false
+					}));
 				}
 			});
 		}
