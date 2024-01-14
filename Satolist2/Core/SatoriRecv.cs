@@ -324,6 +324,8 @@ namespace Satolist2.Core
 		public static extern int GetClientRect(IntPtr hwnd, ref RECT rect);
 		[DllImport("user32.dll")]
 		public static extern int SetWindowPos(IntPtr hwmd, IntPtr hwndInsertAfter, int x, int y, int cx, int cy, uint flags);
+		[DllImport("user32.dll")]
+		public static extern int SetActiveWindow(IntPtr hwnd);
 
 		public delegate bool EnumWindowsDelegate(IntPtr hWnd, IntPtr lparam);
 
