@@ -15,6 +15,7 @@ namespace Satolist2.Core
 	internal class TemporaryGhostRuntimeEx : IDisposable
 	{
 		private ChildProcess process;
+
 		public string FMOName { get; }
 		public Model.GhostModel Ghost { get; private set; }
 		public TemporaryDirectory RuntimeDirectory { get; private set; }

@@ -15,9 +15,10 @@ namespace Satolist2.Utility
 	//きせかえ周辺の情報を取得する
 	internal class ShellDescriptAnalyzer
 	{
-		private static readonly Regex BindGroupNamePattern = new Regex(@"(sakura|kero|char[0-9]+)\.bindgroup([0-9]+)\.name,(.+),(.+),?(.*)");
-		private static readonly Regex BindGroupDefaultPattern = new Regex(@"(sakura|kero|char[0-9]+)\.bindgroup([0-9]+)\.default,([0-9]+)");
-		private static readonly Regex BindOptionPattern = new Regex(@"(sakura|kero|char[0-9]+)\.bindoption([0-9]+)\.group,(.+),(.+)");
+		private static readonly Regex BindGroupNamePattern = new Regex(@"^(sakura|kero|char[0-9]+)\.bindgroup([0-9]+)\.name,(.+),(.+),?(.*)");
+		private static readonly Regex BindGroupDefaultPattern = new Regex(@"^(sakura|kero|char[0-9]+)\.bindgroup([0-9]+)\.default,([0-9]+)");
+		private static readonly Regex BindOptionPattern = new Regex(@"^(sakura|kero|char[0-9]+)\.bindoption([0-9]+)\.group,(.+),(.+)");
+		private static readonly Regex CommonScopePattern = new Regex(@"^(sakura|kero|char[0-9]+)");
 
 		//データ本体
 		public ShellDescriptModel Model { get; private set; }
@@ -25,7 +26,7 @@ namespace Satolist2.Utility
 		//きせかえアイテム一覧
 		public BindPartModel[] GetBindParts(int scopeId)
 		{
-			var scope = Model.GetScope(scopeId);
+			var scope = Model.GetBindScope(scopeId);
 			if (scope == null)
 				return Array.Empty<BindPartModel>();
 
@@ -41,7 +42,7 @@ namespace Satolist2.Utility
 		//きせかえカテゴリ一覧
 		public BindCategoryModel[] GetBindCategories(int scopeId)
 		{
-			var scope = Model.GetScope(scopeId);
+			var scope = Model.GetBindScope(scopeId);
 			if (scope == null)
 				return Array.Empty<BindCategoryModel>();
 			return scope.Categories.Values.ToArray();
@@ -93,6 +94,16 @@ namespace Satolist2.Utility
 					Model.AddBindOption(scopeId, categoryName, isMustSelect, isMultiple);
 					continue;
 				}
+
+				//それ以外で、kero,sakura,char* など、「設定が存在するスコープ」の列挙
+				var commonScopeMatch = CommonScopePattern.Match(line);
+				if(commonScopeMatch.Success)
+				{
+					var scopeName = commonScopeMatch.Groups[1].Value;
+					var scopeId = GetScopeIndex(scopeName);
+					Model.AddCommonScope(scopeId);
+					continue;
+				}
 			}
 		}
 
@@ -112,14 +123,19 @@ namespace Satolist2.Utility
 
 	public class ShellDescriptModel
 	{
-		public Dictionary<int, BindScopeModel> Bind { get; }
+		//きせかえ情報リスト
+		private Dictionary<int, BindScopeModel> Bind { get; }
+
+		//きせかえなどに関係なくとにかく何かしらの設定が入っているスコープの列挙
+		private HashSet<int> CommonScopes { get; }
 
 		public ShellDescriptModel()
 		{
 			Bind = new Dictionary<int, BindScopeModel>();
+			CommonScopes = new HashSet<int>();
 		}
 
-		public BindScopeModel AddScope(int id)
+		public BindScopeModel AddBindScope(int id)
 		{
 			BindScopeModel scope;
 			if(!Bind.TryGetValue(id, out scope))
@@ -130,29 +146,40 @@ namespace Satolist2.Utility
 			return scope;
 		}
 
-		public BindScopeModel GetScope(int id)
+		public BindScopeModel GetBindScope(int id)
 		{
 			BindScopeModel scope;
 			Bind.TryGetValue(id, out scope);
 			return scope;
 		}
 
+		//スコープが存在していることを登録
+		public void AddCommonScope(int id)
+		{
+			CommonScopes.Add(id);
+		}
+
+		public IEnumerable<int> GetCommonScopes()
+		{
+			return CommonScopes;
+		}
+
 		public void AddBindName(int scopeId, int bindId, string categoryName, string partName)
 		{
-			var scope = AddScope(scopeId);
+			var scope = AddBindScope(scopeId);
 			var category = scope.AddCategory(categoryName);
 			category.AddPart(partName, bindId);
 		}
 
 		public void AddBindDefault(int scopeId, int bindId, bool isDefault)
 		{
-			var scope = AddScope(scopeId);
+			var scope = AddBindScope(scopeId);
 			scope.SetDefault(bindId, isDefault);
 		}
 
 		public void AddBindOption(int scopeId, string categoryName, bool isMustSelect, bool isMultiple)
 		{
-			var scope = AddScope(scopeId);
+			var scope = AddBindScope(scopeId);
 			var category = scope.AddCategory(categoryName);
 			category.IsMustSelect = isMustSelect;
 			category.IsMultiple = isMultiple;

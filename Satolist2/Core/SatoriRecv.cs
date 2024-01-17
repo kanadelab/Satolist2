@@ -127,16 +127,17 @@ namespace Satolist2.Core
 		public const int GWL_STYLE = -16;
 		public const int GWL_EXSTYLE = -20;
 
-		public const int SWP_NOZORDER = 0x0004;
-		public const int SWP_NOSIZE = 0x0001;
-		public const int SWP_NOACTIVE = 0x0010;
-		public const int SWP_HIDEWINDOW = 0x0080;
-		public const int SWP_SHOWWINDOW = 0x0040;
+		public const uint SWP_NOZORDER = 0x0004;
+		public const uint SWP_NOSIZE = 0x0001;
+		public const uint SWP_NOACTIVE = 0x0010;
+		public const uint SWP_HIDEWINDOW = 0x0080;
+		public const uint SWP_SHOWWINDOW = 0x0040;
 
-		public const int WS_EX_LAYERED = 0x00080000;
-		public const int WS_EX_NOACTIVATE = 0x08000000;
+		public const uint WS_EX_LAYERED = 0x00080000;
+		public const uint WS_EX_NOACTIVATE = 0x08000000;
 
-		public const int WS_CHILD = 0x40000000;
+		public const uint WS_CHILD = 0x40000000;
+		public const uint WS_POPUP = 0x80000000;
 
 		public const int JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE = 0x00002000;
 		public const int JobObjectExtendedLimitInformation = 9;
@@ -287,6 +288,17 @@ namespace Satolist2.Core
 			public ulong JobMemoryLimit;
 			public ulong PeakProcessMemoryUsed;
 			public ulong PeakJobMemoryUsed;
+		}
+
+		public struct WINDOWPOS
+		{
+			IntPtr hwnd;
+			IntPtr hwndInsertAfter;
+			int x;
+			int y;
+			int cx;
+			int cy;
+			uint flags;
 		}
 
 		//れしばとしてやりとりするためのウインドウ操作系API

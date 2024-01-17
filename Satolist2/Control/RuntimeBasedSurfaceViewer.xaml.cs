@@ -1,4 +1,6 @@
-﻿using Satolist2.Core;
+﻿using Microsoft.VisualBasic;
+using Microsoft.Xaml.Behaviors.Media;
+using Satolist2.Core;
 using Satolist2.Utility;
 using System;
 using System.Collections.Generic;
@@ -50,8 +52,8 @@ namespace Satolist2.Control
 	internal class RuntimeBasedSurfaceViewerViewModel : NotificationObject, IDockingWindowContent, IControlBindedReceiver, IDisposable
 	{
 		public const string ContentId = "RuntimeBasedSurfaceViewer";
-		public const int CaptureScopeCount = 3; //\p[x] までのウインドウを確保するか
 		public const int ScriptExecutedMessage = 0x0401;
+		public const int MetadataGeneratedMessage = 0x0402;
 
 		private Dictionary<int, WindowItem> windowItems;
 		private int currentScope;
@@ -69,9 +71,12 @@ namespace Satolist2.Control
 		private ICollectionView bindList;
 		private RuntimeBasedSurfaceViewerBindCategoryViewModel[] bindItems;
 
+		private HashSet<int> captureScopes;
+
 		private bool isRuntimeBooting;
 		private bool isRuntimeAvailable;
 		private bool isMakeCollisionMode;
+		private bool showCollision;
 
 		private SSTPCallBackNativeWindow callbackWindow;
 		private CancellationTokenSource runtimeBootCanceller;
@@ -174,6 +179,21 @@ namespace Satolist2.Control
 			get => !isMakeCollisionMode;
 		}
 
+		//触り判定領域の表示
+		public bool ShowCollision
+		{
+			get => showCollision;
+			set
+			{
+				if(showCollision != value)
+				{
+					showCollision = value;
+					NotifyChanged();
+					SyncToRuntime();	//sspに同期
+				}
+			}
+		}
+
 		public Bitmap SurfaceBitmapForMakeCollision
 		{
 			get => surfaceBitmapForMakeCollision;
@@ -190,13 +210,14 @@ namespace Satolist2.Control
 			windowItems = new Dictionary<int, WindowItem>();
 			currentScope = -1;
 			CurrentScale = 1.0;
+			captureScopes = null;
 
 			ToggleMakeCollisionCommand = new ActionCommand(
 				(e) =>
 				{
 					//試しに切り替え
 					IsMakeCollisionMode = !IsMakeCollisionMode;
-					SendToRuntime();
+					SyncToRuntime();
 				});
 		}
 
@@ -221,6 +242,7 @@ namespace Satolist2.Control
 			{
 				callbackWindow = new SSTPCallBackNativeWindow(Main.MainWindow.HWnd);
 				callbackWindow.RegisterCallback(ScriptExecutedMessage, OnScriptExecuted);
+				callbackWindow.RegisterCallback(MetadataGeneratedMessage, OnMetadataGenerated);
 			}
 
 			if (Main.SurfacePreview.RuntimeBasedSurfacePreviewData != null)
@@ -228,6 +250,11 @@ namespace Satolist2.Control
 				IsPreviewDataEnable = true;
 				previewData = Main.SurfacePreview.RuntimeBasedSurfacePreviewData;
 				items = previewData.Surfaces.Records.Select(o => new RuntimeBasedSurfaceViewerItemViewModel(this, o.Key, o.Value)).ToArray();
+
+				//定義されているスコープを列挙、sakuraとkeroは必ずキャプチャする
+				captureScopes = new HashSet<int>(previewData.Descript.Model.GetCommonScopes());
+				captureScopes.Add(0);
+				captureScopes.Add(1);
 
 				SurfaceList = CollectionViewSource.GetDefaultView(items);
 				SurfaceList.Filter = (o) =>
@@ -284,20 +311,30 @@ namespace Satolist2.Control
 							Thread.Sleep(100);
 							cancelToken.ThrowIfCancellationRequested();
 							runtimeGhostFMORecord = SakuraFMOReader.Read(runtime.Ghost, runtime.FMOName);
-							if (runtimeGhostFMORecord != null && runtimeGhostFMORecord.HWndList.Length >= CaptureScopeCount)
+							if (runtimeGhostFMORecord != null)
 							{
-								break;
+								if (runtimeGhostFMORecord.HWndList.Length >= captureScopes.Count)
+								{
+									break;
+								}
+
+								//SSPは起動してるが、シェル設定に対してウインドウが足りてない場合はスクリプトを実行して生成を促す
+								MakeWindowRequestToRuntime(captureScopes);
 							}
 						}
 
 						//メインスレッドで表示更新系
 						Control.Dispatcher.Invoke(new Action(() =>
 						{
-							//立ち絵のウインドウを取得
-							for (int i = 0; i < CaptureScopeCount; i++)
+							var sortedScopes = new List<int>(captureScopes);
+							sortedScopes.Sort();
+
+							//HWndListにスコープ順にハンドルが並んでるはず
+							for (int i = 0; i < sortedScopes.Count; i++)
 							{
+								var scope = sortedScopes[i];
 								var item = new WindowItem(Control.FormsHostGrid, runtimeGhostFMORecord.HWndList[i], this);
-								windowItems.Add(i, item);
+								windowItems.Add(scope, item);
 								item.Visibility = Visibility.Collapsed;
 							}
 
@@ -332,7 +369,7 @@ namespace Satolist2.Control
 				item.Value.Visibility = Visibility.Collapsed;
 			}
 
-			if(selectedSurface != null && selectedSurface.Scope < CaptureScopeCount)
+			if(selectedSurface != null && captureScopes.Contains(selectedSurface.Scope))
 			{
 				if (windowItems.TryGetValue(selectedSurface.Scope, out var item))
 				{
@@ -356,7 +393,6 @@ namespace Satolist2.Control
 		//選択中のサーフェスが変更
 		public void NotifyChangeSurface()
 		{
-			//TODO: ウインドウ切替時の対応がいる
 			if (selectedSurface == null)
 				return;
 
@@ -364,15 +400,57 @@ namespace Satolist2.Control
 			{
 				NotifyChangeScope();
 			}
-			SendToRuntime();
+			SyncToRuntime();
+		}
+
+		//SSPにウインドウを生成させるため、スコープ切り替えを送る
+		private void MakeWindowRequestToRuntime(IEnumerable<int> scopes)
+		{
+			StringBuilder script = new StringBuilder();
+			foreach (var s in scopes)
+			{
+				script.Append(string.Format(@"\p[{0}]\s[-1]", s));
+			}
+			try
+			{
+				//送信
+				Satorite.SendSSTP(runtimeGhostFMORecord, script.ToString(), true, true, callbackWindow.HWnd);
+			}
+			catch { }
+		}
+
+		//サイズ情報を取得するためのもととなるリクエスト
+		private void RequestMetadataImages(int scopeId, long surfaceId)
+		{
+			StringBuilder script = new StringBuilder();
+			script.Append(string.Format(@"\![execute,dumpsurface,test,{0},{1}]", scopeId, surfaceId));
+			script.Append(string.Format(@"\![execute,dumpsurface,test,{0},{1},surfacezero,,1]", scopeId, surfaceId));
+			script.Append(string.Format(@"\m[{0},0,0]", MetadataGeneratedMessage));
+
+			try
+			{
+				//送信
+				Satorite.SendSSTP(runtimeGhostFMORecord, script.ToString(), true, true, callbackWindow.HWnd);
+			}
+			catch { }
 		}
 
 		//ランタイムに変更を送信
-		private void SendToRuntime()
+		private void SyncToRuntime()
 		{
 			//選択中の情報を送る
-			if (runtimeGhostFMORecord != null && selectedSurface != null && selectedSurface.Scope < CaptureScopeCount)
+			if (runtimeGhostFMORecord != null && selectedSurface != null && captureScopes.Contains(selectedSurface.Scope))
 			{
+				var windowItem = windowItems[selectedSurface.Scope];
+				windowItem.CurrentSurfaceId = selectedSurface.Id;
+
+				//データがない
+				if (!windowItem.HasSurfaceImageSize(selectedSurface.Id))
+				{
+					RequestMetadataImages(selectedSurface.Scope, selectedSurface.Id);
+					return;
+				}
+
 				StringBuilder script = new StringBuilder();
 
 				//scope
@@ -396,12 +474,35 @@ namespace Satolist2.Control
 					}
 				}
 
+				//出力された2つのサーフェス画像からオフセットを算出して、シェルの基準位置ではなく実際のゴーストの位置を基準に表示する
+				int marginTop = 0;
+				if(windowItem.CurrentSurfaceSizeData != null)
+				{
+					marginTop = (int)(windowItem.CurrentSurfaceSizeData.MarginTop * CurrentScale);
+				}
+
+				//位置調整
+				script.Append(string.Format(@"\![move,--X=0,--Y={0},--base=global,--base-offset=left.top,--move-offset=left.top]", marginTop));
+
+				//判定表示設定
+				if(showCollision)
+				{
+					script.Append(@"\![enter,collisionmode]");
+				}
+				else
+				{
+					script.Append(@"\![leave,collisionmode]");
+				}
+
+				//コリジョン作成(静止画)モードの場合、画像を出力する
 				if(IsMakeCollisionMode)
 				{
 					script.Append(string.Format(@"\![execute,dumpsurface,test,{0},{1}]", selectedSurface.Scope, selectedSurface.Id));
+					script.Append(string.Format(@"\![execute,dumpsurface,test,{0},{1},surfacezero,,1]", selectedSurface.Scope, selectedSurface.Id));
 				}
 
-				script.Append(string.Format(@"\m[{0},0,0]", ScriptExecutedMessage));
+				//\_w はお守り(たまに位置が合わないときがあるので対策として入れてみた程度…？)
+				script.Append(string.Format(@"\_w[0]\m[{0},0,0]", ScriptExecutedMessage));
 
 				try
 				{
@@ -418,27 +519,9 @@ namespace Satolist2.Control
 			//整数パーセンテージで変更がある場合にのみ更新
 			if ((int)(requestScale * 100.0) != (int)(CurrentScale * 100.0))
 			{
+				//スケールを設定した後再表示
 				CurrentScale = requestScale;
-				if (runtimeGhostFMORecord != null && selectedSurface != null && selectedSurface.Scope < CaptureScopeCount)
-				{
-					StringBuilder script = new StringBuilder();
-
-					//scope
-					script.Append(string.Format(@"\p[{0}]", selectedSurface.Scope));
-
-					//scale
-					script.Append(string.Format(@"\![set,scaling,{0}]", (int)(CurrentScale * 100.0)));
-
-					script.Append(string.Format(@"\m[{0},0,0]", ScriptExecutedMessage));
-
-					try
-					{
-						//送信
-						Satorite.SendSSTP(runtimeGhostFMORecord, script.ToString(), true, true, callbackWindow.HWnd);
-					}
-					catch { }
-					return true;
-				}
+				SyncToRuntime();
 			}
 			return false;
 		}
@@ -472,6 +555,31 @@ namespace Satolist2.Control
 			}
 		}
 
+		//メタデータ用サーフェスが出力された
+		private void OnMetadataGenerated(int msg, IntPtr wparam, IntPtr lparam)
+		{
+			//2つの画像をよみこみ、オリジン基準と画像実体基準のサイズを取得する
+			var imagePath = DictionaryUtility.ConbinePath(runtime.RuntimeDirectory.FullPath, "ssp", "ghost", "temporaryghost", "ghost", "master", "test", "surface" + selectedSurface.Id.ToString() + ".png");
+			var imagePath2 = DictionaryUtility.ConbinePath(runtime.RuntimeDirectory.FullPath, "ssp", "ghost", "temporaryghost", "ghost", "master", "test", "surfacezero" + selectedSurface.Id.ToString() + ".png");
+
+			try
+			{
+				using (var surfaceBitmap = (Bitmap)Bitmap.FromFile(imagePath))
+				{
+					using (var surfaceZeroBitmap = (Bitmap)Bitmap.FromFile(imagePath2))
+					{
+						var sizeData = new SurfaceSizeData(surfaceBitmap.Size, surfaceZeroBitmap.Size);
+						windowItems[selectedSurface.Scope].SetSurfaceImageSize(selectedSurface.Id, sizeData);
+					}
+				}
+				SyncToRuntime();
+			}
+			catch
+			{ 
+				//IOがおかしいのでちょっとどうしようもない
+			}
+		}
+
 		public void Dispose()
 		{
 			runtime?.Dispose();
@@ -482,15 +590,46 @@ namespace Satolist2.Control
 			runtimeBootTask?.Wait();
 		}
 
+
+		private class SurfaceSizeData
+		{
+			public System.Drawing.Size SurfaceSize { get; }
+			public System.Drawing.Size ZeroOriginSize { get; }
+
+			public int MarginTop => SurfaceSize.Height - ZeroOriginSize.Height;
+
+			public SurfaceSizeData(System.Drawing.Size surfaceSize, System.Drawing.Size zeroOriginSize)
+			{
+				SurfaceSize = surfaceSize;
+				ZeroOriginSize = zeroOriginSize;
+			}
+		}
+		
+		//キャプチャするウインドウあたりの情報
 		private class WindowItem : IDisposable
 		{
 			private WindowsFormsHost formsHost;
+			private Dictionary<long, SurfaceSizeData> surfaceSizeItems;
+
 			public bool isWindowConnected;
 
 			public RuntimeBasedSurfaceViewerViewModel Parent { get;}
 			public Grid ParentGrid { get; }
 			public System.Windows.Forms.Panel FormsPanel { get; set; }
 			public IntPtr RuntimeHwnd { get; set; }
+			public long CurrentSurfaceId { get; set; }
+
+			public SurfaceSizeData CurrentSurfaceSizeData
+			{
+				get
+				{
+					if(surfaceSizeItems.TryGetValue(CurrentSurfaceId, out var sizeData))
+					{
+						return sizeData;
+					}
+					return null;
+				}
+			}
 			
 			public Visibility Visibility
 			{
@@ -511,6 +650,8 @@ namespace Satolist2.Control
 				ParentGrid = parentGrid;
 				RuntimeHwnd = runtimeHwnd;
 
+				surfaceSizeItems = new Dictionary<long, SurfaceSizeData>();
+
 				formsHost = new WindowsFormsHost();
 				FormsPanel = new System.Windows.Forms.Panel();
 				ParentGrid.Children.Add(formsHost);
@@ -526,6 +667,16 @@ namespace Satolist2.Control
 				ParentGrid.Children.Remove(formsHost);
 			}
 
+			public void SetSurfaceImageSize(long surfaceId, SurfaceSizeData sizeData)
+			{
+				surfaceSizeItems.Add(surfaceId, sizeData);
+			}
+
+			public bool HasSurfaceImageSize(long surfaceId)
+			{
+				return surfaceSizeItems.ContainsKey(surfaceId);
+			}
+
 			private void FormsHost_Loaded(object sender, RoutedEventArgs e)
 			{
 				if(isWindowConnected)
@@ -538,6 +689,12 @@ namespace Satolist2.Control
 				isWindowConnected = true;
 			}
 
+			public void SetWindowZeroPosition()
+			{
+				//0位置設定するだけの実験用
+				Win32Import.SetWindowPos(RuntimeHwnd, IntPtr.Zero, 0, 0, 0, 0, Win32Import.SWP_NOSIZE | Win32Import.SWP_NOZORDER | Win32Import.SWP_NOACTIVE | Win32Import.SWP_SHOWWINDOW);
+			}
+
 			public void ResetWindowPosition()
 			{
 				//Visilibityを子ウインドウ側にも適用
@@ -545,36 +702,28 @@ namespace Satolist2.Control
 				{
 					FormsPanel.Visible = true;
 
-					//サイズ調整
-					Win32Import.RECT rc = new Win32Import.RECT();
-					Win32Import.GetClientRect(RuntimeHwnd, ref rc);
+					//出力画像ベースで用意すればいいはず
+					if(surfaceSizeItems.TryGetValue(CurrentSurfaceId, out var sizeData))
+					{
+						//dpiScale値を取得
+						var dpiScale = PresentationSource.FromVisual(Parent.Main.MainWindow).CompositionTarget.TransformToDevice.M11;
 
-					//dpiScale値を取得
-					var dpiScale = PresentationSource.FromVisual(Parent.Main.MainWindow).CompositionTarget.TransformToDevice.M11;
+						int surfaceHeight = sizeData.SurfaceSize.Height;
+						int gridHeight = (int)(ParentGrid.ActualHeight * dpiScale);
 
-					//TODO: サイズがなんども更新されちゃうのでもうちょっといい決定方法を考えたい
-					//SSP側のウインドウサイズと描画ターゲットGridのサイズを比較してスケールを決定する
-					//このときSSP側は常にdpiスケール1倍の見た目なので、さとりすと側でさとりすとのdpiスケールと一致するようにサイズを補正する
-					int surfaceHeight = (int)((rc.bottom - rc.top) / Parent.CurrentScale);
-					int gridHeight = (int)(ParentGrid.ActualHeight * dpiScale);
+						//dpiスケールを最大としてスケール
+						double requestScale = (double)gridHeight / (double)surfaceHeight;
+						requestScale = Math.Min(requestScale, dpiScale);
 
-					Debug.WriteLine($"surfaceHeight: {surfaceHeight}");
-					//Debug.WriteLine($"surfaceHeight: {surfaceHeight}");
+						//一旦スケール合わせを優先する
+						if (Parent.UpdateScale(requestScale))
+							return;
+					}
 
-					//dpiスケールを最大としてスケール
-					double requestScale = (double)gridHeight / (double)surfaceHeight;
-					requestScale = Math.Min(requestScale, dpiScale);
-
-					//一旦スケール合わせを優先する
-					if (Parent.UpdateScale(requestScale))
-						return;
-
-					//var arr = Win32Import.SetWindowPos(RuntimeHwnd, IntPtr.Zero, 0, 0, 0, 0, Win32Import.SWP_NOSIZE | Win32Import.SWP_NOZORDER | Win32Import.SWP_NOACTIVE | Win32Import.SWP_SHOWWINDOW);
 				}
 				else
 				{
 					FormsPanel.Visible = false;
-					//var arr = Win32Import.SetWindowPos(RuntimeHwnd, IntPtr.Zero, 0, 0, 0, 0, Win32Import.SWP_NOSIZE | Win32Import.SWP_NOZORDER | Win32Import.SWP_NOACTIVE | Win32Import.SWP_HIDEWINDOW);
 				}
 			}
 
@@ -589,19 +738,29 @@ namespace Satolist2.Control
 
 				int a = Win32Import.IsWindow(childHwnd);
 				int b = Win32Import.IsWindow(hostHwnd);
-				
+
+				{
+					IntPtr ws = Win32Import.GetWindowLongPtr(childHwnd, Win32Import.GWL_STYLE);
+					ws = new IntPtr(((long)ws | Win32Import.WS_CHILD) & ~Win32Import.WS_POPUP);
+					var res = Win32Import.SetWindowLongPtr(childHwnd, Win32Import.GWL_STYLE, ws);
+				}
+
+				var arr = Win32Import.SetWindowPos(childHwnd, new IntPtr(-2), 0, 0, 0, 0, Win32Import.SWP_NOSIZE  | Win32Import.SWP_NOACTIVE);
 
 				//SetParentでアクティブを奪われるので対策が必要？
 				IntPtr result = Win32Import.SetParent(childHwnd, hostHwnd);
 				if (System.Runtime.InteropServices.Marshal.GetLastWin32Error() != 0)
 					throw new Win32Exception(System.Runtime.InteropServices.Marshal.GetLastWin32Error());
+				//Win32Import.SetActiveWindow(Parent.Main.MainWindow.HWnd);
 
 				Win32Import.RECT rc = new Win32Import.RECT();
 				Win32Import.GetClientRect(childHwnd, ref rc);
 				int width = rc.right - rc.left;
 				int height = rc.bottom - rc.top;
 
-				var arr = Win32Import.SetWindowPos(childHwnd, IntPtr.Zero, 0, 0, 0, 0, Win32Import.SWP_NOSIZE | Win32Import.SWP_NOZORDER | Win32Import.SWP_NOACTIVE);
+				
+
+				
 
 				{
 					IntPtr es = Win32Import.GetWindowLongPtr(childHwnd, Win32Import.GWL_EXSTYLE);
@@ -609,11 +768,7 @@ namespace Satolist2.Control
 					var rees = Win32Import.SetWindowLongPtr(childHwnd, Win32Import.GWL_EXSTYLE, es);
 				}
 
-				{
-					IntPtr ws = Win32Import.GetWindowLongPtr(childHwnd, Win32Import.GWL_STYLE);
-					ws = new IntPtr((long)ws | Win32Import.WS_CHILD);
-					var res = Win32Import.SetWindowLongPtr(childHwnd, Win32Import.GWL_STYLE, ws);
-				}
+				
 			}
 		}
 	}

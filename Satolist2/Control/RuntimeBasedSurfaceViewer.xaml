@@ -12,80 +12,79 @@
 		<util:BitmapImageSourceConverter x:Key="BitmapImageSourceConverter" />
 	</UserControl.Resources>
 	<Grid>
-		<Grid.ColumnDefinitions>
-			<ColumnDefinition Width="auto" />
-			<ColumnDefinition Width="auto" />
-			<ColumnDefinition Width="*" />
-		</Grid.ColumnDefinitions>
-		<!--サーフェスリスト-->
-		<ListView Grid.Column="0" ItemsSource="{Binding SurfaceList}" SelectedItem="{Binding SelectedSurface}" DisplayMemberPath="Label">
-			
-		</ListView>
-		<!--きせかえ-->
-		<!--
-		<ListView Grid.Column="1" ItemsSource="{Binding BindList}">
-			<ListView.ItemTemplate>
-				<DataTemplate>
-					<CheckBox Content="{Binding Label}" IsChecked="{Binding IsEnabled}" />
-				</DataTemplate>
-			</ListView.ItemTemplate>
-		</ListView>
-		-->
-		<TreeView Grid.Column="1" ItemsSource="{Binding BindList}">
-			<TreeView.ItemTemplate>
-				<HierarchicalDataTemplate ItemsSource="{Binding Items}">
-					<StackPanel Orientation="Horizontal">
-						<CheckBox IsChecked="{Binding IsEnabled}">
-							<CheckBox.Style>
-								<Style TargetType="CheckBox">
-									<Style.Triggers>
-										<DataTrigger Binding="{Binding NodeType}" Value="Category">
-											<Setter Property="Visibility" Value="Collapsed" />
-										</DataTrigger>
-									</Style.Triggers>
-								</Style>
-							</CheckBox.Style>
-						</CheckBox>
-						<TextBlock Text="{Binding Label}" />
+		<Grid.RowDefinitions>
+			<RowDefinition Height="auto" />
+			<RowDefinition Height="*" />
+		</Grid.RowDefinitions>
+
+		<Menu Grid.Row="0">
+			<MenuItem Header="表示">
+				<MenuItem Header="触り判定の表示" IsCheckable="True" IsChecked="{Binding ShowCollision, Mode=TwoWay}" />
+			</MenuItem>
+		</Menu>
+
+		<Grid Grid.Row="1">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="auto" />
+				<ColumnDefinition Width="auto" />
+				<ColumnDefinition Width="*" />
+			</Grid.ColumnDefinitions>
+			<!--サーフェスリスト-->
+			<ListView Grid.Column="0" ItemsSource="{Binding SurfaceList}" SelectedItem="{Binding SelectedSurface}" DisplayMemberPath="Label">
+			</ListView>
+
+			<!--きせかえツリービュー-->
+			<TreeView Grid.Column="1" ItemsSource="{Binding BindList}">
+				<TreeView.ItemTemplate>
+					<HierarchicalDataTemplate ItemsSource="{Binding Items}">
+						<StackPanel Orientation="Horizontal">
+							<CheckBox IsChecked="{Binding IsEnabled}">
+								<CheckBox.Style>
+									<Style TargetType="CheckBox">
+										<Style.Triggers>
+											<DataTrigger Binding="{Binding NodeType}" Value="Category">
+												<Setter Property="Visibility" Value="Collapsed" />
+											</DataTrigger>
+										</Style.Triggers>
+									</Style>
+								</CheckBox.Style>
+							</CheckBox>
+							<TextBlock Text="{Binding Label}" />
+						</StackPanel>
+					</HierarchicalDataTemplate>
+				</TreeView.ItemTemplate>
+			</TreeView>
+
+			<!--パネル本体-->
+			<Grid Grid.Column="2">
+				<Grid.RowDefinitions>
+					<RowDefinition Height="*" />
+					<RowDefinition Height="auto" />
+				</Grid.RowDefinitions>
+
+				<Grid Grid.Row="0">
+					<StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="{Binding IsRuntimeBooting, Converter={StaticResource BooleanToVisibilityConverter}}">
+						<TextBlock Text="レンダラ プロセスを起動中..." />
+						<ProgressBar IsIndeterminate="true" Height="10" Width="100" />
 					</StackPanel>
-				</HierarchicalDataTemplate>
-			</TreeView.ItemTemplate>
-		</TreeView>
 
-		<!--パネル本体-->
-		<Grid Grid.Column="2">
-			<Grid.RowDefinitions>
-				<RowDefinition Height="*" />
-				<RowDefinition Height="auto" />
-			</Grid.RowDefinitions>
-			
-			<Grid Grid.Row="0">
-				<StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="{Binding IsRuntimeBooting, Converter={StaticResource BooleanToVisibilityConverter}}">
-					<TextBlock Text="レンダラ プロセスを起動中..." />
-					<ProgressBar IsIndeterminate="true" Height="10" Width="100" />
+					<!--SSPホスト-->
+					<Grid x:Name="FormsHostGrid" SizeChanged="FormsHostGrid_SizeChanged" Visibility="{Binding IsRuntimeMode, Converter={StaticResource BooleanToVisibilityConverter}}">
+					</Grid>
+
+					<!--当たり判定作成用静止画ビュー-->
+					<Grid Visibility="{Binding IsMakeCollisionMode, Converter={StaticResource BooleanToVisibilityConverter}}">
+						<Image Source="{Binding SurfaceBitmapForMakeCollision, Converter={StaticResource BitmapImageSourceConverter}}"
+						   HorizontalAlignment="Left" VerticalAlignment="Top" StretchDirection="DownOnly"/>
+					</Grid>
+				</Grid>
+
+				<!--
+				<StackPanel Grid.Row="1">
+					<Button Content="判定作成モード" Command="{Binding ToggleMakeCollisionCommand}" />
 				</StackPanel>
-
-				<!--SSPホスト-->
-				<Grid x:Name="FormsHostGrid" SizeChanged="FormsHostGrid_SizeChanged" Visibility="{Binding IsRuntimeMode, Converter={StaticResource BooleanToVisibilityConverter}}">
-				</Grid>
-			
-				<!--当たり判定作成用静止画ビュー-->
-				<Grid Visibility="{Binding IsMakeCollisionMode, Converter={StaticResource BooleanToVisibilityConverter}}">
-					<Image Source="{Binding SurfaceBitmapForMakeCollision, Converter={StaticResource BitmapImageSourceConverter}}" />
-				</Grid>
+				-->
 			</Grid>
-
-			<StackPanel Grid.Row="1">
-				<Button Content="判定作成モード" Command="{Binding ToggleMakeCollisionCommand}" />
-			</StackPanel>
-			
-			<!--上にコントロールを被せるのは難しいかも-->
-			<!--
-			<Grid Background="Red" Opacity="0.5">
-
-			</Grid>
-			-->
-
 		</Grid>
 	</Grid>
 </UserControl>
