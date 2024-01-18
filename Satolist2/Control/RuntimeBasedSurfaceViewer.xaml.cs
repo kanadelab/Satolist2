@@ -4,6 +4,7 @@ using Satolist2.Core;
 using Satolist2.Utility;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
@@ -17,6 +18,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Forms.Integration;
@@ -34,6 +36,12 @@ namespace Satolist2.Control
 	/// </summary>
 	public partial class RuntimeBasedSurfaceViewer : UserControl
 	{
+		internal new RuntimeBasedSurfaceViewerViewModel DataContext
+		{
+			get => (RuntimeBasedSurfaceViewerViewModel)base.DataContext;
+			set => base.DataContext = value;
+		}
+
 		public RuntimeBasedSurfaceViewer()
 		{
 			InitializeComponent();
@@ -46,11 +54,30 @@ namespace Satolist2.Control
 				vm.PreviewWindowSizeChanged();
 			}
 		}
+
+		private void ListViewItem_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+		{
+			//ダブルクリックでスクリプト挿入
+			if (sender is ListViewItem listViewItem)
+			{
+				SurfacePaletteViewModel.InsertSurfaceToActiveEditor(((SurfaceViewerItemViewModel)listViewItem.DataContext).Id);
+			}
+			e.Handled = true;
+		}
 	}
 
 	//viewmodel
 	internal class RuntimeBasedSurfaceViewerViewModel : NotificationObject, IDockingWindowContent, IControlBindedReceiver, IDisposable
 	{
+		public enum CollisionType
+		{
+			Invalid,
+			Rect,
+			Ellipse,
+			Circle,         //未対応。Ellipseで代用できるはずなので
+			Polygon
+		}
+
 		public const string ContentId = "RuntimeBasedSurfaceViewer";
 		public const int ScriptExecutedMessage = 0x0401;
 		public const int MetadataGeneratedMessage = 0x0402;
@@ -77,6 +104,7 @@ namespace Satolist2.Control
 		private bool isRuntimeAvailable;
 		private bool isMakeCollisionMode;
 		private bool showCollision;
+		private bool showBindList;
 
 		private SSTPCallBackNativeWindow callbackWindow;
 		private CancellationTokenSource runtimeBootCanceller;
@@ -86,13 +114,21 @@ namespace Satolist2.Control
 
 		public RuntimeBasedSurfaceViewer Control { get; private set; }
 		public MainViewModel Main { get; private set; }
-		public double CurrentScale { get; private set; }
+		public CollisionEditorViewModel CollisionEditorViewModel { get; }
 
-		//判定作成(静止画)モード切り替えコマンド
-		public ICommand ToggleMakeCollisionCommand { get; }
+		public double CurrentScale { get; private set; }
 
 		public string DockingTitle => "サーフェスビューワv3";
 		public string DockingContentId => ContentId;
+
+		private System.Drawing.Size SelectedSurfaceBaseSize
+		{
+			get
+			{
+				var windowItem = windowItems[selectedSurface.Scope];
+				return windowItem.CurrentSurfaceSizeData.ZeroOriginSize;
+			}
+		}
 
 		public bool IsPreviewDataEnable
 		{
@@ -167,9 +203,26 @@ namespace Satolist2.Control
 			get => isMakeCollisionMode;
 			set
 			{
-				isMakeCollisionMode = value;
+				if (isMakeCollisionMode != value)
+				{
+					isMakeCollisionMode = value;
+					NotifyChanged();
+					NotifyChanged(nameof(IsRuntimeMode));
+
+					//表示を切り替え
+					SyncToRuntime();
+				}
+			}
+		}
+
+		//きせかえリストの表示有無
+		public bool ShowBindList
+		{
+			get => showBindList;
+			set
+			{
+				showBindList = value;
 				NotifyChanged();
-				NotifyChanged(nameof(IsRuntimeMode));
 			}
 		}
 
@@ -194,6 +247,7 @@ namespace Satolist2.Control
 			}
 		}
 
+		//判定作成用の静止画
 		public Bitmap SurfaceBitmapForMakeCollision
 		{
 			get => surfaceBitmapForMakeCollision;
@@ -207,18 +261,13 @@ namespace Satolist2.Control
 		public RuntimeBasedSurfaceViewerViewModel(MainViewModel main)
 		{
 			Main = main;
+			CollisionEditorViewModel = new CollisionEditorViewModel(main);
+
 			windowItems = new Dictionary<int, WindowItem>();
+			isMakeCollisionMode = true;
 			currentScope = -1;
 			CurrentScale = 1.0;
 			captureScopes = null;
-
-			ToggleMakeCollisionCommand = new ActionCommand(
-				(e) =>
-				{
-					//試しに切り替え
-					IsMakeCollisionMode = !IsMakeCollisionMode;
-					SyncToRuntime();
-				});
 		}
 
 		public void ControlBind(System.Windows.Controls.Control control)
@@ -226,6 +275,7 @@ namespace Satolist2.Control
 			if(control is RuntimeBasedSurfaceViewer ctrl)
 			{
 				Control = ctrl;
+				CollisionEditorViewModel.Control = ctrl.CollisionEditor;
 
 				if (Main.Ghost != null)
 				{
@@ -497,8 +547,8 @@ namespace Satolist2.Control
 				//コリジョン作成(静止画)モードの場合、画像を出力する
 				if(IsMakeCollisionMode)
 				{
-					script.Append(string.Format(@"\![execute,dumpsurface,test,{0},{1}]", selectedSurface.Scope, selectedSurface.Id));
-					script.Append(string.Format(@"\![execute,dumpsurface,test,{0},{1},surfacezero,,1]", selectedSurface.Scope, selectedSurface.Id));
+					script.Append(string.Format(@"\![execute,dumpsurface,test,{0},{1},surfacecol]", selectedSurface.Scope, selectedSurface.Id));
+					//script.Append(string.Format(@"\![execute,dumpsurface,test,{0},{1},surfacezero,,1]", selectedSurface.Scope, selectedSurface.Id));
 				}
 
 				//\_w はお守り(たまに位置が合わないときがあるので対策として入れてみた程度…？)
@@ -537,13 +587,20 @@ namespace Satolist2.Control
 
 		private void OnScriptExecuted(int msg, IntPtr wparam, IntPtr lparam)
 		{
+			//TODO: さくらスクリプトが実行されるまえに別のサーフェスを選択した場合におかしくなるはずなので修正
 			if (IsMakeCollisionMode)
 			{
+				SurfaceBitmapForMakeCollision?.Dispose();
+				SurfaceBitmapForMakeCollision = null;
 				try
 				{
 					//出力されたビットマップを拾ってくる
-					var imagePath = DictionaryUtility.ConbinePath(runtime.RuntimeDirectory.FullPath, "ssp", "ghost", "temporaryghost", "ghost", "master", "test", "surface" + selectedSurface.Id.ToString() + ".png");
-					SurfaceBitmapForMakeCollision = (Bitmap)Bitmap.FromFile(imagePath);
+					var imagePath = DictionaryUtility.ConbinePath(runtime.RuntimeDirectory.FullPath, "ssp", "ghost", "temporaryghost", "ghost", "master", "test", "surfacecol" + selectedSurface.Id.ToString() + ".png");
+
+					//ファイルをロックしないように一旦streamにする
+					var bytes = File.ReadAllBytes(imagePath);
+					SurfaceBitmapForMakeCollision = (Bitmap)Bitmap.FromStream(new MemoryStream(bytes));
+					File.Delete(imagePath);
 				}
 				catch { }
 			}
@@ -729,46 +786,32 @@ namespace Satolist2.Control
 
 			private void BindGhostWindow(IntPtr hostHwnd, IntPtr childHwnd)
 			{
-				//レイヤードウインドウのフラグを付け外ししないとうまくいかないので注意
+				//WS_CHILD, WS_POPUP をとりかえて子ウインドウ扱いにする
+
 				{
 					IntPtr es = Win32Import.GetWindowLongPtr(childHwnd, Win32Import.GWL_EXSTYLE);
 					es = new IntPtr(((long)es & ~Win32Import.WS_EX_LAYERED) | Win32Import.WS_EX_NOACTIVATE);
 					var rees = Win32Import.SetWindowLongPtr(childHwnd, Win32Import.GWL_EXSTYLE, es);
 				}
 
-				int a = Win32Import.IsWindow(childHwnd);
-				int b = Win32Import.IsWindow(hostHwnd);
-
 				{
 					IntPtr ws = Win32Import.GetWindowLongPtr(childHwnd, Win32Import.GWL_STYLE);
 					ws = new IntPtr(((long)ws | Win32Import.WS_CHILD) & ~Win32Import.WS_POPUP);
-					var res = Win32Import.SetWindowLongPtr(childHwnd, Win32Import.GWL_STYLE, ws);
+					Win32Import.SetWindowLongPtr(childHwnd, Win32Import.GWL_STYLE, ws);
 				}
 
-				var arr = Win32Import.SetWindowPos(childHwnd, new IntPtr(-2), 0, 0, 0, 0, Win32Import.SWP_NOSIZE  | Win32Import.SWP_NOACTIVE);
-
-				//SetParentでアクティブを奪われるので対策が必要？
-				IntPtr result = Win32Import.SetParent(childHwnd, hostHwnd);
-				if (System.Runtime.InteropServices.Marshal.GetLastWin32Error() != 0)
-					throw new Win32Exception(System.Runtime.InteropServices.Marshal.GetLastWin32Error());
-				//Win32Import.SetActiveWindow(Parent.Main.MainWindow.HWnd);
-
-				Win32Import.RECT rc = new Win32Import.RECT();
-				Win32Import.GetClientRect(childHwnd, ref rc);
-				int width = rc.right - rc.left;
-				int height = rc.bottom - rc.top;
-
-				
-
-				
+				//親子関係を接続
+				Win32Import.SetParent(childHwnd, hostHwnd);
+				if (Marshal.GetLastWin32Error() != 0)
+					throw new Win32Exception(Marshal.GetLastWin32Error());
 
 				{
 					IntPtr es = Win32Import.GetWindowLongPtr(childHwnd, Win32Import.GWL_EXSTYLE);
 					es = new IntPtr((long)es | Win32Import.WS_EX_LAYERED);
-					var rees = Win32Import.SetWindowLongPtr(childHwnd, Win32Import.GWL_EXSTYLE, es);
+					Win32Import.SetWindowLongPtr(childHwnd, Win32Import.GWL_EXSTYLE, es);
 				}
 
-				
+				Win32Import.SetWindowPos(childHwnd, IntPtr.Zero, 0, 0, 0, 0, Win32Import.SWP_NOZORDER | Win32Import.SWP_NOSIZE | Win32Import.SWP_NOACTIVE);
 			}
 		}
 	}

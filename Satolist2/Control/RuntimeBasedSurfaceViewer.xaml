@@ -9,7 +9,6 @@
              d:DesignHeight="450" d:DesignWidth="800">
 	<UserControl.Resources>
 		<BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
-		<util:BitmapImageSourceConverter x:Key="BitmapImageSourceConverter" />
 	</UserControl.Resources>
 	<Grid>
 		<Grid.RowDefinitions>
@@ -19,7 +18,20 @@
 
 		<Menu Grid.Row="0">
 			<MenuItem Header="表示">
-				<MenuItem Header="触り判定の表示" IsCheckable="True" IsChecked="{Binding ShowCollision, Mode=TwoWay}" />
+				<MenuItem Header="きせかえリストの表示" IsCheckable="True" IsChecked="{Binding ShowBindList, Mode=TwoWay}" />
+				<MenuItem Header="触り判定の表示" IsCheckable="True" IsChecked="{Binding ShowCollision, Mode=TwoWay}" IsEnabled="{Binding IsRuntimeMode}" />
+			</MenuItem>
+			<MenuItem Header="範囲選択">
+				<MenuItem Header="範囲選択モード" IsCheckable="True" IsChecked="{Binding IsMakeCollisionMode, Mode=TwoWay}" />
+				<Separator />
+				<MenuItem Header="範囲選択をリセット" IsEnabled="{Binding IsMakeCollisionMode}" Command="{Binding CollisionEditorViewModel.CloseCollisionToolCommand}" />
+				<MenuItem Header="範囲形状" IsEnabled="{Binding IsMakeCollisionMode}">
+					<MenuItem Header="矩形" IsCheckable="True"  IsChecked="{Binding CollisionEditorViewModel.IsCollisionModeRect, Mode=TwoWay}" />
+					<MenuItem Header="楕円形" IsCheckable="True" IsChecked="{Binding CollisionEditorViewModel.IsCollisionModeEllipse, Mode=TwoWay}" />
+					<MenuItem Header="多角形" IsCheckable="True" IsChecked="{Binding CollisionEditorViewModel.IsCollisionModePolygon, Mode=TwoWay}" />
+				</MenuItem>
+				<Separator />
+				<MenuItem Header="選択位置をサーフェスパレットのデフォルト表示位置に設定" IsEnabled="{Binding {Binding IsMakeCollisionMode}}" Command="{Binding CollisionEditorViewModel.SetSurfacePaletteDefaultPositionCommand}" />
 			</MenuItem>
 		</Menu>
 
@@ -29,12 +41,13 @@
 				<ColumnDefinition Width="auto" />
 				<ColumnDefinition Width="*" />
 			</Grid.ColumnDefinitions>
+			
 			<!--サーフェスリスト-->
 			<ListView Grid.Column="0" ItemsSource="{Binding SurfaceList}" SelectedItem="{Binding SelectedSurface}" DisplayMemberPath="Label">
 			</ListView>
 
 			<!--きせかえツリービュー-->
-			<TreeView Grid.Column="1" ItemsSource="{Binding BindList}">
+			<TreeView Grid.Column="1" ItemsSource="{Binding BindList}" Visibility="{Binding ShowBindList, Converter={StaticResource BooleanToVisibilityConverter}}">
 				<TreeView.ItemTemplate>
 					<HierarchicalDataTemplate ItemsSource="{Binding Items}">
 						<StackPanel Orientation="Horizontal">
@@ -53,16 +66,23 @@
 						</StackPanel>
 					</HierarchicalDataTemplate>
 				</TreeView.ItemTemplate>
+				<TreeView.ItemContainerStyle>
+					<Style TargetType="TreeViewItem">
+						<Setter Property="Margin" Value="0" />
+					</Style>
+				</TreeView.ItemContainerStyle>
 			</TreeView>
 
 			<!--パネル本体-->
 			<Grid Grid.Column="2">
 				<Grid.RowDefinitions>
-					<RowDefinition Height="*" />
 					<RowDefinition Height="auto" />
+					<RowDefinition Height="*" />
 				</Grid.RowDefinitions>
 
-				<Grid Grid.Row="0">
+				<TextBlock HorizontalAlignment="Right" Text="[範囲選択モード]" Margin="1 1 10 1" Visibility="{Binding IsMakeCollisionMode, Converter={StaticResource BooleanToVisibilityConverter}}" />
+
+				<Grid Grid.Row="1">
 					<StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="{Binding IsRuntimeBooting, Converter={StaticResource BooleanToVisibilityConverter}}">
 						<TextBlock Text="レンダラ プロセスを起動中..." />
 						<ProgressBar IsIndeterminate="true" Height="10" Width="100" />
@@ -73,17 +93,15 @@
 					</Grid>
 
 					<!--当たり判定作成用静止画ビュー-->
-					<Grid Visibility="{Binding IsMakeCollisionMode, Converter={StaticResource BooleanToVisibilityConverter}}">
-						<Image Source="{Binding SurfaceBitmapForMakeCollision, Converter={StaticResource BitmapImageSourceConverter}}"
-						   HorizontalAlignment="Left" VerticalAlignment="Top" StretchDirection="DownOnly"/>
-					</Grid>
+					<local:CollisionEditor x:Name="CollisionEditor"
+						ImageHorizontalAlignment="Left"
+						HorizontalAlignment="Stretch"
+						DataContext="{Binding CollisionEditorViewModel}"
+						Visibility="{Binding DataContext.IsMakeCollisionMode, Converter={StaticResource BooleanToVisibilityConverter}, RelativeSource={RelativeSource AncestorType=local:RuntimeBasedSurfaceViewer}}"
+						SurfaceBitmap="{Binding DataContext.SurfaceBitmapForMakeCollision, RelativeSource={RelativeSource AncestorType=local:RuntimeBasedSurfaceViewer}, Mode=OneWay}"
+						SurfaceBaseSize="{Binding DataContext.SelectedSurfaceBaseSize, RelativeSource={RelativeSource AncestorType=local:RuntimeBasedSurfaceViewer}, Mode=OneWay}"
+						/>
 				</Grid>
-
-				<!--
-				<StackPanel Grid.Row="1">
-					<Button Content="判定作成モード" Command="{Binding ToggleMakeCollisionCommand}" />
-				</StackPanel>
-				-->
 			</Grid>
 		</Grid>
 	</Grid>

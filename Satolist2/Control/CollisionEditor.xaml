@@ -1,0 +1,187 @@
+﻿<UserControl x:Class="Satolist2.Control.CollisionEditor"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Satolist2.Control"
+			 xmlns:util="clr-namespace:Satolist2.Utility"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800" SizeChanged="UserControl_SizeChanged">
+	<UserControl.Resources>
+		<BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+		<util:BitmapImageSourceConverter x:Key="BitmapConverter" />
+	</UserControl.Resources>
+
+	<Grid>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="*" />
+			<RowDefinition Height="auto" />
+		</Grid.RowDefinitions>
+
+		<Grid Grid.Row="0" >
+		<!--サーフェス画像本体-->
+			<Image Grid.Column="1" 
+				   HorizontalAlignment="{Binding ImageHorizontalAlignment, RelativeSource={RelativeSource AncestorType=local:CollisionEditor}}" VerticalAlignment="Top" x:Name="SurfaceImage"
+			   IsHitTestVisible="False" Source="{Binding SurfaceBitmap, RelativeSource={RelativeSource AncestorType=local:CollisionEditor}, Converter={StaticResource BitmapConverter}}"
+			   Width="{Binding SurfaceBitmap.Width, RelativeSource={RelativeSource AncestorType=local:CollisionEditor}}" />
+
+		<!--判定作成機能-->
+		<Canvas Grid.Column="1" Background="Transparent" IsHitTestVisible="False" ClipToBounds="True"
+					Width="{Binding ActualWidth,ElementName=SurfaceImage}"
+				   Height="{Binding ActualHeight,ElementName=SurfaceImage}"
+				   HorizontalAlignment="{Binding ImageHorizontalAlignment, RelativeSource={RelativeSource AncestorType=local:CollisionEditor}}" VerticalAlignment="Top">
+
+			<Rectangle Fill="#77FFFFFF" Stroke="{StaticResource ThemeRed}" Canvas.Top="{Binding RectTop, FallbackValue=0}" Canvas.Left="{Binding RectLeft,FallbackValue=0}"
+						   Width="{Binding RectWidth,FallbackValue=100}" Height="{Binding RectHeight, FallbackValue=100}"
+						   SnapsToDevicePixels="True" Visibility="{Binding IsCollisionModeRect, Converter={StaticResource BooleanToVisibilityConverter}}">
+			</Rectangle>
+
+
+			<Ellipse  Fill="#77FFFFFF" Stroke="{StaticResource ThemeRed}" Canvas.Top="{Binding RectTop, FallbackValue=0}" Canvas.Left="{Binding RectLeft,FallbackValue=0}"
+						   Width="{Binding RectWidth,FallbackValue=100}" Height="{Binding RectHeight, FallbackValue=100}"
+						   SnapsToDevicePixels="True" Visibility="{Binding IsCollisionModeEllipse, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+
+			<Rectangle Stroke="Black" Canvas.Top="{Binding RectTop, FallbackValue=0}" Canvas.Left="{Binding RectLeft,FallbackValue=0}"
+						   Width="{Binding RectWidth,FallbackValue=100}" Height="{Binding RectHeight, FallbackValue=100}"
+						   SnapsToDevicePixels="True" Visibility="{Binding IsCollisionModeEllipse, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+
+
+			<Polygon x:Name="CollisionPolygon" Fill="#77FFFFFF" Stroke="{StaticResource ThemeRed}" Canvas.Left="0" Canvas.Top="0" SnapsToDevicePixels="True"
+						 Visibility="{Binding IsCollisionModePolygon, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+		</Canvas>
+
+		<!--判定作成機能-->
+		<Canvas Grid.Column="1"
+					Width="{Binding ActualWidth,ElementName=SurfaceImage}"
+				   Height="{Binding ActualHeight,ElementName=SurfaceImage}"
+				   HorizontalAlignment="{Binding ImageHorizontalAlignment, RelativeSource={RelativeSource AncestorType=local:CollisionEditor}}" VerticalAlignment="Top">
+
+			<!--判定作成用のクリックエリア-->
+			<Thumb DragStarted="SurfaceImageArea_DragStarted" DragDelta="SurfaceImageArea_DragDelta"
+						Canvas.Left="0" Canvas.Top="0" 
+						Width="{Binding ActualWidth,ElementName=SurfaceImage}"
+						Height="{Binding ActualHeight,ElementName=SurfaceImage}">
+				<Thumb.ContextMenu>
+					<ContextMenu>
+						<MenuItem Header="判定選択をリセット" Command="{Binding CloseCollisionToolCommand}" />
+						<MenuItem Header="触り判定作成">
+							<MenuItem Header="オフ" IsCheckable="True" IsChecked="{Binding IsCollisionModeInvalid, Mode=TwoWay}" />
+							<MenuItem Header="矩形" IsCheckable="True" IsChecked="{Binding IsCollisionModeRect, Mode=TwoWay}" />
+							<MenuItem Header="楕円形" IsCheckable="True" IsChecked="{Binding IsCollisionModeEllipse, Mode=TwoWay}" />
+							<MenuItem Header="多角形" IsCheckable="True" IsChecked="{Binding IsCollisionModePolygon, Mode=TwoWay}" />
+						</MenuItem>
+					</ContextMenu>
+				</Thumb.ContextMenu>
+				<Thumb.Template>
+					<ControlTemplate>
+						<Rectangle Fill="Transparent" />
+					</ControlTemplate>
+				</Thumb.Template>
+			</Thumb>
+
+			<!--ポリゴン頂点のキャンバス-->
+			<ItemsControl ItemsSource="{Binding PolygonPointsViewModel}"
+						  Visibility="{Binding IsCollisionModePolygon, Converter={StaticResource BooleanToVisibilityConverter}}"
+						  Canvas.Left="0" Canvas.Top="0" 
+						Width="{Binding ActualWidth,ElementName=SurfaceImage}"
+						Height="{Binding ActualHeight,ElementName=SurfaceImage}">
+				<ItemsControl.ItemContainerStyle>
+					<Style TargetType="ContentPresenter">
+						<Setter Property="Canvas.Left" Value="{Binding Point.X}" />
+						<Setter Property="Canvas.Top" Value="{Binding Point.Y}"/>
+						<Setter Property="Width" Value="4" />
+						<Setter Property="Height" Value="4" />
+						<Setter Property="IsHitTestVisible" Value="True" />
+					</Style>
+				</ItemsControl.ItemContainerStyle>
+
+				<ItemsControl.ItemsPanel>
+					<ItemsPanelTemplate>
+						<Canvas />
+					</ItemsPanelTemplate>
+				</ItemsControl.ItemsPanel>
+
+				<ItemsControl.ItemTemplate>
+					<DataTemplate>
+						<Thumb Margin="-4 -4 0 0" DragStarted="PolygonVertex_DragStarted" DragDelta="PolygonVertex_DragDelta" MouseDoubleClick="PolygonVertex_DoubleClick">
+							<Thumb.ContextMenu>
+								<ContextMenu>
+									<MenuItem Header="頂点の削除" Click="PolygonVertex_Remove" />
+								</ContextMenu>
+							</Thumb.ContextMenu>
+							<Thumb.Template>
+								<ControlTemplate>
+									<Rectangle SnapsToDevicePixels="True">
+										<Rectangle.Style>
+											<Style TargetType="Rectangle">
+												<Setter Property="Fill" Value="{StaticResource ThemeDarkRed}" />
+												<Style.Triggers>
+													<DataTrigger Binding="{Binding IsLastVertex}" Value="True">
+														<Setter Property="Fill" Value="{StaticResource ThemeRed}" />
+													</DataTrigger>
+													<Trigger Property="IsMouseOver" Value="True">
+														<Setter Property="Fill" Value="Orange" />
+													</Trigger>
+												</Style.Triggers>
+											</Style>
+										</Rectangle.Style>
+									</Rectangle>
+								</ControlTemplate>
+							</Thumb.Template>
+						</Thumb>
+					</DataTemplate>
+				</ItemsControl.ItemTemplate>
+			</ItemsControl>
+
+			<!--作った判定のドラッグ操作領域-->
+			<Thumb DragStarted="SelectedArea_DragStarted" DragDelta="SelectedArea_DragDelta"
+					Canvas.Top="{Binding RectTop, FallbackValue=0}" Canvas.Left="{Binding RectLeft,FallbackValue=0}"
+						Width="{Binding RectWidth,FallbackValue=100}" Height="{Binding RectHeight, FallbackValue=100}"
+						SnapsToDevicePixels="True" Visibility="{Binding IsMovableCollisionMaking, Converter={StaticResource BooleanToVisibilityConverter}}">
+				<Thumb.Template>
+					<ControlTemplate>
+						<Rectangle Fill="Transparent" />
+					</ControlTemplate>
+				</Thumb.Template>
+				<Thumb.ContextMenu>
+					<ContextMenu>
+						<MenuItem Header="サーフェスパレットのデフォルト表示位置に設定" Command="{Binding SetSurfacePaletteDefaultPositionCommand}" />
+					</ContextMenu>
+				</Thumb.ContextMenu>
+			</Thumb>
+
+		</Canvas>
+	</Grid>
+
+	<!--生成判定情報-->
+	<Grid Grid.Row="1">
+		<Grid.Style>
+			<Style TargetType="Grid">
+				<Setter Property="Visibility" Value="Visible" />
+				<Style.Triggers>
+					<DataTrigger Binding="{Binding IsCollisionMaking}" Value="False">
+						<Setter Property="Visibility" Value="Hidden" />
+					</DataTrigger>
+				</Style.Triggers>
+			</Style>
+		</Grid.Style>
+
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="*" />
+			<ColumnDefinition Width="auto" />
+			<ColumnDefinition Width="auto" />
+		</Grid.ColumnDefinitions>
+		<TextBox Grid.Column="0" Margin="3" Text="{Binding SelectedRange, Mode=OneWay}" VerticalAlignment="Center" IsReadOnly="True" />
+		<Button Grid.Column="1" Margin="3" Padding="2" Command="{Binding CopyToClipBoardCommand}" ToolTip="クリップボードに判定をコピー" Width="24" Height="24">
+			<Button.Content>
+				<Path Fill="{StaticResource ThemeGreen}" Stretch="UniformToFill" Data="{StaticResource ClipboardIcon}" />
+			</Button.Content>
+		</Button>
+		<Button Grid.Column="2" Margin="3" Padding="2" Command="{Binding CloseCollisionToolCommand}" ToolTip="判定の作成を終える" Width="24" Height="24">
+			<Button.Content>
+				<Path Fill="{StaticResource ThemeRed}" Stretch="UniformToFill" Data="{StaticResource RemoveIcon}" />
+			</Button.Content>
+		</Button>
+	</Grid>
+	</Grid>
+</UserControl>
