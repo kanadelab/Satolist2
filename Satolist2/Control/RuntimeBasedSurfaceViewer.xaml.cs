@@ -264,7 +264,7 @@ namespace Satolist2.Control
 			CollisionEditorViewModel = new CollisionEditorViewModel(main);
 
 			windowItems = new Dictionary<int, WindowItem>();
-			isMakeCollisionMode = true;
+			showBindList = true;
 			currentScope = -1;
 			CurrentScale = 1.0;
 			captureScopes = null;

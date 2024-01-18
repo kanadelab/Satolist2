@@ -31,7 +31,7 @@
 					<MenuItem Header="多角形" IsCheckable="True" IsChecked="{Binding CollisionEditorViewModel.IsCollisionModePolygon, Mode=TwoWay}" />
 				</MenuItem>
 				<Separator />
-				<MenuItem Header="選択位置をサーフェスパレットのデフォルト表示位置に設定" IsEnabled="{Binding {Binding IsMakeCollisionMode}}" Command="{Binding CollisionEditorViewModel.SetSurfacePaletteDefaultPositionCommand}" />
+				<MenuItem Header="選択位置をサーフェスパレットのデフォルト表示位置に設定" IsEnabled="{Binding IsMakeCollisionMode}" Command="{Binding CollisionEditorViewModel.SetSurfacePaletteDefaultPositionCommand}" />
 			</MenuItem>
 		</Menu>
 

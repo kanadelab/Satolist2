@@ -167,12 +167,14 @@
 				<MenuItem Header="さとりすと本体フォルダを開く" Command="{Binding OpenSatolistDirectoryCommand}" />
 			</MenuItem>
 			<MenuItem Header="ヘルプ">
-				<MenuItem Header="さとりすと配布webページ" Command="{Binding OpenUrlCommand}" CommandParameter="https://nanachi.sakura.ne.jp/satolist.html" />
-				<MenuItem Header="ゴーストアップローダ「ななろだ」" Command="{Binding OpenUrlCommand}" CommandParameter="https://nanachi.sakura.ne.jp/narnaloader.html" />
-				<MenuItem Header="さとりすと＆ななろだフォーラムサイト(実験中)" Command="{Binding OpenUrlCommand}" CommandParameter="https://q2a.satolist.ukagaka.net/" />
+				<MenuItem Header="さとりすと配布webページ" Command="{Binding OpenUrlCommand}" CommandParameter="https://home.kanadelab.ukagaka.net/satolist.html" />
+				<MenuItem Header="更新履歴(github)" Command="{Binding OpenUrlCommand}" CommandParameter="https://github.com/kanadelab/Satolist2/releases" />
+				<Separator/>
+				<MenuItem Header="ゴーストアップローダ「ななろだ」" Command="{Binding OpenUrlCommand}" CommandParameter="https://home.kanadelab.ukagaka.net/narnaloader.html" />
+				<MenuItem Header="さとりすと＆ななろだフォーラムサイト(ご質問などお気軽に)" Command="{Binding OpenUrlCommand}" CommandParameter="https://q2a.satolist.ukagaka.net/" />
 				<Separator />
 				<MenuItem Header="Ukadoc(SSP公式仕様書)" Command="{Binding OpenUrlCommand}" CommandParameter="http://ssp.shillest.net/ukadoc/manual/index.html" />
-				<MenuItem Header="里々wiki" Command="{Binding OpenUrlCommand}" CommandParameter="https://soliton.sub.jp/satori/" />
+				<MenuItem Header="里々wiki(里々の非公式wiki)" Command="{Binding OpenUrlCommand}" CommandParameter="https://soliton.sub.jp/satori/" />
 			</MenuItem>
 		</Menu>
 
