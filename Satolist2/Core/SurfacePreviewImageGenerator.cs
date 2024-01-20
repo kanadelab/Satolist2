@@ -86,7 +86,7 @@ namespace Satolist2.Core
 			string temporaryDumpDirectory = DictionaryUtility.ConbinePath(ghost.FullDictionaryPath, "profile/satolist/surfacepreview");
 			try
 			{
-				System.IO.Directory.Delete(temporaryDumpDirectory);
+				System.IO.Directory.Delete(temporaryDumpDirectory, true);
 			}
 			catch { }
 			System.IO.Directory.CreateDirectory(temporaryDumpDirectory);
@@ -246,7 +246,7 @@ namespace Satolist2.Core
 					//掃除
 					try
 					{
-						System.IO.Directory.Delete(temporaryDumpDirectory);
+						System.IO.Directory.Delete(temporaryDumpDirectory, true);
 					}
 					catch { }
 

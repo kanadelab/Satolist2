@@ -60,7 +60,7 @@ namespace Satolist2.Control
 			//ダブルクリックでスクリプト挿入
 			if (sender is ListViewItem listViewItem)
 			{
-				SurfacePaletteViewModel.InsertSurfaceToActiveEditor(((SurfaceViewerItemViewModel)listViewItem.DataContext).Id);
+				SurfacePaletteViewModel.InsertSurfaceToActiveEditor(((RuntimeBasedSurfaceViewerItemViewModel)listViewItem.DataContext).Id);
 			}
 			e.Handled = true;
 		}
@@ -82,7 +82,10 @@ namespace Satolist2.Control
 		public const int ScriptExecutedMessage = 0x0401;
 		public const int MetadataGeneratedMessage = 0x0402;
 
+		//各スコープウインドウの情報
 		private Dictionary<int, WindowItem> windowItems;
+
+		//現在スコープ
 		private int currentScope;
 
 		private TemporaryGhostRuntimeEx runtime;
@@ -91,10 +94,13 @@ namespace Satolist2.Control
 		private bool isPreviewDataEnable;
 		private RuntimeBasedSurfacePreviewMetaData previewData;
 
+		//シェル情報
 		private ICollectionView surfaceList;
 		private RuntimeBasedSurfaceViewerItemViewModel selectedSurface;
+		private long generatingSurfaceId;
 		private RuntimeBasedSurfaceViewerItemViewModel[] items;
 
+		//きせかえ情報
 		private ICollectionView bindList;
 		private RuntimeBasedSurfaceViewerBindCategoryViewModel[] bindItems;
 
@@ -121,6 +127,7 @@ namespace Satolist2.Control
 		public string DockingTitle => "サーフェスビューワv3";
 		public string DockingContentId => ContentId;
 
+		//サーフェスの基準サイズ
 		private System.Drawing.Size SelectedSurfaceBaseSize
 		{
 			get
@@ -130,6 +137,7 @@ namespace Satolist2.Control
 			}
 		}
 
+		//プレビューデータが有効かどうか
 		public bool IsPreviewDataEnable
 		{
 			get => isPreviewDataEnable;
@@ -162,6 +170,7 @@ namespace Satolist2.Control
 			}
 		}
 
+		//選択中のサーフェス
 		public RuntimeBasedSurfaceViewerItemViewModel SelectedSurface
 		{
 			get => selectedSurface;
@@ -288,15 +297,36 @@ namespace Satolist2.Control
 		{
 #if SURFACE_VIEWER_V3
 
-			if (callbackWindow == null)
+			//ランタイムをクローズ
+			runtime?.Dispose();
+			runtime = null;
+
+			//初期化
+			foreach (var item in windowItems)
 			{
-				callbackWindow = new SSTPCallBackNativeWindow(Main.MainWindow.HWnd);
-				callbackWindow.RegisterCallback(ScriptExecutedMessage, OnScriptExecuted);
-				callbackWindow.RegisterCallback(MetadataGeneratedMessage, OnMetadataGenerated);
+				item.Value.Dispose();
 			}
+			windowItems.Clear();
+			SelectedSurface = null;
+			IsRuntimeAvailable = false;
+			IsRuntimeBooting = false;
+
+			//起動中の処理があればキャンセル
+			runtimeBootCanceller?.Cancel();
+			runtimeBootCanceller?.Dispose();
+			runtimeBootTask?.Wait();
+			runtimeBootCanceller = new CancellationTokenSource();
 
 			if (Main.SurfacePreview.RuntimeBasedSurfacePreviewData != null)
 			{
+				//ネイティブコールバックを準備
+				if (callbackWindow == null)
+				{
+					callbackWindow = new SSTPCallBackNativeWindow(Main.MainWindow.HWnd);
+					callbackWindow.RegisterCallback(ScriptExecutedMessage, OnScriptExecuted);
+					callbackWindow.RegisterCallback(MetadataGeneratedMessage, OnMetadataGenerated);
+				}
+
 				IsPreviewDataEnable = true;
 				previewData = Main.SurfacePreview.RuntimeBasedSurfacePreviewData;
 				items = previewData.Surfaces.Records.Select(o => new RuntimeBasedSurfaceViewerItemViewModel(this, o.Key, o.Value)).ToArray();
@@ -314,6 +344,69 @@ namespace Satolist2.Control
 				SurfaceList.SortDescriptions.Add(new SortDescription("Id", ListSortDirection.Ascending));
 
 				NotifyChangeScope();
+
+				//有効なシェルが指定されてる場合にランタイムを起動する
+				if (Directory.Exists(Main.SurfacePreview.SelectedShellPath))
+				{
+					IsRuntimeBooting = true;
+
+					//Sakura FMOを汚染しないようにGUIDでFMO名を決定して使用する
+					runtime = TemporaryGhostRuntimeEx.PrepareShell(Main.SurfacePreview.SelectedShellPath, Guid.NewGuid().ToString());
+					runtime.Boot();
+
+					var cancelToken = runtimeBootCanceller.Token;
+
+					var runtimeBootTask = Task.Run(() =>
+					{
+						try
+						{
+							//FMOの構築待ち
+							while (true)
+							{
+								Thread.Sleep(100);
+								cancelToken.ThrowIfCancellationRequested();
+								runtimeGhostFMORecord = SakuraFMOReader.Read(runtime.Ghost, runtime.FMOName);
+								if (runtimeGhostFMORecord != null)
+								{
+									if (runtimeGhostFMORecord.HWndList.Length >= captureScopes.Count)
+									{
+										break;
+									}
+
+									//SSPは起動してるが、シェル設定に対してウインドウが足りてない場合はスクリプトを実行して生成を促す
+									MakeWindowRequestToRuntime(captureScopes);
+								}
+							}
+
+							//メインスレッドで表示更新系
+							Control.Dispatcher.Invoke(new Action(() =>
+							{
+								var sortedScopes = new List<int>(captureScopes);
+								sortedScopes.Sort();
+
+								//HWndListにスコープ順にハンドルが並んでるはず
+								for (int i = 0; i < sortedScopes.Count; i++)
+								{
+									var scope = sortedScopes[i];
+									var item = new WindowItem(Control.FormsHostGrid, runtimeGhostFMORecord.HWndList[i], this);
+									windowItems.Add(scope, item);
+									item.Visibility = Visibility.Collapsed;
+								}
+
+								//起動完了
+								IsRuntimeBooting = false;
+								IsRuntimeAvailable = true;
+							}));
+
+
+						}
+						catch
+						{
+							//TODO: エラー時処理、起動タイムアウトなど？
+							//TODO: 終了時のタスクキャンセルなど
+						}
+					});
+				}
 			}
 			else
 			{
@@ -323,87 +416,6 @@ namespace Satolist2.Control
 				BindList = CollectionViewSource.GetDefaultView(Array.Empty<RuntimeBasedSurfaceViewerBindItemViewModel>());
 			}
 
-			//ランタイムをクローズ
-			runtime?.Dispose();
-			runtime = null;
-
-			//初期化
-			foreach(var item in windowItems)
-			{
-				item.Value.Dispose();
-			}
-			windowItems.Clear();
-
-			//起動中の処理があればキャンセル
-			runtimeBootCanceller?.Cancel();
-			runtimeBootCanceller?.Dispose();
-			runtimeBootTask?.Wait();
-			runtimeBootCanceller = new CancellationTokenSource();
-
-			//有効なシェルが指定されてる場合にランタイムを起動する
-			if (Directory.Exists(Main.SurfacePreview.SelectedShellPath))
-			{
-				IsRuntimeBooting = true;
-
-				//Sakura FMOを汚染しないようにGUIDでFMO名を決定して使用する
-				runtime = TemporaryGhostRuntimeEx.PrepareShell(Main.SurfacePreview.SelectedShellPath, Guid.NewGuid().ToString());
-				runtime.Boot();
-
-				var cancelToken = runtimeBootCanceller.Token;
-
-				var runtimeBootTask = Task.Run(() =>
-				{
-					try
-					{
-						//FMOの構築待ち
-						while (true)
-						{
-							Thread.Sleep(100);
-							cancelToken.ThrowIfCancellationRequested();
-							runtimeGhostFMORecord = SakuraFMOReader.Read(runtime.Ghost, runtime.FMOName);
-							if (runtimeGhostFMORecord != null)
-							{
-								if (runtimeGhostFMORecord.HWndList.Length >= captureScopes.Count)
-								{
-									break;
-								}
-
-								//SSPは起動してるが、シェル設定に対してウインドウが足りてない場合はスクリプトを実行して生成を促す
-								MakeWindowRequestToRuntime(captureScopes);
-							}
-						}
-
-						//メインスレッドで表示更新系
-						Control.Dispatcher.Invoke(new Action(() =>
-						{
-							var sortedScopes = new List<int>(captureScopes);
-							sortedScopes.Sort();
-
-							//HWndListにスコープ順にハンドルが並んでるはず
-							for (int i = 0; i < sortedScopes.Count; i++)
-							{
-								var scope = sortedScopes[i];
-								var item = new WindowItem(Control.FormsHostGrid, runtimeGhostFMORecord.HWndList[i], this);
-								windowItems.Add(scope, item);
-								item.Visibility = Visibility.Collapsed;
-							}
-
-							//起動完了
-							IsRuntimeBooting = false;
-							IsRuntimeAvailable = true;
-						}));
-
-						
-					}
-					catch
-					{
-						//TODO: エラー時処理、起動タイムアウトなど？
-						//TODO: 終了時のタスクキャンセルなど
-					}
-				});
-
-				
-			}
 #endif
 		}
 
@@ -480,6 +492,7 @@ namespace Satolist2.Control
 			try
 			{
 				//送信
+				generatingSurfaceId = surfaceId;
 				Satorite.SendSSTP(runtimeGhostFMORecord, script.ToString(), true, true, callbackWindow.HWnd);
 			}
 			catch { }
@@ -505,7 +518,6 @@ namespace Satolist2.Control
 
 				//scope
 				script.Append(string.Format(@"\p[{0}]", selectedSurface.Scope));
-				//script.Append(string.Format(@"\p[{0}]", 1));
 
 				//scale
 				script.Append(string.Format(@"\![set,scaling,{0}]", (int)(CurrentScale * 100.0)));
@@ -548,7 +560,6 @@ namespace Satolist2.Control
 				if(IsMakeCollisionMode)
 				{
 					script.Append(string.Format(@"\![execute,dumpsurface,test,{0},{1},surfacecol]", selectedSurface.Scope, selectedSurface.Id));
-					//script.Append(string.Format(@"\![execute,dumpsurface,test,{0},{1},surfacezero,,1]", selectedSurface.Scope, selectedSurface.Id));
 				}
 
 				//\_w はお守り(たまに位置が合わないときがあるので対策として入れてみた程度…？)
@@ -557,6 +568,7 @@ namespace Satolist2.Control
 				try
 				{
 					//送信
+					generatingSurfaceId = selectedSurface.Id;
 					Satorite.SendSSTP(runtimeGhostFMORecord, script.ToString(), true, true, callbackWindow.HWnd);
 				}
 				catch { }
@@ -564,7 +576,7 @@ namespace Satolist2.Control
 		}
 
 		//スケール合わせ
-		public bool UpdateScale(double requestScale)
+		public void UpdateScale(double requestScale, bool forceSyncToRuntime)
 		{
 			//整数パーセンテージで変更がある場合にのみ更新
 			if ((int)(requestScale * 100.0) != (int)(CurrentScale * 100.0))
@@ -573,7 +585,10 @@ namespace Satolist2.Control
 				CurrentScale = requestScale;
 				SyncToRuntime();
 			}
-			return false;
+			else if(forceSyncToRuntime)
+			{
+				SyncToRuntime();
+			}
 		}
 
 		public void PreviewWindowSizeChanged()
@@ -582,7 +597,7 @@ namespace Satolist2.Control
 				return;
 
 			//同じようにサイズ補正
-			windowItems[selectedSurface.Scope].ResetWindowPosition();
+			windowItems[selectedSurface.Scope].ResetWindowPosition(false);
 		}
 
 		private void OnScriptExecuted(int msg, IntPtr wparam, IntPtr lparam)
@@ -595,45 +610,50 @@ namespace Satolist2.Control
 				try
 				{
 					//出力されたビットマップを拾ってくる
-					var imagePath = DictionaryUtility.ConbinePath(runtime.RuntimeDirectory.FullPath, "ssp", "ghost", "temporaryghost", "ghost", "master", "test", "surfacecol" + selectedSurface.Id.ToString() + ".png");
+					var imagePath = DictionaryUtility.ConbinePath(runtime.RuntimeDirectory.FullPath, "ssp", "ghost", "temporaryghost", "ghost", "master", "test", "surfacecol" + generatingSurfaceId.ToString() + ".png");
 
 					//ファイルをロックしないように一旦streamにする
 					var bytes = File.ReadAllBytes(imagePath);
 					SurfaceBitmapForMakeCollision = (Bitmap)Bitmap.FromStream(new MemoryStream(bytes));
-					File.Delete(imagePath);
 				}
 				catch { }
 			}
 			else
 			{
-				//スクリプトの実行後、ウインドウのサイズが変更されている可能性があるので位置を更新する
-				//TODO: かならずしも表示が更新されたタイミングで呼ばれるわけではないようなので、再検討が必要そう
-				windowItems[selectedSurface.Scope].ResetWindowPosition();
+				var surface = items.FirstOrDefault(o => o.Id == generatingSurfaceId);
+				if (surface != null)
+				{
+					windowItems[surface.Scope].ResetWindowPosition(false);
+				}
 			}
 		}
 
 		//メタデータ用サーフェスが出力された
 		private void OnMetadataGenerated(int msg, IntPtr wparam, IntPtr lparam)
 		{
-			//2つの画像をよみこみ、オリジン基準と画像実体基準のサイズを取得する
-			var imagePath = DictionaryUtility.ConbinePath(runtime.RuntimeDirectory.FullPath, "ssp", "ghost", "temporaryghost", "ghost", "master", "test", "surface" + selectedSurface.Id.ToString() + ".png");
-			var imagePath2 = DictionaryUtility.ConbinePath(runtime.RuntimeDirectory.FullPath, "ssp", "ghost", "temporaryghost", "ghost", "master", "test", "surfacezero" + selectedSurface.Id.ToString() + ".png");
-
-			try
+			var surface = items.FirstOrDefault(o => o.Id == generatingSurfaceId);
+			if (surface != null)
 			{
-				using (var surfaceBitmap = (Bitmap)Bitmap.FromFile(imagePath))
+				//2つの画像をよみこみ、オリジン基準と画像実体基準のサイズを取得する
+				var imagePath = DictionaryUtility.ConbinePath(runtime.RuntimeDirectory.FullPath, "ssp", "ghost", "temporaryghost", "ghost", "master", "test", "surface" + generatingSurfaceId.ToString() + ".png");
+				var imagePath2 = DictionaryUtility.ConbinePath(runtime.RuntimeDirectory.FullPath, "ssp", "ghost", "temporaryghost", "ghost", "master", "test", "surfacezero" + generatingSurfaceId.ToString() + ".png");
+
+				try
 				{
-					using (var surfaceZeroBitmap = (Bitmap)Bitmap.FromFile(imagePath2))
+					using (var surfaceBitmap = (Bitmap)Bitmap.FromFile(imagePath))
 					{
-						var sizeData = new SurfaceSizeData(surfaceBitmap.Size, surfaceZeroBitmap.Size);
-						windowItems[selectedSurface.Scope].SetSurfaceImageSize(selectedSurface.Id, sizeData);
+						using (var surfaceZeroBitmap = (Bitmap)Bitmap.FromFile(imagePath2))
+						{
+							var sizeData = new SurfaceSizeData(surfaceBitmap.Size, surfaceZeroBitmap.Size);
+							windowItems[surface.Scope].SetSurfaceImageSize(generatingSurfaceId, sizeData);
+						}
 					}
+					windowItems[surface.Scope].ResetWindowPosition(true);
 				}
-				SyncToRuntime();
-			}
-			catch
-			{ 
-				//IOがおかしいのでちょっとどうしようもない
+				catch
+				{
+					//IOがおかしいのでちょっとどうしようもない
+				}
 			}
 		}
 
@@ -647,6 +667,18 @@ namespace Satolist2.Control
 			runtimeBootTask?.Wait();
 		}
 
+		public void SendRuntimeChangeSurface(RuntimeBasedSurfaceViewerItemViewModel item)
+		{
+			var insertStr = string.Format(@"\p[{0}]\s[{1}]", item.Scope, item.Id.ToString());
+			try
+			{
+				Satorite.SendSSTP(Main.Ghost, insertStr, false, false);
+			}
+			catch (GhostNotFoundException ex)
+			{
+				ex.PrintErrorLog();
+			}
+		}
 
 		private class SurfaceSizeData
 		{
@@ -696,7 +728,7 @@ namespace Satolist2.Control
 					if(formsHost.Visibility != value)
 					{
 						formsHost.Visibility = value;
-						ResetWindowPosition();
+						ResetWindowPosition(false);
 					}
 				}
 			}
@@ -752,7 +784,7 @@ namespace Satolist2.Control
 				Win32Import.SetWindowPos(RuntimeHwnd, IntPtr.Zero, 0, 0, 0, 0, Win32Import.SWP_NOSIZE | Win32Import.SWP_NOZORDER | Win32Import.SWP_NOACTIVE | Win32Import.SWP_SHOWWINDOW);
 			}
 
-			public void ResetWindowPosition()
+			public void ResetWindowPosition(bool forceSyncToRuntime)
 			{
 				//Visilibityを子ウインドウ側にも適用
 				if (Visibility == Visibility.Visible)
@@ -773,8 +805,7 @@ namespace Satolist2.Control
 						requestScale = Math.Min(requestScale, dpiScale);
 
 						//一旦スケール合わせを優先する
-						if (Parent.UpdateScale(requestScale))
-							return;
+						Parent.UpdateScale(requestScale, forceSyncToRuntime);
 					}
 
 				}
@@ -820,6 +851,8 @@ namespace Satolist2.Control
 	internal class RuntimeBasedSurfaceViewerItemViewModel : NotificationObject
 	{
 		public LiteSurfaceRecord Model { get; }
+		public ActionCommand InsertSurfaceCommand { get; }
+		public ActionCommand RuntimeChangeSurfaceCommand { get; }
 
 		public long Id { get; }
 		public int Scope => Model.SatolistScope;
@@ -843,6 +876,20 @@ namespace Satolist2.Control
 		{
 			Id = id;
 			Model = surface;
+
+			InsertSurfaceCommand = new ActionCommand(
+				o =>
+				{
+					SurfaceViewerViewModel.InsertSurfaceToActiveEditor(Id);
+				}
+				);
+
+			RuntimeChangeSurfaceCommand = new ActionCommand(
+				o =>
+				{
+					parent.SendRuntimeChangeSurface(this);
+				}
+				);
 		}
 	}
 

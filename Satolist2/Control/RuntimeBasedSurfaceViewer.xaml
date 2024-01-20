@@ -44,6 +44,20 @@
 			
 			<!--サーフェスリスト-->
 			<ListView Grid.Column="0" ItemsSource="{Binding SurfaceList}" SelectedItem="{Binding SelectedSurface}" DisplayMemberPath="Label">
+				<ListView.ItemContainerStyle>
+					<Style TargetType="ListViewItem" BasedOn="{StaticResource {x:Type ListViewItem}}">
+						<EventSetter Event="MouseDoubleClick" Handler="ListViewItem_MouseDoubleClick" />
+						<Setter Property="ContextMenu">
+							<Setter.Value>
+								<ContextMenu>
+									<MenuItem Header="サーフェス切り替えをトークに挿入" Command="{Binding InsertSurfaceCommand}" />
+									<Separator />
+									<MenuItem Header="サーフェス切り替えを起動中のゴーストに送信" Command="{Binding RuntimeChangeSurfaceCommand}" />
+								</ContextMenu>
+							</Setter.Value>
+						</Setter>
+					</Style>
+				</ListView.ItemContainerStyle>
 			</ListView>
 
 			<!--きせかえツリービュー-->
