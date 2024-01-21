@@ -333,6 +333,8 @@ namespace Satolist2.Core
 		[DllImport("user32.dll")]
 		public static extern IntPtr SetParent(IntPtr child, IntPtr parent);
 		[DllImport("user32.dll")]
+		public static extern IntPtr GetParent(IntPtr child);
+		[DllImport("user32.dll")]
 		public static extern int GetClientRect(IntPtr hwnd, ref RECT rect);
 		[DllImport("user32.dll")]
 		public static extern int SetWindowPos(IntPtr hwmd, IntPtr hwndInsertAfter, int x, int y, int cx, int cy, uint flags);

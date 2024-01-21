@@ -544,6 +544,34 @@ namespace Satolist2.Control
 			catch { }
 		}
 
+		//スケールの再計算
+		private bool UpdateScale()
+		{
+			var windowItem = windowItems[selectedSurface.Scope];
+			windowItem.CurrentSurfaceId = selectedSurface.Id;
+
+			if (windowItem.CurrentSurfaceSizeData == null)
+				return false;
+
+			//dpiScale値を取得
+			var dpiScale = PresentationSource.FromVisual(Main.MainWindow).CompositionTarget.TransformToDevice.M11;
+
+			int surfaceHeight = windowItem.CurrentSurfaceSizeData.SurfaceSize.Height;
+			int gridHeight = (int)(Control.FormsHostGrid.ActualHeight * dpiScale);
+
+			//dpiスケールを最大としてスケール
+			double requestScale = (double)gridHeight / (double)surfaceHeight;
+			requestScale = Math.Min(requestScale, dpiScale);
+
+			//パーセンテージで変化がある場合にのみ更新
+			if ((int)(requestScale * 100.0) != (int)(CurrentScale * 100.0))
+			{
+				CurrentScale = requestScale;
+				return true;
+			}
+			return false;
+		}
+
 		//ランタイムに変更を送信
 		private void SyncToRuntime()
 		{
@@ -552,6 +580,7 @@ namespace Satolist2.Control
 			{
 				var windowItem = windowItems[selectedSurface.Scope];
 				windowItem.CurrentSurfaceId = selectedSurface.Id;
+				windowItem.RepairWindowBind();
 
 				//データがない
 				if (!windowItem.HasSurfaceImageSize(selectedSurface.Id))
@@ -559,6 +588,9 @@ namespace Satolist2.Control
 					RequestMetadataImages(selectedSurface.Scope, selectedSurface.Id);
 					return;
 				}
+
+				//スケール更新
+				UpdateScale();
 
 				StringBuilder script = new StringBuilder();
 
@@ -643,8 +675,11 @@ namespace Satolist2.Control
 			if (selectedSurface == null)
 				return;
 
-			//同じようにサイズ補正
-			windowItems[selectedSurface.Scope].ResetWindowPosition(false);
+			//サイズの変更があれば再表示
+			if(UpdateScale())
+			{
+				SyncToRuntime();
+			}
 		}
 
 		private void OnScriptExecuted(int msg, IntPtr wparam, IntPtr lparam)
@@ -664,14 +699,6 @@ namespace Satolist2.Control
 					SurfaceBitmapForMakeCollision = (Bitmap)Bitmap.FromStream(new MemoryStream(bytes));
 				}
 				catch { }
-			}
-			else
-			{
-				var surface = items.FirstOrDefault(o => o.Id == generatingSurfaceId);
-				if (surface != null)
-				{
-					windowItems[surface.Scope].ResetWindowPosition(false);
-				}
 			}
 		}
 
@@ -695,7 +722,9 @@ namespace Satolist2.Control
 							windowItems[surface.Scope].SetSurfaceImageSize(generatingSurfaceId, sizeData);
 						}
 					}
-					windowItems[surface.Scope].ResetWindowPosition(true);
+
+					//表示
+					SyncToRuntime();
 				}
 				catch
 				{
@@ -775,7 +804,6 @@ namespace Satolist2.Control
 					if(formsHost.Visibility != value)
 					{
 						formsHost.Visibility = value;
-						ResetWindowPosition(false);
 					}
 				}
 			}
@@ -831,50 +859,26 @@ namespace Satolist2.Control
 				Win32Import.SetWindowPos(RuntimeHwnd, IntPtr.Zero, 0, 0, 0, 0, Win32Import.SWP_NOSIZE | Win32Import.SWP_NOZORDER | Win32Import.SWP_NOACTIVE | Win32Import.SWP_SHOWWINDOW);
 			}
 
-			public void ResetWindowPosition(bool forceSyncToRuntime)
+			//うまく親子関係がつながらないときがある？ SSPに取り戻される？ ようなので後天的に接続できるようにする
+			public void RepairWindowBind()
 			{
-				//Visilibityを子ウインドウ側にも適用
-				if (Visibility == Visibility.Visible)
+				if(Win32Import.GetParent(RuntimeHwnd) != FormsPanel.Handle)
 				{
-					FormsPanel.Visible = true;
-
-					//出力画像ベースで用意すればいいはず
-					if(surfaceSizeItems.TryGetValue(CurrentSurfaceId, out var sizeData))
-					{
-						//dpiScale値を取得
-						var dpiScale = PresentationSource.FromVisual(Parent.Main.MainWindow).CompositionTarget.TransformToDevice.M11;
-
-						int surfaceHeight = sizeData.SurfaceSize.Height;
-						int gridHeight = (int)(ParentGrid.ActualHeight * dpiScale);
-
-						//dpiスケールを最大としてスケール
-						double requestScale = (double)gridHeight / (double)surfaceHeight;
-						requestScale = Math.Min(requestScale, dpiScale);
-
-						//一旦スケール合わせを優先する
-						Parent.UpdateScale(requestScale, forceSyncToRuntime);
-					}
-
-				}
-				else
-				{
-					FormsPanel.Visible = false;
+					BindGhostWindow(FormsPanel.Handle, RuntimeHwnd);
 				}
 			}
 
-			private void BindGhostWindow(IntPtr hostHwnd, IntPtr childHwnd)
+            private void BindGhostWindow(IntPtr hostHwnd, IntPtr childHwnd)
 			{
-				//WS_CHILD, WS_POPUP をとりかえて子ウインドウ扱いにする
-
 				{
 					IntPtr es = Win32Import.GetWindowLongPtr(childHwnd, Win32Import.GWL_EXSTYLE);
 					es = new IntPtr(((long)es & ~Win32Import.WS_EX_LAYERED) | Win32Import.WS_EX_NOACTIVATE);
-					var rees = Win32Import.SetWindowLongPtr(childHwnd, Win32Import.GWL_EXSTYLE, es);
+					Win32Import.SetWindowLongPtr(childHwnd, Win32Import.GWL_EXSTYLE, es);
 				}
 
 				{
 					IntPtr ws = Win32Import.GetWindowLongPtr(childHwnd, Win32Import.GWL_STYLE);
-					ws = new IntPtr(((long)ws | Win32Import.WS_CHILD) & ~Win32Import.WS_POPUP);
+					ws = new IntPtr(((long)ws | Win32Import.WS_CHILD ) & ~(Win32Import.WS_POPUP));
 					Win32Import.SetWindowLongPtr(childHwnd, Win32Import.GWL_STYLE, ws);
 				}
 
@@ -889,7 +893,7 @@ namespace Satolist2.Control
 					Win32Import.SetWindowLongPtr(childHwnd, Win32Import.GWL_EXSTYLE, es);
 				}
 
-				Win32Import.SetWindowPos(childHwnd, IntPtr.Zero, 0, 0, 0, 0, Win32Import.SWP_NOZORDER | Win32Import.SWP_NOSIZE | Win32Import.SWP_NOACTIVE);
+				Win32Import.SetWindowPos(childHwnd, IntPtr.Zero, 0, 0, 0, 0, Win32Import.SWP_NOZORDER | Win32Import.SWP_NOSIZE | Win32Import.SWP_NOACTIVE | Win32Import.SWP_SHOWWINDOW);
 			}
 		}
 	}
