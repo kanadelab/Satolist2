@@ -290,7 +290,7 @@ namespace Satolist2.Utility
 		public static readonly char[] TabSeparator = { Tab };
 		//改行
 		public const string NewLine = "\r\n";
-		public static readonly string[] NewLineSeparator = { NewLine };
+		public static readonly string[] NewLineSeparator = { NewLine, "\n" };
 
 		//カンマ
 		public static readonly string[] CommaSeparator = { "," };
