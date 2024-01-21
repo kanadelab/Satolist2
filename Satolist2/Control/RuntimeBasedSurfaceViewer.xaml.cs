@@ -106,6 +106,7 @@ namespace Satolist2.Control
 
 		private HashSet<int> captureScopes;
 
+		private bool isRuntimeExited;
 		private bool isRuntimeBooting;
 		private bool isRuntimeAvailable;
 		private bool isMakeCollisionMode;
@@ -121,6 +122,7 @@ namespace Satolist2.Control
 		public RuntimeBasedSurfaceViewer Control { get; private set; }
 		public MainViewModel Main { get; private set; }
 		public CollisionEditorViewModel CollisionEditorViewModel { get; }
+		public ActionCommand RuntimeRebootCommand { get; }
 
 		public double CurrentScale { get; private set; }
 
@@ -198,10 +200,22 @@ namespace Satolist2.Control
 		//SSPが起動完了したか
 		public bool IsRuntimeAvailable
 		{
-			get => IsRuntimeAvailable;
+			get => isRuntimeAvailable;
 			set
 			{
 				isRuntimeAvailable = value;
+				NotifyChanged();
+				NotifyChanged(nameof(IsRuntimeVisible));
+			}
+		}
+
+		//SSPが起動後停止したか
+		public bool IsRuntimeExited
+		{
+			get => isRuntimeExited;
+			set
+			{
+				isRuntimeExited = value;
 				NotifyChanged();
 			}
 		}
@@ -217,6 +231,7 @@ namespace Satolist2.Control
 					isMakeCollisionMode = value;
 					NotifyChanged();
 					NotifyChanged(nameof(IsRuntimeMode));
+					NotifyChanged(nameof(IsRuntimeVisible));
 
 					//表示を切り替え
 					SyncToRuntime();
@@ -239,6 +254,12 @@ namespace Satolist2.Control
 		public bool IsRuntimeMode
 		{
 			get => !isMakeCollisionMode;
+		}
+
+		//ランタイムを表示するか
+		public bool IsRuntimeVisible
+		{
+			get => IsRuntimeMode && IsRuntimeAvailable;
 		}
 
 		//触り判定領域の表示
@@ -277,6 +298,12 @@ namespace Satolist2.Control
 			currentScope = -1;
 			CurrentScale = 1.0;
 			captureScopes = null;
+
+			RuntimeRebootCommand = new ActionCommand(
+				o =>
+				{
+					UpdateSurfacePreviewData();
+				});
 		}
 
 		public void ControlBind(System.Windows.Controls.Control control)
@@ -297,9 +324,19 @@ namespace Satolist2.Control
 		{
 #if SURFACE_VIEWER_V3
 
+			//起動中の処理があればキャンセル
+			runtimeBootCanceller?.Cancel();
+			runtimeBootCanceller?.Dispose();
+			runtimeBootTask?.Wait();
+			runtimeBootCanceller = new CancellationTokenSource();
+
 			//ランタイムをクローズ
-			runtime?.Dispose();
-			runtime = null;
+			if (runtime != null)
+			{
+				runtime.Exited -= Runtime_Exited;
+				runtime.Dispose();
+				runtime = null;
+			}
 
 			//初期化
 			foreach (var item in windowItems)
@@ -310,12 +347,7 @@ namespace Satolist2.Control
 			SelectedSurface = null;
 			IsRuntimeAvailable = false;
 			IsRuntimeBooting = false;
-
-			//起動中の処理があればキャンセル
-			runtimeBootCanceller?.Cancel();
-			runtimeBootCanceller?.Dispose();
-			runtimeBootTask?.Wait();
-			runtimeBootCanceller = new CancellationTokenSource();
+			IsRuntimeExited = false;
 
 			if (Main.SurfacePreview.RuntimeBasedSurfacePreviewData != null)
 			{
@@ -349,17 +381,17 @@ namespace Satolist2.Control
 				if (Directory.Exists(Main.SurfacePreview.SelectedShellPath))
 				{
 					IsRuntimeBooting = true;
-
-					//Sakura FMOを汚染しないようにGUIDでFMO名を決定して使用する
-					runtime = TemporaryGhostRuntimeEx.PrepareShell(Main.SurfacePreview.SelectedShellPath, Guid.NewGuid().ToString());
-					runtime.Boot();
-
 					var cancelToken = runtimeBootCanceller.Token;
 
 					var runtimeBootTask = Task.Run(() =>
 					{
 						try
 						{
+							//Sakura FMOを汚染しないようにGUIDでFMO名を決定して使用する
+							runtime = TemporaryGhostRuntimeEx.PrepareShell(Main.SurfacePreview.SelectedShellPath, Guid.NewGuid().ToString());
+							runtime.Exited += Runtime_Exited;
+							runtime.Boot();
+
 							//FMOの構築待ち
 							while (true)
 							{
@@ -402,8 +434,7 @@ namespace Satolist2.Control
 						}
 						catch
 						{
-							//TODO: エラー時処理、起動タイムアウトなど？
-							//TODO: 終了時のタスクキャンセルなど
+							runtime.Kill();
 						}
 					});
 				}
@@ -417,6 +448,19 @@ namespace Satolist2.Control
 			}
 
 #endif
+		}
+
+		private void Runtime_Exited(object sender, EventArgs e)
+		{
+			IsRuntimeBooting = false;
+			IsRuntimeAvailable = false;
+			IsRuntimeExited = true;
+			if (runtime != null)
+			{
+				runtime.Exited -= Runtime_Exited;
+				runtime.Dispose();
+				runtime = null;
+			}
 		}
 
 		//選択中のサーフェスのスコープが変更
@@ -455,6 +499,8 @@ namespace Satolist2.Control
 		//選択中のサーフェスが変更
 		public void NotifyChangeSurface()
 		{
+			if (!IsRuntimeAvailable)
+				return;
 			if (selectedSurface == null)
 				return;
 
@@ -502,7 +548,7 @@ namespace Satolist2.Control
 		private void SyncToRuntime()
 		{
 			//選択中の情報を送る
-			if (runtimeGhostFMORecord != null && selectedSurface != null && captureScopes.Contains(selectedSurface.Scope))
+			if (IsRuntimeAvailable && selectedSurface != null && captureScopes.Contains(selectedSurface.Scope))
 			{
 				var windowItem = windowItems[selectedSurface.Scope];
 				windowItem.CurrentSurfaceId = selectedSurface.Id;
@@ -544,7 +590,8 @@ namespace Satolist2.Control
 				}
 
 				//位置調整
-				script.Append(string.Format(@"\![move,--X=0,--Y={0},--base=global,--base-offset=left.top,--move-offset=left.top]", marginTop));
+				//\_w はお守り(たまに位置が合わないときがあるので対策として入れてみた程度…？)
+				script.Append(string.Format(@"\_w[0]\![move,--X=0,--Y={0},--base=global,--base-offset=left.top,--move-offset=left.top]", marginTop));
 
 				//判定表示設定
 				if(showCollision)
@@ -562,8 +609,8 @@ namespace Satolist2.Control
 					script.Append(string.Format(@"\![execute,dumpsurface,test,{0},{1},surfacecol]", selectedSurface.Scope, selectedSurface.Id));
 				}
 
-				//\_w はお守り(たまに位置が合わないときがあるので対策として入れてみた程度…？)
-				script.Append(string.Format(@"\_w[0]\m[{0},0,0]", ScriptExecutedMessage));
+				//完了通知
+				script.Append(string.Format(@"\m[{0},0,0]", ScriptExecutedMessage));
 
 				try
 				{

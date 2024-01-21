@@ -102,8 +102,13 @@
 						<ProgressBar IsIndeterminate="true" Height="10" Width="100" />
 					</StackPanel>
 
+					<StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="{Binding IsRuntimeExited, Converter={StaticResource BooleanToVisibilityConverter}}">
+						<TextBlock Text="レンダラ プロセスが停止しました" />
+						<Button Content="再起動" Command="{Binding RuntimeRebootCommand}" />
+					</StackPanel>
+
 					<!--SSPホスト-->
-					<Grid x:Name="FormsHostGrid" SizeChanged="FormsHostGrid_SizeChanged" Visibility="{Binding IsRuntimeMode, Converter={StaticResource BooleanToVisibilityConverter}}">
+					<Grid x:Name="FormsHostGrid" SizeChanged="FormsHostGrid_SizeChanged" Visibility="{Binding IsRuntimeVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
 					</Grid>
 
 					<!--当たり判定作成用静止画ビュー-->

@@ -1,4 +1,6 @@
-﻿using Microsoft.VisualBasic.FileIO;
+﻿using FluentFTP.Servers.Handlers;
+using MahApps.Metro.Converters;
+using Microsoft.VisualBasic.FileIO;
 using Satolist2.Utility;
 using System;
 using System.Collections.Generic;
@@ -19,6 +21,8 @@ namespace Satolist2.Core
 		public string FMOName { get; }
 		public Model.GhostModel Ghost { get; private set; }
 		public TemporaryDirectory RuntimeDirectory { get; private set; }
+
+		public event EventHandler Exited;
 
 		private TemporaryGhostRuntimeEx(string fmoName)
 		{
@@ -67,13 +71,37 @@ namespace Satolist2.Core
 			startInfo.WorkingDirectory = Path.Combine(RuntimeDirectory.FullPath, @"ssp");
 
 			process = new ChildProcess(startInfo);
+			process.Process.EnableRaisingEvents = true;
+			process.Process.Exited += Process_Exited;
+		}
+
+		private void Process_Exited(object sender, EventArgs e)
+		{
+			//プロセス停止イベント
+			Exited?.Invoke(sender, e);
+		}
+
+		public void Kill()
+		{
+			try
+			{
+				process?.Process?.Kill();
+			}
+			catch { }
 		}
 
 		public void Dispose()
 		{
 			try
 			{
-				process.Dispose();
+				if (process != null)
+				{
+					if (process.Process != null)
+					{
+						process.Process.Exited -= Process_Exited;
+					}
+					process.Dispose();
+				}
 			}
 			catch { }
 			RuntimeDirectory.Dispose();

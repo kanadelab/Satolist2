@@ -18,13 +18,16 @@ namespace Satolist2.Utility
 
 		public void Dispose()
 		{
-			try
+			//削除は失敗しても仕方ないという感じにしておく
+			//そのうちクリーンアップされる判断
+			Task.Run(() =>
 			{
-				//削除は失敗しても仕方ないという感じにしておく
-				//そのうちクリーンアップされる判断
-				System.IO.Directory.Delete(FullPath, true);
-			}
-			catch { }
+				try
+				{
+					System.IO.Directory.Delete(FullPath, true);
+				}
+				catch { }
+			});
 		}
 
 		//文字列扱いで結合やらができるよう
