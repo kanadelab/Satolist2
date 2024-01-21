@@ -577,7 +577,7 @@ namespace Satolist2.Control
 					foreach (var bind in category.Items)
 					{
 						script.Append(
-							string.Format(@"\![bind,{0},{1},{2}]", bind.Category, bind.Name, bind.IsEnabled ? 1 : 0)
+							string.Format("\\![bind,\"{0}\",\"{1}\",{2}]", bind.Category, bind.Name, bind.IsEnabled ? 1 : 0)
 							);
 					}
 				}

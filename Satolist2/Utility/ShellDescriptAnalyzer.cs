@@ -15,9 +15,9 @@ namespace Satolist2.Utility
 	//きせかえ周辺の情報を取得する
 	internal class ShellDescriptAnalyzer
 	{
-		private static readonly Regex BindGroupNamePattern = new Regex(@"^(sakura|kero|char[0-9]+)\.bindgroup([0-9]+)\.name,(.+),(.+),?(.*)");
+		private static readonly Regex BindGroupNamePattern = new Regex(@"^(sakura|kero|char[0-9]+)\.bindgroup([0-9]+)\.name,([^,]+),([^,]+),?([^,]*)");
 		private static readonly Regex BindGroupDefaultPattern = new Regex(@"^(sakura|kero|char[0-9]+)\.bindgroup([0-9]+)\.default,([0-9]+)");
-		private static readonly Regex BindOptionPattern = new Regex(@"^(sakura|kero|char[0-9]+)\.bindoption([0-9]+)\.group,(.+),(.+)");
+		private static readonly Regex BindOptionPattern = new Regex(@"^(sakura|kero|char[0-9]+)\.bindoption([0-9]+)\.group,([^,]+),([^,]+)");
 		private static readonly Regex CommonScopePattern = new Regex(@"^(sakura|kero|char[0-9]+)");
 
 		//データ本体
