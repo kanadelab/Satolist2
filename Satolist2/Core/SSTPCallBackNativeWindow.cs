@@ -48,8 +48,8 @@ namespace Satolist2.Core
 						lpszClassName = WindowClassName,
 						hIconSm = IntPtr.Zero
 					};
-					Win32Import.RegisterClassEx(ref windowClass);
-					if (Marshal.GetLastWin32Error() != 0)
+
+					if (Win32Import.RegisterClassEx(ref windowClass) == 0)
 						throw new Win32Exception(Marshal.GetLastWin32Error());
 				}
 
@@ -57,7 +57,7 @@ namespace Satolist2.Core
 
 				//ウインドウの生成
 				HWnd = Win32Import.CreateWindowEx(0, WindowClassName, WindowName, 0, 0, 0, 100, 100, parent, IntPtr.Zero, hInstance, IntPtr.Zero);
-				if (Marshal.GetLastWin32Error() != 0)
+				if (HWnd == IntPtr.Zero)
 					throw new Win32Exception(Marshal.GetLastWin32Error());
 
 				//クラスの登録
