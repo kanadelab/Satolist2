@@ -79,6 +79,8 @@ namespace Satolist2.Model
 		public string LastBootExecutePath { get; set; }
 		[JsonProperty]
 		public string SurfacePreviewShellDirectory { get; set; }
+		[JsonProperty]
+		public bool IsRuntimeBasedSurfaceViewerEnabled { get; set; }
 
 		[JsonProperty]
 		public Dictionary<string, Tuple<int,int>> DefaultSurfacePaletteOffset { get; }

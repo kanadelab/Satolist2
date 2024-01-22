@@ -9,6 +9,7 @@
              d:DesignHeight="450" d:DesignWidth="800">
 	<UserControl.Resources>
 		<BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+		<util:InvertBoolToVisibilityConverter x:Key="InvertBoolToVisibilityConverter"/>
 	</UserControl.Resources>
 	<Grid>
 		<Grid.RowDefinitions>
@@ -17,9 +18,13 @@
 		</Grid.RowDefinitions>
 
 		<Menu Grid.Row="0">
-			<MenuItem Header="表示">
+			<MenuItem Header="設定">
 				<MenuItem Header="きせかえリストの表示" IsCheckable="True" IsChecked="{Binding ShowBindList, Mode=TwoWay}" />
 				<MenuItem Header="触り判定の表示" IsCheckable="True" IsChecked="{Binding ShowCollision, Mode=TwoWay}" IsEnabled="{Binding IsRuntimeMode}" />
+				<Separator />
+				<MenuItem Header="シェルを再読み込み" Command="{Binding ReloadShellCommand}" />
+				<Separator />
+				<MenuItem Header="サーフェスビューワv3を有効化" IsCheckable="True" IsEnabled="{Binding IsGhostEnabled}" IsChecked="{Binding IsEnabled, Mode=TwoWay}" />
 			</MenuItem>
 			<MenuItem Header="範囲選択">
 				<MenuItem Header="範囲選択モード" IsCheckable="True" IsChecked="{Binding IsMakeCollisionMode, Mode=TwoWay}" />
@@ -105,6 +110,11 @@
 					<StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="{Binding IsRuntimeExited, Converter={StaticResource BooleanToVisibilityConverter}}">
 						<TextBlock Text="レンダラ プロセスが停止しました" />
 						<Button Content="再起動" Command="{Binding RuntimeRebootCommand}" />
+					</StackPanel>
+
+					<StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="{Binding IsEnabled, Converter={StaticResource InvertBoolToVisibilityConverter}}">
+						<TextBlock Text="クリックするとサーフェスビューワをひらきます" />
+						<Button Content="サーフェスビューワを起動" Command="{Binding EnableSurfaceViewerCommand}" />
 					</StackPanel>
 
 					<!--SSPホスト-->

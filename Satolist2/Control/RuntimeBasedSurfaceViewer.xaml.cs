@@ -13,6 +13,7 @@ using System.IO.Packaging;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Runtime.InteropServices;
+using System.ServiceModel.Security;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -123,6 +124,8 @@ namespace Satolist2.Control
 		public MainViewModel Main { get; private set; }
 		public CollisionEditorViewModel CollisionEditorViewModel { get; }
 		public ActionCommand RuntimeRebootCommand { get; }
+		public ActionCommand EnableSurfaceViewerCommand { get; }
+		public ActionCommand ReloadShellCommand { get; }
 
 		public double CurrentScale { get; private set; }
 
@@ -182,6 +185,40 @@ namespace Satolist2.Control
 				{
 					selectedSurface = value;
 					NotifyChangeSurface();
+				}
+			}
+		}
+
+		//ゴーストが有効かどうか(ゴーストを読み込まずにシェルだけとかだとfalse)
+		public bool IsGhostEnabled
+		{
+			get => Main.Ghost != null;
+		}
+
+		//ゴーストでサーフェスビューワが有効かどうか
+		public bool IsEnabled
+		{
+			get
+			{
+				if (IsGhostEnabled)
+					return MainViewModel.EditorSettings.GhostTemporarySettings.IsRuntimeBasedSurfaceViewerEnabled;
+				else
+					return true;	//ゴースト単体の場合は必ず有効
+			}
+				
+			set
+			{
+				if(!IsGhostEnabled)
+				{
+					return;
+				}
+
+				if (IsEnabled != value)
+				{
+					MainViewModel.EditorSettings.GhostTemporarySettings.IsRuntimeBasedSurfaceViewerEnabled = value;
+					MainViewModel.EditorSettings.SaveGhostTemporarySettings(Main.Ghost);
+					NotifyChanged();
+					UpdateSurfacePreviewData();
 				}
 			}
 		}
@@ -294,7 +331,7 @@ namespace Satolist2.Control
 			CollisionEditorViewModel = new CollisionEditorViewModel(main);
 
 			windowItems = new Dictionary<int, WindowItem>();
-			showBindList = true;
+			showBindList = false;
 			currentScope = -1;
 			CurrentScale = 1.0;
 			captureScopes = null;
@@ -302,6 +339,21 @@ namespace Satolist2.Control
 			RuntimeRebootCommand = new ActionCommand(
 				o =>
 				{
+					UpdateSurfacePreviewData();
+				});
+
+			EnableSurfaceViewerCommand = new ActionCommand(
+				o =>
+				{
+					IsEnabled = true;
+				});
+
+			ReloadShellCommand = new ActionCommand(
+				o =>
+				{
+					//ランタイムを再起動せずにきれいにシェルだけさくらスクリプトベースでリロードできるとよい
+					//surfaces.txt, deascript.txt のリロード、スコープが増えたりを考える必要があるので一旦全部再起動でいく
+					Main.SurfacePreview.ReloadRuntimeBasedSurfaceViewerData();
 					UpdateSurfacePreviewData();
 				});
 		}
@@ -349,7 +401,7 @@ namespace Satolist2.Control
 			IsRuntimeBooting = false;
 			IsRuntimeExited = false;
 
-			if (Main.SurfacePreview.RuntimeBasedSurfacePreviewData != null)
+			if (IsEnabled && Main.SurfacePreview.RuntimeBasedSurfacePreviewData != null)
 			{
 				//ネイティブコールバックを準備
 				if (callbackWindow == null)

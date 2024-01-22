@@ -2336,6 +2336,21 @@ namespace Satolist2
 			}
 		}
 
+		public void ReloadRuntimeBasedSurfaceViewerData()
+		{
+#if SURFACE_VIEWER_V3
+			try
+			{
+				RuntimeBasedSurfacePreviewData = new RuntimeBasedSurfacePreviewMetaData();
+				RuntimeBasedSurfacePreviewData.Load(SelectedShell.DirectoryFullPath);
+			}
+			catch
+			{
+				RuntimeBasedSurfacePreviewData = null;
+			}
+#endif
+		}
+
 		internal class SurfacePreviewViewModelShellItem : NotificationObject
 		{
 			private bool isSelected;
