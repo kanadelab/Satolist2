@@ -155,13 +155,13 @@ namespace Satolist2.Control
 
 				if (System.IO.File.Exists(replacePath))
 				{
-					var fileBody = System.IO.File.ReadAllText(replacePath, Constants.EncodingShiftJis);
+					var fileBody = System.IO.File.ReadAllText(replacePath, main.Ghost.BootConf.ReplaceEncoding);
 					DeserializeReplace(fileBody);
 				}
 
 				if (System.IO.File.Exists(replaceAfterPath))
 				{
-					var fileBody = System.IO.File.ReadAllText(replaceAfterPath, Constants.EncodingShiftJis);
+					var fileBody = System.IO.File.ReadAllText(replaceAfterPath, main.Ghost.BootConf.ReplaceEncoding);
 					DeserializeReplaceAfter(fileBody);
 				}
 
@@ -201,7 +201,7 @@ namespace Satolist2.Control
 			try
 			{
 				var fullPath = main.Ghost.FullPath + ReplaceFilePath;
-				System.IO.File.WriteAllText(fullPath, saveText, Constants.EncodingShiftJis);
+				System.IO.File.WriteAllText(fullPath, saveText, main.Ghost.BootConf.ReplaceEncoding);
 				ReplaceSaveObject.IsChanged = false;
 				return true;
 			}
@@ -231,7 +231,7 @@ namespace Satolist2.Control
 			try
 			{
 				var fullPath = main.Ghost.FullPath + ReplaceAfterFilePath;
-				System.IO.File.WriteAllText(fullPath, saveText, Constants.EncodingShiftJis);
+				System.IO.File.WriteAllText(fullPath, saveText, main.Ghost.BootConf.ReplaceEncoding);
 				ReplaceSaveObject.IsChanged = false;
 				return true;
 			}

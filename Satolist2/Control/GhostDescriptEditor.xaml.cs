@@ -2,6 +2,7 @@
 using Satolist2.Utility;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
@@ -103,7 +104,7 @@ namespace Satolist2.Control
 		private EditorLoadState loadState;
 		private List<string> commonLine;
 		private bool isChanged;
-		private IEnumerable<DescriptItemViewModel> items;
+		private ObservableCollection<DescriptItemViewModel> items;
 		private string searchString;
 		public ICollectionView Items { get; }
 
@@ -170,7 +171,7 @@ namespace Satolist2.Control
 			this.main = main;
 			serializingScope = new ListEditorSerializingScope();
 			loadState = EditorLoadState.Initialized;
-			items = ItemModel.Select(o => new DescriptItemViewModel(o, this)).ToArray();
+			items = new ObservableCollection<DescriptItemViewModel>(ItemModel.Select(o => new DescriptItemViewModel(o, this)).ToArray());
 			Items = CollectionViewSource.GetDefaultView(items);
 			Items.Filter = new Predicate<object>(
 				o =>
@@ -195,7 +196,7 @@ namespace Satolist2.Control
 				var fullPath = main.Ghost.FullPath + SaveFilePath;
 				if (System.IO.File.Exists(fullPath))
 				{
-					var fileBody = System.IO.File.ReadAllText(fullPath, Constants.EncodingShiftJis);
+					var fileBody = DictionaryUtility.ReadAllTextWithDescriptStyleCharset(fullPath);
 					Deserialize(fileBody);
 				}
 				loadState = EditorLoadState.Loaded;
@@ -229,7 +230,7 @@ namespace Satolist2.Control
 			try
 			{
 				var fullPath = main.Ghost.FullPath + SaveFilePath;
-				System.IO.File.WriteAllText(fullPath, saveText, Constants.EncodingShiftJis);
+				DictionaryUtility.WriteAllTextWithDescriptStyleCharset(fullPath, saveText);
 				isChanged = false;
 				return true;
 			}
@@ -243,6 +244,11 @@ namespace Satolist2.Control
 		private void Deserialize(string body)
 		{
 			commonLine.Clear();
+			for(var i = 0; i < ItemModel.Length; i++)
+			{
+				items[i] = new DescriptItemViewModel(ItemModel[i], this);
+			}
+
 			var lines = DictionaryUtility.SplitLines(body);
 
 			foreach(var line in lines)
@@ -315,6 +321,26 @@ namespace Satolist2.Control
 				this.control = editor;
 				MainTextEditor.OnTextChanged += Document_TextChanged;
 			}
+		}
+
+		//テキスト本体からエンコーディングを推論
+		public Encoding GetDescriptStyleCharsetEncoding()
+		{
+			string contents = "";
+			if (loadState == EditorLoadState.Loaded)
+			{
+				if (CurrentTabIndex == TabIndexList)
+				{
+					//リスト化されてるのでシリアライズして保存
+					contents = Serialize();
+				}
+				else
+				{
+					//テキスト編集モードなのでDocumentを保存
+					contents = MainTextEditor.Text;
+				}
+			}
+			return DictionaryUtility.GetDescriptStyleCharsetEncoding(contents);
 		}
 	}
 

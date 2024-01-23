@@ -317,7 +317,7 @@ namespace Satolist2.Utility
 		//surfacetable.txtのロード
 		public void LoadSurfaceTable(string path)
 		{
-			var text = File.ReadAllText(path, Constants.EncodingShiftJis);
+			var text = DictionaryUtility.ReadAllTextWithDescriptStyleCharset(path);
 			text = text.Replace("\t", "");
 			text = text.Replace(" ", "");
 

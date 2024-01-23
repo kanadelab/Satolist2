@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Drawing.Printing;
 using System.IO;
 using System.Linq;
 using System.ServiceModel.Channels;
@@ -21,6 +22,11 @@ namespace Satolist2.Model
 	{
 		private string fullPath;
 		private ObservableCollection<DictionaryModel> dictionaries;
+		
+		public SatoriBootConfModel BootConf
+		{
+			get; private set;
+		}
 
 		//ゴーストのフルパス（readme.txt 等のフル階層）
 		public string FullPath
@@ -68,6 +74,10 @@ namespace Satolist2.Model
 		{
 			fullPath = DictionaryUtility.NormalizeFullPath(Path.GetFullPath(path));
 			dictionaries = new ObservableCollection<DictionaryModel>();
+
+			//bootconfを最初にロード
+			BootConf = new SatoriBootConfModel();
+			BootConf.Load(DictionaryUtility.ConbinePath(FullDictionaryPath, "satori_bootconf.txt"));
 
 			//読み込まない設定ファイル
 			var ignoreDictionaryFiles = new HashSet<string>();
@@ -384,7 +394,7 @@ namespace Satolist2.Model
 		public void LoadDictionary()
 		{
 			//ファイルをロード
-			var text = File.ReadAllText(FullPath, Constants.EncodingShiftJis);
+			var text = File.ReadAllText(FullPath, Ghost.BootConf.DicEncoding);
 			if (!MainViewModel.EditorSettings.GeneralSettings.IsTextModeDefault && IsSatoriDictionary)
 			{
 				//リストモード
@@ -730,7 +740,7 @@ namespace Satolist2.Model
 					//シリアライズして保存
 					saveText = Serialize();
 				}
-				File.WriteAllText(FullPath, saveText, Constants.EncodingShiftJis);
+				File.WriteAllText(FullPath, saveText, Ghost.BootConf.DicEncoding);
 				lastUpdateTime = File.GetLastWriteTimeUtc(FullPath);
 				IsChanged = false;
 				return true;

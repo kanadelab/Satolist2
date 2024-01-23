@@ -675,7 +675,7 @@ namespace Satolist2.Control
 
 				//位置調整
 				//\_w はお守り(たまに位置が合わないときがあるので対策として入れてみた程度…？)
-				script.Append(string.Format(@"\_w[0]\![move,--X=0,--Y={0},--base=global,--base-offset=left.top,--move-offset=left.top]", marginTop));
+				script.Append(string.Format(@"\_w[1]\![move,--X=0,--Y={0},--base=global,--base-offset=left.top,--move-offset=left.top]", marginTop));
 
 				//判定表示設定
 				if(showCollision)

@@ -2263,7 +2263,7 @@ namespace Satolist2
 				try
 				{
 					var parser = new CsvBuilder();
-					parser.Deserialize(System.IO.File.ReadAllText(descriptPath, Constants.EncodingShiftJis));
+					parser.Deserialize(DictionaryUtility.ReadAllTextWithDescriptStyleCharset(descriptPath));
 
 					var name = parser.GetValue("name") ?? "(無名のシェル)";
 

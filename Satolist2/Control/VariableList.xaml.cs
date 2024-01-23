@@ -321,7 +321,7 @@ namespace Satolist2.Control
 			{
 				if(System.IO.File.Exists(fullPath))
 				{
-					var fileBody = System.IO.File.ReadAllText(fullPath, Constants.EncodingShiftJis);
+					var fileBody = System.IO.File.ReadAllText(fullPath, main.Ghost.BootConf.DicEncoding);
 
 					//ここで初期化とSAORIのリストを切り出す
 					var lines = DictionaryUtility.SplitLines(fileBody);
@@ -402,7 +402,7 @@ namespace Satolist2.Control
 			try
 			{
 				var fullPath = main.Ghost.FullPath + SatoriConfFilePath;
-				System.IO.File.WriteAllText(fullPath, saveText, Constants.EncodingShiftJis);
+				System.IO.File.WriteAllText(fullPath, saveText, main.Ghost.BootConf.DicEncoding);
 				IsChanged = false;
 				return true;
 			}

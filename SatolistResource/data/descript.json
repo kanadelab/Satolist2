@@ -3,7 +3,7 @@
 		"Property": "charset",
 		"Description": "",
 		"Help": "",
-		"Type": "Constant",
+		"Type": "String",
 		"Default": "Shift_JIS",
 		"Hidden": true
 	},

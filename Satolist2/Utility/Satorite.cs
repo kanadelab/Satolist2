@@ -62,7 +62,7 @@ namespace Satolist2.Utility
 
 				//さとりてに読ませる辞書を作成
 				string filePath = ghost.FullDictionaryPath + "/" + dictionaryDirectory + "/" + TemporaryDictionaryFileName;
-				var writer = new StreamWriter(filePath, false, Constants.EncodingShiftJis);
+				var writer = new StreamWriter(filePath, false, ghost.BootConf.DicEncoding);
 				writer.WriteLine(Constants.GetEventHead(type) + SatoriteEventName);
 				writer.WriteLine(script);
 				writer.Close();

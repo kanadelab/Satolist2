@@ -204,23 +204,26 @@ namespace Satolist2.Control
 
 					var cloneBitmap = image.Image.Clone(r, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
 
-					Main.MainWindow.Dispatcher.BeginInvoke(new Action(() =>
-				   {
-					   vm.Image = cloneBitmap;
-
-					   if (isGenerate)
+					if (Main.Ghost != null)
+					{
+						Main.MainWindow.Dispatcher.BeginInvoke(new Action(() =>
 					   {
-						   try
+						   vm.Image = cloneBitmap;
+
+						   if (isGenerate)
 						   {
-							   //データがあったら、サムネイルを生成してprofileに保存しておく
-							   //スタートメニューでつかう
-							   var ghostPreviewPath = DictionaryUtility.ConbinePath(Main.Ghost.FullDictionaryPath, "profile/satolist");
-							   System.IO.Directory.CreateDirectory(ghostPreviewPath);
-							   vm.Image.Save(DictionaryUtility.ConbinePath(ghostPreviewPath, "preview.png"), System.Drawing.Imaging.ImageFormat.Png);
+							   try
+							   {
+								   //データがあったら、サムネイルを生成してprofileに保存しておく
+								   //スタートメニューでつかう
+								   var ghostPreviewPath = DictionaryUtility.ConbinePath(Main.Ghost.FullDictionaryPath, "profile/satolist");
+								   System.IO.Directory.CreateDirectory(ghostPreviewPath);
+								   vm.Image.Save(DictionaryUtility.ConbinePath(ghostPreviewPath, "preview.png"), System.Drawing.Imaging.ImageFormat.Png);
+							   }
+							   catch { }
 						   }
-						   catch { }
-					   }
-				   }), System.Windows.Threading.DispatcherPriority.ApplicationIdle);
+					   }), System.Windows.Threading.DispatcherPriority.ApplicationIdle);
+					}
 
 					//1枚だけサムネ出力
 					isFirstImage = false;

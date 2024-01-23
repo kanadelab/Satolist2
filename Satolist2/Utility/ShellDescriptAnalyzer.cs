@@ -50,7 +50,8 @@ namespace Satolist2.Utility
 
 		public void Load(string path)
 		{
-			var lines = System.IO.File.ReadAllLines(path, Constants.EncodingShiftJis);
+			var text = DictionaryUtility.ReadAllTextWithDescriptStyleCharset(path);
+			var lines = DictionaryUtility.SplitLines(text);
 			Model = new ShellDescriptModel();
 
 			//各行を解析する

@@ -270,6 +270,53 @@ namespace Satolist2.Utility
 			return Regex.IsMatch(System.IO.Path.GetFileName(path), "^dic.+\\.txt$");
 		}
 
+		//descript スタイルのcharset指定を検索し、それにあわせたchasetでテキストを読む
+		//sjisもしくはutf-8のみ
+		public static string ReadAllTextWithDescriptStyleCharset(string path)
+		{
+			//一旦バイト配列で読む
+			var bytes = File.ReadAllBytes(path);
+
+			//文字化け許容で一旦sjisで読む
+			var sjisString = Constants.EncodingShiftJis.GetString(bytes);
+
+			//"charset,utf-8" を探す
+			if (sjisString.IndexOf("charset,utf-8", 0, StringComparison.OrdinalIgnoreCase) >= 0)
+			{
+				//utf-8
+				using(var mst = new MemoryStream(bytes))
+				{
+					using(var sst = new StreamReader(mst, Encoding.UTF8))
+					{
+						return sst.ReadToEnd();
+					}
+				}
+			}
+
+			//それ以外(Shift_JIS)
+			return sjisString;
+		}
+
+		//descript スタイルのcharset指定を検索し、それに基づいて保存を行う
+		public static void WriteAllTextWithDescriptStyleCharset(string path, string contents)
+		{
+			//書き込み
+			File.WriteAllText(path, contents, GetDescriptStyleCharsetEncoding(contents));
+		}
+
+		//descript スタイルのcharset指定を検索し、それに基づくエンコーディングを取得
+		public static Encoding GetDescriptStyleCharsetEncoding(string contents)
+		{
+			var encoding = Constants.EncodingShiftJis;
+
+			//"charset,utf-8" を探す
+			if (contents.IndexOf("charset,utf-8", 0, StringComparison.OrdinalIgnoreCase) >= 0)
+			{
+				//utf-8
+				encoding = Encoding.UTF8;
+			}
+			return encoding;
+		}
 	}
 
 	internal static class Constants
@@ -386,9 +433,9 @@ namespace Satolist2.Utility
 			SaveData = new Dictionary<string, string>();
 
 			//規定のファイルからロードを試みる
-			if(!Deserialize(ghost.FullDictionaryPath + "/" + Constants.SaveDataFileName))
+			if(!Deserialize(ghost.FullDictionaryPath + "/" + Constants.SaveDataFileName, ghost.BootConf.SavedataEncoding))
 			{
-				Deserialize(ghost.FullDictionaryPath + "/" + Constants.SaveBackupFileName);
+				Deserialize(ghost.FullDictionaryPath + "/" + Constants.SaveBackupFileName, ghost.BootConf.SavedataEncoding);
 			}
 		}
 
@@ -397,11 +444,11 @@ namespace Satolist2.Utility
 			SaveData = new Dictionary<string, string>();
 		}
 
-		public bool Deserialize(string path)
+		public bool Deserialize(string path, Encoding encoding)
 		{
 			try
 			{
-				string[] lines = File.ReadAllLines(path, Constants.EncodingShiftJis);
+				string[] lines = File.ReadAllLines(path, encoding);
 				foreach (var line in lines)
 				{
 					if (line.IndexOf(Constants.VariableHead) == 0)
@@ -541,6 +588,12 @@ namespace Satolist2.Utility
 		public string GetValue(string key)
 		{
 			return Records.FirstOrDefault(o => o.Key == key).Value;
+		}
+
+		public bool TryGetValue(string key, out string value)
+		{
+			value = GetValue(key);
+			return value != null;
 		}
 	}
 	

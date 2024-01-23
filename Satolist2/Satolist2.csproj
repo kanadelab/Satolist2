@@ -310,6 +310,7 @@
     <Compile Include="Model\EditorSettings.cs" />
     <Compile Include="Model\GhostLocalSettings.cs" />
     <Compile Include="Model\GhostTemplate.cs" />
+    <Compile Include="Model\SatoriBootConfModel.cs" />
     <Compile Include="Model\TextEditor.cs" />
     <Compile Include="Model\UploadSettings.cs" />
     <Compile Include="Module\TextEditor\AvalonEditModule.xaml.cs">
