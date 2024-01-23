@@ -16,17 +16,29 @@ namespace Satolist2.Model
 		private const string IsUtf8ReplaceSettings = "is_utf8_replace";
 		private const string IsUtf8SavedataSettings = "is_utf8_savedata";
 		private const string IsUtf8CharactersiniSettings = "is_utf8_charactersini";
+		private const string IsUtf8SatolistDeveloperOptionsSettings = "is_utf8_satolist_developer_options";
+		private const string IsUtf8SatolistDeleteSettings = "is_utf8_satolist_delete";
 
 		public bool IsUtf8Dic { get; private set; }
 		public bool IsUtf8Replace { get; private set; }
 		public bool IsUtf8Savedata { get; private set; }
 		public bool IsUtf8CharactersIni { get; private set; }
+		public bool IsUtf8SatolistDeveloperOptions { get; private set; }
+		public bool IsUtf8SatolistDelete { get; private set; }
 
 		//実際に有効なエンコーディング
 		public Encoding DicEncoding => IsUtf8Dic ? Encoding.UTF8 : Constants.EncodingShiftJis;
 		public Encoding ReplaceEncoding => IsUtf8Replace ? Encoding.UTF8 : Constants.EncodingShiftJis;
 		public Encoding SavedataEncoding => IsUtf8Savedata ? Encoding.UTF8 : Constants.EncodingShiftJis;
 		public Encoding CharactersIniEncoding => IsUtf8CharactersIni ? Encoding.UTF8 : Constants.EncodingShiftJis;
+#if false
+		public Encoding SatolistDeveloperOptionsEncoding => IsUtf8SatolistDeveloperOptions ? Encoding.UTF8 : Constants.EncodingShiftJis;
+		public Encoding SatolistDeleteEncoding => IsUtf8SatolistDelete ? Encoding.UTF8 : Constants.EncodingShiftJis;
+#else
+		public Encoding SatolistDeveloperOptionsEncoding => Constants.EncodingShiftJis;
+		public Encoding SatolistDeleteEncoding => Constants.EncodingShiftJis;
+#endif
+
 
 		private bool StringToBool(string s)
 		{
@@ -57,25 +69,37 @@ namespace Satolist2.Model
 				IsUtf8CharactersIni = true;
 			}
 
-			if(StringToBool(builder.GetValue(IsUtf8DicSettings)))
+			if(builder.TryGetValue(IsUtf8DicSettings, out string dic))
 			{
-				IsUtf8Dic = true;
+				IsUtf8Dic = StringToBool(dic);
 			}
 
-			if (StringToBool(builder.GetValue(IsUtf8ReplaceSettings)))
+			if (builder.TryGetValue(IsUtf8ReplaceSettings, out string rep))
 			{
-				IsUtf8Replace = true;
+				IsUtf8Replace = StringToBool(rep);
 			}
 
-			if (StringToBool(builder.GetValue(IsUtf8SavedataSettings)))
+			if (builder.TryGetValue(IsUtf8SavedataSettings, out string sav))
 			{
-				IsUtf8Savedata = true;
+				IsUtf8Savedata = StringToBool(sav);
 			}
 
-			if (StringToBool(builder.GetValue(IsUtf8CharactersiniSettings)))
+			if (builder.TryGetValue(IsUtf8CharactersiniSettings, out string ch))
 			{
-				IsUtf8CharactersIni = true;
+				IsUtf8CharactersIni = StringToBool(ch);
 			}
+
+#if false   //GhostDeploy でシェル等を考えると使えないので一旦おいとく                                       
+			if(builder.TryGetValue(IsUtf8SatolistDeveloperOptionsSettings, out string dev))
+			{
+				IsUtf8SatolistDeveloperOptions = StringToBool(dev);
+			}
+
+			if(builder.TryGetValue(IsUtf8SatolistDeleteSettings, out string del))
+			{
+				IsUtf8SatolistDelete = StringToBool(del);
+			}
+#endif
 		}
 	}
 }

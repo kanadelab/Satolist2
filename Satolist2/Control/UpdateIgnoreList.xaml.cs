@@ -235,13 +235,13 @@ namespace Satolist2.Control
 			{
 				if (System.IO.File.Exists(deveoperOptionsPath))
 				{
-					var fileBody = System.IO.File.ReadAllText(deveoperOptionsPath, Constants.EncodingShiftJis);
+					var fileBody = System.IO.File.ReadAllText(deveoperOptionsPath, main.Ghost.BootConf.SatolistDeveloperOptionsEncoding);
 					DeserializeDeveloperOptions(fileBody);
 				}
 
 				if (System.IO.File.Exists(deletePath))
 				{
-					var fileBody = System.IO.File.ReadAllText(deletePath, Constants.EncodingShiftJis);
+					var fileBody = System.IO.File.ReadAllText(deletePath, main.Ghost.BootConf.SatolistDeleteEncoding);
 					DeserializeDelete(fileBody);
 				}
 				DeleteSaveObject.LoadState = EditorLoadState.Loaded;
@@ -279,7 +279,7 @@ namespace Satolist2.Control
 			try
 			{
 				var fullPath = main.Ghost.FullPath + DeveloperOptionsFilePath;
-				System.IO.File.WriteAllText(fullPath, saveText, Constants.EncodingShiftJis);
+				System.IO.File.WriteAllText(fullPath, saveText, main.Ghost.BootConf.SatolistDeveloperOptionsEncoding);
 				DeveloperOptionsSaveObject.IsChanged = false;
 				return true;
 			}
@@ -309,7 +309,7 @@ namespace Satolist2.Control
 			try
 			{
 				var fullPath = main.Ghost.FullPath + DeleteFilePath;
-				System.IO.File.WriteAllText(fullPath, saveText, Constants.EncodingShiftJis);
+				System.IO.File.WriteAllText(fullPath, saveText, main.Ghost.BootConf.SatolistDeleteEncoding);
 				DeleteSaveObject.IsChanged = false;
 				return true;
 			}
