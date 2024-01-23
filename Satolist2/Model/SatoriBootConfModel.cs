@@ -31,7 +31,7 @@ namespace Satolist2.Model
 		public Encoding ReplaceEncoding => IsUtf8Replace ? Encoding.UTF8 : Constants.EncodingShiftJis;
 		public Encoding SavedataEncoding => IsUtf8Savedata ? Encoding.UTF8 : Constants.EncodingShiftJis;
 		public Encoding CharactersIniEncoding => IsUtf8CharactersIni ? Encoding.UTF8 : Constants.EncodingShiftJis;
-#if false
+#if true
 		public Encoding SatolistDeveloperOptionsEncoding => IsUtf8SatolistDeveloperOptions ? Encoding.UTF8 : Constants.EncodingShiftJis;
 		public Encoding SatolistDeleteEncoding => IsUtf8SatolistDelete ? Encoding.UTF8 : Constants.EncodingShiftJis;
 #else
@@ -89,7 +89,7 @@ namespace Satolist2.Model
 				IsUtf8CharactersIni = StringToBool(ch);
 			}
 
-#if false   //GhostDeploy でシェル等を考えると使えないので一旦おいとく                                       
+#if true
 			if(builder.TryGetValue(IsUtf8SatolistDeveloperOptionsSettings, out string dev))
 			{
 				IsUtf8SatolistDeveloperOptions = StringToBool(dev);

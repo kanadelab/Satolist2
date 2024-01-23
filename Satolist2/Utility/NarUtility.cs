@@ -52,6 +52,7 @@ namespace Satolist2.Utility
 		{
 			var pathHashSize = new List<Tuple<string, string, int>>();
 			var developerOptions = new DeveloperOptionsParser();
+			var developerOptionsUtf = new DeveloperOptionsParser();
 
 			var pathUpdates2Dau = path + "/updates2.dau";
 			var pathUpdatesTxt = path + "/updates.txt";
@@ -60,7 +61,9 @@ namespace Satolist2.Utility
 			var pathDeveloperOptions = path + "/developer_options.txt";
 			if(File.Exists(pathDeveloperOptions))
 			{
+				//2通りのcharsetでロードして両方を使う
 				developerOptions = new DeveloperOptionsParser(File.ReadAllText(pathDeveloperOptions, Constants.EncodingShiftJis));
+				developerOptionsUtf = new DeveloperOptionsParser(File.ReadAllText(pathDeveloperOptions, Encoding.UTF8));
 			}
 
 			//古い更新ファイルを削除
@@ -77,6 +80,8 @@ namespace Satolist2.Utility
 				if (IsIgnoreFile(relativePath, false))
 					continue;
 				if (developerOptions.IsIgnored(relativePath, false))
+					continue;
+				if (developerOptionsUtf.IsIgnored(relativePath, false))
 					continue;
 
 				//ハッシュ計算
@@ -171,10 +176,13 @@ namespace Satolist2.Utility
 
 				//developerOptionsの検出
 				var developerOptions = new DeveloperOptionsParser();
+				var developerOptionsUtf = new DeveloperOptionsParser();
 				var pathDeveloperOptions = sourceDirectory + "/developer_options.txt";
+
 				if (File.Exists(pathDeveloperOptions))
 				{
 					developerOptions = new DeveloperOptionsParser(File.ReadAllText(pathDeveloperOptions, Constants.EncodingShiftJis));
+					developerOptionsUtf = new DeveloperOptionsParser(File.ReadAllText(pathDeveloperOptions, Encoding.UTF8));
 				}
 
 				var files = Directory.GetFiles(sourceDirectory, "*", SearchOption.AllDirectories);
@@ -184,6 +192,8 @@ namespace Satolist2.Utility
 					if (IsIgnoreFile(relativePath, true))
 						continue;
 					if (developerOptions.IsIgnored(relativePath, true))
+						continue;
+					if (developerOptionsUtf.IsIgnored(relativePath, true))
 						continue;
 
 					Directory.CreateDirectory(Directory.GetParent(temporaryDirectory + "/" + relativePath).FullName);
