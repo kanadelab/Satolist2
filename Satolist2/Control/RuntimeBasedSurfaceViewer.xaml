@@ -27,7 +27,7 @@
 				<MenuItem Header="サーフェスビューワv3を有効化" IsCheckable="True" IsEnabled="{Binding IsGhostEnabled}" IsChecked="{Binding IsEnabled, Mode=TwoWay}" />
 			</MenuItem>
 			<MenuItem Header="範囲選択">
-				<MenuItem Header="範囲選択モード" IsCheckable="True" IsChecked="{Binding IsMakeCollisionMode, Mode=TwoWay}" />
+				<MenuItem Header="範囲選択(静止画)モード" IsCheckable="True" IsChecked="{Binding IsMakeCollisionMode, Mode=TwoWay}" />
 				<Separator />
 				<MenuItem Header="範囲選択をリセット" IsEnabled="{Binding IsMakeCollisionMode}" Command="{Binding CollisionEditorViewModel.CloseCollisionToolCommand}" />
 				<MenuItem Header="範囲形状" IsEnabled="{Binding IsMakeCollisionMode}">
