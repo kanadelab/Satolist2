@@ -133,12 +133,14 @@ namespace Satolist2.Control
 		public string DockingContentId => ContentId;
 
 		//サーフェスの基準サイズ
-		private System.Drawing.Size SelectedSurfaceBaseSize
+		public System.Drawing.Size SelectedSurfaceBaseSize
 		{
 			get
 			{
+				if (selectedSurface == null)
+					return default;
 				var windowItem = windowItems[selectedSurface.Scope];
-				return windowItem.CurrentSurfaceSizeData.ZeroOriginSize;
+				return windowItem.CurrentSurfaceSizeData?.ZeroOriginSize ?? default;
 			}
 		}
 
@@ -185,6 +187,7 @@ namespace Satolist2.Control
 				{
 					selectedSurface = value;
 					NotifyChangeSurface();
+					NotifyChanged(nameof(SelectedSurfaceBaseSize));
 				}
 			}
 		}
@@ -772,6 +775,9 @@ namespace Satolist2.Control
 						{
 							var sizeData = new SurfaceSizeData(surfaceBitmap.Size, surfaceZeroBitmap.Size);
 							windowItems[surface.Scope].SetSurfaceImageSize(generatingSurfaceId, sizeData);
+
+							//ちょっと不自然だがここで交信かけてやる
+							NotifyChanged(nameof(SelectedSurfaceBaseSize));
 						}
 					}
 
