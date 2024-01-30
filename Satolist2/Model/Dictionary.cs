@@ -116,7 +116,7 @@ namespace Satolist2.Model
 
 			//descriptから基本情報を得る
 			var tempDescript = new CsvBuilder();
-			tempDescript.DeserializeFromFile(FullGhostDescriptPath);
+			tempDescript.Deserialize(DictionaryUtility.ReadAllTextWithDescriptStyleCharset(FullGhostDescriptPath));
 			GhostDescriptSakuraName = tempDescript.GetValue("sakura.name");
 			GhostDescriptName = tempDescript.GetValue("name");
 			GhostIconPath = tempDescript.GetValue("icon");

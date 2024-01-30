@@ -123,7 +123,7 @@ namespace Satolist2.Utility
 		//１つのsurfaces.txtをロード
 		private void LoadSurfaces(string path)
 		{
-			var text = File.ReadAllText(path);
+			var text = DictionaryUtility.ReadAllTextWithDescriptStyleCharset(path);
 			text = text.Replace("\t", "");
 			text = text.Replace(" ", "");
 

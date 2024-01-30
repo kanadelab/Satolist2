@@ -79,14 +79,6 @@ namespace SatolistTest
 		}
 
 		[TestMethod]
-		public void SurfaceParseTest()
-		{
-			ShellAnalyzer reader = new ShellAnalyzer();
-			reader.Load(@"D:\SSP_2\ghost\0x15\shell\master");
-			Console.Write("loaded");
-		}
-
-		[TestMethod]
 		public void SurfaceRangeTest()
 		{
 			string input = "10-20,10-20,!15";
