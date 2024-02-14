@@ -51,7 +51,7 @@ namespace Satolist2.Control
 		}
 	}
 
-	internal class SurfaceViewerViewModel : NotificationObject, IDockingWindowContent, IControlBindedReceiver
+	internal class SurfaceViewerViewModel : NotificationObject, IDockingWindowContent, IDockingWindowActive, IControlBindedReceiver
 	{
 		public const string ContentId = "SurfaceViewer";
 		private SurfaceViewer control;
@@ -60,6 +60,7 @@ namespace Satolist2.Control
 		private ICollectionView surfaceList;
 		private SurfaceViewerItemViewModel selectedSurface;
 		private SurfaceViewerItemViewModel[] items;
+		private bool isDockingWindowActive;
 
 		public CollisionEditorViewModel CollisionEditorViewModel { get; }
 		public MainViewModel Main { get; }
@@ -194,6 +195,16 @@ namespace Satolist2.Control
 		public string DockingTitle => "サーフェスビューワ";
 
 		public string DockingContentId => ContentId;
+
+		public bool IsDockingWindowActive
+		{
+			get => isDockingWindowActive;
+			set
+			{
+				isDockingWindowActive = value;
+				NotifyChanged();
+			}
+		}
 	}
 
 	internal class SurfaceViewerItemViewModel : NotificationObject

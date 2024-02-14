@@ -68,7 +68,7 @@ namespace Satolist2.Control
 	}
 
 	//viewmodel
-	internal class RuntimeBasedSurfaceViewerViewModel : NotificationObject, IDockingWindowContent, IControlBindedReceiver, IDisposable
+	internal class RuntimeBasedSurfaceViewerViewModel : NotificationObject, IDockingWindowContent, IDockingWindowActive, IControlBindedReceiver, IDisposable
 	{
 		public enum CollisionType
 		{
@@ -82,6 +82,8 @@ namespace Satolist2.Control
 		public const string ContentId = "RuntimeBasedSurfaceViewer";
 		public const int ScriptExecutedMessage = 0x0401;
 		public const int MetadataGeneratedMessage = 0x0402;
+
+		private bool isDockingWindowActive;
 
 		//各スコープウインドウの情報
 		private Dictionary<int, WindowItem> windowItems;
@@ -131,6 +133,15 @@ namespace Satolist2.Control
 
 		public string DockingTitle => "サーフェスビューワv3";
 		public string DockingContentId => ContentId;
+		public bool IsDockingWindowActive
+		{
+			get => isDockingWindowActive;
+			set
+			{
+				isDockingWindowActive = value;
+				NotifyChanged();
+			}
+		}
 
 		//サーフェスの基準サイズ
 		public System.Drawing.Size SelectedSurfaceBaseSize
@@ -139,8 +150,10 @@ namespace Satolist2.Control
 			{
 				if (selectedSurface == null)
 					return default;
-				var windowItem = windowItems[selectedSurface.Scope];
-				return windowItem.CurrentSurfaceSizeData?.ZeroOriginSize ?? default;
+				if (windowItems.TryGetValue(selectedSurface.Scope, out var windowItem))
+					return windowItem.CurrentSurfaceSizeData?.ZeroOriginSize ?? default;
+				else
+					return default;
 			}
 		}
 

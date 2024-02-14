@@ -17,6 +17,7 @@
 			<RowDefinition Height="*" />
 		</Grid.RowDefinitions>
 
+		<!--
 		<Menu Grid.Row="0">
 			<MenuItem Header="設定">
 				<MenuItem Header="きせかえリストの表示" IsCheckable="True" IsChecked="{Binding ShowBindList, Mode=TwoWay}" />
@@ -39,6 +40,7 @@
 				<MenuItem Header="選択位置をサーフェスパレットのデフォルト表示位置に設定" IsEnabled="{Binding IsMakeCollisionMode}" Command="{Binding CollisionEditorViewModel.SetSurfacePaletteDefaultPositionCommand}" />
 			</MenuItem>
 		</Menu>
+		-->
 
 		<Grid Grid.Row="1">
 			<Grid.ColumnDefinitions>

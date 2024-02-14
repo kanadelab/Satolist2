@@ -17,9 +17,10 @@
 			<RowDefinition Height="*" />
 		</Grid.RowDefinitions>
 
-		<Menu Grid.Row="0">
-			<MenuItem Header="ゴーストに送信 (Alt+Q)" Command="{Binding SendToGhostCommand}" />
-		</Menu>
+		<StackPanel Grid.Row="0" Orientation="Horizontal">
+			<Button Content="ゴーストに送信 (Alt+Q)" Command="{Binding SendToGhostCommand}" Padding="5 2 5 2"
+					BorderThickness="0"/>
+		</StackPanel>
 
 		<module:TextEditorModuleSelector x:Name="MainTextEditor" Grid.Row="1"
 										 SendToGhostCommand="{Binding SendToGhostCommand}"

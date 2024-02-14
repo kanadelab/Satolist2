@@ -599,7 +599,7 @@ namespace Satolist2
 			UkadocEventReference.ViewModel = mainVm.UkadocEventReferenceViewModel;
 			UkadocScriptReference.ViewModel = mainVm.UkadocScriptReferenceViewModel;
 			HelpViewer.ViewModel = mainVm.HelpViewerViewModel;
-			RuntimeBasedSurfaceViewer.ViewModel = mainViewModel.RuntimeBasedSurfaceViewerViewModel;
+			RuntimeBasedSurfaceViewer.ViewModel = mainVm.RuntimeBasedSurfaceViewerViewModel;
 			LegacySurfaceViewer.ViewModel = mainVm.LegacySurfaceViewerViewModel;
 			LegacySurfacePalette.ViewModel = mainVm.LegacySurfacePaletteViewModel;
 		}

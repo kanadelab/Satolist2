@@ -75,6 +75,12 @@ namespace Satolist2.Utility
 		{
 			Content = control;
 			ViewModel = viewModel;
+			IsActiveChanged += (s, e) => {
+				if(ViewModel is IDockingWindowActive active)
+				{
+					active.IsDockingWindowActive = IsActive;
+				}
+			};
 		}
 
 		//デシリアライズ用
@@ -83,6 +89,13 @@ namespace Satolist2.Utility
 			//ツールウインドウは非表示のみ可能、ドキュメントは外部から逆の設定が入る
 			CanClose = false;
 			CanHide = true;
+
+			IsActiveChanged += (s, e) => {
+				if (ViewModel is IDockingWindowActive active)
+				{
+					active.IsDockingWindowActive = IsActive;
+				}
+			};
 		}
 
 		private void ViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -133,6 +146,11 @@ namespace Satolist2.Utility
 	{
 		string DockingTitle { get; }
 		string DockingContentId { get; }
+	}
+
+	internal interface IDockingWindowActive
+	{
+		bool IsDockingWindowActive { set; }
 	}
 
 	//ビューモデル側にコントロールを渡す処理

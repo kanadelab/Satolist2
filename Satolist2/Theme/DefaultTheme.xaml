@@ -6,6 +6,7 @@
 	<SolidColorBrush x:Key="ThemeBlue">Blue</SolidColorBrush>
 	<SolidColorBrush x:Key="ThemeDarkRed">DarkRed</SolidColorBrush>
 	<SolidColorBrush x:Key="ThemePeachPuff">#444400</SolidColorBrush>
+	<SolidColorBrush x:Key="TemporaryMenu">PaleGreen</SolidColorBrush>
 	<SolidColorBrush x:Key="TextEditorBackgroundColor">#FFFFFF</SolidColorBrush>
 	<SolidColorBrush x:Key="ControlBackGround">#FFFFFF</SolidColorBrush>
 
