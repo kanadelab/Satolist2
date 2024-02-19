@@ -71,11 +71,11 @@
     <Reference Include="AngleSharp, Version=0.17.1.0, Culture=neutral, PublicKeyToken=e83494dcdc6d31ea, processorArchitecture=MSIL">
       <HintPath>..\packages\AngleSharp.0.17.1\lib\net472\AngleSharp.dll</HintPath>
     </Reference>
-    <Reference Include="AvalonDock, Version=4.70.1.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
-      <HintPath>..\packages\Dirkster.AvalonDock.4.70.1\lib\net40\AvalonDock.dll</HintPath>
+    <Reference Include="AvalonDock, Version=4.72.1.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
+      <HintPath>..\packages\Dirkster.AvalonDock.4.72.1\lib\net40\AvalonDock.dll</HintPath>
     </Reference>
-    <Reference Include="AvalonDock.Themes.VS2013, Version=4.70.1.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
-      <HintPath>..\packages\Dirkster.AvalonDock.Themes.VS2013.4.70.1\lib\net40\AvalonDock.Themes.VS2013.dll</HintPath>
+    <Reference Include="AvalonDock.Themes.VS2013, Version=4.72.1.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
+      <HintPath>..\packages\Dirkster.AvalonDock.Themes.VS2013.4.72.1\lib\net40\AvalonDock.Themes.VS2013.dll</HintPath>
     </Reference>
     <Reference Include="Azuki, Version=1.7.12.38751, Culture=neutral, PublicKeyToken=46b77eb7f2d82aba, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
