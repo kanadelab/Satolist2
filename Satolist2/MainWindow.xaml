@@ -228,6 +228,64 @@
 				<MenuItem Header="選択位置をサーフェスパレットのデフォルト表示位置に設定" IsEnabled="{Binding IsMakeCollisionMode}" Command="{Binding CollisionEditorViewModel.SetSurfacePaletteDefaultPositionCommand}" />
 			</MenuItem>
 			
+			<!--集約拡張メニュー-->
+			<MenuItem Header="ウインドウメニュー">
+				<MenuItem.Style>
+					<Style TargetType="MenuItem">
+						<Style.Triggers>
+							<DataTrigger Binding="{Binding SurfaceViewerViewModel.IsDockingWindowActive}" Value="True">
+								<Setter Property="Visibility" Value="Collapsed" />
+							</DataTrigger>
+
+							<DataTrigger Binding="{Binding RuntimeBasedSurfaceViewerViewModel.IsDockingWindowActive}" Value="True">
+								<Setter Property="Visibility" Value="Collapsed" />
+							</DataTrigger>
+						</Style.Triggers>
+					</Style>
+				</MenuItem.Style>
+
+					<!--拡張: サーフェスビューワ-->
+				<MenuItem Header="サーフェスビューワ">
+					<MenuItem Header="範囲選択" 
+				DataContext="{Binding SurfaceViewerViewModel}">
+						<MenuItem Header="判定選択をリセット" Command="{Binding CollisionEditorViewModel.CloseCollisionToolCommand}" />
+						<MenuItem Header="触り判定作成">
+							<MenuItem Header="オフ" IsCheckable="True" IsChecked="{Binding CollisionEditorViewModel.IsCollisionModeInvalid, Mode=TwoWay}" />
+							<MenuItem Header="矩形" IsCheckable="True" IsChecked="{Binding CollisionEditorViewModel.IsCollisionModeRect, Mode=TwoWay}" />
+							<MenuItem Header="楕円形" IsCheckable="True" IsChecked="{Binding CollisionEditorViewModel.IsCollisionModeEllipse, Mode=TwoWay}" />
+							<MenuItem Header="多角形" IsCheckable="True" IsChecked="{Binding CollisionEditorViewModel.IsCollisionModePolygon, Mode=TwoWay}" />
+						</MenuItem>
+						<Separator />
+						<MenuItem Header="選択位置をサーフェスパレットのデフォルト表示位置に設定" Command="{Binding CollisionEditorViewModel.SetSurfacePaletteDefaultPositionCommand}" />
+					</MenuItem>
+				</MenuItem>
+
+
+				<!--拡張: サーフェスビューワv3-->
+				<MenuItem Header="サーフェスビューワv3(仮)">
+					<MenuItem Header="設定" DataContext="{Binding RuntimeBasedSurfaceViewerViewModel}">
+						<MenuItem Header="きせかえリストの表示" IsCheckable="True" IsChecked="{Binding ShowBindList, Mode=TwoWay}" />
+						<MenuItem Header="触り判定の表示" IsCheckable="True" IsChecked="{Binding ShowCollision, Mode=TwoWay}" IsEnabled="{Binding IsRuntimeMode}" />
+						<Separator />
+						<MenuItem Header="シェルを再読み込み" Command="{Binding ReloadShellCommand}" />
+						<Separator />
+						<MenuItem Header="サーフェスビューワv3を有効化" IsCheckable="True" IsEnabled="{Binding IsGhostEnabled}" IsChecked="{Binding IsEnabled, Mode=TwoWay}" />
+					</MenuItem>
+					<MenuItem Header="範囲選択" 
+DataContext="{Binding RuntimeBasedSurfaceViewerViewModel}">
+						<MenuItem Header="範囲選択(静止画)モード" IsCheckable="True" IsChecked="{Binding IsMakeCollisionMode, Mode=TwoWay}" />
+						<Separator />
+						<MenuItem Header="範囲選択をリセット" IsEnabled="{Binding IsMakeCollisionMode}" Command="{Binding CollisionEditorViewModel.CloseCollisionToolCommand}" />
+						<MenuItem Header="範囲形状" IsEnabled="{Binding IsMakeCollisionMode}">
+							<MenuItem Header="矩形" IsCheckable="True"  IsChecked="{Binding CollisionEditorViewModel.IsCollisionModeRect, Mode=TwoWay}" />
+							<MenuItem Header="楕円形" IsCheckable="True" IsChecked="{Binding CollisionEditorViewModel.IsCollisionModeEllipse, Mode=TwoWay}" />
+							<MenuItem Header="多角形" IsCheckable="True" IsChecked="{Binding CollisionEditorViewModel.IsCollisionModePolygon, Mode=TwoWay}" />
+						</MenuItem>
+						<Separator />
+						<MenuItem Header="選択位置をサーフェスパレットのデフォルト表示位置に設定" IsEnabled="{Binding IsMakeCollisionMode}" Command="{Binding CollisionEditorViewModel.SetSurfacePaletteDefaultPositionCommand}" />
+					</MenuItem>
+				</MenuItem>
+			</MenuItem>
 		</Menu>
 
 		<avalonDock:DockingManager Grid.Row="1" AllowMixedOrientation="True" x:Name="DockingManager"
