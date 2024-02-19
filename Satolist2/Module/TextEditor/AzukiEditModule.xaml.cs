@@ -38,6 +38,8 @@ namespace Satolist2.Module.TextEditor
 		private MenuItem insertPaletteMenuItem;
 		private MenuItem sendToGhostMenuItem;
 		private MenuItem sendToGhostSelectionRangeMenuItem;
+		private MenuItem sendShioriEchoToGhostMenuItem;
+		private MenuItem sendShioriEchoToGhostSelectionRangeMenuItem;
 
 		public AzukiEditModule()
 		{
@@ -55,6 +57,10 @@ namespace Satolist2.Module.TextEditor
 			contextmenu.MenuItems.Add(sendToGhostMenuItem);
 			sendToGhostSelectionRangeMenuItem = new MenuItem("選択範囲をゴーストに送信", RequestSendToGhostSelectionRange, (Shortcut)(Keys.Alt | Keys.Shift | Keys.Q));
 			contextmenu.MenuItems.Add(sendToGhostSelectionRangeMenuItem);
+			sendShioriEchoToGhostMenuItem = new MenuItem("ゴーストにShioriEchoで送信", RequestSendShioriEchoToGhost);
+			contextmenu.MenuItems.Add(sendShioriEchoToGhostMenuItem);
+			sendShioriEchoToGhostSelectionRangeMenuItem = new MenuItem("選択範囲をゴーストにShioriEchoで送信", RequestSendShioriEchoToGhostSelectionRange);
+			contextmenu.MenuItems.Add(sendShioriEchoToGhostSelectionRangeMenuItem);
 			contextmenu.MenuItems.Add("-");
 			contextmenu.MenuItems.Add(new MenuItem("検索", RequestShowSearchBox, Shortcut.CtrlF));
 			insertPaletteMenuItem = new MenuItem("挿入");
@@ -67,8 +73,11 @@ namespace Satolist2.Module.TextEditor
 
 			FormsHost.Child = MainTextEditor;
 
+			//デフォルトでオフ、コマンド割当を受けると有効化される
 			IsEnableSendToGhostSelectionRange = false;
-			IsEnableSendToGhost = false;    //デフォルトでオフ
+			IsEnableSendToGhost = false;
+			IsEnableSendShioriEchoToGhost = false;
+			IsEnableSendShioriEchoToGhostSelectionRange = false;
 		}
 
 		private void MainTextEditor_SizeChanged(object sender, EventArgs e)
@@ -104,6 +113,16 @@ namespace Satolist2.Module.TextEditor
 		private void RequestSendToGhostSelectionRange(object sender, EventArgs args)
 		{
 			SendToGhostSelectionRange();
+		}
+
+		private void RequestSendShioriEchoToGhost(object sender, EventArgs args)
+		{
+			SendShioriEchoToGhost();
+		}
+
+		private void RequestSendShioriEchoToGhostSelectionRange(object sender, EventArgs args)
+		{
+			SendShioriEchoToGhostSelectionRange();
 		}
 
 		private void RequestShowSearchBox(object sender, EventArgs args)
@@ -267,6 +286,26 @@ namespace Satolist2.Module.TextEditor
 			{
 				sendToGhostSelectionRangeMenuItem.Enabled = value;
 				sendToGhostSelectionRangeMenuItem.Visible = value;
+			}
+		}
+
+		public override bool IsEnableSendShioriEchoToGhost
+		{
+			get => sendShioriEchoToGhostMenuItem.Enabled;
+			set
+			{
+				sendShioriEchoToGhostMenuItem.Enabled = value;
+				sendShioriEchoToGhostMenuItem.Visible = value;
+			}
+		}
+
+		public override bool IsEnableSendShioriEchoToGhostSelectionRange
+		{
+			get => sendShioriEchoToGhostSelectionRangeMenuItem.Enabled;
+			set
+			{
+				sendShioriEchoToGhostSelectionRangeMenuItem.Enabled = value;
+				sendShioriEchoToGhostSelectionRangeMenuItem.Visible = value;
 			}
 		}
 

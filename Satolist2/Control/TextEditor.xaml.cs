@@ -78,7 +78,9 @@ namespace Satolist2.Control
 	{
 		private TextEditor control;
 		private string randomizedContetnId;
-		
+		private readonly ActionCommand sendShioriEchoToGhostCommand;
+		private readonly ActionCommand sendShioriEchoToGhostSelectionRangeCommand;
+
 		public override string DocumentTitle => TextFile.RelativeName;
 		public override string DockingContentId => randomizedContetnId;
 		
@@ -86,6 +88,10 @@ namespace Satolist2.Control
 		public ActionCommand SendToGhostCommand { get; }
 		public ActionCommand SendToGhostSelectionRangeCommand { get; }
 		public ActionCommand InsertCommand { get; }
+
+		//設定してある場合に限りコマンドが有効
+		public ActionCommand SendShioriEchoToGhostCommand => MainViewModel.EditorSettings.GeneralSettings.IsShowTextEditorShioriEcho ? sendShioriEchoToGhostCommand : null;
+		public ActionCommand SendShioriEchoToGhostSelectionRangeCommand => MainViewModel.EditorSettings.GeneralSettings.IsShowTextEditorShioriEcho ? sendShioriEchoToGhostSelectionRangeCommand : null;
 
 		public override TextEditorModuleBase MainTextEditor => control.MainTextEditor.MainTextEditor;
 
@@ -95,22 +101,35 @@ namespace Satolist2.Control
 			TextFile = textFile;
 
 			Main.PropertyChanged += Main_PropertyChanged;
+			Main.MainWindow.OnTextEditorSettingsChanged += MainWindow_OnTextEditorSettingsChanged;
 
 			//コマンド
 			SendToGhostCommand = new ActionCommand(
 				o =>
 				{
 					//イベントのスコープを検出して送信する必要がある
-					SendToGhost();
+					SendToGhost(false);
 				}
 				);
 
 			SendToGhostSelectionRangeCommand = new ActionCommand(
 				o =>
 				{
-					SendToGhostSelectionRange();
+					SendToGhostSelectionRange(false);
 				}
 				);
+
+			sendShioriEchoToGhostCommand = new ActionCommand(
+				o =>
+				{
+					SendToGhost(true);
+				});
+
+			sendShioriEchoToGhostSelectionRangeCommand = new ActionCommand(
+				o =>
+				{
+					SendToGhostSelectionRange(true);
+				});
 
 			InsertCommand = new ActionCommand(
 				o =>
@@ -118,6 +137,13 @@ namespace Satolist2.Control
 					MainTextEditor.PerformTextInput(((InsertItemPaletteModel)o).Body);
 				}
 				);
+		}
+
+		private void MainWindow_OnTextEditorSettingsChanged(object sender, EventArgs e)
+		{
+			//ShioriEchoを使うかどうかの設定が切り替わった可能性があるので通知
+			NotifyChanged(nameof(SendShioriEchoToGhostCommand));
+			NotifyChanged(nameof(SendShioriEchoToGhostSelectionRangeCommand));
 		}
 
 		private void Main_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -143,7 +169,7 @@ namespace Satolist2.Control
 		}
 
 		//カレットの位置からトークを特定して送信する
-		public void SendToGhost()
+		public void SendToGhost(bool useShioriEcho)
 		{
 			var currentLine = MainTextEditor.CaretLine - 1;	//indexにするので-1
 			var beginLine = 0;
@@ -220,8 +246,16 @@ namespace Satolist2.Control
 
 			try
 			{
-				Satorite.SendSatori(Main.Ghost, builder.ToString(), type);
-				Core.LogMessage.AddLog("ゴーストにトークを送信しました。");
+				if(useShioriEcho)
+				{
+					Satorite.SendShioriEcho(Main.Ghost, builder.ToString());
+					Core.LogMessage.AddLog("ゴーストにShioriEchoを送信しました。");
+				}
+				else
+				{
+					Satorite.SendSatori(Main.Ghost, builder.ToString(), type);
+					Core.LogMessage.AddLog("ゴーストにトークを送信しました。");
+				}
 			}
 			catch(GhostNotFoundException ex)
 			{
@@ -233,6 +267,7 @@ namespace Satolist2.Control
 		{
 			MainTextEditor.OnTextChanged -= Document_TextChanged;
 			MainTextEditor.OnCaretPositionChanged -= Caret_PositionChanged;
+			Main.MainWindow.OnTextEditorSettingsChanged -= MainWindow_OnTextEditorSettingsChanged;
 		}
 
 		public void ControlBind(System.Windows.Controls.Control ctrl)

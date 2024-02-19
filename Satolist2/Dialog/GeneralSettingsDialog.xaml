@@ -62,6 +62,7 @@
 					<RadioButton Content="里々形式(半角数字)" IsChecked="{Binding IsSurfacePaletteInsertTypeSatoriHalfWidth, Mode=TwoWay}" Margin="20 2 3 2"/>
 					<RadioButton Content="さくらスクリプト形式" IsChecked="{Binding IsSurfacePaletteInserTypeSakuraScript, Mode=TwoWay}" Margin="20 2 3 2"/>
 					<CheckBox Content="テキストエディタ上でマウスオーバーした箇所のヒントを表示（既定のエディタエンジン専用）" IsChecked="{Binding Model.IsShowTextEditorToolTip}" Margin="3" />
+					<CheckBox Content="テキストエディタの右クリックメニューにShioriEchoの送信機能を表示" IsChecked="{Binding Model.IsShowTextEditorShioriEcho}" Margin="3" />
 				</StackPanel>
 			</TabItem>
 

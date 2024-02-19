@@ -82,6 +82,12 @@ namespace Satolist2.Module.TextEditor
 		//ゴーストに選択範囲を送信する機能を有効化
 		public abstract bool IsEnableSendToGhostSelectionRange { get; set; }
 
+		//ゴーストにShioriEcho送信機能を有効化
+		public abstract bool IsEnableSendShioriEchoToGhost { get; set; }
+		
+		//ゴーストに選択範囲でShioriEcho送信機能を有効化
+		public abstract bool IsEnableSendShioriEchoToGhostSelectionRange { get; set; }
+
 		//現在行へスクロール
 		public abstract void ScrollToCaret();
 
@@ -120,6 +126,12 @@ namespace Satolist2.Module.TextEditor
 
 		//選択範囲をゴーストに送信
 		public event EventHandler OnSendToGhostSelectionRange;
+
+		//ゴーストにShioriEchoを送信
+		public event EventHandler OnSendShioriEchoToGhost;
+
+		//選択範囲をゴーストにShioriEchoで送信
+		public event EventHandler OnSendShioriEchoToGhostSelectionRange;
 
 		//検索ボックス表示リクエスト
 		public event EventHandler OnShowSearchBoxRequested;
@@ -315,6 +327,18 @@ namespace Satolist2.Module.TextEditor
 		public void SendToGhostSelectionRange()
 		{
 			OnSendToGhostSelectionRange?.Invoke(this, new EventArgs());
+		}
+
+		//ゴーストにShioriEchoを送信
+		public void SendShioriEchoToGhost()
+		{
+			OnSendShioriEchoToGhost?.Invoke(this, new EventArgs());
+		}
+
+		//ゴーストにShioriEchoを送信（選択範囲）
+		public void SendShioriEchoToGhostSelectionRange()
+		{
+			OnSendShioriEchoToGhostSelectionRange?.Invoke(this, new EventArgs());
 		}
 
 		//コメントアウト

@@ -31,6 +31,14 @@ namespace Satolist2.Utility
 			}
 		}
 
+		//里々のスクリプトをShioriEchoでゴーストに送信
+		public static void SendShioriEcho(GhostModel ghost, string script)
+		{
+			//ShioriEcho としてイベントを送信する
+			string[] lines = DictionaryUtility.SplitLines(script);
+			NotifySSTP(ghost, "ShioriEcho", "ShioriEcho送信に失敗", lines);
+		}
+
 		//里々のスクリプトを実行してさくらスクリプト出力を返す
 		public static string ExecuteSatori(GhostModel ghost, string script, EventType type)
 		{
@@ -150,24 +158,30 @@ namespace Satolist2.Utility
 		}
 
 		//NOTIFY SSTPの送信
-		public static void NotifySSTP(GhostModel ghost, string eventName, params string[] references)
+		public static void NotifySSTP(GhostModel ghost, string eventName, string fallbackScript = null, params string[] references)
 		{
-			//未実装
-			throw new NotImplementedException();
-
-			/*
 			var fmoRecord = SakuraFMOReader.Read(ghost);
 			if (fmoRecord == null)
 			{
-				Core.LogMessage.AddLog("編集中のゴーストにアクセスできません。SSPでゴーストを起動していますか？", Core.LogMessageType.Error);
-				return; //送信できてない
+				throw new GhostNotFoundException();
 			}
 
 			var sstpBuilder = new ProtocolBuilder();
 			sstpBuilder.Command = "NOTIFY SSTP/1.0";
 			sstpBuilder.Parameters["Event"] = eventName;
-			*/
-			
+			sstpBuilder.Parameters["Sender"] = "さとりすと";
+			sstpBuilder.Parameters["Charset"] = "Shift_JIS";
+
+			for (int i = 0; i < references.Length; i++)
+			{
+				sstpBuilder.Parameters.Add(string.Format("Reference{0}", i), references[i]);
+			}
+
+			if (string.IsNullOrEmpty(fallbackScript))
+			{
+				sstpBuilder.Parameters["Script"] = fallbackScript;
+			}
+			RaiseSSTP(sstpBuilder, fmoRecord);
 		}
 
 		//NOTIFY SSTPブロードキャスト

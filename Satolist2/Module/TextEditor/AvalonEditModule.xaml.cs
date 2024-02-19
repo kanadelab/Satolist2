@@ -56,9 +56,11 @@ namespace Satolist2.Module.TextEditor
 			tooltipTimer.Tick += TooltipTimer_Tick;
 			DataContext = new AvalonEditModuleViewModel(this);
 
-			//
+			//デフォルトでオフ、コマンド割当を受けると有効化される
 			IsEnableSendToGhostSelectionRange = false;
-			IsEnableSendToGhost = false;    //デフォルトでオフ
+			IsEnableSendToGhost = false;
+			IsEnableSendShioriEchoToGhost = false;
+			IsEnableSendShioriEchoToGhostSelectionRange = false;
 
 			MouseMove += AvalonEditModule_MouseMove;
 			MouseLeave += AvalonEditModule_MouseLeave;
@@ -274,6 +276,26 @@ namespace Satolist2.Module.TextEditor
 			}
 		}
 
+		public override bool IsEnableSendShioriEchoToGhost
+		{
+			get => SendToGhostShioriEchoMenuItem.IsEnabled;
+			set
+			{
+				SendToGhostShioriEchoMenuItem.IsEnabled = value;
+				SendToGhostShioriEchoMenuItem.Visibility = value ? Visibility.Visible : Visibility.Collapsed;
+			}
+		}
+
+		public override bool IsEnableSendShioriEchoToGhostSelectionRange
+		{
+			get => SelectedRangeSendToGhostShioriEchoMenuItem.IsEnabled;
+			set
+			{
+				SelectedRangeSendToGhostShioriEchoMenuItem.IsEnabled = value;
+				SelectedRangeSendToGhostShioriEchoMenuItem.Visibility = value ? Visibility.Visible : Visibility.Collapsed;
+			}
+		}
+
 		public override event EventHandler OnCaretPositionChanged
 		{
 			add => MainTextEditor.TextArea.Caret.PositionChanged += value;
@@ -460,6 +482,8 @@ namespace Satolist2.Module.TextEditor
 
 		public ICommand SendToGhostSelectionRangeCommand { get; }
 		public ICommand SendToGhostCommand { get; }
+		public ICommand SendShioriEchoToGhostSelectionRangeCommand { get; }
+		public ICommand SendShioriEchoToGhostCommand { get; }
 		public ICommand ShowSearchBoxCommand { get; }
 		public ICommand ShowGlobalSearchCommand { get; }
 		public ICommand CompletionCommand { get; }
@@ -732,6 +756,16 @@ namespace Satolist2.Module.TextEditor
 			SendToGhostSelectionRangeCommand = new ActionCommand(o =>
 			{
 				module.SendToGhostSelectionRange();
+			});
+
+			SendShioriEchoToGhostCommand = new ActionCommand(o =>
+			{
+				module.SendShioriEchoToGhost();
+			});
+
+			SendShioriEchoToGhostSelectionRangeCommand = new ActionCommand(o =>
+			{
+				module.SendShioriEchoToGhostSelectionRange();
 			});
 
 			ShowSearchBoxCommand = new ActionCommand(o =>

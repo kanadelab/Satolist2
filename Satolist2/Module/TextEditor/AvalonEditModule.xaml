@@ -49,6 +49,8 @@
 						<Separator />
 						<MenuItem Header="ゴーストに送信" x:Name="SendToGhostMenuItem" Command="{Binding SendToGhostCommand}" InputGestureText="Alt+Q" />
 						<MenuItem Header="選択範囲をゴーストに送信" x:Name="SelectedRangeSendToGhostMenuItem" Command="{Binding SendToGhostSelectionRangeCommand}" InputGestureText="Alt+Shift+Q" />
+						<MenuItem Header="ゴーストにShioriEchoで送信" x:Name="SendToGhostShioriEchoMenuItem" Command="{Binding SendShioriEchoToGhostCommand}"/>
+						<MenuItem Header="選択範囲をゴーストにShioriEchoで送信" x:Name="SelectedRangeSendToGhostShioriEchoMenuItem" Command="{Binding SendShioriEchoToGhostSelectionRangeCommand}" />
 						<MenuItem Header="挿入" ItemsSource="{Binding Main.InsertPalette.Items, FallbackValue={x:Null}}" IsEnabled="{Binding Main.InsertPalette, Converter={StaticResource ReferenceToBoolConverter}}">
 							<MenuItem.ItemContainerStyle>
 								<Style TargetType="MenuItem">

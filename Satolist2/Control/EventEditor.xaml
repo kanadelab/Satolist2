@@ -67,6 +67,8 @@
 		<module:TextEditorModuleSelector x:Name="MainTextEditor" Grid.Row="1" Margin="3" IsEnableSyntaxHighlighting="True" 
 										 SendToGhostCommand="{Binding SendToGhostCommand}" 
 										 SendToGhostSelectionRangeCommand="{Binding SendToGhostSelectionRangeCommand}"
+										 SendShioriEchoToGhostCommand="{Binding SendShioriEchoToGhostCommand}"
+										 SendShioriEchoToGhostSelectionRangeCommand="{Binding SendShioriEchoToGhostSelectionRangeCommand}"
 										 />
 		
 	</Grid>

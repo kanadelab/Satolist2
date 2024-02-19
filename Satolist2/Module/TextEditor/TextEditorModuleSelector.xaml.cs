@@ -47,7 +47,25 @@ namespace Satolist2.Module.TextEditor
 					ctrl.MainTextEditor.IsEnableSendToGhostSelectionRange = e.NewValue != null;
 				}
 			}));
-		
+
+		public static readonly DependencyProperty SendShioriEchoToGhostCommandProperty = DependencyProperty.Register(nameof(SendShioriEchoToGhostCommand), typeof(ICommand), typeof(TextEditorModuleSelector),
+			new PropertyMetadata((d, e) =>
+			{
+				if(d is TextEditorModuleSelector ctrl)
+				{
+					ctrl.MainTextEditor.IsEnableSendShioriEchoToGhost = e.NewValue != null;
+				}
+			}));
+
+		public static readonly DependencyProperty SendShioriEchoToGhostSelectionRangeCommandProperty = DependencyProperty.Register(nameof(SendShioriEchoToGhostSelectionRangeCommand), typeof(ICommand), typeof(TextEditorModuleSelector),
+			new PropertyMetadata((d, e) =>
+			{
+				if (d is TextEditorModuleSelector ctrl)
+				{
+					ctrl.MainTextEditor.IsEnableSendShioriEchoToGhostSelectionRange = e.NewValue != null;
+				}
+			}));
+
 		private TextEditorSearchBoxViewModel searchBoxViewModel;
 		public TextEditorModuleBase MainTextEditor { get; }
 
@@ -67,6 +85,18 @@ namespace Satolist2.Module.TextEditor
 		{
 			get => (ICommand)GetValue(SendToGhostSelectionRangeCommandProperty);
 			set => SetValue(SendToGhostSelectionRangeCommandProperty, value);
+		}
+
+		public ICommand SendShioriEchoToGhostCommand
+		{
+			get => (ICommand)GetValue(SendShioriEchoToGhostCommandProperty);
+			set => SetValue(SendShioriEchoToGhostCommandProperty, value);
+		}
+
+		public ICommand SendShioriEchoToGhostSelectionRangeCommand
+		{
+			get => (ICommand)GetValue(SendShioriEchoToGhostSelectionRangeCommandProperty);
+			set => SetValue(SendShioriEchoToGhostSelectionRangeCommandProperty, value);
 		}
 
 		public TextEditorModuleSelector()
@@ -94,6 +124,8 @@ namespace Satolist2.Module.TextEditor
 				MainTextEditor.OnShowGlobalSearchBox += MainTextEditor_OnShowGlobalSearchBox;
 				MainTextEditor.OnSendToGhost += MainTextEditor_OnSendToGhost;
 				MainTextEditor.OnSendToGhostSelectionRange += MainTextEditor_OnSendToGhostSelectionRange;
+				MainTextEditor.OnSendShioriEchoToGhost += MainTextEditor_OnSendShioriEchoToGhost;
+				MainTextEditor.OnSendShioriEchoToGhostSelectionRange += MainTextEditor_OnSendShioriEchoToGhostSelectionRange;
 
 				//多重に発生することがあるようなので対策として
 				MainTextEditor.IsEventRegistered = true;
@@ -109,6 +141,8 @@ namespace Satolist2.Module.TextEditor
 				MainTextEditor.OnShowGlobalSearchBox -= MainTextEditor_OnShowGlobalSearchBox;
 				MainTextEditor.OnSendToGhost -= MainTextEditor_OnSendToGhost;
 				MainTextEditor.OnSendToGhostSelectionRange -= MainTextEditor_OnSendToGhostSelectionRange;
+				MainTextEditor.OnSendShioriEchoToGhost -= MainTextEditor_OnSendShioriEchoToGhost;
+				MainTextEditor.OnSendShioriEchoToGhostSelectionRange -= MainTextEditor_OnSendShioriEchoToGhostSelectionRange;
 				MainTextEditor.IsEventRegistered = false;
 			}
 		}
@@ -121,6 +155,16 @@ namespace Satolist2.Module.TextEditor
 		private void MainTextEditor_OnSendToGhostSelectionRange(object sender, EventArgs e)
 		{
 			SendToGhostSelectionRangeCommand?.Execute(null);
+		}
+
+		private void MainTextEditor_OnSendShioriEchoToGhost(object sender, EventArgs e)
+		{
+			SendShioriEchoToGhostCommand?.Execute(null);
+		}
+
+		private void MainTextEditor_OnSendShioriEchoToGhostSelectionRange(object sender, EventArgs e)
+		{
+			SendShioriEchoToGhostSelectionRangeCommand?.Execute(null);
 		}
 
 		private void MainTextEditor_OnShowGlobalSearchBox(object sender, EventArgs e)

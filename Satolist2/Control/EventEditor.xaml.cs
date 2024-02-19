@@ -25,6 +25,7 @@ using ICSharpCode.AvalonEdit.CodeCompletion;
 using ICSharpCode.AvalonEdit.Editing;
 using ICSharpCode.AvalonEdit;
 using Satolist2.Module.TextEditor;
+using System.Diagnostics.Contracts;
 
 namespace Satolist2.Control
 {
@@ -219,7 +220,7 @@ namespace Satolist2.Control
 		}
 
 		//選択中の内容をゴーストに送信
-		public void SendToGhostSelectionRange()
+		public void SendToGhostSelectionRange(bool useShioriEcho)
 		{
 			if (!string.IsNullOrEmpty(MainTextEditor.SelectionString))
 			{
@@ -240,6 +241,8 @@ namespace Satolist2.Control
 	{
 		private bool disableBodyPropertyChanged;
 		private EventEditor control;
+		private readonly ActionCommand sendShioriEchoToGhostCommand;
+		private readonly ActionCommand sendShioriEchoToGhostSelectionRangeCommand;
 
 		public EventModel Event { get; }
 		public string randomizedContentId;
@@ -262,6 +265,10 @@ namespace Satolist2.Control
 		public ActionCommand SendToGhostSelectionRangeCommand { get; }
 		public ActionCommand InsertCommand { get; }
 
+		//設定してある場合に限りコマンドが有効
+		public ActionCommand SendShioriEchoToGhostCommand => MainViewModel.EditorSettings.GeneralSettings.IsShowTextEditorShioriEcho ? sendShioriEchoToGhostCommand : null;
+		public ActionCommand SendShioriEchoToGhostSelectionRangeCommand => MainViewModel.EditorSettings.GeneralSettings.IsShowTextEditorShioriEcho ? sendShioriEchoToGhostSelectionRangeCommand : null;
+
 		public override TextEditorModuleBase MainTextEditor => control.MainTextEditor.MainTextEditor;
 		public object HilightColors { get; private set; }
 		public bool EnableHeaderEdit => Event.Type != EventType.Header;
@@ -271,19 +278,32 @@ namespace Satolist2.Control
 			randomizedContentId = Guid.NewGuid().ToString();	//複数出現するのでユニークなIDを振る
 			Event = ev;
 			Event.PropertyChanged += Event_PropertyChanged;
+			Main.MainWindow.OnTextEditorSettingsChanged += MainWindow_OnTextEditorSettingsChanged;
 
 			//コマンド
 			SendToGhostCommand = new ActionCommand(
 				o =>
 				{
-					SendToGhost();
+					SendToGhost(false);
 				}
 				);
 
 			SendToGhostSelectionRangeCommand = new ActionCommand(
 				o =>
 				{
-					SendToGhostSelectionRange();
+					SendToGhostSelectionRange(false);
+				});
+
+			sendShioriEchoToGhostCommand = new ActionCommand(
+				o =>
+				{
+					SendToGhost(true);
+				});
+
+			sendShioriEchoToGhostSelectionRangeCommand = new ActionCommand(
+				o =>
+				{
+					SendToGhostSelectionRange(true);
 				});
 
 			InsertCommand = new ActionCommand(
@@ -292,6 +312,13 @@ namespace Satolist2.Control
 					MainTextEditor.PerformTextInput(((InsertItemPaletteModel)o).Body);
 				}
 				);
+		}
+
+		private void MainWindow_OnTextEditorSettingsChanged(object sender, EventArgs e)
+		{
+			//ShioriEchoを使うかどうかの設定が切り替わった可能性があるので通知
+			NotifyChanged(nameof(SendShioriEchoToGhostCommand));
+			NotifyChanged(nameof(SendShioriEchoToGhostSelectionRangeCommand));
 		}
 
 		private void Document_TextChanged(object sender, EventArgs e)
@@ -320,7 +347,7 @@ namespace Satolist2.Control
 		}
 
 		//ゴーストにトークを送信
-		public void SendToGhost()
+		public void SendToGhost(bool useShioriEcho)
 		{
 			var currentLine = MainTextEditor.CaretLine - 1;	//indexにするので-1
 			var beginLine = 0;
@@ -398,8 +425,16 @@ namespace Satolist2.Control
 
 			try
 			{
-				Satorite.SendSatori(Main.Ghost, builder.ToString(), type);
-				Core.LogMessage.AddLog("ゴーストにトークを送信しました。");
+				if(useShioriEcho)
+				{
+					Satorite.SendShioriEcho(Main.Ghost, builder.ToString());
+					Core.LogMessage.AddLog("ゴーストにShioriEchoを送信しました。");
+				}
+				else
+				{
+					Satorite.SendSatori(Main.Ghost, builder.ToString(), type);
+					Core.LogMessage.AddLog("ゴーストにトークを送信しました。");
+				}
 			}
 			catch(GhostNotFoundException ex)
 			{
@@ -413,6 +448,7 @@ namespace Satolist2.Control
 			MainTextEditor.OnTextChanged -= Document_TextChanged;
 			MainTextEditor.OnCaretPositionChanged -= Caret_PositionChanged;
 			MainTextEditor.RequestEditingEvent = null;
+			Main.MainWindow.OnTextEditorSettingsChanged -= MainWindow_OnTextEditorSettingsChanged;
 		}
 
 		public void ControlBind(System.Windows.Controls.Control ctrl)

@@ -266,6 +266,8 @@ namespace Satolist2.Model
 		public bool IsSurfacePaletteInsertTypeSatoriHalfWidth { get; set; }
 		[JsonProperty]
 		public bool IsShowTextEditorToolTip { get; set; }
+		[JsonProperty]
+		public bool IsShowTextEditorShioriEcho { get; set; }
 
 		//カラー
 		[JsonProperty]
