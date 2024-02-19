@@ -121,7 +121,7 @@
 				<MenuItem Header="検索結果" x:Name="SearchResultVisibleMenu" IsCheckable="True" IsChecked="{Binding IsVisible, Mode=TwoWay}" />
 				<MenuItem Header="サーフェスビューワ" x:Name="SurfaceViewerVisibleMenu" IsCheckable="True" IsChecked="{Binding IsVisible, Mode=TwoWay}" />
 				<MenuItem Header="サーフェスパレット" x:Name="SurfacePaletteVisibleMenu" IsCheckable="True" IsChecked="{Binding IsVisible, Mode=TwoWay}" />
-				<MenuItem Header="サーフェスビューワv3" x:Name="RuntimeBasedSurfaceViewerVisibleMenu" IsCheckable="True" IsChecked="{Binding IsVisible, Mode=TwoWay}" />
+				<MenuItem Header="サーフェスビューワv3(仮)" x:Name="RuntimeBasedSurfaceViewerVisibleMenu" IsCheckable="True" IsChecked="{Binding IsVisible, Mode=TwoWay}" />
 				<MenuItem Header="デバッグメニュー" x:Name="DebugMainMenuVisibleMenu" IsCheckable="True" IsChecked="{Binding IsVisible, Mode=TwoWay}" />
 				<MenuItem Header="スタートメニュー" x:Name="StartMenuVisibleMenu" IsCheckable="True" IsChecked="{Binding IsVisible, Mode=TwoWay}" />
 				<MenuItem Header="ゴーストプロパティ" x:Name="GhostDescriptEditorVisibleMenu" IsCheckable="True" IsChecked="{Binding IsVisible, Mode=TwoWay}"/>

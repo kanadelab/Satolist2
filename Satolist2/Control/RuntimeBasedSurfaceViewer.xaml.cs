@@ -131,7 +131,7 @@ namespace Satolist2.Control
 
 		public double CurrentScale { get; private set; }
 
-		public string DockingTitle => "サーフェスビューワv3";
+		public string DockingTitle => "サーフェスビューワv3(仮)";
 		public string DockingContentId => ContentId;
 		public bool IsDockingWindowActive
 		{
