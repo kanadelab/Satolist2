@@ -57,9 +57,9 @@ namespace Satolist2.Module.TextEditor
 			contextmenu.MenuItems.Add(sendToGhostMenuItem);
 			sendToGhostSelectionRangeMenuItem = new MenuItem("選択範囲をゴーストに送信", RequestSendToGhostSelectionRange, (Shortcut)(Keys.Alt | Keys.Shift | Keys.Q));
 			contextmenu.MenuItems.Add(sendToGhostSelectionRangeMenuItem);
-			sendShioriEchoToGhostMenuItem = new MenuItem("ゴーストにShioriEchoで送信", RequestSendShioriEchoToGhost);
+			sendShioriEchoToGhostMenuItem = new MenuItem("ゴーストにShioriEchoで送信", RequestSendShioriEchoToGhost, (Shortcut)(Keys.Alt | Keys.E));
 			contextmenu.MenuItems.Add(sendShioriEchoToGhostMenuItem);
-			sendShioriEchoToGhostSelectionRangeMenuItem = new MenuItem("選択範囲をゴーストにShioriEchoで送信", RequestSendShioriEchoToGhostSelectionRange);
+			sendShioriEchoToGhostSelectionRangeMenuItem = new MenuItem("選択範囲をゴーストにShioriEchoで送信", RequestSendShioriEchoToGhostSelectionRange, (Shortcut)(Keys.Alt | Keys.Shift | Keys.E));
 			contextmenu.MenuItems.Add(sendShioriEchoToGhostSelectionRangeMenuItem);
 			contextmenu.MenuItems.Add("-");
 			contextmenu.MenuItems.Add(new MenuItem("検索", RequestShowSearchBox, Shortcut.CtrlF));

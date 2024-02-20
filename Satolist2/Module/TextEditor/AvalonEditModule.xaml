@@ -36,6 +36,8 @@
 				<avalonEdit:TextEditor.InputBindings>
 					<KeyBinding Gesture="ALT+Q" Command="{Binding SendToGhostCommand}" />
 					<KeyBinding Gesture="ALT+SHIFT+Q" Command="{Binding SendToGhostSelectionRangeCommand}" />
+					<KeyBinding Gesture="ALT+E" Command="{Binding SendShioriEchoToGhostCommand}" />
+					<KeyBinding Gesture="ALT+SHIFT+E" Command="{Binding SendShioriEchoToGhostSelectionRangeCommand}" />
 					<KeyBinding Gesture="CTRL+F" Command="{Binding ShowSearchBoxCommand}" />
 					<KeyBinding Gesture="CTRL+SHIFT+F" Command="{Binding ShowGlobalSearchCommand}" CommandParameter="{Binding .,RelativeSource={RelativeSource AncestorType=avalonEdit:TextEditor}}" />
 					<KeyBinding Gesture="CTRL+SPACE" Command="{Binding CompletionCommand}" />
@@ -49,8 +51,8 @@
 						<Separator />
 						<MenuItem Header="ゴーストに送信" x:Name="SendToGhostMenuItem" Command="{Binding SendToGhostCommand}" InputGestureText="Alt+Q" />
 						<MenuItem Header="選択範囲をゴーストに送信" x:Name="SelectedRangeSendToGhostMenuItem" Command="{Binding SendToGhostSelectionRangeCommand}" InputGestureText="Alt+Shift+Q" />
-						<MenuItem Header="ゴーストにShioriEchoで送信" x:Name="SendToGhostShioriEchoMenuItem" Command="{Binding SendShioriEchoToGhostCommand}"/>
-						<MenuItem Header="選択範囲をゴーストにShioriEchoで送信" x:Name="SelectedRangeSendToGhostShioriEchoMenuItem" Command="{Binding SendShioriEchoToGhostSelectionRangeCommand}" />
+						<MenuItem Header="ゴーストにShioriEchoで送信" x:Name="SendToGhostShioriEchoMenuItem" Command="{Binding SendShioriEchoToGhostCommand}" InputGestureText="Alt+E"/>
+						<MenuItem Header="選択範囲をゴーストにShioriEchoで送信" x:Name="SelectedRangeSendToGhostShioriEchoMenuItem" Command="{Binding SendShioriEchoToGhostSelectionRangeCommand}" InputGestureText="Alt+Shift+E"/>
 						<MenuItem Header="挿入" ItemsSource="{Binding Main.InsertPalette.Items, FallbackValue={x:Null}}" IsEnabled="{Binding Main.InsertPalette, Converter={StaticResource ReferenceToBoolConverter}}">
 							<MenuItem.ItemContainerStyle>
 								<Style TargetType="MenuItem">

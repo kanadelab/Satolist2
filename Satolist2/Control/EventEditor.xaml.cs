@@ -26,6 +26,7 @@ using ICSharpCode.AvalonEdit.Editing;
 using ICSharpCode.AvalonEdit;
 using Satolist2.Module.TextEditor;
 using System.Diagnostics.Contracts;
+using System.Reflection;
 
 namespace Satolist2.Control
 {
@@ -226,8 +227,16 @@ namespace Satolist2.Control
 			{
 				try
 				{
-					Satorite.SendSatori(Main.Ghost, MainTextEditor.SelectionString, EventType.Sentence);
-					Core.LogMessage.AddLog("ゴーストにトークを送信しました。");
+					if (useShioriEcho)
+					{
+						Satorite.SendShioriEcho(Main.Ghost, MainTextEditor.SelectionString);
+						Core.LogMessage.AddLog("ゴーストにShioriEchoを送信しました。");
+					}
+					else
+					{
+						Satorite.SendSatori(Main.Ghost, MainTextEditor.SelectionString, EventType.Sentence);
+						Core.LogMessage.AddLog("ゴーストにトークを送信しました。");
+					}
 				}
 				catch (GhostNotFoundException ex)
 				{
