@@ -1,7 +1,8 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 					xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 					xmlns:avalonEditCodeComp="clr-namespace:ICSharpCode.AvalonEdit.CodeCompletion;assembly=ICSharpCode.AvalonEdit"
-					xmlns:avalonEdit="http://icsharpcode.net/sharpdevelop/avalonedit">
+					xmlns:avalonEdit="http://icsharpcode.net/sharpdevelop/avalonedit"
+					xmlns:ctl="clr-namespace:Satolist2.Control">
 	<ResourceDictionary.MergedDictionaries>
 		<ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
 		<ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Themes/Dark.Cyan.xaml" />
@@ -19,5 +20,7 @@
 
 	<Style TargetType="avalonEditCodeComp:CompletionWindow">
 		<Setter Property="Foreground" Value="#dcdcdc" />
+	</Style>
+	<Style TargetType="ctl:WartermarkedTextBox" BasedOn="{StaticResource {x:Type TextBox}}">
 	</Style>
 </ResourceDictionary>
