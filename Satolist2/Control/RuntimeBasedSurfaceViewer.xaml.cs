@@ -491,6 +491,9 @@ namespace Satolist2.Control
 									var item = new WindowItem(Control.FormsHostGrid, runtimeGhostFMORecord.HWndList[i], this);
 									windowItems.Add(scope, item);
 									item.Visibility = Visibility.Collapsed;
+
+									//非表示を要求
+									Satorite.SendSSTP(runtimeGhostFMORecord, string.Format(@"\p[{0}]\s[-1]", i), true, true, callbackWindow.HWnd);
 								}
 
 								//起動完了
@@ -529,6 +532,13 @@ namespace Satolist2.Control
 				runtime.Dispose();
 				runtime = null;
 			}
+
+			//ランタイムが死んだらウインドウをクリアする必要がある
+			foreach (var item in windowItems)
+			{
+				item.Value.Dispose();
+			}
+			windowItems.Clear();
 		}
 
 		//選択中のサーフェスのスコープが変更
@@ -812,6 +822,13 @@ namespace Satolist2.Control
 			runtimeBootCanceller?.Cancel();
 			runtimeBootCanceller?.Dispose();
 			runtimeBootTask?.Wait();
+
+			//ウインドウを開放
+			foreach (var item in windowItems)
+			{
+				item.Value.Dispose();
+			}
+			windowItems.Clear();
 		}
 
 		public void SendRuntimeChangeSurface(RuntimeBasedSurfaceViewerItemViewModel item)
@@ -951,6 +968,16 @@ namespace Satolist2.Control
 					IntPtr ws = Win32Import.GetWindowLongPtr(childHwnd, Win32Import.GWL_STYLE);
 					ws = new IntPtr(((long)ws | Win32Import.WS_CHILD ) & ~(Win32Import.WS_POPUP));
 					Win32Import.SetWindowLongPtr(childHwnd, Win32Import.GWL_STYLE, ws);
+				}
+
+				if(Win32Import.IsWindow(childHwnd) == Win32Import.FALSE)
+				{
+					throw new Exception();
+				}
+
+				if (Win32Import.IsWindow(hostHwnd) == Win32Import.FALSE)
+				{
+					throw new Exception();
 				}
 
 				//親子関係を接続
