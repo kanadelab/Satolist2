@@ -6,6 +6,7 @@ using Sgry.Azuki.Highlighter;
 using Sgry.Azuki.WinForms;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
@@ -153,16 +154,23 @@ namespace Satolist2.Module.TextEditor
 		{
 			get
 			{
-				//折り返し有効時、MainTextEditor.GetLineIndexFromCharIndex()が折り返しベースで計算する問題がある
-				//仕方ないので数える
-				int sum = 0;
-				for(var i = 0; i<LineCount;i++)
+				if (WordWrap)
 				{
-					sum += MainTextEditor.GetLineLength(i) + Environment.NewLine.Length;
-					if (CaretOffset < sum)
-						return i;
+					//折り返し有効時、MainTextEditor.GetLineIndexFromCharIndex()が折り返しベースで計算する問題がある
+					//仕方ないので数える
+					int sum = 0;
+					for (var i = 0; i < LineCount; i++)
+					{
+						sum += MainTextEditor.GetLineLength(i) + Environment.NewLine.Length;
+						if (CaretOffset < sum)
+							return i;
+					}
+					return LineCount - 1;
 				}
-				return LineCount - 1;
+				else
+				{
+					return MainTextEditor.GetLineIndexFromCharIndex(MainTextEditor.CaretIndex) + 1;
+				}
 			}
 		}
 
@@ -323,36 +331,50 @@ namespace Satolist2.Module.TextEditor
 
 		public override LineData GetLineData(int line)
 		{
-			//折り返し有効時、GetLineHeadIndex()が折り返しベースで計算する問題がある
-			//仕方ないので効率は悪いが数えてみる
-			int sum = 0;
-			for(int i = 0; i<line;i++)
+			if (WordWrap)
 			{
-				sum += MainTextEditor.GetLineLength(i) + Environment.NewLine.Length;
-			}
+				//折り返し有効時、GetLineHeadIndex()が折り返しベースで計算する問題がある
+				//仕方ないので効率は悪いが数えてみる
+				int sum = 0;
+				for (int i = 0; i < line; i++)
+				{
+					sum += MainTextEditor.GetLineLength(i) + Environment.NewLine.Length;
+				}
 
-			return new LineData(
-				sum,
-				MainTextEditor.GetLineLength(line),
-				line
-				);
+				return new LineData(
+					sum,
+					MainTextEditor.GetLineLength(line),
+					line
+					);
+			}
+			else
+			{
+				return new LineData(MainTextEditor.GetLineHeadIndex(line), MainTextEditor.GetLineLength(line), line);
+			}
 		}
 
 		public override LineData GetLineDataFromCharIndex(int charIndex)
 		{
-			//折返し有効時、GetLineIndexFromCharIndex() が折り返しベースで計算する問題がある
-			//仕方ないので数える
-			int sum = 0;
-			int lineIndex = 0;
-			for(int i = 0; i < MainTextEditor.LineCount; i++)
+			if (WordWrap)
 			{
-				sum += MainTextEditor.GetLineLength(i) + Environment.NewLine.Length;
-				if (charIndex < sum)
-					break;
-				lineIndex++;
-			}
+				//折返し有効時、GetLineIndexFromCharIndex() が折り返しベースで計算する問題がある
+				//仕方ないので数える
+				int sum = 0;
+				int lineIndex = 0;
+				for (int i = 0; i < MainTextEditor.LineCount; i++)
+				{
+					sum += MainTextEditor.GetLineLength(i) + Environment.NewLine.Length;
+					if (charIndex < sum)
+						break;
+					lineIndex++;
+				}
 
-			return GetLineData(lineIndex);
+				return GetLineData(lineIndex);
+			}
+			else
+			{
+				return GetLineData(MainTextEditor.GetLineIndexFromCharIndex(charIndex));
+			}
 		}
 
 		public override void PerformTextInput(string str)
