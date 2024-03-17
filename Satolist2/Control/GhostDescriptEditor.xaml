@@ -55,7 +55,7 @@
 												</Style>
 											</TextBlock.Style>
 										</TextBlock>
-										<ContentControl Grid.Column="1" Grid.Row="0" HorizontalAlignment="Stretch" Height="20">
+										<ContentControl Grid.Column="1" Grid.Row="0" HorizontalAlignment="Stretch">
 											<ContentControl.Style>
 												<Style TargetType="Control">
 													<EventSetter Event="GotFocus" Handler="StringInput_GotFocus" />
