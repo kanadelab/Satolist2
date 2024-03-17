@@ -24,7 +24,8 @@ namespace Satolist2.Control
 		public WartermarkedAdorner(UIElement element) : base(element)
 		{
 			wartermarkTextBlock = new TextBlock();
-			wartermarkTextBlock.Margin = new Thickness(5, 5, 5, 0);
+			wartermarkTextBlock.Margin = new Thickness(5, 0, 5, 0);
+			wartermarkTextBlock.VerticalAlignment = VerticalAlignment.Center;
 			wartermarkTextBlock.Opacity = 0.3;
 			wartermarkTextBlock.IsHitTestVisible = false;
 			wartermarkTextBlock.Foreground = Themes.ApplicationTheme.GetWartermarkBrush();
