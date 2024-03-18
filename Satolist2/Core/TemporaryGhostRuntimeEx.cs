@@ -66,7 +66,7 @@ namespace Satolist2.Core
 		{
 			var startInfo = new ProcessStartInfo();
 			startInfo.FileName = Path.Combine( RuntimeDirectory.FullPath, @"ssp\ssp.exe");
-			startInfo.Arguments = $"/o bootunlock,standalone,kiosk,dpiaware /f {FMOName} /g temporaryghost";
+			startInfo.Arguments = $"/o bootunlock,standalone,kiosk,dpiaware,dontloadmodule /f {FMOName} /g temporaryghost";
 			startInfo.UseShellExecute = true;
 			startInfo.WorkingDirectory = Path.Combine(RuntimeDirectory.FullPath, @"ssp");
 
