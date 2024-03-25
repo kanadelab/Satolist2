@@ -439,7 +439,11 @@ namespace Satolist2.Control
 				SurfaceList = CollectionViewSource.GetDefaultView(items);
 				SurfaceList.Filter = (o) =>
 				{
-					return ((RuntimeBasedSurfaceViewerItemViewModel)o).IsViewerVisible;
+					if(o is RuntimeBasedSurfaceViewerItemViewModel model)
+					{
+						return model.IsViewerVisible && !model.Model.IsImageFileOnly;
+					}
+					return false;
 				};
 				SurfaceList.SortDescriptions.Add(new SortDescription("Id", ListSortDirection.Ascending));
 
