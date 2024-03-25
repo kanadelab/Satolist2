@@ -72,7 +72,7 @@
 		<doc:H3 Text="スコープの設定" />
 		<doc:Paragraph Text="プレビュー画像を生成する際に、きせかえ設定で使用するキャラ番号を指定します。" />
 		<doc:Paragraph Text="メインキャラ(sakura)なら0、サブキャラクタ(kero)なら1、３人目以降もそれぞれのスコープ番号を設定します。" />
-		<doc:CodeSnippet Text="//satolist.scope,スコープID" />
+		<doc:CodeSnippet Text="//satolist.surface.scope,スコープID" />
 
 	</StackPanel>
 </UserControl>

@@ -38,6 +38,7 @@ namespace Satolist
 		public const String SURFACE_VISIBLE = "//satolist.surface.visible";
 		public const String VIEWER_ACTIVE_PATTERN = "//satolist.surface.default";
 		public const String SURFACE_CHARACTER_ID = "//satolist.scope";
+		public const String SURFACE_CHARACTER_ID2 = "//satolist.surface.scope";	//新さとりすと対応の互換
 
 		public const String COLLISION = "collision";
 		public const String COLLISION_EX = "collisionex";
@@ -1196,7 +1197,7 @@ namespace Satolist
 						AddLog("...ERROR - 数値変換できませんでした");
 					}
 				}
-				else if (line.IndexOf(SURFACE_CHARACTER_ID) == 0)
+				else if (line.IndexOf(SURFACE_CHARACTER_ID) == 0 || line.IndexOf(SURFACE_CHARACTER_ID2) == 0)
 				{
 					String[] sp2 = line.Split(SEPARATOR, StringSplitOptions.RemoveEmptyEntries);
 					AddLog("Satolist Surface Scope: " + line);
