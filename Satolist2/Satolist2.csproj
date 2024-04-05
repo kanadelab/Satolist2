@@ -341,6 +341,7 @@
     <Compile Include="Utility\NotificaionObject.cs" />
     <Compile Include="Utility\Progress.cs" />
     <Compile Include="Utility\CustomizedReadOnlyObservableCollection.cs" />
+    <Compile Include="Utility\RefereceAnalyzer.cs" />
     <Compile Include="Utility\SakuraFMOReader.cs" />
     <Compile Include="Utility\Satorite.cs" />
     <Compile Include="Utility\SatoriUpdator.cs" />
