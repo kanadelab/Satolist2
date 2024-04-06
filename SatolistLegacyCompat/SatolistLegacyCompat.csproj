@@ -58,6 +58,7 @@
       <DependentUpon>LegacySurfaceViewer.xaml</DependentUpon>
     </Compile>
     <Compile Include="CompatCore\ProjectCompat.cs" />
+    <Compile Include="CompatCore\UploadSettings.cs" />
     <Compile Include="LegacyCodes\BlendBitmap.cs" />
     <Compile Include="LegacyCodes\OpeningGhostDialog.cs">
       <SubType>Form</SubType>

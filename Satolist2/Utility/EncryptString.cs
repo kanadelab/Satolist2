@@ -68,5 +68,10 @@ namespace Satolist2.Utility
 				}
 			}
 		}
+
+		public static bool DecryptEquals(string e1, string e2)
+		{
+			return Decrypt(e1) == Decrypt(e2);
+		}
 	}
 }

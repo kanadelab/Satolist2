@@ -18,11 +18,18 @@
 	</local:DialogContentBase.Resources>
 	<Grid>
 		<Grid.RowDefinitions>
+			<RowDefinition Height="auto" />
 			<RowDefinition Height="*" />
 			<RowDefinition Height="auto" />
 		</Grid.RowDefinitions>
 
-		<Grid Grid.Row="0">
+		<Menu Grid.Row="0">
+			<MenuItem Header="インポート">
+				<MenuItem Header="さとりすと 1.xの設定情報を移行する" Command="{Binding ImportLegacySettingsCommand}" />
+			</MenuItem>
+		</Menu>
+
+		<Grid Grid.Row="1">
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition Width="1.6*" />
 				<ColumnDefinition Width="1*" />
@@ -201,7 +208,7 @@
 						<Style TargetType="TextBlock">
 							<Setter Property="Visibility" Value="Collapsed" />
 							<Style.Triggers>
-								<DataTrigger Binding="{Binding Items.Count}" Value="0">
+								<DataTrigger Binding="{Binding Items.Count, Mode=OneWay}" Value="0">
 									<Setter Property="Visibility" Value="Visible" />
 								</DataTrigger>
 							</Style.Triggers>
@@ -403,7 +410,7 @@
 		</Grid>
 
 		<!--保存ボタン-->
-		<StackPanel Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Right">
+		<StackPanel Orientation="Horizontal" Grid.Row="2" HorizontalAlignment="Right">
 			<Button Content="保存" Command="{Binding OkCommand}" Margin="3" Width="100" />
 			<Button Content="キャンセル" Command="{Binding CancelCommand}" IsCancel="True" Margin="3" Width="100"/>
 		</StackPanel>

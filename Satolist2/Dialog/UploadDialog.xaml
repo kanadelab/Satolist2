@@ -205,13 +205,35 @@
 														<Path Grid.Row="1" Grid.Column="0" Height="20" Width="20" HorizontalAlignment="Center" Stretch="Uniform" Fill="DarkGreen" Visibility="{Binding IsUploadFiles, Converter={StaticResource BoolToVisibilityConverter}}" Data="{StaticResource UploadUpdatePathIcon}" />
 														<StackPanel Grid.Row="1" Grid.Column="2">
 															<TextBlock Text="更新データパス" />
-															<TextBlock Text="{Binding UpdatePath}" />
+															<TextBlock>
+																<TextBlock.Style>
+																	<Style TargetType="TextBlock">
+																		<Setter Property="Text" Value="{Binding UpdatePath}" />
+																		<Style.Triggers>
+																			<DataTrigger Binding="{Binding UpdatePath}" Value="">
+																				<Setter Property="Text" Value="(設定なし)" />
+																			</DataTrigger>
+																		</Style.Triggers>
+																	</Style>
+																</TextBlock.Style>
+															</TextBlock>
 														</StackPanel>
 
 														<Path Grid.Row="2" Grid.Column="0" Height="20" Width="20" HorizontalAlignment="Center" Stretch="Uniform" Fill="HotPink" Visibility="{Binding IsUploadNar, Converter={StaticResource BoolToVisibilityConverter}}" Data="{StaticResource UploadNarPathIcon}" />
 														<StackPanel Grid.Row="2" Grid.Column="2">
 															<TextBlock Text="Narアップロードパス" />
-															<TextBlock Text="{Binding NarPath}" />
+															<TextBlock>
+																<TextBlock.Style>
+																	<Style TargetType="TextBlock">
+																		<Setter Property="Text" Value="{Binding NarPath}" />
+																		<Style.Triggers>
+																			<DataTrigger Binding="{Binding NarPath}" Value="">
+																				<Setter Property="Text" Value="(設定なし)" />
+																			</DataTrigger>
+																		</Style.Triggers>
+																	</Style>
+																</TextBlock.Style>
+															</TextBlock>
 														</StackPanel>
 													</Grid>
 
@@ -334,9 +356,11 @@
 
 				<GroupBox Header="アップロード設定" Margin="3 10 3 3">
 					<StackPanel>
-						<CheckBox Content="更新ファイルをアップロード" IsChecked="{Binding IsUploadFiles, Mode=TwoWay}" Margin="3 10 3 3" />
+						<CheckBox Content="更新ファイルをアップロード" IsChecked="{Binding IsUploadFiles, Mode=TwoWay}" Margin="3 10 3 3"
+								  IsEnabled="{Binding CanUploadFiles, Mode=OneWay}"/>
 						<CheckBox Content="サーバ側のupdates2.dauを使用して差分アップロード (エラーが起きる場合やキャンセルした後は使用せず全アップロードを推奨)" IsChecked="{Binding IsDiffUpload, Mode=TwoWay}" Margin="20 3 3 3"/>
-						<CheckBox Content="narファイルをアップロード" IsChecked="{Binding IsUploadNar, Mode=TwoWay}" Margin="3 10 3 3" />
+						<CheckBox Content="narファイルをアップロード" IsChecked="{Binding IsUploadNar, Mode=TwoWay}" Margin="3 10 3 3"
+								  IsEnabled="{Binding CanUploadNar, Mode=OneWay}"/>
 					</StackPanel>
 					<GroupBox.Style>
 						<Style TargetType="GroupBox">

@@ -1,4 +1,8 @@
-﻿using Satolist2.Utility;
+﻿using FluentFTP;
+using Microsoft.Win32;
+using Satolist2.Control;
+using Satolist2.Model;
+using Satolist2.Utility;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -48,12 +52,12 @@ namespace Satolist2.Dialog
 
 		public class UploadSettingDialogViewModel : NotificationObject
 		{
-			private ObservableCollection<UploadSettingItemViewModelBase> items;
+			private readonly ObservableCollection<UploadSettingItemViewModelBase> items;
 			private Model.UploadServerSettingModelBase[] originalModel;
 
-			public CustomizedReadOnlyObservableCollection<UploadSettingItemViewModelBase> Items
+			public ReadOnlyObservableCollection<UploadSettingItemViewModelBase> Items
 			{
-				get => new CustomizedReadOnlyObservableCollection<UploadSettingItemViewModelBase>(items);
+				get => new ReadOnlyObservableCollection<UploadSettingItemViewModelBase>(items);
 			}
 
 			public UploadSettingDialog Dialog { get; private set; }
@@ -64,6 +68,7 @@ namespace Satolist2.Dialog
 			public ActionCommand AddNarnaloaderAccountCommand { get; }
 			public ActionCommand CancelCommand { get; }
 			public ActionCommand OkCommand { get; }
+			public ActionCommand ImportLegacySettingsCommand { get; }
 
 			internal UploadSettingDialogViewModel(Model.UploadServerSettingModelBase[] uploadSettings, UploadSettingDialog dialog)
 			{
@@ -113,6 +118,118 @@ namespace Satolist2.Dialog
 							CloseAccepted = true;
 							dialog.DialogResult = false;
 							dialog.Close();
+						}
+					}
+					);
+
+				ImportLegacySettingsCommand = new ActionCommand(
+					o =>
+					{
+						//確認ダイアログを出す
+						if (MessageBox.Show("さとりすと1.x のアップロード設定を取り込みます。\r\nファイルを開く画面を表示するので、さとりすと1.xの「settings」フォルダ内にある「upload.ini」を選択してください。",
+							"設定のインポート", MessageBoxButton.OKCancel) != MessageBoxResult.OK)
+						{
+							return;
+						}
+
+						var d = new OpenFileDialog();
+						d.Filter = "upload.ini|upload.ini";
+						if(d.ShowDialog() != true)
+						{
+							return;
+						}
+
+						try
+						{
+							var legacySettings = SatolistLegacyCompat.CompatCore.UploadSettings.LoadUploadSettins(d.FileName, Utility.EncryptString.Encrypt);
+
+							//まったく同じ設定のものがあれば追記する形
+							foreach (var item in legacySettings)
+							{
+								if (item.mUploadMode == SatolistLegacyCompat.CompatCore.UploadSettings.UploadListItem.UploadMode.Ftp)
+								{
+									FtpAccountUploadSettingViewModel server = (FtpAccountUploadSettingViewModel)items.FirstOrDefault(
+										s =>
+										{
+											if (s is FtpAccountUploadSettingViewModel ftpServer)
+											{
+												return ftpServer.Url == item.mHostName &&
+													ftpServer.UserName == item.mUserName &&
+													(item.mIsEveryInputPassword || EncryptString.DecryptEquals(ftpServer.Password, item.mPassword)) &&
+													ftpServer.AlwaysPasswordInput == item.mIsEveryInputPassword;
+											}
+											return false;
+										});
+
+									if (server == null)
+									{
+										//サーバ設定がみつからないので新規
+										var serverModel = new Model.FtpServerSettingModel();
+										serverModel.Url = item.mHostName;
+										serverModel.UserName = item.mUserName;
+										serverModel.Password = item.mPassword;
+										serverModel.AlwaysPasswordInput = item.mIsEveryInputPassword;
+										serverModel.Label = "*FTPサーバ";
+
+										server = new FtpAccountUploadSettingViewModel(serverModel, this);
+										server.IsExpanded = true;
+										items.Add(server);
+									}
+
+									//サーバに内容を追加
+									var ghostViewModel = server.AddItem();
+									ghostViewModel.Label = $"*{item.mSettingName}";
+									ghostViewModel.UpdatePath = item.mDirectory;
+
+									//narファイルが設定されている場合はnarの設定を書き込む
+									if (!string.IsNullOrEmpty(item.mNarName))
+									{
+										ghostViewModel.NarPath = DictionaryUtility.ConbinePath(item.mDirectory, item.mNarName);
+									}
+								}
+								else if (item.mUploadMode == SatolistLegacyCompat.CompatCore.UploadSettings.UploadListItem.UploadMode.NarNaLoader2)
+								{
+									//ななろだ設定
+									NarnaloaderSettingViewModel server = (NarnaloaderSettingViewModel)items.FirstOrDefault(
+										s =>
+										{
+											if (s is NarnaloaderSettingViewModel nnlServer)
+											{
+												return nnlServer.Url == item.mHostName &&
+													nnlServer.UserName == item.mUserName &&
+													(item.mIsEveryInputPassword || EncryptString.DecryptEquals(nnlServer.Password, item.mPassword)) &&
+													nnlServer.AlwaysPasswordInput == item.mIsEveryInputPassword;
+											}
+											return false;
+										});
+
+									if (server == null)
+									{
+										//サーバ設定がみつからないので新規
+										var serverModel = new Model.NarnaloaderV2ServerSettingModel();
+										serverModel.Url = item.mHostName;
+										serverModel.UserName = item.mUserName;
+										serverModel.Password = item.mPassword;
+										serverModel.AlwaysPasswordInput = item.mIsEveryInputPassword;
+										serverModel.Label = "*ななろだサーバ";
+
+										server = new NarnaloaderSettingViewModel(serverModel, this);
+										server.IsExpanded = true;
+										items.Add(server);
+									}
+
+									//サーバに内容を追加
+									var ghostViewModel = server.AddItem();
+									ghostViewModel.Label = $"*{item.mSettingName}";
+									ghostViewModel.GhostId = item.mDirectory;   //古い方はディレクトリ名のところにアイテムIDが入ってる
+								}
+							}
+
+							MessageBox.Show("設定を取り込みました。\r\n取り込んだ設定には「*」マークをつけてあります。アップロードがうまくいかない場合はログイン情報やアップロードパスを再度指定してみてください。", "インポート", MessageBoxButton.OK);
+						}
+						catch
+						{
+							MessageBox.Show("設定の読み込みに失敗しました。\r\n設定ファイルが違うかもしれません。", "インポート", MessageBoxButton.OK, MessageBoxImage.Exclamation);
 						}
 					}
 					);
@@ -321,13 +438,8 @@ namespace Satolist2.Dialog
 						IsExpanded = true;
 
 						//追加
-						var itemModel = new Model.FtpItemSettingModel();
-						model.Items.Add(itemModel);
-
-						var item = new FtpUploadGhostSettingViewModel(itemModel, this);
-						item.Label = "新しいアップロード設定";
+						var item = AddItem();
 						item.IsSelected = true;
-					items.Add(item);
 					}
 					);
 				RemoveServerCommand = new ActionCommand(
@@ -342,6 +454,17 @@ namespace Satolist2.Dialog
 					var itemViewModel = new FtpUploadGhostSettingViewModel(item, this);
 					items.Add(itemViewModel);
 				}
+			}
+
+			public FtpUploadGhostSettingViewModel AddItem()
+			{
+				var itemModel = new Model.FtpItemSettingModel();
+				model.Items.Add(itemModel);
+
+				var item = new FtpUploadGhostSettingViewModel(itemModel, this);
+				item.Label = "新しいアップロード設定";
+				items.Add(item);
+				return item;
 			}
 
 			public void RemoveItem(FtpUploadGhostSettingViewModel item)
@@ -538,16 +661,8 @@ namespace Satolist2.Dialog
 					{
 						//展開
 						IsExpanded = true;
-
-						//modelの追加
-						var itemModel = new Model.NarnaloaderV2ItemSettingModel();
-						model.Items.Add(itemModel);
-
-						//viewModelの追加
-						var item = new NarnaloaderUploadGhostViewModel(itemModel, this);
+						var item = AddItem();
 						item.IsSelected = true;
-						item.Label = "新しいアップロード設定";
-						items.Add(item);
 					}
 					);
 				RemoveServerCommand = new ActionCommand(
@@ -562,6 +677,19 @@ namespace Satolist2.Dialog
 					var itemViewModel = new NarnaloaderUploadGhostViewModel(item, this);
 					items.Add(itemViewModel);
 				}
+			}
+
+			public NarnaloaderUploadGhostViewModel AddItem()
+			{
+				//modelの追加
+				var itemModel = new Model.NarnaloaderV2ItemSettingModel();
+				model.Items.Add(itemModel);
+
+				//viewModelの追加
+				var item = new NarnaloaderUploadGhostViewModel(itemModel, this);
+				item.Label = "新しいアップロード設定";
+				items.Add(item);
+				return item;
 			}
 
 			public void RemoveItem(NarnaloaderUploadGhostViewModel item)

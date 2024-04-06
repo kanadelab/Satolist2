@@ -1,4 +1,5 @@
-﻿using Satolist2.Utility;
+﻿using Satolist2.Model;
+using Satolist2.Utility;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -34,6 +35,8 @@ namespace Satolist2.Dialog
 			set => base.DataContext = value;
 		}
 
+		private Model.GhostLocalSettings ghostLocalSettings;
+
 		public UploadDialog(Model.UploadServerSettingModelBase[] servers, string targetPath, Model.GhostLocalSettings ghostSettings)
 		{
 			this.targetPath = targetPath;
@@ -55,18 +58,15 @@ namespace Satolist2.Dialog
 				}
 				).ToArray();
 
-			if (ghostSettings != null)
+			ghostLocalSettings = ghostSettings;
+			if (ghostLocalSettings != null)
 			{
-				DataContext.IsDiffUpload = ghostSettings.LastUploadUseDiff;
-				DataContext.IsUploadFiles = ghostSettings.LastUploadUseFiles;
-				DataContext.IsUploadNar = ghostSettings.LastUploadUseNar;
-
 				//選択中アイテムの検出
 				foreach(var item in DataContext.Items)
 				{
 					if(item is FtpServerViewModel ftp)
 					{
-						var selectedItem = ftp.Items.FirstOrDefault(o => o.SettingId == ghostSettings.LastUploadSettingId);
+						var selectedItem = ftp.Items.FirstOrDefault(o => o.SettingId == ghostLocalSettings.LastUploadSettingId);
 						if (selectedItem != null)
 						{
 							selectedItem.IsSelected = true;
@@ -74,7 +74,7 @@ namespace Satolist2.Dialog
 					}
 					else if(item is NarnaloaderV2ServerViewModel nnl)
 					{
-						var selectedItem = nnl.Items.FirstOrDefault(o => o.SettingId == ghostSettings.LastUploadSettingId);
+						var selectedItem = nnl.Items.FirstOrDefault(o => o.SettingId == ghostLocalSettings.LastUploadSettingId);
 						if (selectedItem != null)
 						{
 							selectedItem.IsSelected = true;
@@ -105,6 +105,8 @@ namespace Satolist2.Dialog
 			private bool isUploadFiles;
 			private bool isUploadNar;
 			private bool isDiffUpload;
+			private bool canUploadNar;
+			private bool canUploadFiles;
 
 			public object[] Items { get; set; }
 			public string Logs
@@ -156,6 +158,42 @@ namespace Satolist2.Dialog
 					isUploadNar = value;
 					NotifyChanged();
 					NotifyChanged(nameof(IsEnableUpload));
+				}
+			}
+
+			public bool CanUploadFiles
+			{
+				get => canUploadFiles;
+				set
+				{
+					if (canUploadFiles != value)
+					{
+						canUploadFiles = value;
+						if (!canUploadFiles)
+						{
+							//出来ない場合はチェックをはずさせる
+							IsUploadFiles = false;
+						}
+						NotifyChanged();
+					}
+				}
+			}
+
+			public bool CanUploadNar
+			{
+				get => canUploadNar;
+				set
+				{
+					if (canUploadNar != value)
+					{
+						canUploadNar = value;
+						if(!canUploadNar)
+						{
+							//出来ない場合はチェックをはずさせる
+							IsUploadNar = false;
+						}
+						NotifyChanged();
+					}
 				}
 			}
 
@@ -320,11 +358,20 @@ namespace Satolist2.Dialog
 
 		private void ServerList_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
 		{
+			//選択を変えるたびに次のページの設定をもとに戻す
+			DataContext.IsDiffUpload = ghostLocalSettings.LastUploadUseDiff;
+			DataContext.IsUploadFiles = ghostLocalSettings.LastUploadUseFiles;
+			DataContext.IsUploadNar = ghostLocalSettings.LastUploadUseNar;
+
 			//アップロード対象として有効なアイテムが選択されてるときだけ
 			if (ServerList.SelectedItem is FtpItemViewModel ftp)
 			{
 				SelectUploadTargetPage_NextButton.IsEnabled = true;
 				DataContext.SelectedSettingId = ftp.SettingId;
+
+				//FTPの場合、narまたはネットワーク更新の対象を指定しないことも可能なので、それぞれ設定できるか伝える
+				DataContext.CanUploadFiles = !string.IsNullOrEmpty(ftp.UpdatePath);
+				DataContext.CanUploadNar = !string.IsNullOrEmpty(ftp.NarPath);
 			}
 			else if(ServerList.SelectedItem is NarnaloaderV2ItemViewModel nnl)
 			{
