@@ -268,6 +268,8 @@ namespace Satolist2.Model
 		public bool IsShowTextEditorToolTip { get; set; }
 		[JsonProperty]
 		public bool IsShowTextEditorShioriEcho { get; set; }
+		[JsonProperty]
+		public bool IsShowTextEditorStatusBar { get; set; }
 
 		//カラー
 		[JsonProperty]

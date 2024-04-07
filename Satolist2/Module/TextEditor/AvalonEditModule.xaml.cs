@@ -64,7 +64,27 @@ namespace Satolist2.Module.TextEditor
 
 			MouseMove += AvalonEditModule_MouseMove;
 			MouseLeave += AvalonEditModule_MouseLeave;
+
+			//OnCaretPositionChanged += AvalonEditModule_OnCaretPositionChanged;
 		}
+
+#if false
+		private void AvalonEditModule_OnCaretPositionChanged(object sender, EventArgs e)
+		{
+			//てすと。
+			var rect = MainTextEditor.TextArea.Caret.CalculateCaretRectangle();
+			try
+			{
+				//TODO: ScrollChangedとかで横方向の位置がずれそうなのでそこも確認を
+				var s = MainTextEditor.PointToScreen(new Point(rect.X, rect.Y));
+				var p = TestCanvas.PointFromScreen(s);
+				Debug.WriteLine($"RECT({p.X}:{s.X})");
+				DataContext.TestPosX = p.X;
+				DataContext.TestIndex = MainTextEditor.TextArea.Caret.Position.Column;
+			}
+			catch { }
+		}
+#endif
 
 		private void AvalonEditModule_MouseLeave(object sender, MouseEventArgs e)
 		{
@@ -194,6 +214,11 @@ namespace Satolist2.Module.TextEditor
 			get => MainTextEditor.TextArea.Caret.Line;
 		}
 
+		public int CaretColumn
+		{
+			get => MainTextEditor.TextArea.Caret.Column;
+		}
+
 		//選択範囲
 		public override string SelectionString
 		{
@@ -225,6 +250,12 @@ namespace Satolist2.Module.TextEditor
 		{
 			get => MainTextEditor.ShowLineNumbers;
 			set => MainTextEditor.ShowLineNumbers = value;
+		}
+
+		public override bool ShowStatusBar
+		{
+			get => StatusBar.Visibility == Visibility.Visible;
+			set => StatusBar.Visibility = value ? Visibility.Visible : Visibility.Collapsed;
 		}
 
 		public override bool WordWrap
@@ -490,6 +521,18 @@ namespace Satolist2.Module.TextEditor
 		public ICommand InsertCommand { get; }
 		public MainViewModel Main => MainWindow.Instance.DataContext;
 
+		//列
+		public int CaretColumn
+		{
+			get => Module.CaretColumn;
+		}
+
+		//行
+		public int CaretLine
+		{
+			get => Module.CaretLine;
+		}
+
 		//背景画像パス
 		public string BackgroundImagePath
 		{
@@ -747,6 +790,12 @@ namespace Satolist2.Module.TextEditor
 		{
 			Module = module;
 			textEditorMargin = new Thickness();
+
+			Module.OnCaretPositionChanged += (s, e) =>
+			{
+				NotifyChanged(nameof(CaretColumn));
+				NotifyChanged(nameof(CaretLine));
+			};
 
 			SendToGhostCommand = new ActionCommand(o =>
 			{

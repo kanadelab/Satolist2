@@ -64,6 +64,9 @@ namespace Satolist2.Module.TextEditor
 		//行数の表示
 		public abstract bool ShowLineNumbers { get; set; }
 
+		//ステータスバーの表示
+		public virtual bool ShowStatusBar { get; set; }
+
 		//自動改行
 		public abstract bool WordWrap { get; set; }
 
@@ -183,6 +186,7 @@ namespace Satolist2.Module.TextEditor
 		{
 			//設定
 			ShowLineNumbers = MainViewModel.EditorSettings.GeneralSettings.IsShowLineNumber;
+			ShowStatusBar = MainViewModel.EditorSettings.GeneralSettings.IsShowTextEditorStatusBar;
 			WordWrap = MainViewModel.EditorSettings.GeneralSettings.IsWardWrap;
 			ShowEndOfLine = MainViewModel.EditorSettings.GeneralSettings.IsShowEndOfLine;
 			HighlightCurrentLine = MainViewModel.EditorSettings.GeneralSettings.IsHilightCurrentLine;

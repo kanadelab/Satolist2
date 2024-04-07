@@ -53,6 +53,7 @@
 					<TextBlock Text="テキストエディタの各種設定を変更します。" Margin="3"/>
 					<Separator Margin="3" />
 					<CheckBox Content="行番号の表示" IsChecked="{Binding Model.IsShowLineNumber}" Margin="3" />
+					<CheckBox Content="ステータスバーでカーソル位置を表示(デフォルトのテキストエディタ専用)" IsChecked="{Binding Model.IsShowTextEditorStatusBar}" Margin="3" />
 					<CheckBox Content="編集中の行を強調する" IsChecked="{Binding Model.IsHilightCurrentLine}" Margin="3" />
 					<CheckBox Content="自動インデント" IsChecked="{Binding Model.IsIndent}" Margin="3" />
 					<CheckBox Content="右端で折り返す" IsChecked="{Binding Model.IsWardWrap}" Margin="3" />
