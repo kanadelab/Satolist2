@@ -21,7 +21,6 @@
 	<UserControl.Resources>
 		<ResourceDictionary>
 			<BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
-			<util:BoolToVisibilityHiddenConverter x:Key="BoolToVisibilityHiddenConverter" />
 			<local:DocumentCloseAllCommand x:Key="DocumentCloseAllCommand" />
 
 			<ContextMenu x:Key="DockingPaneContextMenu">
@@ -449,7 +448,6 @@ DataContext="{Binding RuntimeBasedSurfaceViewerViewModel}">
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition Width="*" />
 				<ColumnDefinition Width="auto" />
-				<ColumnDefinition Width="auto" />
 			</Grid.ColumnDefinitions>
 			
 			<Button Grid.Column="0" Command="{Binding ShowLogMessageCommand}" VerticalAlignment="Center" Margin="3" MaxHeight="20">
@@ -466,12 +464,8 @@ DataContext="{Binding RuntimeBasedSurfaceViewerViewModel}">
 				</Button.Template>
 			</Button>
 
-			<TextBlock Grid.Column="1" Foreground="White" VerticalAlignment="Center" Margin="3" Text="あああ">
-				
-			</TextBlock>
-
-			<Button Grid.Column="2" VerticalAlignment="Center" Margin="3" MaxHeight="20" Foreground="White" Command="{Binding NetworkUpdateCommand}"
-					Visibility="{Binding IsUpdateAvailable, Converter={StaticResource BoolToVisibilityHiddenConverter}}">
+			<Button Grid.Column="1" VerticalAlignment="Center" Margin="3" MaxHeight="20" Foreground="White" Command="{Binding NetworkUpdateCommand}"
+					Visibility="{Binding IsUpdateAvailable, Converter={StaticResource BoolToVisibilityConverter}}">
 				<Button.Template>
 					<ControlTemplate>
 						<Grid>
