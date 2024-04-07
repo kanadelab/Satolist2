@@ -90,6 +90,7 @@ namespace Satolist2.Model
 			ignoreDictionaryFiles.Add("satori_conf.txt");
 			ignoreDictionaryFiles.Add("satori_savedata.txt");
 			ignoreDictionaryFiles.Add("satori_savebackup.txt");
+			ignoreDictionaryFiles.Add("ssp_shiori_log.txt");
 
 			//ファイル巡回
 			var files = Directory.GetFiles(FullDictionaryPath, "*.*", SearchOption.AllDirectories).ToList();
