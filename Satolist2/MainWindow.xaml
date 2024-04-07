@@ -21,6 +21,7 @@
 	<UserControl.Resources>
 		<ResourceDictionary>
 			<BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+			<util:BoolToVisibilityHiddenConverter x:Key="BoolToVisibilityHiddenConverter" />
 			<local:DocumentCloseAllCommand x:Key="DocumentCloseAllCommand" />
 
 			<ContextMenu x:Key="DockingPaneContextMenu">
@@ -147,7 +148,12 @@
 			<MenuItem Header="デバッグ">
 				<MenuItem Header="起動中のゴーストの辞書をリロード" Command="{Binding ReloadShioriCommand}" InputGestureText="Ctrl+Alt+R" />
 				<Separator />
-				<MenuItem Header="FMOをダンプ" Command="{Binding DumpFMOCommand}" />
+				<MenuItem Header="辞書の簡易エラーチェック(beta)">
+					<MenuItem Header="問題の出そうな箇所をチェック" Command="{Binding DictionaryCommonErrorCheckCommand}" />
+					<MenuItem Header="移動先のみつからないジャンプ・選択肢をチェック" Command="{Binding DictionaryBrokenJumpCheckCommand}"/>
+				</MenuItem>
+				<Separator />
+				<MenuItem Header="Sakura FMOをファイルに書き出し" Command="{Binding DumpFMOCommand}" />
 			</MenuItem>
 			<MenuItem Header="更新">
 				<MenuItem Header="narファイル作成" Command="{Binding ExportNarCommand}" />
@@ -443,6 +449,7 @@ DataContext="{Binding RuntimeBasedSurfaceViewerViewModel}">
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition Width="*" />
 				<ColumnDefinition Width="auto" />
+				<ColumnDefinition Width="auto" />
 			</Grid.ColumnDefinitions>
 			
 			<Button Grid.Column="0" Command="{Binding ShowLogMessageCommand}" VerticalAlignment="Center" Margin="3" MaxHeight="20">
@@ -459,8 +466,12 @@ DataContext="{Binding RuntimeBasedSurfaceViewerViewModel}">
 				</Button.Template>
 			</Button>
 
-			<Button Grid.Column="1" VerticalAlignment="Center" Margin="3" MaxHeight="20" Foreground="White" Command="{Binding NetworkUpdateCommand}"
-					Visibility="{Binding IsUpdateAvailable, Converter={StaticResource BoolToVisibilityConverter}}">
+			<TextBlock Grid.Column="1" Foreground="White" VerticalAlignment="Center" Margin="3" Text="あああ">
+				
+			</TextBlock>
+
+			<Button Grid.Column="2" VerticalAlignment="Center" Margin="3" MaxHeight="20" Foreground="White" Command="{Binding NetworkUpdateCommand}"
+					Visibility="{Binding IsUpdateAvailable, Converter={StaticResource BoolToVisibilityHiddenConverter}}">
 				<Button.Template>
 					<ControlTemplate>
 						<Grid>

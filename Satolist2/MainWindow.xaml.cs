@@ -295,6 +295,11 @@ namespace Satolist2
 
 		internal EventEditor OpenEventEditor(EventModel ev)
 		{
+			//イベントエディタを開く場合、親の辞書とリンクが切れている場合は簡易デシリアライズかデータが古いモデルなので編集させない
+			if (!ev.Dictionary.Events.Contains(ev))
+				return null;
+
+			//既に開いている場合はそれをアクティベートする
 			var currentWindow = EventEditors.FirstOrDefault(o => ((EventEditorViewModel)o.ViewModel).Event == ev);
 			if (currentWindow == null)
 			{
@@ -1090,6 +1095,8 @@ namespace Satolist2
 		public ActionCommand CommentOutSelectionRangeCommand { get; }
 		public ActionCommand RemoveCommentOutSelectionRangeCommand { get; }
 		public ActionCommand OpenUrlCommand { get; }
+		public ActionCommand DictionaryCommonErrorCheckCommand { get; }
+		public ActionCommand DictionaryBrokenJumpCheckCommand { get; }
 
 		public static void StaticInitialize()
 		{
@@ -1561,11 +1568,11 @@ namespace Satolist2
 						try
 						{
 							SakuraFMOReader.DumpToFile(d.FileName);
-							MessageBox.Show("FMOをダンプしました。", "さとりすと", MessageBoxButton.OK, MessageBoxImage.Information);
+							MessageBox.Show("FMOをファイルに書き出しました。", "さとりすと", MessageBoxButton.OK, MessageBoxImage.Information);
 						}
 						catch
 						{
-							MessageBox.Show("FMOダンプに失敗しました。", "さとりすと", MessageBoxButton.OK, MessageBoxImage.Warning);
+							MessageBox.Show("FMOの書き出しに失敗しました。", "さとりすと", MessageBoxButton.OK, MessageBoxImage.Warning);
 						}
 					}
 				}
@@ -1843,6 +1850,20 @@ namespace Satolist2
 					catch { }
 				});
 
+			DictionaryCommonErrorCheckCommand = new ActionCommand(
+				o =>
+				{
+					//辞書の簡易エラーチェックを呼び出す
+					SearchResultViewModel.StaticDictionaryErrorCheck_CommonErrorCheck();
+				});
+
+			DictionaryBrokenJumpCheckCommand = new ActionCommand(
+				o =>
+				{
+					//辞書のジャンプ参照切れを検索する
+					SearchResultViewModel.StaticDictionaryErrorCheck_BrokenJumpCheck();
+				});
+
 			//読込エラーが発生している場合に通知
 			List<ErrorListDialogItemViewModel> errorItems = new List<ErrorListDialogItemViewModel>();
 			foreach (var err in SaveLoadPanes.Where(o => o.LoadState == EditorLoadState.LoadFailed))
@@ -1889,6 +1910,11 @@ namespace Satolist2
 		public void OpenEventEditor(InlineEventModel ev)
 		{
 			var eventEditor = MainWindow.OpenEventEditor(ev.ParentEvent);
+			if(eventEditor == null)
+			{
+				return;
+			}
+
 			if (eventEditor.DataContext is EventEditorViewModel vm)
 			{
 				vm.MoveCaretToLine(ev.InlineEvent.AnalyzeLineIndex);

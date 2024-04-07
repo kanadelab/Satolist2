@@ -30,13 +30,33 @@
 					</Style.Triggers>
 				</Style>
 			</ListView.ItemContainerStyle>
-			<ListView.View>
-				<GridView>
-					<GridViewColumn Header="ファイル" x:Name="SearchResultFileColumn" DisplayMemberBinding="{Binding HitFileName}" />
-					<GridViewColumn Header="名前" x:Name="SearchResultNameColumn" DisplayMemberBinding="{Binding HitName}" />
-					<GridViewColumn Header="内容" x:Name="SearchResultBodyColumn" DisplayMemberBinding="{Binding HitBody}" />
-				</GridView>
-			</ListView.View>
+			<ListView.Style>
+				<Style TargetType="ListView" BasedOn="{StaticResource {x:Type ListView}}">
+					<Setter Property="View">
+						<Setter.Value>
+							<GridView>
+								<GridViewColumn Header="ファイル" DisplayMemberBinding="{Binding HitFileName}" />
+								<GridViewColumn Header="名前" DisplayMemberBinding="{Binding HitName}" />
+								<GridViewColumn Header="内容" DisplayMemberBinding="{Binding HitBody}" />
+							</GridView>
+						</Setter.Value>
+					</Setter>
+					<Style.Triggers>
+						<DataTrigger Binding="{Binding ShowErrorColumn}" Value="True">
+							<Setter Property="View">
+								<Setter.Value>
+									<GridView>
+										<GridViewColumn Header="エラー内容" DisplayMemberBinding="{Binding ErrorLabel}" />
+										<GridViewColumn Header="ファイル" DisplayMemberBinding="{Binding HitFileName}" />
+										<GridViewColumn Header="名前" DisplayMemberBinding="{Binding HitName}" />
+										<GridViewColumn Header="内容" DisplayMemberBinding="{Binding HitBody}" />
+									</GridView>
+								</Setter.Value>
+							</Setter>
+						</DataTrigger>
+					</Style.Triggers>
+				</Style>
+			</ListView.Style>
 		</ListView>
 	</Grid>
 </UserControl>

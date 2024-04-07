@@ -4,7 +4,9 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
+using System.IO;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -13,6 +15,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
+using System.Windows.Markup;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
@@ -73,6 +76,7 @@ namespace Satolist2.Control
 		private ObservableCollection<SearchResultItemViewModel> items;
 		private MainViewModel Main { get; }
 		private string dockingTitle;
+		private bool showErrorColumn;
 
 		public string DockingTitle
 		{
@@ -80,6 +84,17 @@ namespace Satolist2.Control
 			set
 			{
 				dockingTitle = value;
+				NotifyChanged();
+			}
+		}
+
+		//エラー表記のカラムを表示するかどうか
+		public bool ShowErrorColumn
+		{
+			get => showErrorColumn;
+			set
+			{
+				showErrorColumn = value;
 				NotifyChanged();
 			}
 		}
@@ -99,13 +114,30 @@ namespace Satolist2.Control
 			DockingTitle = "検索結果";
 		}
 
-		//検索の実行?
-		public void RunSearch(SearchQuery query)
+		//リザルトアイテムの解放
+		private void ClearResult()
 		{
-			//クリア処理
 			foreach (var item in items)
 				item.Dispose();
 			items.Clear();
+		}
+
+		private void ActivateResultWindow()
+		{
+			Main.MainWindow.SearchResult.IsActive = true;
+			Main.MainWindow.SearchResult.IsVisible = true;
+			DockingTitle = string.Format("検索結果 ({0})", items.Count);
+
+			//エラーを示す行があればエラーカラムを表示する
+			ShowErrorColumn = items.FirstOrDefault(o => !string.IsNullOrEmpty(o.ErrorLabel)) != null;
+		}
+
+		//検索の実行?
+		//NOTE: 処理がここにあるべきかはちょっと自信がない
+		public void RunSearch(SearchQuery query)
+		{
+			//クリア処理
+			ClearResult();
 
 			//検索対象を作成
 			object queryObj = (object)query.SearchRegex ?? (object)query.SearchString ?? string.Empty;
@@ -198,9 +230,7 @@ namespace Satolist2.Control
 			}
 
 			//ウインドウの表示・アクティブ化
-			Main.MainWindow.SearchResult.IsActive = true;
-			Main.MainWindow.SearchResult.IsVisible = true;
-			DockingTitle = string.Format("検索結果 ({0})", items.Count);
+			ActivateResultWindow();
 		}
 
 		//検索処理
@@ -224,6 +254,49 @@ namespace Satolist2.Control
 			else
 			{
 				throw new NotImplementedException();
+			}
+		}
+
+		//辞書の簡易エラーチェック
+		public void StaticDictionaryErrorCheck_CommonErrorCheck()
+		{
+			ClearResult();
+			var errors = StaticDictionaryErrorChecker.CommonErrorCheck(Main.Ghost).ToArray();
+			foreach(var e in errors)
+			{
+				items.Add(new SearchResultItemViewModel(this, e.Event, e.LineIndex, e.Message));
+			}
+
+			//リザルト
+			if (items.Count == 0)
+			{
+				MessageBox.Show("問題は見つかりませんでした。", "辞書の検証");
+			}
+			else
+			{
+				ActivateResultWindow();
+				MessageBox.Show(items.Count.ToString() + " 個の問題が見つかりました。", "辞書の検証");
+			}
+		}
+
+		public void StaticDictionaryErrorCheck_BrokenJumpCheck()
+		{
+			ClearResult();
+			var errors = StaticDictionaryErrorChecker.CheckReferences(Main.Ghost).ToArray();
+			foreach (var e in errors)
+			{
+				items.Add(new SearchResultItemViewModel(this, e.Event, e.LineIndex, e.Message));
+			}
+
+			//リザルト
+			if (items.Count == 0)
+			{
+				MessageBox.Show("問題は見つかりませんでした。", "辞書の検証");
+			}
+			else
+			{
+				ActivateResultWindow();
+				MessageBox.Show(items.Count.ToString() + " 個の問題が見つかりました。", "辞書の検証");
 			}
 		}
 
@@ -271,14 +344,27 @@ namespace Satolist2.Control
 		}
 	}
 
+	//検索結果ビューモデル
 	public class SearchResultItemViewModel : NotificationObject, IDisposable
 	{
 		private EventModel ev;
 		private DictionaryModel textFile;
 		private int textFileLineNumber;
+		private int? eventLineIndex;
 		private string textFileLinePreview;
+		private string searchLabel;
 		private bool isSelected;
 		private SearchResultViewModel Parent { get; }
+
+		public string ErrorLabel
+		{
+			get => searchLabel;
+			set
+			{
+				searchLabel = value;
+				NotifyChanged();
+			}
+		}
 
 		public bool IsSelected
 		{
@@ -323,6 +409,17 @@ namespace Satolist2.Control
 			}
 		}
 
+		public int? EventLineIndex
+		{
+			get => eventLineIndex;
+			set
+			{
+				eventLineIndex = value;
+				NotifyChanged();
+				NotifySearchResultChanged();
+			}
+		}
+
 		public string TextFileLinePreview
 		{
 			get => textFileLinePreview;
@@ -336,13 +433,11 @@ namespace Satolist2.Control
 
 		public bool IsListedEvent
 		{
-			get => Event != null;
+			get => !Event?.Dictionary.IsSerialized ?? false;
 		}
 
 		public ActionCommand OpenCommand { get; }
 		public ActionCommand RemoveItemCommand { get; }
-
-		//検索結果の表示について、中身に応じての切り替え
 
 		//項目名ラベル
 		public string HitName
@@ -407,15 +502,18 @@ namespace Satolist2.Control
 		}
 
 		//単語群・文に関係する設定
-		internal SearchResultItemViewModel(SearchResultViewModel parent, EventModel ev):this()
+		internal SearchResultItemViewModel(SearchResultViewModel parent, EventModel ev, int? lineIndex = null, string errorLabel = null):this()
 		{
 			Parent = parent;
 			Event = ev;
+			ErrorLabel = errorLabel;
+			EventLineIndex = lineIndex;	//いまのところあまり役に立ってないけど、直接示す行にジャンプできるといいのかも
 			Event.PropertyChanged += Event_PropertyChanged;
 			Event.OnRemove += Event_OnRemove;
 		}
 
-		internal SearchResultItemViewModel(SearchResultViewModel parent, int lineNumber, string linePreviewString, DictionaryModel textFile)
+		//プレーンテキストに関する設定
+		internal SearchResultItemViewModel(SearchResultViewModel parent, int lineNumber, string linePreviewString, DictionaryModel textFile):this()
 		{
 			Parent = parent;
 			TextFile = textFile;
