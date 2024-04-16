@@ -70,7 +70,7 @@ namespace Satolist2
 		/// </summary>
 		private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
 		{
-#if DEPLOY || true
+#if DEPLOY
 			//アプリケーションが続行不能の場合
 			if(Satolist2.MainWindow.Instance.DataContext is MainViewModel vm)
 			{
