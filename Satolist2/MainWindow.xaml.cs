@@ -1967,6 +1967,27 @@ namespace Satolist2
 			}
 		}
 
+		//緊急回避的保存
+		public void SaveToOtherDirectory(string baseDirectory)
+		{
+			if (Ghost == null)
+				return;
+
+			//保存対象を列挙
+			List<ISaveFileObject> objects = new List<ISaveFileObject>();
+			objects.AddRange(SaveLoadPanes);
+			objects.AddRange(Ghost.Dictionaries);
+
+			//変更があるものを保存
+			foreach(var item in objects)
+			{
+				if (!item.IsChanged)
+					continue;
+
+				item.SaveToOtherBaseDirectory(baseDirectory);
+			}
+		}
+
 		//保存ダイアログを呼ぶ
 		public bool AskSave(bool isAutomaticSaveDialog, bool isClosing = false)
 		{
@@ -1983,8 +2004,7 @@ namespace Satolist2
 
 			List<ISaveFileObject> objects = new List<ISaveFileObject>();
 			objects.AddRange(SaveLoadPanes);
-			if(Ghost != null)
-				objects.AddRange(Ghost.Dictionaries);
+			objects.AddRange(Ghost.Dictionaries);
 
 			var dialog = new SaveFileListDialog(this);
 			var dialogViewModel = new SaveFileListViewModel(objects);

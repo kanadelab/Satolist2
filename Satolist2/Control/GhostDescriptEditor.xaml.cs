@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -87,7 +88,7 @@ namespace Satolist2.Control
 	internal class GhostDescriptEditorViewModel : NotificationObject, ISaveFileObject, IDockingWindowContent, IDisposable, IControlBindedReceiver
 	{
 		public const string ContentId = "GhostProperty";
-		public virtual string SaveFilePath => "/ghost/master/descript.txt";
+		public virtual string SaveFilePath => "ghost/master/descript.txt";
 		public virtual string DockingTitle => "ゴーストプロパティ";
 		public virtual string DockingContentId => ContentId;
 		public virtual DescriptItemModel[] ItemModel => DataModelManager.DescriptItems;
@@ -193,7 +194,7 @@ namespace Satolist2.Control
 			loadState = EditorLoadState.Initialized;
 			try
 			{
-				var fullPath = main.Ghost.FullPath + SaveFilePath;
+				var fullPath = DictionaryUtility.ConbinePath(main.Ghost.FullPath, SaveFilePath);
 				if (System.IO.File.Exists(fullPath))
 				{
 					var fileBody = DictionaryUtility.ReadAllTextWithDescriptStyleCharset(fullPath);
@@ -209,14 +210,13 @@ namespace Satolist2.Control
 			}
 		}
 
-		//ファイルへの書き込み
-		public bool Save()
+		private bool Save(string ghostDirectory)
 		{
 			if (loadState != EditorLoadState.Loaded)
 				return false;
 
 			string saveText;
-			if(CurrentTabIndex == TabIndexList)
+			if (CurrentTabIndex == TabIndexList)
 			{
 				//リスト化されてるのでシリアライズして保存
 				saveText = Serialize();
@@ -229,15 +229,34 @@ namespace Satolist2.Control
 
 			try
 			{
-				var fullPath = main.Ghost.FullPath + SaveFilePath;
+				var fullPath = DictionaryUtility.ConbinePath(ghostDirectory, SaveFilePath);
+				Directory.CreateDirectory(System.IO.Path.GetDirectoryName(fullPath));
 				DictionaryUtility.WriteAllTextWithDescriptStyleCharset(fullPath, saveText);
-				isChanged = false;
 				return true;
 			}
 			catch
 			{
 				return false;
 			}
+		}
+
+		//ファイルへの書き込み
+		public bool Save()
+		{
+			if(Save(main.Ghost.FullPath))
+			{
+				isChanged = false;
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+
+		public bool SaveToOtherBaseDirectory(string ghostDirectory)
+		{
+			return Save(ghostDirectory);
 		}
 
 		//テキストのデシリアライズ
@@ -349,7 +368,7 @@ namespace Satolist2.Control
 		public new const string ContentId = "Install";
 		public override string DockingContentId => ContentId;
 		public override string DockingTitle => "インストール設定";
-		public override string SaveFilePath => "/install.txt";
+		public override string SaveFilePath => "install.txt";
 		public override DescriptItemModel[] ItemModel => DataModelManager.InstallItems;
 
 		public GhostInstallEditorViewModel(MainViewModel main):base(main)

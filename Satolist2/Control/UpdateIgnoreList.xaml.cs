@@ -6,6 +6,7 @@ using Satolist2.Utility;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -71,8 +72,8 @@ namespace Satolist2.Control
 	internal class UpdateIgnoreListViewModel : NotificationObject, IDockingWindowContent, IDisposable, IControlBindedReceiver
 	{
 		public const string ContentId = "UpdateIgnoreList";
-		public const string DeleteFilePath = "/delete.txt";
-		public const string DeveloperOptionsFilePath = "/developer_options.txt";
+		public const string DeleteFilePath = "delete.txt";
+		public const string DeveloperOptionsFilePath = "developer_options.txt";
 
 		private const int TabIndexList = 0;
 
@@ -164,8 +165,8 @@ namespace Satolist2.Control
 				}
 				);
 
-			DeleteSaveObject = new SaveFileObjectWrapper(DeleteFilePath, SaveDelete);
-			DeveloperOptionsSaveObject = new SaveFileObjectWrapper(DeveloperOptionsFilePath, SaveDeveloperOptions);
+			DeleteSaveObject = new SaveFileObjectWrapper(main, DeleteFilePath, SaveDelete);
+			DeveloperOptionsSaveObject = new SaveFileObjectWrapper(main, DeveloperOptionsFilePath, SaveDeveloperOptions);
 
 			//読み込み処理
 			if(main.Ghost != null)
@@ -224,8 +225,8 @@ namespace Satolist2.Control
 		//読み書き系
 		public void Load()
 		{
-			var deletePath = main.Ghost.FullPath + DeleteFilePath;
-			var deveoperOptionsPath = main.Ghost.FullPath + DeveloperOptionsFilePath;
+			var deletePath = DictionaryUtility.ConbinePath(main.Ghost.FullPath, DeleteFilePath);
+			var deveoperOptionsPath = DictionaryUtility.ConbinePath(main.Ghost.FullPath, DeveloperOptionsFilePath);
 
 			//セットで考える
 			DeleteSaveObject.LoadState = EditorLoadState.Initialized;
@@ -259,7 +260,7 @@ namespace Satolist2.Control
 			}
 		}
 
-		public bool SaveDeveloperOptions()
+		public bool SaveDeveloperOptions(string ghostDirectory)
 		{
 			if (DeveloperOptionsSaveObject.LoadState != EditorLoadState.Loaded)
 				return false;
@@ -278,9 +279,9 @@ namespace Satolist2.Control
 
 			try
 			{
-				var fullPath = main.Ghost.FullPath + DeveloperOptionsFilePath;
-				System.IO.File.WriteAllText(fullPath, saveText, main.Ghost.BootConf.SatolistDeveloperOptionsEncoding);
-				DeveloperOptionsSaveObject.IsChanged = false;
+				var fullPath = DictionaryUtility.ConbinePath(ghostDirectory, DeveloperOptionsFilePath);
+				Directory.CreateDirectory(System.IO.Path.GetDirectoryName(fullPath));
+				File.WriteAllText(fullPath, saveText, main.Ghost.BootConf.SatolistDeveloperOptionsEncoding);
 				return true;
 			}
 			catch
@@ -289,7 +290,7 @@ namespace Satolist2.Control
 			}
 		}
 
-		public bool SaveDelete()
+		public bool SaveDelete(string ghostDirectory)
 		{
 			if (DeleteSaveObject.LoadState != EditorLoadState.Loaded)
 				return false;
@@ -308,9 +309,9 @@ namespace Satolist2.Control
 
 			try
 			{
-				var fullPath = main.Ghost.FullPath + DeleteFilePath;
-				System.IO.File.WriteAllText(fullPath, saveText, main.Ghost.BootConf.SatolistDeleteEncoding);
-				DeleteSaveObject.IsChanged = false;
+				var fullPath = DictionaryUtility.ConbinePath(ghostDirectory, DeleteFilePath);
+				Directory.CreateDirectory(System.IO.Path.GetDirectoryName(fullPath));
+				File.WriteAllText(fullPath, saveText, main.Ghost.BootConf.SatolistDeleteEncoding);
 				return true;
 			}
 			catch

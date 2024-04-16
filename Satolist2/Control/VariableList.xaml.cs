@@ -3,6 +3,7 @@ using Satolist2.Utility;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -287,7 +288,7 @@ namespace Satolist2.Control
 	internal class SatoriConfWrapper : SaveFileObjectWrapper
 	{
 		private MainViewModel main;
-		public const string SatoriConfFilePath = "/ghost/master/satori_conf.txt";
+		public const string SatoriConfFilePath = "ghost/master/satori_conf.txt";
 
 		//変数リストの保存内容を取得する
 		public Func<string> VariableInitializeListFileSaveBody { get; set; }
@@ -300,7 +301,7 @@ namespace Satolist2.Control
 		public string SaoriListBody { get; private set; }
 		public string VariableInitializeListBody { get; private set; }
 
-		public SatoriConfWrapper(MainViewModel main) : base(SatoriConfFilePath, null)
+		public SatoriConfWrapper(MainViewModel main) : base(main, SatoriConfFilePath, null)
 		{
 			this.main = main;
 			base.SetSaveFunc(SaveSatoriConf);
@@ -314,7 +315,7 @@ namespace Satolist2.Control
 
 		private void Load()
 		{
-			var fullPath = main.Ghost.FullPath + SatoriConfFilePath;
+			var fullPath = DictionaryUtility.ConbinePath(main.Ghost.FullPath, SatoriConfFilePath);
 			LoadState = EditorLoadState.Initialized;
 
 			try
@@ -380,7 +381,7 @@ namespace Satolist2.Control
 			}
 		}
 
-		private bool SaveSatoriConf()
+		private bool SaveSatoriConf(string ghostDirectory)
 		{
 			if (LoadState != EditorLoadState.Loaded)
 				return false;
@@ -401,9 +402,9 @@ namespace Satolist2.Control
 
 			try
 			{
-				var fullPath = main.Ghost.FullPath + SatoriConfFilePath;
-				System.IO.File.WriteAllText(fullPath, saveText, main.Ghost.BootConf.DicEncoding);
-				IsChanged = false;
+				var fullPath = DictionaryUtility.ConbinePath(ghostDirectory, SatoriConfFilePath);
+				Directory.CreateDirectory(System.IO.Path.GetDirectoryName(fullPath));
+				File.WriteAllText(fullPath, saveText, main.Ghost.BootConf.DicEncoding);
 				return true;
 			}
 			catch

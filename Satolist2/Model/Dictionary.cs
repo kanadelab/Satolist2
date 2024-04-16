@@ -726,7 +726,7 @@ namespace Satolist2.Model
 			IsChanged = true;
 		}
 
-		public bool Save()
+		private bool Save(string filename)
 		{
 			try
 			{
@@ -741,15 +741,34 @@ namespace Satolist2.Model
 					//シリアライズして保存
 					saveText = Serialize();
 				}
-				File.WriteAllText(FullPath, saveText, Ghost.BootConf.DicEncoding);
+				Directory.CreateDirectory(Path.GetDirectoryName(filename));
+				File.WriteAllText(filename, saveText, Ghost.BootConf.DicEncoding);
 				lastUpdateTime = File.GetLastWriteTimeUtc(FullPath);
-				IsChanged = false;
 				return true;
 			}
 			catch
 			{
 				return false;
 			}
+		}
+
+		public bool Save()
+		{
+			if(Save(FullPath))
+			{
+				IsChanged = false;
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+
+		public bool SaveToOtherBaseDirectory(string ghostDirectory)
+		{
+			var relativePath = DictionaryUtility.MakeRelativePath(Ghost.FullPath, FullPath);
+			return Save(DictionaryUtility.ConbinePath(ghostDirectory, relativePath));
 		}
 	}
 

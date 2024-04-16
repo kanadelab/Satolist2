@@ -3,6 +3,7 @@ using Satolist2.Utility;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -32,8 +33,8 @@ namespace Satolist2.Control
 	internal class ReplaceListViewModel : NotificationObject, IDockingWindowContent, IControlBindedReceiver, IDisposable
 	{
 		public const string ContentId = "ReplaceList";
-		public const string ReplaceFilePath = "/ghost/master/replace.txt";
-		public const string ReplaceAfterFilePath = "/ghost/master/replace_after.txt";
+		public const string ReplaceFilePath = "ghost/master/replace.txt";
+		public const string ReplaceAfterFilePath = "ghost/master/replace_after.txt";
 		private const int TabIndexList = 0;
 
 		private MainViewModel main;
@@ -116,8 +117,8 @@ namespace Satolist2.Control
 				}
 				);
 
-			ReplaceSaveObject = new SaveFileObjectWrapper(ReplaceFilePath, SaveReplace);
-			ReplaceAfterSaveObject = new SaveFileObjectWrapper(ReplaceAfterFilePath, SaveReplaceAfter);
+			ReplaceSaveObject = new SaveFileObjectWrapper(main, ReplaceFilePath, SaveReplace);
+			ReplaceAfterSaveObject = new SaveFileObjectWrapper(main, ReplaceAfterFilePath, SaveReplaceAfter);
 
 			if (main.Ghost != null)
 				Load();
@@ -143,8 +144,8 @@ namespace Satolist2.Control
 		//ロード周り
 		public void Load()
 		{
-			var replacePath = main.Ghost.FullPath + ReplaceFilePath;
-			var replaceAfterPath = main.Ghost.FullPath + ReplaceAfterFilePath;
+			var replacePath = DictionaryUtility.ConbinePath(main.Ghost.FullPath, ReplaceFilePath);
+			var replaceAfterPath = DictionaryUtility.ConbinePath(main.Ghost.FullPath, ReplaceAfterFilePath);
 
 			//セットで考える必要がある、片方が失敗したら両方NG扱いにする
 			ReplaceAfterSaveObject.LoadState = EditorLoadState.Initialized;
@@ -181,7 +182,7 @@ namespace Satolist2.Control
 		}
 
 		//保存
-		public bool SaveReplace()
+		public bool SaveReplace(string ghostPath)
 		{
 			if (ReplaceSaveObject.LoadState != EditorLoadState.Loaded)
 				return false;
@@ -200,9 +201,9 @@ namespace Satolist2.Control
 
 			try
 			{
-				var fullPath = main.Ghost.FullPath + ReplaceFilePath;
-				System.IO.File.WriteAllText(fullPath, saveText, main.Ghost.BootConf.ReplaceEncoding);
-				ReplaceSaveObject.IsChanged = false;
+				var fullPath = DictionaryUtility.ConbinePath(ghostPath, ReplaceFilePath);
+				Directory.CreateDirectory(System.IO.Path.GetDirectoryName(fullPath));
+				File.WriteAllText(fullPath, saveText, main.Ghost.BootConf.ReplaceEncoding);
 				return true;
 			}
 			catch
@@ -211,7 +212,7 @@ namespace Satolist2.Control
 			}
 		}
 
-		public bool SaveReplaceAfter()
+		public bool SaveReplaceAfter(string ghostPath)
 		{
 			if (ReplaceAfterSaveObject.LoadState != EditorLoadState.Loaded)
 				return false;
@@ -230,9 +231,9 @@ namespace Satolist2.Control
 
 			try
 			{
-				var fullPath = main.Ghost.FullPath + ReplaceAfterFilePath;
-				System.IO.File.WriteAllText(fullPath, saveText, main.Ghost.BootConf.ReplaceEncoding);
-				ReplaceSaveObject.IsChanged = false;
+				var fullPath = DictionaryUtility.ConbinePath(ghostPath, ReplaceAfterFilePath);
+				Directory.CreateDirectory(System.IO.Path.GetDirectoryName(fullPath));
+				File.WriteAllText(fullPath, saveText, main.Ghost.BootConf.ReplaceEncoding);
 				return true;
 			}
 			catch
@@ -366,9 +367,10 @@ namespace Satolist2.Control
 	//単純な形の変更管理
 	internal class SaveFileObjectWrapper : NotificationObject, ISaveFileObject
 	{
+		private MainViewModel main;
 		private bool isChanged;
 		private EditorLoadState loadState;
-		private Func<bool> saveFunc;
+		private Func<string, bool> saveFunc;
 
 		public bool IsChanged 
 		{
@@ -394,7 +396,7 @@ namespace Satolist2.Control
 
 		public bool Save()
 		{
-			if( saveFunc())
+			if(saveFunc(main.Ghost.FullPath))
 			{
 				IsChanged = false;
 				return true;
@@ -405,18 +407,24 @@ namespace Satolist2.Control
 			}
 		}
 
+		public bool SaveToOtherBaseDirectory(string directory)
+		{
+			return saveFunc(directory);
+		}
+
 		public void Changed()
 		{
 			IsChanged = true;
 		}
 
-		public SaveFileObjectWrapper(string saveFilePath, Func<bool> saveFunc)
+		public SaveFileObjectWrapper(MainViewModel main, string saveFilePath, Func<string, bool> saveFunc)
 		{
+			this.main = main;
 			this.saveFunc = saveFunc;
 			this.SaveFilePath = saveFilePath;
 		}
 
-		public void SetSaveFunc(Func<bool> saveFunc)
+		public void SetSaveFunc(Func<string, bool> saveFunc)
 		{
 			this.saveFunc = saveFunc;
 		}

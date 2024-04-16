@@ -18,7 +18,7 @@ namespace Satolist2.Model
 	{
 		private const string InsertPaettePath = "settings/insertpalette.json";
 		private const string TemporarySettingsPath = "settings/temporary.json";
-		private const string GeneralSettingPath = "settings/general.json";
+		public const string GeneralSettingPath = "settings/general.json";
 		private const string LegacySettingPath = "settings/legacy.json";
 
 		//ロードエラー定型文

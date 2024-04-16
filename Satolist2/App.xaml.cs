@@ -2,10 +2,13 @@
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Threading;
+using Satolist2.Model;
 using Satolist2.Utility;
 
 namespace Satolist2
@@ -22,6 +25,7 @@ namespace Satolist2
 			//アセンブリ位置をカレントに設定
 			Environment.CurrentDirectory = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
 			PrepareEnvironment();
+			AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
 
 			base.OnStartup(e);
 
@@ -39,6 +43,7 @@ namespace Satolist2
 			AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
 		}
 
+		
 		//アセンブリを奥におしやる
 		private static System.Reflection.Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
 		{
@@ -58,6 +63,37 @@ namespace Satolist2
 			}
 			else
 				return null;
+		}
+		
+		/// <summary>
+		/// クラッシュレポートとデータ保護関係
+		/// </summary>
+		private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+		{
+#if DEPLOY || true
+			//アプリケーションが続行不能の場合
+			if(Satolist2.MainWindow.Instance.DataContext is MainViewModel vm)
+			{
+				//クラッシュレポートディレクトリを作成
+				var dtDirName = DateTime.Now.ToString("yyyyMMdd-HHmmss");
+				var directoryName = DictionaryUtility.ConbinePath("crashreport", dtDirName);
+				Directory.CreateDirectory(directoryName);
+
+				//ゴーストの回避的保存
+				vm.SaveToOtherDirectory(directoryName);
+
+				//例外情報の書き込み
+				if (e.ExceptionObject is Exception ex)
+				{
+					var saveStr = string.Format("{0}\r\n{1}", ex.ToString(), ex.StackTrace.ToString());
+					File.WriteAllText(DictionaryUtility.ConbinePath(directoryName, "exception.txt"), saveStr);
+				}
+
+				//解析目的で基本設定を送る
+				//比較して他の設定はプライバシー性が高いのでこれだけにしとく
+				File.Copy(EditorSettings.GeneralSettingPath, DictionaryUtility.ConbinePath(directoryName, "general.json"));
+			}
+#endif
 		}
 
 		protected override void OnExit(ExitEventArgs e)

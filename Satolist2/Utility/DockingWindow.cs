@@ -168,6 +168,9 @@ namespace Satolist2.Utility
 		bool Save();
 		void Changed();
 		EditorLoadState LoadState { get; }
+
+		//別フォルダへの保存。クラッシュ時補助向け
+		bool SaveToOtherBaseDirectory(string ghostDirectory);
 	}
 
 	public enum EditorLoadState
