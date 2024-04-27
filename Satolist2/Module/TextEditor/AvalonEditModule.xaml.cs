@@ -111,9 +111,12 @@ namespace Satolist2.Module.TextEditor
 			//Ctrl+Click
 			if ((Keyboard.Modifiers & ModifierKeys.Control) != 0)
 			{
-				//無効化したいのでHandledに
-				e.Handled = true;
-				RequestJumpToToolTipTarget(mouseOverWord);
+				if (!string.IsNullOrEmpty(mouseOverWord))
+				{
+					//無効化したいのでHandledに
+					e.Handled = true;
+					RequestJumpToToolTipTarget(mouseOverWord);
+				}
 			}
 		}
 
@@ -195,6 +198,9 @@ namespace Satolist2.Module.TextEditor
 
 		private void RequestJumpToToolTipTarget(string word)
 		{
+			if (string.IsNullOrEmpty(word))
+				return;
+
 			if(DataContext is AvalonEditModuleViewModel vm)
 			{
 				vm.JumpToToolTipTarget(word, mouseOverWordLineIndex);
@@ -676,7 +682,9 @@ namespace Satolist2.Module.TextEditor
 				return;
 			if (Main.Ghost == null)
 				return;
-			
+			if (string.IsNullOrEmpty(word))
+				return;
+
 			//サーフェスパレットのプレビュー表示
 			var surfaceId = DictionaryUtility.NumberZen2Han(word);
 			if (int.TryParse(surfaceId, out int _))
@@ -756,6 +764,9 @@ namespace Satolist2.Module.TextEditor
 
 		public void JumpToToolTipTarget(string word, int wordLineIndex)
 		{
+			if (string.IsNullOrEmpty(word))
+				return;
+
 			if (!IsToolTipOpen)
 			{
 				//ツールチップ開いてなかったら一旦検索しておく
