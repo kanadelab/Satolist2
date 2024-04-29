@@ -52,7 +52,7 @@
 		<doc:H3 Text="表示位置の変更" />
 		<doc:Paragraph Text="サーフェスパレット上の表示位置をずらすことができます。画像上の指定位置はサーフェスパレットの左上に来ます。" />
 		<doc:CodeSnippet Text="//satolist.palette.offset,X座標,Y座標" Description="書式" />
-		<doc:CodeSnippet Text="//surface.palette.offset,100,100" Description="例：画像の左上から100,100ずらして表示" />
+		<doc:CodeSnippet Text="//satolist.palette.offset,100,100" Description="例：画像の左上から100,100ずらして表示" />
 		<doc:Paragraph Text="サーフェスビューワの立ち絵画像をドラッグして範囲選択、その後「選択位置をサーフェスパレットのデフォルト表示位置に設定」でサーフェスパレットの表示位置を簡易的に指定することもできます。ただし、すべての画像に対して適用することになるので、２人以上のキャラクターが居るなど立ち絵ごとに帰る必要がある場合は surfaces.txt で設定を行ってください。" />
 
 		<doc:H3 Text="表示倍率を変更" />
