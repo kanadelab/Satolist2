@@ -30,6 +30,8 @@ namespace SatolistDeploy
 				"readme.txt",
 				"licence.txt",
 				"MahApps.Metro.dll",
+				"x64",
+				"x86"
 			};
 
 			//必要なアセンブリ。雑多にあるので data/assembly に移動。
@@ -75,7 +77,9 @@ namespace SatolistDeploy
 				"System.Text.Encoding.CodePages.dll",
 				"Azuki.dll",
 				"SatolistGhostBackup.exe",
-				"System.Data.SQLite.dll"
+				"System.Data.SQLite.dll",
+				"x64",
+				"x86"
 			};
 
 			foreach(var item in copyItems )
