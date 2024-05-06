@@ -77,6 +77,7 @@ namespace SatolistDeploy
 				"System.Text.Encoding.CodePages.dll",
 				"Azuki.dll",
 				"SatolistGhostBackup.exe",
+				"SatolistUtility.dll",
 				"System.Data.SQLite.dll",
 				"x64",
 				"x86"
