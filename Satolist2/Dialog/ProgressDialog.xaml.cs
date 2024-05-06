@@ -171,7 +171,9 @@ namespace Satolist2.Dialog
 
 		public ProgressDialogViewModel(ProgressDialog dialog)
 		{
-			this.title = "さとりすと";	//default title
+			this.title = "さとりすと";   //default title
+			this.stableMessage = string.Empty;
+			this.message = string.Empty;
 			this.dialog = dialog;
 		}
 
@@ -187,6 +189,7 @@ namespace Satolist2.Dialog
 		{
 			SetMessage(message);
 			Progress = progress;
+			IsIndeterminate = false;
 		}
 
 		public void SetProgress(Progress progress)

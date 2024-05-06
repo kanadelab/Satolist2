@@ -73,7 +73,9 @@ namespace SatolistDeploy
 				"System.Numerics.Vectors.dll",
 				"System.Runtime.CompilerServices.Unsafe.dll",
 				"System.Text.Encoding.CodePages.dll",
-				"Azuki.dll"
+				"Azuki.dll",
+				"SatolistGhostBackup.exe",
+				"System.Data.SQLite.dll"
 			};
 
 			foreach(var item in copyItems )

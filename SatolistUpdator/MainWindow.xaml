@@ -25,6 +25,7 @@
 			</ProgressBar.Style>
 		</ProgressBar>
 		<StackPanel HorizontalAlignment="Right" Orientation="Horizontal" Margin="3">
+			<Button Content="キャンセル" Margin="3" MinWidth="100" MinHeight="25" Command="{Binding CancelCommand}" Visibility="{Binding ShowCancelButton, Converter={StaticResource BooleanToVisibilityConverter}}" />
 			<Button Content="アップデート開始" Margin="3" MinWidth="100" MinHeight="25" Command="{Binding UpdateButtonCommand}" Visibility="{Binding ShowUpdateButton, Converter={StaticResource BooleanToVisibilityConverter}}" />
 			<Button Content="閉じる(さとりすとを起動)" MinWidth="100" MinHeight="25" Margin="3" Command="{Binding BootSatolistButtonCommand}" Visibility="{Binding ShowBootSatolistButton, Converter={StaticResource BooleanToVisibilityConverter}}"/>
 			<Button Content="閉じる" MinWidth="100" MinHeight="25" Margin="3" Command="{Binding CloseButtonCommand}" Visibility="{Binding ShowCloseButton, Converter={StaticResource BooleanToVisibilityConverter}}" />
