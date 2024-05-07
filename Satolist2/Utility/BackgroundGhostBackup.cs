@@ -23,8 +23,6 @@ namespace Satolist2.Utility
 		//バックアップが必要であれば開始する
 		public static bool BackupIfNeed(string sourcePath, Action<FinishedCallbackArgs> finishedCallback)
 		{
-			var backupMin = 0;	//バックアップ間隔分
-
 			//既に実行中であればキャンセル
 			lock(requestedProcessList)
 			{
@@ -46,7 +44,7 @@ namespace Satolist2.Utility
 				return true;
 			}
 
-			if(latestBackup.CreatedAt + TimeSpan.FromMinutes(backupMin) < DateTime.UtcNow)
+			if(latestBackup.CreatedAt + TimeSpan.FromMinutes(MainViewModel.EditorSettings.GeneralSettings.GhostBackupWithSaveIntervalMinutes) < DateTime.UtcNow)
 			{
 				//必要時間経過している
 				Backup(sourcePath, finishedCallback);

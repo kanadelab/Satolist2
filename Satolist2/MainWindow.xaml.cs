@@ -2070,17 +2070,17 @@ namespace Satolist2
 							//バックアップ完了
 							if (args.IsError)
 							{
-								MainWindow.Dispatcher.Invoke(() => LogMessage.AddLog($"ゴーストバックアップが完了しました: {Ghost.GhostDescriptName}"));
+								MainWindow.Dispatcher.Invoke(() => LogMessage.AddLog($"ゴーストバックアップでエラーが発生しました: {Ghost.GhostDescriptName}"));
 							}
 							else
 							{
-								MainWindow.Dispatcher.Invoke(() => LogMessage.AddLog($"ゴーストバックアップでエラーが発生しました: {Ghost.GhostDescriptName}"));
+								MainWindow.Dispatcher.Invoke(() => LogMessage.AddLog($"ゴーストバックアップが完了しました: {Ghost.GhostDescriptName}"));
 							}
 						});
 
 						if (isBackupStarted)
 						{
-							LogMessage.AddLog($"ゴーストバックアップを開始中...");
+							LogMessage.AddLog($"ゴーストバックアップを実行中...");
 						}
 					}
 				}
