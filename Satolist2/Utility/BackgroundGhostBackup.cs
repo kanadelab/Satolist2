@@ -35,7 +35,7 @@ namespace Satolist2.Utility
 			//バックアップ起動要件チェックのために同ソースのバックアップデータを検索
 			var db = new BackupDatabase(BackupDatabasePath);
 			var backupList = db.QueryBackups(sourcePath);
-			var latestBackup = backupList.OrderBy(o => o.CreatedAt).FirstOrDefault();
+			var latestBackup = backupList.OrderByDescending(o => o.CreatedAt).FirstOrDefault();
 
 			if(latestBackup == null)
 			{
