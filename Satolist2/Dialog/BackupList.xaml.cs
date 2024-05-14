@@ -57,7 +57,7 @@ namespace Satolist2.Dialog
 			{
 				if(MainViewModel.EditorSettings.GeneralSettings.GhostBackupExpiryDays > 0)
 				{
-					return $"さとりすとが作成したゴーストのバックアップデータの一覧です。任意のフォルダにバックアップを書き出すことができます。\r\nバックアップは{MainViewModel.EditorSettings.GeneralSettings.GhostBackupExpiryDays}日を経過すると自動的に削除されます。保持期限はオプションの基本設定から変更できます。";
+					return $"さとりすとが作成したゴーストのバックアップデータの一覧です。任意のフォルダにバックアップを書き出すことができます。\r\nバックアップは{MainViewModel.EditorSettings.GeneralSettings.GhostBackupExpiryDays}日経過後、次のバックアップ時に自動で削除されます。保持期限はオプションの基本設定から変更できます。";
 				}
 				else
 				{
