@@ -5,6 +5,7 @@ using System.ComponentModel.Design;
 using System.Data.SqlClient;
 using System.Data.SQLite;
 using System.Diagnostics;
+using System.Diagnostics.Contracts;
 using System.Diagnostics.Tracing;
 using System.IO;
 using System.IO.Compression;
@@ -22,31 +23,13 @@ namespace Satolist.GhostBackup
 		private const string OptionMaxFileSizeKb = "maxFileSizeKb";
 		private const string OptionOverwrite = "overwrite";
 
-		//自動的に無効化するファイル名の列挙
-
-		//sqlite blob にzipアーカイブのバックアップをためしてみるよ
 		static int Main(string[] args)
 		{
-			//(new Backup()).BackupGhost(@"D:\SSP_2\ghost\nadenade\", "test");
-
-			string[] testArgs =
-			{
-				
-				"backup",
-				"test.db",
-				@"D:/SSP_2/ghost/twin2"
-				/*
-				"list",
-				"backup",
-				"test.db"
-				*/
-			};
-			//(new Backup()).Main2(testArgs);
-			return (new Backup()).Main2(args);
+			return (new Backup()).MainProcess(args);
 		}
 
 
-		int Main2(string[] args)
+		int MainProcess(string[] args)
 		{
 			//オプションは key-value 形式で表示
 			var options = new Dictionary<string, string>();
@@ -511,106 +494,118 @@ namespace Satolist.GhostBackup
 				//データベースにバイナリブロブを書き込み
 				using (var connection = ConnectToDatabase(dbPath))
 				{
-					//バックアップID重複を確認
-					while (true)
+					using (var transaction = connection.BeginTransaction())
 					{
-						var sql = "select backupId from backup where backupId = @backupId";
-						using (var command = new SQLiteCommand(sql, connection))
+						try
 						{
-							var param = new SQLiteParameter();
-							param.DbType = System.Data.DbType.String;
-							param.Value = backupId;
-							param.ParameterName = "@backupId";
-							command.Parameters.Add(param);
-							using (var reader = command.ExecuteReader())
+							//バックアップID重複を確認
+							while (true)
 							{
-								if (reader.Read())
-								{
-									//レコードがあったら重複
-									backupId = Guid.NewGuid().ToString();
-									continue;
-								}
-							}
-						}
-
-						//なにごともなく終わればOK
-						break;
-					}
-
-					//データベースに登録
-					{
-						var sql = "insert into backup(backupId, sourcePath, archiveBinary, archiveSizeBytes) values(@backupId, @sourcePath, @archiveBinary, @archiveSizeBytes)";
-						using (var command = new SQLiteCommand(sql, connection))
-						{
-							{
-								var param = new SQLiteParameter();
-								param.DbType = System.Data.DbType.String;
-								param.Value = backupId;
-								param.ParameterName = "@backupId";
-								command.Parameters.Add(param);
-							}
-							{
-								var param = new SQLiteParameter();
-								param.DbType = System.Data.DbType.String;
-								param.Value = ghostDirectory;
-								param.ParameterName = "@sourcePath";
-								command.Parameters.Add(param);
-							}
-							{
-								var param = new SQLiteParameter();
-								param.DbType = System.Data.DbType.Binary;
-								param.Value = archiveData;
-								param.ParameterName = "@archiveBinary";
-								command.Parameters.Add(param);
-							}
-							{
-								var param = new SQLiteParameter();
-								param.DbType = System.Data.DbType.Int64;
-								param.Value = archiveInfo.Length;
-								param.ParameterName = "@archiveSizeBytes";
-								command.Parameters.Add(param);
-							}
-							command.ExecuteNonQuery();
-						}
-					}
-
-					//ファイルリストを記録
-					{
-						var sql = "insert into files(backupId, path, sizeBytes, updatedAt) values(@backupId, @path, @sizeBytes, @updatedAt)";
-						foreach (var item in backupItems)
-						{
-							using(var command = new SQLiteCommand(sql, connection))
-							{
+								var sql = "select backupId from backup where backupId = @backupId";
+								using (var command = new SQLiteCommand(sql, connection))
 								{
 									var param = new SQLiteParameter();
 									param.DbType = System.Data.DbType.String;
 									param.Value = backupId;
 									param.ParameterName = "@backupId";
 									command.Parameters.Add(param);
+									using (var reader = command.ExecuteReader())
+									{
+										if (reader.Read())
+										{
+											//レコードがあったら重複
+											backupId = Guid.NewGuid().ToString();
+											continue;
+										}
+									}
 								}
-								{
-									var param = new SQLiteParameter();
-									param.DbType = System.Data.DbType.DateTime;
-									param.Value = item.UpdatedAt;
-									param.ParameterName = "@updatedAt";
-									command.Parameters.Add(param);
-								}
-								{
-									var param = new SQLiteParameter();
-									param.DbType = System.Data.DbType.String;
-									param.Value = item.Path;
-									param.ParameterName = "@path";
-									command.Parameters.Add(param);
-								}
-								{
-									var param = new SQLiteParameter();
-									param.DbType = System.Data.DbType.Int64;
-									param.Value = item.SizeBytes;
-									param.ParameterName = "@sizeBytes";
-									command.Parameters.Add(param);
-								}
-								command.ExecuteNonQuery();
+
+								//なにごともなく終わればOK
+								break;
 							}
+
+							//データベースに登録
+							{
+								var sql = "insert into backup(backupId, sourcePath, archiveBinary, archiveSizeBytes) values(@backupId, @sourcePath, @archiveBinary, @archiveSizeBytes)";
+								using (var command = new SQLiteCommand(sql, connection))
+								{
+									{
+										var param = new SQLiteParameter();
+										param.DbType = System.Data.DbType.String;
+										param.Value = backupId;
+										param.ParameterName = "@backupId";
+										command.Parameters.Add(param);
+									}
+									{
+										var param = new SQLiteParameter();
+										param.DbType = System.Data.DbType.String;
+										param.Value = ghostDirectory;
+										param.ParameterName = "@sourcePath";
+										command.Parameters.Add(param);
+									}
+									{
+										var param = new SQLiteParameter();
+										param.DbType = System.Data.DbType.Binary;
+										param.Value = archiveData;
+										param.ParameterName = "@archiveBinary";
+										command.Parameters.Add(param);
+									}
+									{
+										var param = new SQLiteParameter();
+										param.DbType = System.Data.DbType.Int64;
+										param.Value = archiveInfo.Length;
+										param.ParameterName = "@archiveSizeBytes";
+										command.Parameters.Add(param);
+									}
+									command.ExecuteNonQuery();
+								}
+							}
+
+							//ファイルリストを記録
+							{
+								var sql = "insert into files(backupId, path, sizeBytes, updatedAt) values(@backupId, @path, @sizeBytes, @updatedAt)";
+								foreach (var item in backupItems)
+								{
+									using (var command = new SQLiteCommand(sql, connection))
+									{
+										{
+											var param = new SQLiteParameter();
+											param.DbType = System.Data.DbType.String;
+											param.Value = backupId;
+											param.ParameterName = "@backupId";
+											command.Parameters.Add(param);
+										}
+										{
+											var param = new SQLiteParameter();
+											param.DbType = System.Data.DbType.DateTime;
+											param.Value = item.UpdatedAt;
+											param.ParameterName = "@updatedAt";
+											command.Parameters.Add(param);
+										}
+										{
+											var param = new SQLiteParameter();
+											param.DbType = System.Data.DbType.String;
+											param.Value = item.Path;
+											param.ParameterName = "@path";
+											command.Parameters.Add(param);
+										}
+										{
+											var param = new SQLiteParameter();
+											param.DbType = System.Data.DbType.Int64;
+											param.Value = item.SizeBytes;
+											param.ParameterName = "@sizeBytes";
+											command.Parameters.Add(param);
+										}
+										command.ExecuteNonQuery();
+									}
+								}
+							}
+							transaction.Commit();
+						}
+						catch
+						{
+							transaction.Rollback();
+							throw;
 						}
 					}
 				}
@@ -786,38 +781,64 @@ namespace Satolist.GhostBackup
 
 				command.ExecuteNonQuery();
 			}
+
+			Vacuum(connection);
 		}
 
 		//バックアップデータの削除
 		public void RemoveBackup(string backupId, SQLiteConnection connection)
 		{
-			//それぞれのテーブルから削除
+			using (var transaction = connection.BeginTransaction())
 			{
-				var sql = "delete from backup where backupId = @backupId";
-				using (var command = new SQLiteCommand(sql, connection))
+				try
 				{
-					var param = new SQLiteParameter();
-					param.DbType = System.Data.DbType.String;
-					param.Value = backupId;
-					param.ParameterName = "@backupId";
-					command.Parameters.Add(param);
+					//それぞれのテーブルから削除
+					{
+						var sql = "delete from backup where backupId = @backupId";
+						using (var command = new SQLiteCommand(sql, connection))
+						{
+							var param = new SQLiteParameter();
+							param.DbType = System.Data.DbType.String;
+							param.Value = backupId;
+							param.ParameterName = "@backupId";
+							command.Parameters.Add(param);
 
-					command.ExecuteNonQuery();
+							command.ExecuteNonQuery();
+						}
+					}
+
+					{
+						var sql = "delete from files where backupId = @backupId";
+						using (var command = new SQLiteCommand(sql, connection))
+						{
+							var param = new SQLiteParameter();
+							param.DbType = System.Data.DbType.String;
+							param.Value = backupId;
+							param.ParameterName = "@backupId";
+							command.Parameters.Add(param);
+
+							command.ExecuteNonQuery();
+						}
+					}
+					transaction.Commit();
+				}
+				catch
+				{
+					transaction.Rollback();
+					throw;
 				}
 			}
 
-			{
-				var sql = "delete from files where backupId = @backupId";
-				using(var command = new SQLiteCommand(sql, connection))
-				{
-					var param = new SQLiteParameter();
-					param.DbType = System.Data.DbType.String;
-					param.Value = backupId;
-					param.ParameterName = "@backupId";
-					command.Parameters.Add(param);
+			Vacuum(connection);
+		}
 
-					command.ExecuteNonQuery();
-				}
+		//不要領域の整理
+		public void Vacuum(SQLiteConnection connection)
+		{
+			var sql = "vacuum";
+			using(var command = new SQLiteCommand(sql, connection))
+			{
+				command.ExecuteNonQuery();
 			}
 		}
 	}
