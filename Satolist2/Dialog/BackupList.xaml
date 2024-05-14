@@ -6,7 +6,7 @@
 		xmlns:local="clr-namespace:Satolist2.Dialog"
 		xmlns:ctrl="clr-namespace:Satolist2.Control"
 		mc:Ignorable="d"
-		Title="ゴーストのバックアップ" Height="500" Width="1000">
+		Title="ゴーストのバックアップ" Height="500" Width="1000" WindowStartupLocation="CenterOwner">
 	<local:DialogContentBase.Resources>
 		<ResourceDictionary>
 			<ResourceDictionary.MergedDictionaries>
