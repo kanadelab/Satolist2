@@ -284,7 +284,15 @@ namespace SatolistUpdator
 					while (true)
 					{
 						cancellationToken.WaitHandle.WaitOne(3000);
-						var editorProcessName = FindRunningDuplecatedEditorProcess();
+
+						if (cancellationToken.IsCancellationRequested)
+						{
+							//キャンセル
+							NotifyRetry();
+							return;
+						}
+
+						var editorProcessName = FindRunningDuplecatedEditorProcess(cancellationToken);
 						var fileName = Path.GetFileName(editorProcessName);
 
 						if(cancellationToken.IsCancellationRequested)
@@ -300,7 +308,7 @@ namespace SatolistUpdator
 							{
 								MainWindow.Dispatcher.Invoke(() =>
 								{
-									Message = "ゴーストバックアップの完了を待機中...";
+									Message = "バックグラウンドで実行中のゴーストバックアップの完了を待機中…";
 								});
 								continue;
 							}
@@ -314,6 +322,7 @@ namespace SatolistUpdator
 								return;
 							}
 						}
+						break;
 					}
 				}
 				catch
@@ -369,25 +378,29 @@ namespace SatolistUpdator
 		}
 
 		//さとりすとのプロセスが実行されているかをチェック
-		public string FindRunningDuplecatedEditorProcess()
+		public string FindRunningDuplecatedEditorProcess(CancellationToken cancellationToken)
 		{
 			var executableDirectory = Path.GetDirectoryName(RequestedImagePath);
 			var process = Process.GetProcesses();
-			var editorProcess = process.FirstOrDefault(o =>
+
+			foreach(var item in process)
 			{
+				if(cancellationToken.IsCancellationRequested)
+				{
+					//キャンセルなら即戻り
+					return null;
+				}
+
 				try
 				{
-					return o.MainModule.FileName.StartsWith(executableDirectory);
+					if(item.MainModule.FileName.StartsWith(executableDirectory))
+					{
+						return item.MainModule.FileName;
+					}
 				}
 				catch
 				{
-					return false;
 				}
-			});
-
-			if (editorProcess != null)
-			{
-				return editorProcess.MainModule.FileName;
 			}
 			return null;
 		}
