@@ -283,11 +283,11 @@ namespace Satolist2.Model
 		//GhostBackup
 		[JsonProperty(PropertyName = "Testing_IsEnableGhostBackupWithSave")]
 		public bool IsEnableGhostBackupWithSave { get; set; }
-		[JsonProperty]
+		[JsonProperty(PropertyName = "Testing_GhostBackupWithSaveIntervalMinutes")]
 		public int GhostBackupWithSaveIntervalMinutes { get; set; }
-		[JsonProperty]
+		[JsonProperty(PropertyName = "Testing_GhostBackupExpiryDays")]
 		public int GhostBackupExpiryDays { get; set; }
-		[JsonProperty]
+		[JsonProperty(PropertyName = "Testing_GhostBackupMaxFileSizeKb")]
 		public int GhostBackupMaxFileSizeKb { get; set; }
 		
 		//試験的
