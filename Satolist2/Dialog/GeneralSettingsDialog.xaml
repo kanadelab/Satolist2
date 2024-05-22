@@ -6,7 +6,7 @@
 		xmlns:local="clr-namespace:Satolist2.Dialog"
 		xmlns:util="clr-namespace:Satolist2.Utility"
 		mc:Ignorable="d"
-		Title="基本設定" Height="550" Width="800" WindowStartupLocation="CenterOwner">
+		Title="基本設定" Height="700" Width="800" WindowStartupLocation="CenterOwner">
 	<local:DialogContentBase.Resources>
 		<ResourceDictionary>
 			<util:InvertBoolConverter x:Key="InvertBoolConverter" />

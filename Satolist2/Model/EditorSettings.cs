@@ -320,6 +320,7 @@ namespace Satolist2.Model
 			IsEnableGhostBackupWithSave = false;	//テスト。本実装にする場合はデフォルト有効に変更。
 			GhostBackupExpiryDays = 30;
 			GhostBackupWithSaveIntervalMinutes = 60;
+			GhostBackupMaxFileSizeKb = 10 * 1000;
 
 #if true
 			OverrideTextEditorEngine = "AvalonEdit";
