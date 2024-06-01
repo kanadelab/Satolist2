@@ -50,7 +50,7 @@ namespace SatolistGhostBackup
 		//バックアップをフォルダにエクスポート
 		public void ExtractToDirectory(string backupId, string targetPath, bool isOverWrite)
 		{
-			if(Directory.Exists(targetPath))
+			if(!Directory.Exists(targetPath))
 			{
 				//対象フォルダが無ければやめる
 				throw new DirectoryNotFoundException();

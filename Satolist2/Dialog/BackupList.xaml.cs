@@ -203,7 +203,7 @@ namespace Satolist2.Dialog
 				db.ExportFile(file.BackupId, file.Path, targetPath, true);
 
 				//出力先をオープン
-				WindowsExplorer.OpenDirectoryFileSelect(targetPath, true);
+				WindowsExplorer.OpenDirectoryFileSelect(targetPath, false);
 			}
 		}
 
@@ -255,7 +255,7 @@ namespace Satolist2.Dialog
 						});
 
 						//出力先をオープン
-						WindowsExplorer.OpenDirectory(targetPath, true);
+						WindowsExplorer.OpenDirectory(targetPath, false);
 					}
 					catch
 					{
