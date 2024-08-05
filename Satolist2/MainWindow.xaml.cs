@@ -1097,7 +1097,6 @@ namespace Satolist2
 		public ActionCommand OpenUrlCommand { get; }
 		public ActionCommand DictionaryCommonErrorCheckCommand { get; }
 		public ActionCommand DictionaryBrokenJumpCheckCommand { get; }
-		public ActionCommand OpenGhostBackupDialogCommand { get; }
 
 		public static void StaticInitialize()
 		{
@@ -1865,15 +1864,6 @@ namespace Satolist2
 					SearchResultViewModel.StaticDictionaryErrorCheck_BrokenJumpCheck();
 				});
 
-			OpenGhostBackupDialogCommand = new ActionCommand(
-				o =>
-				{
-					var backupDialog = new BackupList();
-					backupDialog.DataContext = new BackupListViewModel(backupDialog, this);
-					backupDialog.Owner = mainWindow.RootWindow;
-					backupDialog.ShowDialog();
-				});
-
 			//読込エラーが発生している場合に通知
 			List<ErrorListDialogItemViewModel> errorItems = new List<ErrorListDialogItemViewModel>();
 			foreach (var err in SaveLoadPanes.Where(o => o.LoadState == EditorLoadState.LoadFailed))
@@ -2061,28 +2051,6 @@ namespace Satolist2
 						Satorite.NotifySSTPBroadcast("OnSatolistSaved", "edit");
 					else
 						Satorite.NotifySSTPBroadcast("OnSatolistSaved", "closing");
-
-					//データ保存後、必要に応じてバックアップを実行する
-					if (EditorSettings.GeneralSettings.IsEnableGhostBackupWithSave)
-					{
-						bool isBackupStarted = BackgroundGhostBackup.BackupIfNeed(Ghost.FullPath, (args) =>
-						{
-							//バックアップ完了
-							if (args.IsError)
-							{
-								MainWindow.Dispatcher.Invoke(() => LogMessage.AddLog($"ゴーストバックアップでエラーが発生しました: {Ghost.GhostDescriptName}"));
-							}
-							else
-							{
-								MainWindow.Dispatcher.Invoke(() => LogMessage.AddLog($"ゴーストバックアップが完了しました: {Ghost.GhostDescriptName}"));
-							}
-						});
-
-						if (isBackupStarted)
-						{
-							LogMessage.AddLog($"ゴーストバックアップを実行中...");
-						}
-					}
 				}
 
 				return true;

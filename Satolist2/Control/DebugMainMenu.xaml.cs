@@ -1,6 +1,5 @@
 ﻿using ControlzEx.Standard;
 using Satolist2.Core;
-using Satolist2.Dialog;
 using Satolist2.Utility;
 using Sgry.Azuki.WinForms;
 using System;
@@ -33,14 +32,6 @@ namespace Satolist2.Control
 		public DebugMainMenu()
 		{
 			InitializeComponent();
-		}
-
-		private void Button_Click(object sender, RoutedEventArgs e)
-		{
-			var backupDialog = new BackupList();
-			backupDialog.DataContext = new BackupListViewModel(backupDialog, MainWindow.Instance.DataContext);
-			backupDialog.Owner = MainWindow.Instance.RootWindow;
-			backupDialog.ShowDialog();
 		}
 	}
 

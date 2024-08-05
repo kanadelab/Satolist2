@@ -15,7 +15,6 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using ICSharpCode.AvalonEdit.Document;
-using Satolist2.Themes;
 using Satolist2.Utility;
 
 namespace Satolist2.Control
@@ -78,8 +77,6 @@ namespace Satolist2.Control
 		public ActionCommand BootRecvCommand { get; }
 		public ActionCommand KillRecvCommand { get; }
 		public ActionCommand ClearLogCommand { get; }
-		public SolidColorBrush EditorForegroundColor => new SolidColorBrush(ApplicationTheme.UintToColorRGB(ApplicationTheme.GetEditorHilight(ScriptSyntax.Default)));
-
 		public CustomizedReadOnlyObservableCollection<RecvEventLogListItemViewModel> Items
 		{
 			get => new CustomizedReadOnlyObservableCollection<RecvEventLogListItemViewModel>(items);

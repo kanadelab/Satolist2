@@ -103,8 +103,7 @@
 			</TabItem>
 
 			<TabItem Header="リアルタイムビュー">
-				<avalonEdit:TextEditor x:Name="RealtimeLog" Document="{Binding RealtimeViewDocument}"
-									   Foreground="{Binding EditorForegroundColor}"/>
+				<avalonEdit:TextEditor x:Name="RealtimeLog" Document="{Binding RealtimeViewDocument}" />
 			</TabItem>
 			
 		</TabControl>

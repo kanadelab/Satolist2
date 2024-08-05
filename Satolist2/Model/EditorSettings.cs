@@ -279,16 +279,6 @@ namespace Satolist2.Model
 		//タイムスタンプソート(そうでない場合は名前ソート)
 		[JsonProperty]
 		public bool IsFileEventTreeTimestampSort { get; set; }
-
-		//GhostBackup
-		[JsonProperty(PropertyName = "Testing_IsEnableGhostBackupWithSave")]
-		public bool IsEnableGhostBackupWithSave { get; set; }
-		[JsonProperty(PropertyName = "Testing_GhostBackupWithSaveIntervalMinutes")]
-		public int GhostBackupWithSaveIntervalMinutes { get; set; }
-		[JsonProperty(PropertyName = "Testing_GhostBackupExpiryDays")]
-		public int GhostBackupExpiryDays { get; set; }
-		[JsonProperty(PropertyName = "Testing_GhostBackupMaxFileSizeKb")]
-		public int GhostBackupMaxFileSizeKb { get; set; }
 		
 		//試験的
 		[JsonProperty]
@@ -316,11 +306,6 @@ namespace Satolist2.Model
 
 			TextEditorFontName = EditorSettings.DefaultFont;
 			TextEditorFontSize = EditorSettings.DefaultFontSize;
-
-			IsEnableGhostBackupWithSave = false;	//テスト。本実装にする場合はデフォルト有効に変更。
-			GhostBackupExpiryDays = 30;
-			GhostBackupWithSaveIntervalMinutes = 60;
-			GhostBackupMaxFileSizeKb = 10 * 1000;
 
 #if true
 			OverrideTextEditorEngine = "AvalonEdit";

@@ -43,10 +43,6 @@ namespace Satolist2.Dialog
 		private string textEditorOffsetX;
 		private string textEditorOffsetY;
 
-		private string ghostBackupWithSaveIntervalMinutes;
-		private string ghostBackupExpiryDays;
-		private string ghostBackupMaxFileSizeKb;
-
 		public GeneralSettings Model { get; }
 		public GeneralSettingsDialog Dialog { get; }
 		public ActionCommand OkCommand { get; }
@@ -57,42 +53,6 @@ namespace Satolist2.Dialog
 		public bool IsChanged
 		{
 			get => !Model.IsEqlals(MainViewModel.EditorSettings.GeneralSettings);
-		}
-
-		public string GhostBackupWithSaveIntervalMinutes
-		{
-			get => ghostBackupWithSaveIntervalMinutes;
-			set
-			{
-				ghostBackupWithSaveIntervalMinutes = value;
-				if (int.TryParse(ghostBackupWithSaveIntervalMinutes, out int data) && data > 0)
-					Model.GhostBackupWithSaveIntervalMinutes = data;
-				NotifyChanged();
-			}
-		}
-
-		public string GhostBackupExpiryDays
-		{
-			get => ghostBackupExpiryDays;
-			set
-			{
-				ghostBackupExpiryDays = value;
-				if (int.TryParse(ghostBackupExpiryDays, out int data) && data > 0)
-					Model.GhostBackupExpiryDays = data;
-				NotifyChanged();
-			}
-		}
-
-		public string GhostBackupMaxFileSizeKb
-		{
-			get => ghostBackupMaxFileSizeKb;
-			set
-			{
-				ghostBackupMaxFileSizeKb = value;
-				if (int.TryParse(ghostBackupMaxFileSizeKb, out int data) && data > 0)
-					Model.GhostBackupMaxFileSizeKb = data;
-				NotifyChanged();
-			}
 		}
 
 		public string TextEditorOffsetX
@@ -215,9 +175,6 @@ namespace Satolist2.Dialog
 				);
 
 			//数値
-			ghostBackupWithSaveIntervalMinutes = Model.GhostBackupWithSaveIntervalMinutes.ToString();
-			ghostBackupExpiryDays = Model.GhostBackupExpiryDays.ToString();
-			ghostBackupMaxFileSizeKb = Model.GhostBackupMaxFileSizeKb.ToString();
 			textEditorOffsetX = Model.TextEditorOffsetX.ToString();
 			textEditorOffsetY = Model.TextEditorOffsetY.ToString();
 

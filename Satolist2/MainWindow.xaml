@@ -168,8 +168,6 @@
 				<MenuItem Header="アップロード設定" Command="{Binding EditUploadSettingCommand}" />
 				<MenuItem Header="テキストエディタのフォント設定" Command="{Binding EditTextEditorFontCommand}" />
 				<Separator />
-				<MenuItem Header="ゴーストのバックアップデータを表示(試験的)" Command="{Binding OpenGhostBackupDialogCommand}" />
-				<Separator />
 				<MenuItem Header="さとりすと本体フォルダを開く" Command="{Binding OpenSatolistDirectoryCommand}" />
 			</MenuItem>
 			<MenuItem Header="ヘルプ">

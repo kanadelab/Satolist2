@@ -6,7 +6,7 @@
 		xmlns:local="clr-namespace:Satolist2.Dialog"
 		xmlns:util="clr-namespace:Satolist2.Utility"
 		mc:Ignorable="d"
-		Title="基本設定" Height="700" Width="800" WindowStartupLocation="CenterOwner">
+		Title="基本設定" Height="450" Width="800" WindowStartupLocation="CenterOwner">
 	<local:DialogContentBase.Resources>
 		<ResourceDictionary>
 			<util:InvertBoolConverter x:Key="InvertBoolConverter" />
@@ -148,33 +148,6 @@
 							</StackPanel>
 						</StackPanel>
 					</GroupBox>
-
-					<CheckBox Content="保存時にゴーストのバックアップを作成する&#xa;バックアップはさとりすとのフォルダの backup.db に保存され、消すことでバックアップの一括削除ができます。" IsChecked="{Binding Model.IsEnableGhostBackupWithSave}" Margin="3 10 3 3"/>
-
-					<StackPanel Margin="3">
-						<TextBlock Text="ゴースト保存時のバックアップ作成間隔(分)" />
-						<StackPanel Orientation="Horizontal">
-							<TextBox Width="100" HorizontalAlignment="Left" Text="{Binding GhostBackupWithSaveIntervalMinutes, Mode=TwoWay}" />
-							<TextBlock Text="分" VerticalAlignment="Center" Margin="5 0 0 0"/>
-						</StackPanel>
-					</StackPanel>
-
-					<StackPanel Margin="3">
-						<TextBlock Text="ゴーストバックアップの保持期間(日)&#xa;バックアップ作成時に古いバックアップを自動削除します。0にすると削除しないためストレージ容量に注意。" />
-						<StackPanel Orientation="Horizontal">
-							<TextBox Width="100" HorizontalAlignment="Left" Text="{Binding GhostBackupExpiryDays, Mode=TwoWay}"/>
-							<TextBlock Text="日" VerticalAlignment="Center" Margin="5 0 0 0"/>
-						</StackPanel>
-					</StackPanel>
-
-					<StackPanel Margin="3">
-						<TextBlock Text="指定サイズより大きなファイルをバックアップの対象外にする(キロバイト)&#xa;イラストツールのファイルなどバックアップが肥大化しやすいときにおすすめ。0を指定すると無制限。"/>
-						<StackPanel Orientation="Horizontal">
-							<TextBox Width="100" HorizontalAlignment="Left" Text="{Binding GhostBackupMaxFileSizeKb, Mode=TwoWay}" />
-							<TextBlock Text="KB" VerticalAlignment="Center" Margin="5 0 0 0" />
-						</StackPanel>
-					</StackPanel>
-
 				</StackPanel>
 			</TabItem>
 

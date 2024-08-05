@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,15 +12,7 @@ namespace Satolist2.Utility
 		public string FullPath { get; private set; }
 		public TemporaryDirectory()
 		{
-			FullPath = Path.Combine(System.IO.Path.GetTempPath(), "satolist2", Guid.NewGuid().ToString());
-
-			//重複回避
-			while(Directory.Exists(FullPath))
-			{
-				//再生成
-				FullPath = Path.Combine(System.IO.Path.GetTempPath(), "satolist2", Guid.NewGuid().ToString());
-			}
-
+			FullPath = DictionaryUtility.ConbinePath(System.IO.Path.GetTempPath(), "satolist2", Guid.NewGuid().ToString());
 			System.IO.Directory.CreateDirectory(FullPath);
 		}
 

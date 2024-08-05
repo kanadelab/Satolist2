@@ -77,9 +77,6 @@ namespace SatolistUpdator
 		public string TargetUrl;				//リリースzipのURL
 		public string RequestedImagePath;       //更新をリクエストしてきたさとりすとのURL
 
-		public CancellationTokenSource canceller;
-
-		public ActionCommand CancelCommand { get; }
 		public ActionCommand UpdateButtonCommand { get; }
 		public ActionCommand CloseButtonCommand { get; }
 		public ActionCommand BootSatolistButtonCommand { get; }
@@ -128,12 +125,6 @@ namespace SatolistUpdator
 			}
 		}
 
-		//キャンセルボタンの表示
-		public bool ShowCancelButton
-		{
-			get => canceller != null;
-		}
-
 		//プログレスバーの表示
 		public bool ShowProgressBar
 		{
@@ -178,11 +169,8 @@ namespace SatolistUpdator
 			Directory.CreateDirectory(BackupDirectory);
 			Directory.CreateDirectory(ExtractDirectory);
 
-			CancelCommand = new ActionCommand(
-				o =>
-				{
-					canceller?.Cancel();
-				});
+			//まずはDL開始
+			Step1_DownloadZip();
 
 			UpdateButtonCommand = new ActionCommand(
 				o =>
@@ -202,9 +190,6 @@ namespace SatolistUpdator
 					Process.Start("Satolist2.exe");
 					MainWindow.Close();
 				});
-
-			//まずはDL開始
-			Step1_DownloadZip();
 		}
 
 		private void NotifyRetry()
@@ -214,10 +199,6 @@ namespace SatolistUpdator
 			ShowUpdateButton = true;
 			ShowCloseButton = true;
 			ShowProgressBar = false;
-
-			canceller?.Dispose();
-			canceller = null;
-			NotifyChanged(nameof(ShowCancelButton));
 		}
 
 		private void NotifyFailed()
@@ -273,56 +254,19 @@ namespace SatolistUpdator
 			ShowProgressBar = true;
 			Message = "さとりすとが終了していることを確認中...";
 
-			canceller = new CancellationTokenSource();
-			NotifyChanged(nameof(ShowCancelButton));
-			var cancellationToken = canceller.Token;
-
 			Task.Run(() =>
 			{
 				try
 				{
-					while (true)
+					Thread.Sleep(3000);	//ちょっと待つ
+					if (IsRunningDuplecatedEditorProcess())
 					{
-						cancellationToken.WaitHandle.WaitOne(3000);
-
-						if (cancellationToken.IsCancellationRequested)
+						MainWindow.Dispatcher.Invoke(() =>
 						{
-							//キャンセル
+							MessageBox.Show("アップデートするには起動中の「さとりすと」と「GhostDeploy」をすべて終了してください。", "さとりすと ネットワーク更新", MessageBoxButton.OK, MessageBoxImage.Information);
 							NotifyRetry();
-							return;
-						}
-
-						var editorProcessName = FindRunningDuplecatedEditorProcess(cancellationToken);
-						var fileName = Path.GetFileName(editorProcessName);
-
-						if(cancellationToken.IsCancellationRequested)
-						{
-							//キャンセル
-							NotifyRetry();
-							return;
-						}
-
-						if (fileName != null)
-						{
-							if (fileName == "SatolistGhostBackup.exe")
-							{
-								MainWindow.Dispatcher.Invoke(() =>
-								{
-									Message = "バックグラウンドで実行中のゴーストバックアップの完了を待機中…";
-								});
-								continue;
-							}
-							else
-							{
-								MainWindow.Dispatcher.Invoke(() =>
-								{
-									MessageBox.Show("アップデートするには起動中の「さとりすと」と「GhostDeploy」をすべて終了してください。", "さとりすと ネットワーク更新", MessageBoxButton.OK, MessageBoxImage.Information);
-									NotifyRetry();
-								});
-								return;
-							}
-						}
-						break;
+						});
+						return;
 					}
 				}
 				catch
@@ -378,31 +322,27 @@ namespace SatolistUpdator
 		}
 
 		//さとりすとのプロセスが実行されているかをチェック
-		public string FindRunningDuplecatedEditorProcess(CancellationToken cancellationToken)
+		public bool IsRunningDuplecatedEditorProcess()
 		{
 			var executableDirectory = Path.GetDirectoryName(RequestedImagePath);
+			
 			var process = Process.GetProcesses();
-
-			foreach(var item in process)
+			if (process.Any(o =>
 			{
-				if(cancellationToken.IsCancellationRequested)
-				{
-					//キャンセルなら即戻り
-					return null;
-				}
-
 				try
 				{
-					if(item.MainModule.FileName.StartsWith(executableDirectory))
-					{
-						return item.MainModule.FileName;
-					}
+					return o.MainModule.FileName.StartsWith(executableDirectory);
 				}
 				catch
 				{
+					return false;
 				}
 			}
-			return null;
+			))
+			{
+				return true;
+			}
+			return false;
 		}
 
 		//自身のプロセスが他に実行されているかチェック
