@@ -64,8 +64,7 @@ namespace Satolist2.Module.TextEditor
 
 			MouseMove += AvalonEditModule_MouseMove;
 			MouseLeave += AvalonEditModule_MouseLeave;
-
-			//OnCaretPositionChanged += AvalonEditModule_OnCaretPositionChanged;
+			OnTextChanged += AvalonEditModule_OnTextChanged;
 		}
 
 #if false
@@ -89,6 +88,14 @@ namespace Satolist2.Module.TextEditor
 		private void AvalonEditModule_MouseLeave(object sender, MouseEventArgs e)
 		{
 			//リセット
+			mouseOverWord = null;
+			tooltipTimer.Stop();
+			TextEditorToolTip.IsOpen = false;
+		}
+
+		private void AvalonEditModule_OnTextChanged(object sender, EventArgs e)
+		{
+			//テキストが変わったらホバーがずれるのでツールチップリクエストをキャンセル
 			mouseOverWord = null;
 			tooltipTimer.Stop();
 			TextEditorToolTip.IsOpen = false;
