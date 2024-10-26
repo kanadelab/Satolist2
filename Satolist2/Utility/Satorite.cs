@@ -19,7 +19,7 @@ namespace Satolist2.Utility
 		private const string SatoriteEventName = "Satolist2_Satorite_Event";
 
 		//里々のスクリプトをゴーストに送信
-		public static void SendSatori(GhostModel ghost, string script, EventType type)
+		public static void SendSatori(GhostModel ghost, string script, EventType type, bool useOwnedSSTP)
 		{
 			if (ghost == null)
 				return;
@@ -27,7 +27,7 @@ namespace Satolist2.Utility
 			var sakuraScript = ExecuteSatori(ghost, script, type);
 			if (!string.IsNullOrEmpty(sakuraScript))
 			{
-				SendSSTP(ghost, sakuraScript, true, false);
+				SendSSTP(ghost, sakuraScript, useOwnedSSTP, false);
 			}
 		}
 

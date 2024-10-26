@@ -253,7 +253,7 @@ namespace Satolist2.Control
 				}
 				else
 				{
-					Satorite.SendSatori(Main.Ghost, builder.ToString(), type);
+					Satorite.SendSatori(Main.Ghost, builder.ToString(), type, MainViewModel.EditorSettings.GeneralSettings.UseOwnedSSTP);
 					Core.LogMessage.AddLog("ゴーストにトークを送信しました。");
 				}
 			}

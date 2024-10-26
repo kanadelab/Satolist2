@@ -75,7 +75,7 @@ namespace SatolistTest
 			Environment.CurrentDirectory = GetSatolistWorkingDirectory();
 
 			GhostModel ghost = new GhostModel(GetTestSampleGhostDirectory());
-			Satorite.SendSatori(ghost, "：（０）こんばんはー。", EventType.Sentence);
+			Satorite.SendSatori(ghost, "：（０）こんばんはー。", EventType.Sentence, false);
 		}
 
 		[TestMethod]
