@@ -131,7 +131,7 @@ namespace Satolist2.Control
 			var insertStr = string.Format(@"\p[{0}]\s[{1}]", item.Scope, item.Id.ToString());
 			try
 			{
-				Satorite.SendSSTP(Main.Ghost, insertStr, false, false);
+				Satorite.Default.SendSSTP(Main.Ghost, insertStr, false, false);
 			}
 			catch(GhostNotFoundException ex)
 			{

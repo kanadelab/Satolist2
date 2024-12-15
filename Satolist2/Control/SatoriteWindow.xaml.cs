@@ -50,7 +50,7 @@ namespace Satolist2.Control
 						return;
 					try
 					{
-						Satorite.SendSatori(main.Ghost, control.MainTextEditor.MainTextEditor.Text, EventType.Sentence, MainViewModel.EditorSettings.GeneralSettings.UseOwnedSSTP);
+						Satorite.Default.SendSatori(main.Ghost, control.MainTextEditor.MainTextEditor.Text, EventType.Sentence, MainViewModel.EditorSettings.GeneralSettings.UseOwnedSSTP);
 						Core.LogMessage.AddLog("ゴーストにトークを送信しました。");
 					}
 					catch(GhostNotFoundException ex)
@@ -68,7 +68,7 @@ namespace Satolist2.Control
 					{
 						if (!string.IsNullOrEmpty(control.MainTextEditor.MainTextEditor.SelectionString))
 						{
-							Satorite.SendSatori(main.Ghost, control.MainTextEditor.MainTextEditor.SelectionString, EventType.Sentence, MainViewModel.EditorSettings.GeneralSettings.UseOwnedSSTP);
+							Satorite.Default.SendSatori(main.Ghost, control.MainTextEditor.MainTextEditor.SelectionString, EventType.Sentence, MainViewModel.EditorSettings.GeneralSettings.UseOwnedSSTP);
 							Core.LogMessage.AddLog("ゴーストにトークを送信しました。");
 						}
 					}

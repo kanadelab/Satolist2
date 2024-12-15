@@ -493,7 +493,7 @@ namespace Satolist2.Control
 									item.Visibility = Visibility.Collapsed;
 
 									//非表示を要求
-									Satorite.SendSSTP(runtimeGhostFMORecord, string.Format(@"\p[{0}]\s[-1]", scope), true, true, callbackWindow.HWnd);
+									Satorite.Default.SendSSTP(runtimeGhostFMORecord, string.Format(@"\p[{0}]\s[-1]", scope), true, true, callbackWindow.HWnd);
 								}
 
 								//起動完了
@@ -600,7 +600,7 @@ namespace Satolist2.Control
 			try
 			{
 				//送信
-				Satorite.SendSSTP(runtimeGhostFMORecord, script.ToString(), true, true, callbackWindow.HWnd);
+				Satorite.Default.SendSSTP(runtimeGhostFMORecord, script.ToString(), true, true, callbackWindow.HWnd);
 			}
 			catch { }
 		}
@@ -617,7 +617,7 @@ namespace Satolist2.Control
 			{
 				//送信
 				generatingSurfaceId = surfaceId;
-				Satorite.SendSSTP(runtimeGhostFMORecord, script.ToString(), true, true, callbackWindow.HWnd);
+				Satorite.Default.SendSSTP(runtimeGhostFMORecord, script.ToString(), true, true, callbackWindow.HWnd);
 			}
 			catch { }
 		}
@@ -726,7 +726,7 @@ namespace Satolist2.Control
 				{
 					//送信
 					generatingSurfaceId = selectedSurface.Id;
-					Satorite.SendSSTP(runtimeGhostFMORecord, script.ToString(), true, true, callbackWindow.HWnd);
+					Satorite.Default.SendSSTP(runtimeGhostFMORecord, script.ToString(), true, true, callbackWindow.HWnd);
 				}
 				catch { }
 			}
@@ -836,7 +836,7 @@ namespace Satolist2.Control
 			var insertStr = string.Format(@"\p[{0}]\s[{1}]", item.Scope, item.Id.ToString());
 			try
 			{
-				Satorite.SendSSTP(Main.Ghost, insertStr, false, false);
+				Satorite.Default.SendSSTP(Main.Ghost, insertStr, false, false);
 			}
 			catch (GhostNotFoundException ex)
 			{

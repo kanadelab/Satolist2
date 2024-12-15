@@ -248,12 +248,12 @@ namespace Satolist2.Control
 			{
 				if(useShioriEcho)
 				{
-					Satorite.SendShioriEcho(Main.Ghost, builder.ToString());
+					Satorite.Default.SendShioriEcho(Main.Ghost, builder.ToString());
 					Core.LogMessage.AddLog("ゴーストにShioriEchoを送信しました。");
 				}
 				else
 				{
-					Satorite.SendSatori(Main.Ghost, builder.ToString(), type, MainViewModel.EditorSettings.GeneralSettings.UseOwnedSSTP);
+					Satorite.Default.SendSatori(Main.Ghost, builder.ToString(), type, MainViewModel.EditorSettings.GeneralSettings.UseOwnedSSTP);
 					Core.LogMessage.AddLog("ゴーストにトークを送信しました。");
 				}
 			}

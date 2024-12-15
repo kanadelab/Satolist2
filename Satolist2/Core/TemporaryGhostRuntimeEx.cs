@@ -30,7 +30,7 @@ namespace Satolist2.Core
 		}
 
 		//シェルをダミーゴーストで起動する準備
-		public static TemporaryGhostRuntimeEx PrepareShell(string shellPath, string fmoName = SakuraFMOReader.DefaultFMOName)
+		public static TemporaryGhostRuntimeEx PrepareShell(string shellPath, string fmoName)
 		{
 			try
 			{

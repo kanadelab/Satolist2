@@ -22,12 +22,16 @@ namespace Satolist2.Core
 		private Action<bool> completedCallback;
 		private Action<Progress> progressCallback;
 		private SSTPCallBackNativeWindow callbackWindow;
+		private string fmoName;
+		private Satorite internalSatorite;
 
 		public SurfacePreviewImageGenerator()
 		{
 			//適当なセッションIDを用意
 			sessionId = (IntPtr)Math.Abs(Guid.NewGuid().GetHashCode());
 			mutex = new Mutex();
+			fmoName = Guid.NewGuid().ToString();
+			internalSatorite = new Satorite(fmoName);
 		}
 
 		public Task GenerateShellOnly(MainViewModel main, string shellPath, Action<bool> completedCallback, Action<Progress> progressCallback, CancellationToken cancel)
@@ -47,7 +51,7 @@ namespace Satolist2.Core
 					}));
 
 					var targetPath = DictionaryUtility.ConbinePath(shellPath, "profile/satolist/surfacepreview");
-					using (var temporaryRuntime = TemporaryGhostRuntimeEx.PrepareShell(shellPath))
+					using (var temporaryRuntime = TemporaryGhostRuntimeEx.PrepareShell(shellPath, fmoName))
 					{
 						temporaryRuntime.Boot();
 						GenerateSurfaceTask(targetPath, temporaryRuntime.Ghost, main, cancel);
@@ -116,12 +120,12 @@ namespace Satolist2.Core
 						//SSPの起動を待機
 						for (int i = 0; i < 10; i++)
 						{
-							if (SakuraFMOReader.Exists(ghost))
+							if (SakuraFMOReader.Read(ghost, fmoName) != null)
 								break;
 							Thread.Sleep(2000);
 							cancel.ThrowIfCancellationRequested();
 						}
-						RetryableAction(() => Satorite.ExecuteSSTP(ghost, "GetProperty[currentghost.shelllist.current.path]", callbackWindow.HWnd));
+						RetryableAction(() => internalSatorite.ExecuteSSTP(ghost, "GetProperty[currentghost.shelllist.current.path]", callbackWindow.HWnd));
 					}
 
 					//シェルデータを読み込んで、さとりすとが出力すべき情報をもってくる
@@ -164,7 +168,7 @@ namespace Satolist2.Core
 					cancel.ThrowIfCancellationRequested();
 
 					//ループ中邪魔が入らないようにパッシブモードに入れる
-					Satorite.SendSSTP(ghost, @"\![enter,passivemode]", true, true);
+					internalSatorite.SendSSTP(ghost, @"\![enter,passivemode]", true, true);
 					try
 					{
 						//foreach (var item in generateSurfaces)
@@ -189,7 +193,7 @@ namespace Satolist2.Core
 								OperationProgressMessage,
 								sessionId,
 								surfaceId);
-							RetryableAction(() => Satorite.SendSSTP(ghost, generateScript, true, true, callbackWindow.HWnd));
+							RetryableAction(() => internalSatorite.SendSSTP(ghost, generateScript, true, true, callbackWindow.HWnd));
 
 							//DispacherにMutexを取らせる
 							mutex.ReleaseMutex();
@@ -212,7 +216,7 @@ namespace Satolist2.Core
 								OperationProgressMessage,
 								sessionId,
 								surfaceId);
-							RetryableAction(() => Satorite.SendSSTP(ghost, generateScript, true, true, callbackWindow.HWnd));
+							RetryableAction(() => internalSatorite.SendSSTP(ghost, generateScript, true, true, callbackWindow.HWnd));
 
 							//画像サイズをロード
 							var zeroFileName = string.Format("surfacezero{0}.png", surfaceId);
@@ -240,7 +244,7 @@ namespace Satolist2.Core
 					finally
 					{
 						//パッシブモード解除
-						Satorite.SendSSTP(ghost, @"\![leave,passivemode]", true, true);
+						internalSatorite.SendSSTP(ghost, @"\![leave,passivemode]", true, true);
 					}
 
 					//掃除

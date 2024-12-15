@@ -11,15 +11,28 @@ using System.Threading.Tasks;
 namespace Satolist2.Utility
 {
 	//さとりて機能
-	static public class Satorite
+	public class Satorite
 	{
 		//里々にロードさせるために、一時的に生成されるテキストファイル
 		private const string TemporaryDictionaryFileName = "dic_made_by_satolist.txt";
 		private const string SatoriProxyPath = "data/SatoriProxy.exe";
 		private const string SatoriteEventName = "Satolist2_Satorite_Event";
+		public static Satorite Default { get; }
+
+		private string fmoName;
+
+		static Satorite()
+		{
+			Default = new Satorite(SakuraFMOReader.DefaultFMOName);
+		}
+
+		public Satorite(string targetFmoName)
+		{
+			fmoName = targetFmoName;
+		}
 
 		//里々のスクリプトをゴーストに送信
-		public static void SendSatori(GhostModel ghost, string script, EventType type, bool useOwnedSSTP)
+		public void SendSatori(GhostModel ghost, string script, EventType type, bool useOwnedSSTP)
 		{
 			if (ghost == null)
 				return;
@@ -32,7 +45,7 @@ namespace Satolist2.Utility
 		}
 
 		//里々のスクリプトをShioriEchoでゴーストに送信
-		public static void SendShioriEcho(GhostModel ghost, string script)
+		public void SendShioriEcho(GhostModel ghost, string script)
 		{
 			//ShioriEcho としてイベントを送信する
 			string[] lines = DictionaryUtility.SplitLines(script);
@@ -40,7 +53,7 @@ namespace Satolist2.Utility
 		}
 
 		//里々のスクリプトを実行してさくらスクリプト出力を返す
-		public static string ExecuteSatori(GhostModel ghost, string script, EventType type)
+		public string ExecuteSatori(GhostModel ghost, string script, EventType type)
 		{
 			try
 			{
@@ -96,7 +109,7 @@ namespace Satolist2.Utility
 		}
 
 		//SEND SSTPの送信
-		public static void SendSSTP(SakuraFMORecord fmoRecord, string script, bool useOwnedSSTP, bool noTranslate, IntPtr hWnd = default(IntPtr))
+		public void SendSSTP(SakuraFMORecord fmoRecord, string script, bool useOwnedSSTP, bool noTranslate, IntPtr hWnd = default(IntPtr))
 		{
 			var sstpBuilder = new ProtocolBuilder();
 			sstpBuilder.Command = "SEND SSTP/1.0";
@@ -123,9 +136,9 @@ namespace Satolist2.Utility
 		}
 
 		//SEND SSTPの送信
-		public static void SendSSTP(GhostModel ghost, string script, bool useOwnedSSTP, bool noTranslate, IntPtr hWnd = default(IntPtr))
+		public void SendSSTP(GhostModel ghost, string script, bool useOwnedSSTP, bool noTranslate, IntPtr hWnd = default(IntPtr))
 		{
-			var fmoRecord = SakuraFMOReader.Read(ghost);
+			var fmoRecord = SakuraFMOReader.Read(ghost, fmoName);
 			if (fmoRecord == null)
 			{
 				throw new GhostNotFoundException();
@@ -135,7 +148,7 @@ namespace Satolist2.Utility
 		}
 
 		//EXECUTE SSTPの送信
-		public static void ExecuteSSTP(GhostModel ghost, string command, IntPtr hWnd = default(IntPtr))
+		public void ExecuteSSTP(GhostModel ghost, string command, IntPtr hWnd = default(IntPtr))
 		{
 			var sstpBuilder = new ProtocolBuilder();
 			sstpBuilder.Command = "EXECUTE SSTP/1.1";
@@ -148,7 +161,7 @@ namespace Satolist2.Utility
 				sstpBuilder.Parameters["HWnd"] = hWnd.ToString();
 			}
 
-			var fmoReader = new SakuraFMOReader();
+			var fmoReader = new SakuraFMOReader(fmoName);
 			fmoReader.Read();
 
 			var fmoRecord = fmoReader.Find(ghost);
@@ -158,9 +171,9 @@ namespace Satolist2.Utility
 		}
 
 		//NOTIFY SSTPの送信
-		public static void NotifySSTP(GhostModel ghost, string eventName, string fallbackScript = null, params string[] references)
+		public void NotifySSTP(GhostModel ghost, string eventName, string fallbackScript = null, params string[] references)
 		{
-			var fmoRecord = SakuraFMOReader.Read(ghost);
+			var fmoRecord = SakuraFMOReader.Read(ghost, fmoName);
 			if (fmoRecord == null)
 			{
 				throw new GhostNotFoundException();
@@ -185,7 +198,7 @@ namespace Satolist2.Utility
 		}
 
 		//NOTIFY SSTPブロードキャスト
-		public static void NotifySSTPBroadcast(string eventName, params string[] references)
+		public void NotifySSTPBroadcast(string eventName, params string[] references)
 		{
 			var sstpBuilder = new ProtocolBuilder();
 			sstpBuilder.Command = "NOTIFY SSTP/1.0";
@@ -202,7 +215,7 @@ namespace Satolist2.Utility
 
 		//里々を起動
 		//さとりすと側のプロセスに依存せず別プロセスで里々を起動するのでさとりすとが64bitでも起動できるしくみ
-		private static string ExecuteSatoriDLL(string satoriDirectory, string eventName)
+		private string ExecuteSatoriDLL(string satoriDirectory, string eventName)
 		{
 			try
 			{
@@ -231,7 +244,7 @@ namespace Satolist2.Utility
 		}
 
 		//SSPへの単純データ送信
-		public static void RaiseSSTP(ProtocolBuilder data, SakuraFMORecord target)
+		public void RaiseSSTP(ProtocolBuilder data, SakuraFMORecord target)
 		{
 			var serializedData = data.Serialize();
 			var dataBytes = Constants.EncodingShiftJis.GetBytes(serializedData);
@@ -253,9 +266,9 @@ namespace Satolist2.Utility
 		}
 
 		//SSTPブロードキャスト
-		public static void RaiseSSTPBroadcast(ProtocolBuilder data)
+		public void RaiseSSTPBroadcast(ProtocolBuilder data)
 		{
-			var fmoReader = new SakuraFMOReader();
+			var fmoReader = new SakuraFMOReader(fmoName);
 			fmoReader.Read();
 			fmoReader.RemoveSurfacePreviewGeneratorRuntime();
 
@@ -266,7 +279,7 @@ namespace Satolist2.Utility
 		}
 
 		//里々のバージョン取得
-		public static string GetSatoriVersion(GhostModel ghost)
+		public string GetSatoriVersion(GhostModel ghost)
 		{
 			return ExecuteSatori(ghost, "（里々のバージョン）", EventType.Word);
 		}

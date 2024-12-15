@@ -45,7 +45,7 @@ namespace SatolistTest
 			sstp.Parameters["ID"] = instantTarget.ID;
 			sstp.Parameters["IfGhost"] = "湯空さとり";
 
-			Satorite.RaiseSSTP(sstp, instantTarget);
+			Satorite.Default.RaiseSSTP(sstp, instantTarget);
 		}
 
 		[TestMethod]
@@ -60,7 +60,7 @@ namespace SatolistTest
 			sstp.Parameters["Event"] = "OnBoot";
 			sstp.Parameters["Sender"] = "さとりすと そのに";
 
-			Satorite.RaiseSSTP(sstp, instantTarget);
+			Satorite.Default.RaiseSSTP(sstp, instantTarget);
 		}
 
 		[TestMethod]
@@ -75,7 +75,7 @@ namespace SatolistTest
 			Environment.CurrentDirectory = GetSatolistWorkingDirectory();
 
 			GhostModel ghost = new GhostModel(GetTestSampleGhostDirectory());
-			Satorite.SendSatori(ghost, "：（０）こんばんはー。", EventType.Sentence, false);
+			Satorite.Default.SendSatori(ghost, "：（０）こんばんはー。", EventType.Sentence, false);
 		}
 
 		[TestMethod]

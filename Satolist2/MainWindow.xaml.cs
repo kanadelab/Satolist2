@@ -232,7 +232,7 @@ namespace Satolist2
 			HWnd = (new System.Windows.Interop.WindowInteropHelper(RootWindow)).Handle;
 
 			//ここでhwndが確定するのでさとりすとの起動イベントを発生する
-			Utility.Satorite.NotifySSTPBroadcast("OnSatolistBoot", HWnd.ToString(), string.Empty, System.Reflection.Assembly.GetExecutingAssembly().Location);
+			Utility.Satorite.Default.NotifySSTPBroadcast("OnSatolistBoot", HWnd.ToString(), string.Empty, System.Reflection.Assembly.GetExecutingAssembly().Location);
 
 			if(MainViewModel.EditorSettings.TemporarySettings.WindowPlacement != null)
 			{
@@ -252,7 +252,7 @@ namespace Satolist2
 		private void MainWindow_Closed(object sender, EventArgs e)
 		{
 			//閉じるときのイベントを送信
-			Utility.Satorite.NotifySSTPBroadcast("OnSatolistClosed");
+			Utility.Satorite.Default.NotifySSTPBroadcast("OnSatolistClosed");
 		}
 
 		private LayoutDocumentPane FindDocumentPane(ILayoutContainer panel)
@@ -578,7 +578,7 @@ namespace Satolist2
 			LogMessage.AddLog(logStr);
 
 			//ゴーストを開いたときのイベントを送信
-			Utility.Satorite.NotifySSTPBroadcast("OnSatolistGhostOpened", ghost.GhostDescriptSakuraName, ghost.GhostDescriptName);
+			Utility.Satorite.Default.NotifySSTPBroadcast("OnSatolistGhostOpened", ghost.GhostDescriptSakuraName, ghost.GhostDescriptName);
 		}
 
 		//各コントロールのViewModelの再バインド
@@ -1681,7 +1681,7 @@ namespace Satolist2
 						{
 							if (SakuraFMOReader.Exists(Ghost))
 							{
-								Satorite.SendSSTP(Ghost, @"\![reload,shell]\m[{0},{1},{2}]", true, true);
+								Satorite.Default.SendSSTP(Ghost, @"\![reload,shell]\m[{0},{1},{2}]", true, true);
 								LogMessage.AddLog("起動中のゴーストの状態をプレビューに反映するため、動作中のシェルをリロードしました。");
 							}
 						}
@@ -1756,7 +1756,7 @@ namespace Satolist2
 			UpdateSatoriCommand = new ActionCommand(
 				o =>
 				{
-					var satoriVersion = Satorite.GetSatoriVersion(Ghost);
+					var satoriVersion = Satorite.Default.GetSatoriVersion(Ghost);
 					if(string.IsNullOrEmpty(satoriVersion))
 					{
 						//バージョン取得失敗
@@ -2048,9 +2048,9 @@ namespace Satolist2
 				if (isSaved)
 				{
 					if(!isClosing)
-						Satorite.NotifySSTPBroadcast("OnSatolistSaved", "edit");
+						Satorite.Default.NotifySSTPBroadcast("OnSatolistSaved", "edit");
 					else
-						Satorite.NotifySSTPBroadcast("OnSatolistSaved", "closing");
+						Satorite.Default.NotifySSTPBroadcast("OnSatolistSaved", "closing");
 				}
 
 				return true;
