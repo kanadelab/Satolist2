@@ -191,14 +191,10 @@ namespace Satolist2.Control
 					if (ev.Dictionary.Dictionary.IsSerialized || !ev.Dictionary.Dictionary.IsSatoriDictionary)
 						return;
 
-
 					//ヘッダの移動不可
 					if (ev.Items.First().Type == EventType.Sentence || ev.Items.First().Type == EventType.Word)
 					{
-						Dispatcher.BeginInvoke(new Action(() =>
-						{
-							DragDrop.DoDragDrop(obj, ev, DragDropEffects.Move);
-						}), DispatcherPriority.Render);
+						DragDrop.DoDragDrop(obj, ev, DragDropEffects.Move);
 						e.Handled = true;
 					}
 				}
