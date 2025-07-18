@@ -2,7 +2,7 @@ name: 自動ビルド　
 on: [push]
 jobs:
   build:
-    runs-on: windows-2019
+    runs-on: windows-2025
     steps:
       - name: checkout
         uses: actions/checkout@v2
@@ -42,7 +42,7 @@ jobs:
           popd
 
       - name: upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: Satolist2-Build
           path: deploy
