@@ -547,8 +547,10 @@ namespace Satolist2.Model
 			if(internalEventMap.TryGetValue(name, out var items))
 			{
 				items.Remove(ev);
-				if (items.Any())
+				if (!items.Any()) {
+					//内容がなくなったら登録解除
 					internalEventMap.Remove(name);
+				}
 			}
 		}
 
