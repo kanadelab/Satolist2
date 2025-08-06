@@ -57,12 +57,12 @@ namespace Satolist2.Core
 						GenerateSurfaceTask(targetPath, temporaryRuntime.Ghost, main, cancel);
 					}
 				}
-				catch
+				catch(Exception ex)
 				{
 					main.MainWindow.Dispatcher.Invoke(() =>
 					progressCallback(new Progress()
 					{
-						Message = "起動処理に失敗しました。",
+						Message = "起動処理に失敗しました: " + ex.ToString(),
 						UseProgress = false
 					}));
 				}
