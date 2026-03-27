@@ -57,7 +57,7 @@
 		</Grid>
 		
 
-		<TreeView Grid.Row="1" ItemsSource="{Binding Directories}" SelectedItemChanged="TreeView_SelectedItemChanged">
+		<TreeView x:Name="MainTreeView" Grid.Row="1" ItemsSource="{Binding Directories}" SelectedItemChanged="TreeView_SelectedItemChanged">
 			<TreeView.ItemTemplate>
 				<HierarchicalDataTemplate ItemsSource="{Binding ChildItems}">
 					<StackPanel Orientation="Horizontal">

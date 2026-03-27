@@ -36,7 +36,6 @@ namespace Satolist2.Control
 		public FileEventTree()
 		{
 			InitializeComponent();
-			
 		}
 
 		private void TreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
@@ -102,10 +101,49 @@ namespace Satolist2.Control
 			}
 		}
 
-		//勝手な横スクロールを抑制
+		//勝手な横スクロールを抑制（垂直方向のみスクロールを許可）
 		private void TreeViewItem_RequestBringIntoView(object sender, RequestBringIntoViewEventArgs e)
 		{
+			//デフォルトの水平・垂直両方向のスクロールを抑制
 			e.Handled = true;
+
+			//垂直方向のみ手動でスクロールする
+			if (sender is TreeViewItem treeViewItem)
+			{
+				var scrollViewer = FindScrollViewer(MainTreeView);
+				if (scrollViewer != null)
+				{
+					//TreeViewItem の位置を ScrollViewer の座標系で取得
+					var transform = treeViewItem.TransformToAncestor(scrollViewer);
+					var itemRect = transform.TransformBounds(new Rect(0, 0, treeViewItem.ActualWidth, treeViewItem.ActualHeight));
+
+					//表示領域の上端より上にある場合、上方向にスクロール
+					if (itemRect.Top < 0)
+					{
+						scrollViewer.ScrollToVerticalOffset(scrollViewer.VerticalOffset + itemRect.Top);
+					}
+					//表示領域の下端より下にある場合、下方向にスクロール
+					else if (itemRect.Bottom > scrollViewer.ViewportHeight)
+					{
+						scrollViewer.ScrollToVerticalOffset(scrollViewer.VerticalOffset + itemRect.Bottom - scrollViewer.ViewportHeight);
+					}
+				}
+			}
+		}
+
+		//VisualTree から ScrollViewer を探すヘルパー
+		private static ScrollViewer FindScrollViewer(DependencyObject parent)
+		{
+			for (int i = 0; i < VisualTreeHelper.GetChildrenCount(parent); i++)
+			{
+				var child = VisualTreeHelper.GetChild(parent, i);
+				if (child is ScrollViewer sv)
+					return sv;
+				var result = FindScrollViewer(child);
+				if (result != null)
+					return result;
+			}
+			return null;
 		}
 
 		private void TreeViewItem_MouseDown(object sender, MouseButtonEventArgs e)
