@@ -76,7 +76,7 @@ namespace Satolist2.Core
 			var startInfo = new ProcessStartInfo();
 			startInfo.FileName = Path.GetFullPath(@"data\ssp\ssp.exe");
 			startInfo.Arguments = "/o bootunlock,standalone /g temporaryghost";
-			startInfo.UseShellExecute = true;
+			startInfo.UseShellExecute = false;
 			startInfo.WorkingDirectory = Path.GetFullPath(@"data\ssp");
 
 			process = Process.Start(startInfo);
