@@ -117,3 +117,12 @@
 2022/12/25 00:00:00	http://yusyuparo.sakura.ne.jp/ntwk/	https://yusyuparo.net/ntwk/
 2023/07/16 00:00:00	http://nanachi.sakura.ne.jp/narnaloader/	http://cherry.narnaloader.ukagaka.net/
 2023/07/16 00:00:01	https://nanachi.sakura.ne.jp/narnaloader/	https://cherry.narnaloader.ukagaka.net/
+2025/02/02 00:00:00	http://ukatorium.html.xdomain.jp/	http://ukatorium.cloudfree.jp/
+2025/08/15 00:00:00	http://dennziryoku.blog101.fc2.com/	https://denmemo31.blog.fc2.com/
+2025/08/15 00:00:01	https://stheskeleton.usite.pro/	https://zichqec.github.io/s-the-skeleton/updates/ghosts/
+2025/08/15 00:00:02	http://sosiremi.appspot.com/dl/ghost/whitesword/WhiteSword.nar	https://nanachi.sakura.ne.jp/narnaloader/nar/WhiteSword.nar
+2023/05/22 18:40:34	http://night0v0l.webcrow.jp/	https://yoippari.n0v0.be/	
+2024/02/28 9:49:26	https://vtodd15.github.io/aurora/	https://raw.githubusercontent.com/yuyudev-thatoddhaystack/Aurora_Dot_EXE_yy/main/	Disregard previous entry with https://raw.githubusercontent.com/yuyudev-thatoddhaystack/Aurora_Dot_EXE_yy/main/
+2024/02/28 9:49:57	https://vtodd15.github.io/aiba/	https://raw.githubusercontent.com/yuyudev-thatoddhaystack/Aiba_yy/main/	Disregard previous entry with https://raw.githubusercontent.com/yuyudev-thatoddhaystack/Aiba_yy/main/
+2025/11/06 23:22:26	https://seizonkakuninbasyo.web.fc2.com/ukagakatop.html	https://hutoshilv5gero.wixsite.com/seizonkakuninbasyo	
+2026/03/13 22:00:00	http://hakoiri.so.land.to/	https://hakoiri.nomaki.jp/	

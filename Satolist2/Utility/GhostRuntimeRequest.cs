@@ -15,7 +15,7 @@ namespace Satolist2.Utility
 			try
 			{
 				string script = @"\0\![reload,shiori]\![quicksession,true]" + message;
-				Satorite.SendSSTP(ghost, script, true, true);
+				Satorite.Default.SendSSTP(ghost, script, true, true);
 				Core.LogMessage.AddLog("SHIORIをリロードします。");
 			}
 			catch(GhostNotFoundException)

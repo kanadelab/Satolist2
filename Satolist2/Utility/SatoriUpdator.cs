@@ -139,7 +139,7 @@ namespace Satolist2.Utility
 						   Application.Current.Dispatcher.Invoke(() => progressViewModel.SetMessage("対象のゴーストが起動しているためSSPから里々をアンロードします。"));
 						   try
 						   {
-							   Satorite.SendSSTP(ghost, @"\![unload,shiori]", true, true);
+							   Satorite.Default.SendSSTP(ghost, @"\![unload,shiori]", true, true);
 						   }
 						   catch { }
 					   }
@@ -170,7 +170,7 @@ namespace Satolist2.Utility
 						   Application.Current.Dispatcher.Invoke(() => progressViewModel.SetMessage("起動中のゴーストの里々をSSPに再ロードします。"));
 						   try
 						   {
-							   Satorite.SendSSTP(ghost, @"\![load,shiori]", true, true);
+							   Satorite.Default.SendSSTP(ghost, @"\![load,shiori]", true, true);
 						   }
 						   catch { }
 					   }
@@ -180,7 +180,7 @@ namespace Satolist2.Utility
 						   Application.Current.Dispatcher.Invoke(() => {
 							   progressViewModel.SetMessage("アップデート完了しました。");
 							   progressViewModel.SetCompletedProgress();
-							   var updatedVersion = Satorite.GetSatoriVersion(ghost);
+							   var updatedVersion = Satorite.Default.GetSatoriVersion(ghost);
 							   if (!string.IsNullOrEmpty(updatedVersion))
 							   {
 								   Core.LogMessage.AddLog(string.Format("里々のアップデートを行いました。現在のバージョンは {0} です。", updatedVersion));
