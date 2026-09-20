@@ -108,27 +108,62 @@ namespace Satolist2.Control
 			e.Handled = true;
 
 			//垂直方向のみ手動でスクロールする
-			if (sender is TreeViewItem treeViewItem)
-			{
-				var scrollViewer = FindScrollViewer(MainTreeView);
-				if (scrollViewer != null)
-				{
-					//TreeViewItem の位置を ScrollViewer の座標系で取得
-					var transform = treeViewItem.TransformToAncestor(scrollViewer);
-					var itemRect = transform.TransformBounds(new Rect(0, 0, treeViewItem.ActualWidth, treeViewItem.ActualHeight));
+			if (!(sender is TreeViewItem treeViewItem))
+				return;
 
-					//表示領域の上端より上にある場合、上方向にスクロール
-					if (itemRect.Top < 0)
-					{
-						scrollViewer.ScrollToVerticalOffset(scrollViewer.VerticalOffset + itemRect.Top);
-					}
-					//表示領域の下端より下にある場合、下方向にスクロール
-					else if (itemRect.Bottom > scrollViewer.ViewportHeight)
-					{
-						scrollViewer.ScrollToVerticalOffset(scrollViewer.VerticalOffset + itemRect.Bottom - scrollViewer.ViewportHeight);
-					}
+			var scrollViewer = FindScrollViewer(MainTreeView);
+			if (scrollViewer == null)
+				return;
+
+			//TreeViewItem 自体の大きさは展開中の子ノードをすべて含んだものになるため、
+			//それを基準にすると子孫ノードの末尾を表示しようとして、選択ノードと無関係な位置にスクロールしてしまう。
+			//そのノード自身の行（ヘッダ部）だけを対象にする。
+			var headerElement = GetHeaderElement(treeViewItem);
+			if (headerElement == null || !headerElement.IsDescendantOf(scrollViewer))
+				return;
+
+			//ヘッダ部の位置を ScrollViewer の座標系で取得
+			var transform = headerElement.TransformToAncestor(scrollViewer);
+			var itemRect = transform.TransformBounds(new Rect(0, 0, headerElement.ActualWidth, headerElement.ActualHeight));
+
+			double offset = 0.0;
+			if (itemRect.Top < 0.0)
+			{
+				//表示領域の上端より上にある場合、上方向にスクロール
+				offset = itemRect.Top;
+			}
+			else if (itemRect.Bottom > scrollViewer.ViewportHeight)
+			{
+				//表示領域の下端より下にある場合、下方向にスクロール。
+				//ビューポートより背が高い場合に上端が見切れないようクランプする
+				offset = Math.Min(itemRect.Bottom - scrollViewer.ViewportHeight, itemRect.Top);
+			}
+
+			if (Math.Abs(offset) >= 0.5)
+				scrollViewer.ScrollToVerticalOffset(scrollViewer.VerticalOffset + offset);
+		}
+
+		//TreeViewItem のヘッダ部（子ノードを含まない、そのノード自身の行）の要素を取得
+		private static FrameworkElement GetHeaderElement(TreeViewItem treeViewItem)
+		{
+			if (treeViewItem.Template != null)
+			{
+				try
+				{
+					if (treeViewItem.Template.FindName("PART_Header", treeViewItem) is FrameworkElement header && header.ActualHeight > 0.0)
+						return header;
+				}
+				catch (InvalidOperationException)
+				{
+					//テンプレートが未適用の場合
 				}
 			}
+
+			//ヘッダ部を取得できなかった場合、子ノードを表示していなければ TreeViewItem 自身の大きさがヘッダ部と一致する
+			if (!treeViewItem.HasItems || !treeViewItem.IsExpanded)
+				return treeViewItem;
+
+			return null;
 		}
 
 		//VisualTree から ScrollViewer を探すヘルパー
