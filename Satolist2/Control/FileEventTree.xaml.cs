@@ -33,9 +33,27 @@ namespace Satolist2.Control
 	{
 		public bool isMouseDown;
 
+		//フォーカスがツリーの外から移ってきた際の自動スクロールを抑制するためのフラグ
+		private bool suppressBringIntoView;
+
 		public FileEventTree()
 		{
 			InitializeComponent();
+			MainTreeView.IsKeyboardFocusWithinChanged += MainTreeView_IsKeyboardFocusWithinChanged;
+		}
+
+		private void MainTreeView_IsKeyboardFocusWithinChanged(object sender, DependencyPropertyChangedEventArgs e)
+		{
+			if (!(e.NewValue is bool isKeyboardFocusWithin) || !isKeyboardFocusWithin)
+				return;
+
+			//ツリーの外からフォーカスが移ってくると、WPFが選択中の項目にフォーカスを与える過程で
+			//BringIntoViewが呼ばれ、選択項目の位置までスクロールしてしまう。
+			//フォーカス移動に伴う一連の処理の間だけ自動スクロールを抑制する。
+			suppressBringIntoView = true;
+
+			//BringIntoViewはDispatcherPriority.Loadedで遅延実行される場合があるため、それより低い優先度で解除する
+			Dispatcher.BeginInvoke(new Action(() => suppressBringIntoView = false), DispatcherPriority.Input);
 		}
 
 		private void TreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
@@ -106,6 +124,10 @@ namespace Satolist2.Control
 		{
 			//デフォルトの水平・垂直両方向のスクロールを抑制
 			e.Handled = true;
+
+			//フォーカスがツリーの外から移ってきた直後は、選択項目の位置へスクロールさせない
+			if (suppressBringIntoView)
+				return;
 
 			//垂直方向のみ手動でスクロールする
 			if (!(sender is TreeViewItem treeViewItem))
