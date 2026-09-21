@@ -118,6 +118,9 @@ resource.update.error,Can't check SSP's version.
 
 resource.schedule.type,Event,Meeting,Appointment,Reservation,Deadline,Party,Date,Work,Outing,TV,Program recording,CD release,Game release,Video/DVD release,Book/Magazine date,Other release
 
+resource.archive.initial,Compression window\nDropping files or folders here will add them to the compression queue.\nThe original files will neither be deleted nor modified.
+resource.archive.extract,Extraction Window\nDrag files or folders freely from here and\ndrop them in the location where you would like to extract them.
+
 //Script
 script.biff.check,Checking email...
 script.biff.result,Emails have arrived.\n%1 email(s), %2 byte(s).

@@ -2,10 +2,7 @@ charset,Shift_JIS
 type,balloon
 name,SSPデフォルト+
 
-origin.x,14
-origin.y,14
-
-wordwrappoint.x,-30
+wordwrappoint.x,-25
 wordwrappoint.y,0
 
 font.height,12
@@ -45,25 +42,25 @@ number.font.color.b,0
 number.xr,-28
 number.y,-20
 
-onlinemarker.x,8
+onlinemarker.x,17
 onlinemarker.y,-22
 
-sstpmarker.x,8
+sstpmarker.x,17
 sstpmarker.y,-18
 
-sstpmessage.x,20
+sstpmessage.x,29
 sstpmessage.y,-20
 
 sstpmessage.font.height,10
 
-arrow0.x,304
+arrow0.x,-20
 arrow0.y,8
-arrow1.x,304
+arrow1.x,-20
 arrow1.y,-18
 
-validrect.left,0
-validrect.top,0
-validrect.right,0
+validrect.left,23
+validrect.top,14
+validrect.right,-23
 validrect.bottom,-12
 
 communicatebox.x,8
@@ -71,8 +68,9 @@ communicatebox.y,18
 communicatebox.width,301
 communicatebox.height,18
 
-craftmanw,菜方柾津 + 解凍まろん
-craftmanurl,http://home3.highway.ne.jp/nakata/
+craftmanw,菜方柾津+解凍まろん+SSPBT
+craftmanurl,http://www.lululila.jp/
 
 homeurl,http://ssp.shillest.net/update/balloon/ssp/
 
+x-ssp.run_delete_txt,1
