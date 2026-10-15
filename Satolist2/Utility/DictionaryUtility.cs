@@ -348,6 +348,7 @@ namespace Satolist2.Utility
 		public const string SaveBackupFileName = "satori_savebackup.txt";
 
 		//変数
+		public const string SaveDataKey = "＊セーブデータ";
 		public const string VariableDictionaryDirectory = "辞書フォルダ";
 
 		//変数初期化
@@ -423,7 +424,10 @@ namespace Satolist2.Utility
 	//セーブデータ解析
 	public class SaveDataBuilder
 	{
+		// 読み込みに成功しているか
 		public bool Loaded { get; private set; }
+		// セーブデータ情報を検出しているか
+		public bool SaveDataFound { get; private set; }
 
 		public Dictionary<string, string> SaveData { get; }
 
@@ -433,9 +437,20 @@ namespace Satolist2.Utility
 			SaveData = new Dictionary<string, string>();
 
 			//規定のファイルからロードを試みる
-			if(!Deserialize(ghost.FullDictionaryPath + "/" + Constants.SaveDataFileName, ghost.BootConf.SavedataEncoding))
+			if (!Deserialize(ghost.FullDictionaryPath + "/" + Constants.SaveDataFileName, ghost.BootConf.SavedataEncoding))
 			{
 				Deserialize(ghost.FullDictionaryPath + "/" + Constants.SaveBackupFileName, ghost.BootConf.SavedataEncoding);
+			}
+
+			//「読み込みエラーは起きてないがセーブデータを検出できなかった」場合、エンコーディングが間違ってる可能性がある。
+			//里々2の場合設定なしでUTF-8を使うので、UTF-8でない場合に限りUTF-8にフォールバックする
+			if (Loaded && !SaveDataFound && !ghost.BootConf.IsUtf8Savedata)
+			{
+				//規定のファイルからロードを試みる
+				if (!Deserialize(ghost.FullDictionaryPath + "/" + Constants.SaveDataFileName, Encoding.UTF8))
+				{
+					Deserialize(ghost.FullDictionaryPath + "/" + Constants.SaveBackupFileName, Encoding.UTF8);
+				}
 			}
 		}
 
@@ -444,13 +459,25 @@ namespace Satolist2.Utility
 			SaveData = new Dictionary<string, string>();
 		}
 
+		// 読み込み専用。もし書き込む必要がある場合はエンコーディングに注意しないといけない
 		public bool Deserialize(string path, Encoding encoding)
 		{
 			try
 			{
 				string[] lines = File.ReadAllLines(path, encoding);
+				bool savedataFound = false;
 				foreach (var line in lines)
 				{
+					// ＊セーブデータ まで読み捨てる
+					if(!savedataFound)
+					{
+						if(line == Constants.SaveDataKey)
+						{
+							savedataFound = true;
+						}
+						continue;
+					}
+
 					if (line.IndexOf(Constants.VariableHead) == 0)
 					{
 						var sp = line.Substring(1).Split(Constants.TabSeparator, 2, StringSplitOptions.RemoveEmptyEntries);
@@ -461,10 +488,12 @@ namespace Satolist2.Utility
 					}
 				}
 				Loaded = true;
+				SaveDataFound = savedataFound;
 			}
 			catch
 			{
 				Loaded = false;
+				SaveDataFound = false;
 				SaveData.Clear();
 			}
 			return Loaded;
