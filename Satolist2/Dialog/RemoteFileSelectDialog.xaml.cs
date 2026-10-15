@@ -146,7 +146,6 @@ namespace Satolist2.Dialog
 		public RemoteFileSelectDialogViewModel(RemoteFileSelectDialog dialog, FtpAccount account, string directory = "")
 		{
 			Domain = account.url;
-			createDirectory = new List<CreateDirectoryRecord>();
 			items = new ObservableCollection<FileListItem>();
 			itemsView = CollectionViewSource.GetDefaultView(items);
 			itemsView.SortDescriptions.Add(new SortDescription(nameof(FileListItem.Name), ListSortDirection.Ascending));
@@ -170,21 +169,8 @@ namespace Satolist2.Dialog
 					inputDialog.DataContext = vm;
 					if (inputDialog.ShowDialog() == true)
 					{
-						createDirectory.Add(new CreateDirectoryRecord()
-						{
-							parent = currentPath,
-							name = vm.Text
-						});
-						var newItem = new FileListItem()
-						{
-							FullName = string.Concat(currentPath, "/", vm.Text),
-							Name = vm.Text,
-							Type = FileListItemType.NewDirectory,
-							IsSelected = true
-						};
-						items.Insert(0, newItem);
-						itemsView.Refresh();
-						dialog.MainList.ScrollIntoView(newItem);
+						// ディレクトリを進める
+						CurrentPath = Utility.DictionaryUtility.ConbinePath(currentPath,  vm.Text);
 					}
 				}
 				);
@@ -320,19 +306,6 @@ namespace Satolist2.Dialog
 				{
 					currentPath = request.ResultCurrentPath;
 					NotifyChanged(nameof(CurrentPath));
-				}
-
-				foreach(var item in createDirectory)
-				{
-					if(item.parent == currentPath)
-					{
-						items.Add(new FileListItem()
-						{ 
-							FullName = string.Concat(currentPath, "/", item.name),
-							Name = item.name,
-							Type = FileListItemType.NewDirectory
-						});
-					}
 				}
 
 				foreach (var item in request.Result)

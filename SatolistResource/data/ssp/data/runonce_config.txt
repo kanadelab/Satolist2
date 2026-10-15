@@ -1,0 +1,8 @@
+Charset,UTF-8
+HighDPIAware,1
+SelfUpdate.Auto,auto
+Inet.ConnectionLimit,0
+Proxy.type,none
+Proxy.SystemSetting,0
+SensorMode,disable
+autoupdate.enable,1

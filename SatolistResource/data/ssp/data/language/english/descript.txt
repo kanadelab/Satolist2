@@ -31,7 +31,7 @@ craftman,SSP BUGTRAQ
 craftmanurl,http://ssp.shillest.net/
 
 //Network Update URL
-homeurl,http://ssp.shillest.net/update/language/english/
+homeurl,https://raw.githubusercontent.com/ukatech/ssp-i18n/master/languages/english/
 
 //Popup menu font name and height
 //menu.font.name,
