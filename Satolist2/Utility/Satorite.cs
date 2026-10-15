@@ -60,7 +60,7 @@ namespace Satolist2.Utility
 				var saveData = new SaveDataBuilder(ghost);
 				var dictionaryDirectory = ".";
 
-				if (saveData.Loaded && saveData.SaveData.ContainsKey(Constants.VariableDictionaryDirectory))
+				if (saveData.SaveDataFound && saveData.SaveData.ContainsKey(Constants.VariableDictionaryDirectory))
 				{
 					dictionaryDirectory = null;
 
